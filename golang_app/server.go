@@ -1,22 +1,23 @@
 package main
 
 import (
+	"fmt"
+	"log"
+
+	"github.com/asma12a/challenge-s6/config"
 	"github.com/asma12a/challenge-s6/database"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/lpernett/godotenv"
 )
 
 func main() {
+	config.LoadEnvironmentFile()
 
-	err := godotenv.Load()
-	if err != nil {
-		panic("Error loading .env file")
-	}
+	db_client := database.GetClient()
+	defer db_client.Close()
 
 	app := fiber.New()
 	app.Use(cors.New())
-	database.ConnectDB()
 
-	app.Listen(":3001")
+	log.Fatal(app.Listen(fmt.Sprintf(":%s", config.Env.APIPort)))
 }
