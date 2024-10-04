@@ -12,7 +12,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/asma12a/challenge-s6/ent/todo"
 	"github.com/asma12a/challenge-s6/ent/user"
 )
 
@@ -74,7 +73,6 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			todo.Table: todo.ValidColumn,
 			user.Table: user.ValidColumn,
 		})
 	})
