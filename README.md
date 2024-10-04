@@ -27,6 +27,18 @@ Migration de la base de données
 go run database/migrate/main.go
 ```
 
+Créer un modèle
+
+```
+go run entgo.io/ent/cmd/ent new <nom-de-modele>
+```
+
+Après avoir édité le modèle:
+
+```
+go generate ./ent
+```
+
 ### Flutter
 
 Lancer l'application
