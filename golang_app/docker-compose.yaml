@@ -5,13 +5,13 @@ services:
     image: postgres:16
     container_name: go_project_postgres
     volumes:
-      - postgresdata:/var/lib/postgresql/data
+      - ./postgresdata:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: ${POSTGRES_DATABASE}
-      POSTGRES_USER: ${POSTGRES_USERNAME}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
-      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+      - 5432:5432
     restart: unless-stopped
     networks:
       - mynetwork
@@ -31,14 +31,14 @@ services:
     ulimits:
       memlock: -1
     ports:
-      - ${DRAGONFLY_PORT}:${DRAGONFLY_PORT}
+      - 6379:6379
     # For better performance, consider `host` mode instead `port` to avoid docker NAT.
     # `host` mode is NOT currently supported in Swarm Mode.
     # https://docs.docker.com/compose/compose-file/compose-file-v3/#network_mode
     # network_mode: "host"
     restart: unless-stopped
     volumes:
-      - dragonflydata:/data
+      - ./dragonflydata:/data
     networks:
       - mynetwork
 

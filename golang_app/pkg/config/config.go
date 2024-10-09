@@ -9,13 +9,12 @@ import (
 )
 
 type Environment struct {
-	DBHost        string
-	DBPort        string
-	DBUser        string
-	DBPass        string
-	DBName        string
-	APIPort       string
-	DragonFlyPort string
+	DBHost  string
+	DBPort  string
+	DBUser  string
+	DBPass  string
+	DBName  string
+	APIPort string
 }
 
 var Env *Environment
@@ -39,12 +38,11 @@ func LoadEnvironment() {
 	Env.DBPass = getEnv("DB_PASS", true)
 	Env.DBName = getEnv("DB_NAME", true)
 	Env.APIPort = getEnv("API_PORT", true)
-	Env.DragonFlyPort = getEnv("DRAGONFLY_PORT", true)
 }
 
-func LoadEnvironmentFile() {
-	if err := godotenv.Load(); err != nil {
-		fmt.Printf("Error on load environment file: %s", err)
+func LoadEnvironmentFile(file string) {
+	if err := godotenv.Load(file); err != nil {
+		fmt.Printf("Error on load environment file: %s", file)
 	}
 	LoadEnvironment()
 }
