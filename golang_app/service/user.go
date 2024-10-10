@@ -10,7 +10,7 @@ type User struct {
 	db *ent.Client
 }
 
-func NewService(client *ent.Client) *User {
+func NewUserService(client *ent.Client) *User {
 	return &User{
 		db: client,
 	}

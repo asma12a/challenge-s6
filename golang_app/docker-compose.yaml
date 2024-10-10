@@ -5,13 +5,13 @@ services:
     image: postgres:16
     container_name: go_project_postgres
     volumes:
-      - postgresdata:/var/lib/postgresql/data
+      - ./postgresdata:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: ${POSTGRES_DATABASE}
-      POSTGRES_USER: ${POSTGRES_USERNAME}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
     ports:
-      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+      - ${DB_PORT}:${DB_PORT}
     restart: unless-stopped
     networks:
       - mynetwork
@@ -38,7 +38,7 @@ services:
     # network_mode: "host"
     restart: unless-stopped
     volumes:
-      - dragonflydata:/data
+      - ./dragonflydata:/data
     networks:
       - mynetwork
 
