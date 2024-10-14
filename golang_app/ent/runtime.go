@@ -3,14 +3,52 @@
 package ent
 
 import (
+	"time"
+
+	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/schema"
 	"github.com/asma12a/challenge-s6/ent/user"
+	"github.com/google/uuid"
 )
 
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	eventFields := schema.Event{}.Fields()
+	_ = eventFields
+	// eventDescName is the schema descriptor for name field.
+	eventDescName := eventFields[1].Descriptor()
+	// event.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	event.NameValidator = eventDescName.Validators[0].(func(string) error)
+	// eventDescAddress is the schema descriptor for address field.
+	eventDescAddress := eventFields[2].Descriptor()
+	// event.AddressValidator is a validator for the "address" field. It is called by the builders before save.
+	event.AddressValidator = eventDescAddress.Validators[0].(func(string) error)
+	// eventDescEventCode is the schema descriptor for event_code field.
+	eventDescEventCode := eventFields[3].Descriptor()
+	// event.EventCodeValidator is a validator for the "event_code" field. It is called by the builders before save.
+	event.EventCodeValidator = eventDescEventCode.Validators[0].(func(int16) error)
+	// eventDescDate is the schema descriptor for date field.
+	eventDescDate := eventFields[4].Descriptor()
+	// event.DateValidator is a validator for the "date" field. It is called by the builders before save.
+	event.DateValidator = eventDescDate.Validators[0].(func(string) error)
+	// eventDescCreatedAt is the schema descriptor for created_at field.
+	eventDescCreatedAt := eventFields[5].Descriptor()
+	// event.DefaultCreatedAt holds the default value on creation for the created_at field.
+	event.DefaultCreatedAt = eventDescCreatedAt.Default.(func() time.Time)
+	// eventDescIsPublic is the schema descriptor for is_public field.
+	eventDescIsPublic := eventFields[6].Descriptor()
+	// event.DefaultIsPublic holds the default value on creation for the is_public field.
+	event.DefaultIsPublic = eventDescIsPublic.Default.(bool)
+	// eventDescIsFinished is the schema descriptor for is_finished field.
+	eventDescIsFinished := eventFields[7].Descriptor()
+	// event.DefaultIsFinished holds the default value on creation for the is_finished field.
+	event.DefaultIsFinished = eventDescIsFinished.Default.(bool)
+	// eventDescID is the schema descriptor for id field.
+	eventDescID := eventFields[0].Descriptor()
+	// event.DefaultID holds the default value on creation for the id field.
+	event.DefaultID = eventDescID.Default.(func() uuid.UUID)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescPassword is the schema descriptor for password field.
