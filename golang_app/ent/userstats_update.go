@@ -12,7 +12,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/asma12a/challenge-s6/ent/predicate"
 	"github.com/asma12a/challenge-s6/ent/userstats"
-	"github.com/google/uuid"
 )
 
 // UserStatsUpdate is the builder for updating UserStats entities.
@@ -43,15 +42,15 @@ func (usu *UserStatsUpdate) SetNillableUserID(s *string) *UserStatsUpdate {
 }
 
 // SetEventID sets the "event_id" field.
-func (usu *UserStatsUpdate) SetEventID(u uuid.UUID) *UserStatsUpdate {
-	usu.mutation.SetEventID(u)
+func (usu *UserStatsUpdate) SetEventID(s string) *UserStatsUpdate {
+	usu.mutation.SetEventID(s)
 	return usu
 }
 
 // SetNillableEventID sets the "event_id" field if the given value is not nil.
-func (usu *UserStatsUpdate) SetNillableEventID(u *uuid.UUID) *UserStatsUpdate {
-	if u != nil {
-		usu.SetEventID(*u)
+func (usu *UserStatsUpdate) SetNillableEventID(s *string) *UserStatsUpdate {
+	if s != nil {
+		usu.SetEventID(*s)
 	}
 	return usu
 }
@@ -88,8 +87,26 @@ func (usu *UserStatsUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (usu *UserStatsUpdate) check() error {
+	if v, ok := usu.mutation.UserID(); ok {
+		if err := userstats.UserIDValidator(v); err != nil {
+			return &ValidationError{Name: "user_id", err: fmt.Errorf(`ent: validator failed for field "UserStats.user_id": %w`, err)}
+		}
+	}
+	if v, ok := usu.mutation.EventID(); ok {
+		if err := userstats.EventIDValidator(v); err != nil {
+			return &ValidationError{Name: "event_id", err: fmt.Errorf(`ent: validator failed for field "UserStats.event_id": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (usu *UserStatsUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := sqlgraph.NewUpdateSpec(userstats.Table, userstats.Columns, sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeUUID))
+	if err := usu.check(); err != nil {
+		return n, err
+	}
+	_spec := sqlgraph.NewUpdateSpec(userstats.Table, userstats.Columns, sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString))
 	if ps := usu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -101,7 +118,7 @@ func (usu *UserStatsUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(userstats.FieldUserID, field.TypeString, value)
 	}
 	if value, ok := usu.mutation.EventID(); ok {
-		_spec.SetField(userstats.FieldEventID, field.TypeUUID, value)
+		_spec.SetField(userstats.FieldEventID, field.TypeString, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, usu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -138,15 +155,15 @@ func (usuo *UserStatsUpdateOne) SetNillableUserID(s *string) *UserStatsUpdateOne
 }
 
 // SetEventID sets the "event_id" field.
-func (usuo *UserStatsUpdateOne) SetEventID(u uuid.UUID) *UserStatsUpdateOne {
-	usuo.mutation.SetEventID(u)
+func (usuo *UserStatsUpdateOne) SetEventID(s string) *UserStatsUpdateOne {
+	usuo.mutation.SetEventID(s)
 	return usuo
 }
 
 // SetNillableEventID sets the "event_id" field if the given value is not nil.
-func (usuo *UserStatsUpdateOne) SetNillableEventID(u *uuid.UUID) *UserStatsUpdateOne {
-	if u != nil {
-		usuo.SetEventID(*u)
+func (usuo *UserStatsUpdateOne) SetNillableEventID(s *string) *UserStatsUpdateOne {
+	if s != nil {
+		usuo.SetEventID(*s)
 	}
 	return usuo
 }
@@ -196,8 +213,26 @@ func (usuo *UserStatsUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (usuo *UserStatsUpdateOne) check() error {
+	if v, ok := usuo.mutation.UserID(); ok {
+		if err := userstats.UserIDValidator(v); err != nil {
+			return &ValidationError{Name: "user_id", err: fmt.Errorf(`ent: validator failed for field "UserStats.user_id": %w`, err)}
+		}
+	}
+	if v, ok := usuo.mutation.EventID(); ok {
+		if err := userstats.EventIDValidator(v); err != nil {
+			return &ValidationError{Name: "event_id", err: fmt.Errorf(`ent: validator failed for field "UserStats.event_id": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (usuo *UserStatsUpdateOne) sqlSave(ctx context.Context) (_node *UserStats, err error) {
-	_spec := sqlgraph.NewUpdateSpec(userstats.Table, userstats.Columns, sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeUUID))
+	if err := usuo.check(); err != nil {
+		return _node, err
+	}
+	_spec := sqlgraph.NewUpdateSpec(userstats.Table, userstats.Columns, sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString))
 	id, ok := usuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "UserStats.id" for update`)}
@@ -226,7 +261,7 @@ func (usuo *UserStatsUpdateOne) sqlSave(ctx context.Context) (_node *UserStats, 
 		_spec.SetField(userstats.FieldUserID, field.TypeString, value)
 	}
 	if value, ok := usuo.mutation.EventID(); ok {
-		_spec.SetField(userstats.FieldEventID, field.TypeUUID, value)
+		_spec.SetField(userstats.FieldEventID, field.TypeString, value)
 	}
 	_node = &UserStats{config: usuo.config}
 	_spec.Assign = _node.assignValues

@@ -11,9 +11,9 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/asma12a/challenge-s6/ent/predicate"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/user"
 	"github.com/asma12a/challenge-s6/ent/userstats"
-	ulid "github.com/oklog/ulid/v2"
 )
 
 // UserUpdate is the builder for updating User entities.
@@ -86,14 +86,14 @@ func (uu *UserUpdate) SetNillableRole(s *string) *UserUpdate {
 }
 
 // AddUserStatIDs adds the "user_stats" edge to the UserStats entity by IDs.
-func (uu *UserUpdate) AddUserStatIDs(ids ...ulid.ULID) *UserUpdate {
+func (uu *UserUpdate) AddUserStatIDs(ids ...ulid.ID) *UserUpdate {
 	uu.mutation.AddUserStatIDs(ids...)
 	return uu
 }
 
 // AddUserStats adds the "user_stats" edges to the UserStats entity.
 func (uu *UserUpdate) AddUserStats(u ...*UserStats) *UserUpdate {
-	ids := make([]ulid.ULID, len(u))
+	ids := make([]ulid.ID, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
@@ -112,14 +112,14 @@ func (uu *UserUpdate) ClearUserStats() *UserUpdate {
 }
 
 // RemoveUserStatIDs removes the "user_stats" edge to UserStats entities by IDs.
-func (uu *UserUpdate) RemoveUserStatIDs(ids ...ulid.ULID) *UserUpdate {
+func (uu *UserUpdate) RemoveUserStatIDs(ids ...ulid.ID) *UserUpdate {
 	uu.mutation.RemoveUserStatIDs(ids...)
 	return uu
 }
 
 // RemoveUserStats removes "user_stats" edges to UserStats entities.
 func (uu *UserUpdate) RemoveUserStats(u ...*UserStats) *UserUpdate {
-	ids := make([]ulid.ULID, len(u))
+	ids := make([]ulid.ID, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
@@ -210,7 +210,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{user.UserStatsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -223,7 +223,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{user.UserStatsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -239,7 +239,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{user.UserStatsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -324,14 +324,14 @@ func (uuo *UserUpdateOne) SetNillableRole(s *string) *UserUpdateOne {
 }
 
 // AddUserStatIDs adds the "user_stats" edge to the UserStats entity by IDs.
-func (uuo *UserUpdateOne) AddUserStatIDs(ids ...ulid.ULID) *UserUpdateOne {
+func (uuo *UserUpdateOne) AddUserStatIDs(ids ...ulid.ID) *UserUpdateOne {
 	uuo.mutation.AddUserStatIDs(ids...)
 	return uuo
 }
 
 // AddUserStats adds the "user_stats" edges to the UserStats entity.
 func (uuo *UserUpdateOne) AddUserStats(u ...*UserStats) *UserUpdateOne {
-	ids := make([]ulid.ULID, len(u))
+	ids := make([]ulid.ID, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
@@ -350,14 +350,14 @@ func (uuo *UserUpdateOne) ClearUserStats() *UserUpdateOne {
 }
 
 // RemoveUserStatIDs removes the "user_stats" edge to UserStats entities by IDs.
-func (uuo *UserUpdateOne) RemoveUserStatIDs(ids ...ulid.ULID) *UserUpdateOne {
+func (uuo *UserUpdateOne) RemoveUserStatIDs(ids ...ulid.ID) *UserUpdateOne {
 	uuo.mutation.RemoveUserStatIDs(ids...)
 	return uuo
 }
 
 // RemoveUserStats removes "user_stats" edges to UserStats entities.
 func (uuo *UserUpdateOne) RemoveUserStats(u ...*UserStats) *UserUpdateOne {
-	ids := make([]ulid.ULID, len(u))
+	ids := make([]ulid.ID, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
@@ -478,7 +478,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: []string{user.UserStatsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -491,7 +491,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: []string{user.UserStatsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -507,7 +507,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: []string{user.UserStatsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

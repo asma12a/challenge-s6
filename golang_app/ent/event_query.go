@@ -14,8 +14,8 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/predicate"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/userstats"
-	"github.com/google/uuid"
 )
 
 // EventQuery is the builder for querying Event entities.
@@ -108,8 +108,8 @@ func (eq *EventQuery) FirstX(ctx context.Context) *Event {
 
 // FirstID returns the first Event ID from the query.
 // Returns a *NotFoundError when no Event ID was found.
-func (eq *EventQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (eq *EventQuery) FirstID(ctx context.Context) (id ulid.ID, err error) {
+	var ids []ulid.ID
 	if ids, err = eq.Limit(1).IDs(setContextOp(ctx, eq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
@@ -121,7 +121,7 @@ func (eq *EventQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (eq *EventQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (eq *EventQuery) FirstIDX(ctx context.Context) ulid.ID {
 	id, err := eq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -159,8 +159,8 @@ func (eq *EventQuery) OnlyX(ctx context.Context) *Event {
 // OnlyID is like Only, but returns the only Event ID in the query.
 // Returns a *NotSingularError when more than one Event ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (eq *EventQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (eq *EventQuery) OnlyID(ctx context.Context) (id ulid.ID, err error) {
+	var ids []ulid.ID
 	if ids, err = eq.Limit(2).IDs(setContextOp(ctx, eq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
@@ -176,7 +176,7 @@ func (eq *EventQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (eq *EventQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (eq *EventQuery) OnlyIDX(ctx context.Context) ulid.ID {
 	id, err := eq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -204,7 +204,7 @@ func (eq *EventQuery) AllX(ctx context.Context) []*Event {
 }
 
 // IDs executes the query and returns a list of Event IDs.
-func (eq *EventQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
+func (eq *EventQuery) IDs(ctx context.Context) (ids []ulid.ID, err error) {
 	if eq.ctx.Unique == nil && eq.path != nil {
 		eq.Unique(true)
 	}
@@ -216,7 +216,7 @@ func (eq *EventQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (eq *EventQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (eq *EventQuery) IDsX(ctx context.Context) []ulid.ID {
 	ids, err := eq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -406,7 +406,7 @@ func (eq *EventQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Event,
 
 func (eq *EventQuery) loadUserStatsID(ctx context.Context, query *UserStatsQuery, nodes []*Event, init func(*Event), assign func(*Event, *UserStats)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[uuid.UUID]*Event)
+	nodeids := make(map[ulid.ID]*Event)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -446,7 +446,7 @@ func (eq *EventQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (eq *EventQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(event.Table, event.Columns, sqlgraph.NewFieldSpec(event.FieldID, field.TypeUUID))
+	_spec := sqlgraph.NewQuerySpec(event.Table, event.Columns, sqlgraph.NewFieldSpec(event.FieldID, field.TypeString))
 	_spec.From = eq.sql
 	if unique := eq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

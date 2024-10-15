@@ -9,9 +9,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/userstats"
-	"github.com/google/uuid"
-	ulid "github.com/oklog/ulid/v2"
 )
 
 // UserStatsCreate is the builder for creating a UserStats entity.
@@ -28,14 +27,22 @@ func (usc *UserStatsCreate) SetUserID(s string) *UserStatsCreate {
 }
 
 // SetEventID sets the "event_id" field.
-func (usc *UserStatsCreate) SetEventID(u uuid.UUID) *UserStatsCreate {
-	usc.mutation.SetEventID(u)
+func (usc *UserStatsCreate) SetEventID(s string) *UserStatsCreate {
+	usc.mutation.SetEventID(s)
 	return usc
 }
 
 // SetID sets the "id" field.
-func (usc *UserStatsCreate) SetID(u ulid.ULID) *UserStatsCreate {
+func (usc *UserStatsCreate) SetID(u ulid.ID) *UserStatsCreate {
 	usc.mutation.SetID(u)
+	return usc
+}
+
+// SetNillableID sets the "id" field if the given value is not nil.
+func (usc *UserStatsCreate) SetNillableID(u *ulid.ID) *UserStatsCreate {
+	if u != nil {
+		usc.SetID(*u)
+	}
 	return usc
 }
 
@@ -46,6 +53,7 @@ func (usc *UserStatsCreate) Mutation() *UserStatsMutation {
 
 // Save creates the UserStats in the database.
 func (usc *UserStatsCreate) Save(ctx context.Context) (*UserStats, error) {
+	usc.defaults()
 	return withHooks(ctx, usc.sqlSave, usc.mutation, usc.hooks)
 }
 
@@ -71,13 +79,31 @@ func (usc *UserStatsCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (usc *UserStatsCreate) defaults() {
+	if _, ok := usc.mutation.ID(); !ok {
+		v := userstats.DefaultID()
+		usc.mutation.SetID(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (usc *UserStatsCreate) check() error {
 	if _, ok := usc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "UserStats.user_id"`)}
 	}
+	if v, ok := usc.mutation.UserID(); ok {
+		if err := userstats.UserIDValidator(v); err != nil {
+			return &ValidationError{Name: "user_id", err: fmt.Errorf(`ent: validator failed for field "UserStats.user_id": %w`, err)}
+		}
+	}
 	if _, ok := usc.mutation.EventID(); !ok {
 		return &ValidationError{Name: "event_id", err: errors.New(`ent: missing required field "UserStats.event_id"`)}
+	}
+	if v, ok := usc.mutation.EventID(); ok {
+		if err := userstats.EventIDValidator(v); err != nil {
+			return &ValidationError{Name: "event_id", err: fmt.Errorf(`ent: validator failed for field "UserStats.event_id": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -94,7 +120,7 @@ func (usc *UserStatsCreate) sqlSave(ctx context.Context) (*UserStats, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*ulid.ULID); ok {
+		if id, ok := _spec.ID.Value.(*ulid.ID); ok {
 			_node.ID = *id
 		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
 			return nil, err
@@ -108,7 +134,7 @@ func (usc *UserStatsCreate) sqlSave(ctx context.Context) (*UserStats, error) {
 func (usc *UserStatsCreate) createSpec() (*UserStats, *sqlgraph.CreateSpec) {
 	var (
 		_node = &UserStats{config: usc.config}
-		_spec = sqlgraph.NewCreateSpec(userstats.Table, sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeUUID))
+		_spec = sqlgraph.NewCreateSpec(userstats.Table, sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString))
 	)
 	if id, ok := usc.mutation.ID(); ok {
 		_node.ID = id
@@ -119,7 +145,7 @@ func (usc *UserStatsCreate) createSpec() (*UserStats, *sqlgraph.CreateSpec) {
 		_node.UserID = value
 	}
 	if value, ok := usc.mutation.EventID(); ok {
-		_spec.SetField(userstats.FieldEventID, field.TypeUUID, value)
+		_spec.SetField(userstats.FieldEventID, field.TypeString, value)
 		_node.EventID = value
 	}
 	return _node, _spec
@@ -143,6 +169,7 @@ func (uscb *UserStatsCreateBulk) Save(ctx context.Context) ([]*UserStats, error)
 	for i := range uscb.builders {
 		func(i int, root context.Context) {
 			builder := uscb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*UserStatsMutation)
 				if !ok {

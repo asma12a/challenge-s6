@@ -12,8 +12,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/asma12a/challenge-s6/ent/predicate"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/userstats"
-	ulid "github.com/oklog/ulid/v2"
 )
 
 // UserStatsQuery is the builder for querying UserStats entities.
@@ -84,8 +84,8 @@ func (usq *UserStatsQuery) FirstX(ctx context.Context) *UserStats {
 
 // FirstID returns the first UserStats ID from the query.
 // Returns a *NotFoundError when no UserStats ID was found.
-func (usq *UserStatsQuery) FirstID(ctx context.Context) (id ulid.ULID, err error) {
-	var ids []ulid.ULID
+func (usq *UserStatsQuery) FirstID(ctx context.Context) (id ulid.ID, err error) {
+	var ids []ulid.ID
 	if ids, err = usq.Limit(1).IDs(setContextOp(ctx, usq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
@@ -97,7 +97,7 @@ func (usq *UserStatsQuery) FirstID(ctx context.Context) (id ulid.ULID, err error
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (usq *UserStatsQuery) FirstIDX(ctx context.Context) ulid.ULID {
+func (usq *UserStatsQuery) FirstIDX(ctx context.Context) ulid.ID {
 	id, err := usq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -135,8 +135,8 @@ func (usq *UserStatsQuery) OnlyX(ctx context.Context) *UserStats {
 // OnlyID is like Only, but returns the only UserStats ID in the query.
 // Returns a *NotSingularError when more than one UserStats ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (usq *UserStatsQuery) OnlyID(ctx context.Context) (id ulid.ULID, err error) {
-	var ids []ulid.ULID
+func (usq *UserStatsQuery) OnlyID(ctx context.Context) (id ulid.ID, err error) {
+	var ids []ulid.ID
 	if ids, err = usq.Limit(2).IDs(setContextOp(ctx, usq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
@@ -152,7 +152,7 @@ func (usq *UserStatsQuery) OnlyID(ctx context.Context) (id ulid.ULID, err error)
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (usq *UserStatsQuery) OnlyIDX(ctx context.Context) ulid.ULID {
+func (usq *UserStatsQuery) OnlyIDX(ctx context.Context) ulid.ID {
 	id, err := usq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -180,7 +180,7 @@ func (usq *UserStatsQuery) AllX(ctx context.Context) []*UserStats {
 }
 
 // IDs executes the query and returns a list of UserStats IDs.
-func (usq *UserStatsQuery) IDs(ctx context.Context) (ids []ulid.ULID, err error) {
+func (usq *UserStatsQuery) IDs(ctx context.Context) (ids []ulid.ID, err error) {
 	if usq.ctx.Unique == nil && usq.path != nil {
 		usq.Unique(true)
 	}
@@ -192,7 +192,7 @@ func (usq *UserStatsQuery) IDs(ctx context.Context) (ids []ulid.ULID, err error)
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (usq *UserStatsQuery) IDsX(ctx context.Context) []ulid.ULID {
+func (usq *UserStatsQuery) IDsX(ctx context.Context) []ulid.ID {
 	ids, err := usq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -371,7 +371,7 @@ func (usq *UserStatsQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (usq *UserStatsQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(userstats.Table, userstats.Columns, sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeUUID))
+	_spec := sqlgraph.NewQuerySpec(userstats.Table, userstats.Columns, sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString))
 	_spec.From = usq.sql
 	if unique := usq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

@@ -14,7 +14,7 @@ import (
 func GetClient() *ent.Client {
 
 	// Postgres DSN
-	db_url := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=disable&client_encoding=utf8",
+	db_url := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=disable",
 		config.Env.DBUser,
 		config.Env.DBPass,
 		config.Env.DBHost,

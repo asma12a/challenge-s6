@@ -4,7 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/oklog/ulid/v2"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
 // User holds the schema definition for the User entity.
@@ -15,11 +15,12 @@ type User struct {
 // Fields of the User.
 func (User) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").DefaultFunc(
-			func() string {
-				return ulid.Make().String()
-			},
-		).NotEmpty().Unique().Immutable(),
+		field.String("id").GoType(ulid.ID("")).
+			DefaultFunc(
+				func() ulid.ID {
+					return ulid.MustNew("")
+				},
+			),
 		field.String("name").NotEmpty(),
 		field.String("email").NotEmpty(),
 		field.String("password").NotEmpty(),

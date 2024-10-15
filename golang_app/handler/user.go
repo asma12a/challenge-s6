@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
 	"github.com/asma12a/challenge-s6/service"
 	"github.com/gofiber/fiber/v2"
@@ -61,7 +62,7 @@ func createUser(ctx context.Context, service service.User) fiber.Handler {
 
 func getUser(ctx context.Context, service service.User) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id, err := entity.StringToID(c.Params("userId"))
+		id, err := ulid.Parse(c.Params("userId"))
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
@@ -87,7 +88,7 @@ func getUser(ctx context.Context, service service.User) fiber.Handler {
 
 func updateUser(ctx context.Context, service service.User) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id, err := entity.StringToID(c.Params("userId"))
+		id, err := ulid.Parse(c.Params("userId"))
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
@@ -135,7 +136,7 @@ func updateUser(ctx context.Context, service service.User) fiber.Handler {
 
 func deleteUser(ctx context.Context, service service.User) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id, err := entity.StringToID(c.Params("userId"))
+		id, err := ulid.Parse(c.Params("userId"))
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",

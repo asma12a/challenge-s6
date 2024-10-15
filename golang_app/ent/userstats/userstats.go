@@ -4,6 +4,7 @@ package userstats
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
 const (
@@ -47,6 +48,15 @@ func ValidColumn(column string) bool {
 	}
 	return false
 }
+
+var (
+	// UserIDValidator is a validator for the "user_id" field. It is called by the builders before save.
+	UserIDValidator func(string) error
+	// EventIDValidator is a validator for the "event_id" field. It is called by the builders before save.
+	EventIDValidator func(string) error
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() ulid.ID
+)
 
 // OrderOption defines the ordering options for the UserStats queries.
 type OrderOption func(*sql.Selector)

@@ -10,7 +10,7 @@ import (
 var (
 	// EventsColumns holds the columns for the "events" table.
 	EventsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID},
+		{Name: "id", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
 		{Name: "address", Type: field.TypeString},
 		{Name: "event_code", Type: field.TypeInt16},
@@ -27,7 +27,7 @@ var (
 	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "id", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
 		{Name: "email", Type: field.TypeString},
 		{Name: "password", Type: field.TypeString},
@@ -41,9 +41,9 @@ var (
 	}
 	// UserStatsColumns holds the columns for the "user_stats" table.
 	UserStatsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID},
+		{Name: "id", Type: field.TypeString},
 		{Name: "user_id", Type: field.TypeString},
-		{Name: "event_id", Type: field.TypeUUID},
+		{Name: "event_id", Type: field.TypeString},
 	}
 	// UserStatsTable holds the schema information for the "user_stats" table.
 	UserStatsTable = &schema.Table{

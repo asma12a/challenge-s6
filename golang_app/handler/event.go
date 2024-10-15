@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
 	"github.com/asma12a/challenge-s6/service"
 	"github.com/gofiber/fiber/v2"
@@ -41,9 +42,8 @@ func createEvent(ctx context.Context, service service.Event) fiber.Handler {
 		createdEvent, err := service.Create(ctx, newEvent)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": err,
-				"error":        err.Error(),
+				"status": "error",
+				"error":  err.Error(),
 			})
 		}
 
@@ -57,7 +57,8 @@ func createEvent(ctx context.Context, service service.Event) fiber.Handler {
 
 func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id, err := entity.StringToID(c.Params("eventId"))
+
+		id, err := ulid.Parse(c.Params("eventId"))
 
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
@@ -84,7 +85,7 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 
 func updateEvent(ctx context.Context, service service.Event) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id, err := entity.StringToID(c.Params("eventId"))
+		id, err := ulid.Parse(c.Params("eventId"))
 		if err != nil {
 			log.Printf("Erreur lors de la conversion de l'ID: %v", err)
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
@@ -124,7 +125,7 @@ func updateEvent(ctx context.Context, service service.Event) fiber.Handler {
 
 func deleteEvent(ctx context.Context, service service.Event) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id, err := entity.StringToID(c.Params("eventId"))
+		id, err := ulid.Parse(c.Params("eventId"))
 
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{

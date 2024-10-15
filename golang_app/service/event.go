@@ -5,6 +5,7 @@ import (
 
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/event"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
 )
 
@@ -29,13 +30,13 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event) (*ent.Event,
 		Save(ctx)
 
 	if err != nil {
-		return nil, entity.ErrCannotBeCreated
+		return nil, err
 	}
 
 	return entEvent, nil
 }
 
-func (e *Event) FindOne(ctx context.Context, id entity.ID) (*ent.Event, error) {
+func (e *Event) FindOne(ctx context.Context, id ulid.ID) (*ent.Event, error) {
 	return e.db.Event.Query().Where(event.IDEQ(id)).Only(ctx)
 }
 
@@ -58,7 +59,7 @@ func (repo *Event) Update(ctx context.Context, event *entity.Event) (*ent.Event,
 	return entEvent, nil
 }
 
-func (e *Event) Delete(ctx context.Context, id entity.ID) error {
+func (e *Event) Delete(ctx context.Context, id ulid.ID) error {
 	err := e.db.Event.DeleteOneID(id).Exec(ctx)
 	if err != nil {
 		return entity.ErrCannotBeDeleted

@@ -3,8 +3,7 @@ package schema
 import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
-	"github.com/oklog/ulid/v2"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
 // UserStats holds the schema definition for the UserStats entity.
@@ -15,9 +14,14 @@ type UserStats struct {
 // Fields of the UserStats.
 func (UserStats) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("id", ulid.ULID{}),
-		field.String("user_id"),
-		field.UUID("event_id", uuid.UUID{}),
+		field.String("id").GoType(ulid.ID("")).
+			DefaultFunc(
+				func() ulid.ID {
+					return ulid.MustNew("")
+				},
+			),
+		field.String("user_id").NotEmpty(),
+		field.String("event_id").NotEmpty(),
 	}
 
 }

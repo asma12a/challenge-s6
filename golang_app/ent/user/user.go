@@ -5,6 +5,7 @@ package user
 import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
 const (
@@ -64,9 +65,7 @@ var (
 	// RoleValidator is a validator for the "role" field. It is called by the builders before save.
 	RoleValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
-	DefaultID func() string
-	// IDValidator is a validator for the "id" field. It is called by the builders before save.
-	IDValidator func(string) error
+	DefaultID func() ulid.ID
 )
 
 // OrderOption defines the ordering options for the User queries.

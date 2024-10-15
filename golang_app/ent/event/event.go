@@ -7,7 +7,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/google/uuid"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
 const (
@@ -80,7 +80,7 @@ var (
 	// DefaultIsFinished holds the default value on creation for the "is_finished" field.
 	DefaultIsFinished bool
 	// DefaultID holds the default value on creation for the "id" field.
-	DefaultID func() uuid.UUID
+	DefaultID func() ulid.ID
 )
 
 // OrderOption defines the ordering options for the Event queries.

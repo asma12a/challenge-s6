@@ -10,14 +10,14 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/asma12a/challenge-s6/ent/event"
-	"github.com/google/uuid"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
 // Event is the model entity for the Event schema.
 type Event struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID uuid.UUID `json:"id,omitempty"`
+	ID ulid.ID `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Address holds the value of the "address" field.
@@ -70,7 +70,7 @@ func (*Event) scanValues(columns []string) ([]any, error) {
 		case event.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
 		case event.FieldID:
-			values[i] = new(uuid.UUID)
+			values[i] = new(ulid.ID)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -87,7 +87,7 @@ func (e *Event) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case event.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*ulid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
 				e.ID = *value

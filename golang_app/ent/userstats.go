@@ -8,22 +8,21 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/userstats"
-	"github.com/google/uuid"
-	ulid "github.com/oklog/ulid/v2"
 )
 
 // UserStats is the model entity for the UserStats schema.
 type UserStats struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID ulid.ULID `json:"id,omitempty"`
+	ID ulid.ID `json:"id,omitempty"`
 	// UserID holds the value of the "user_id" field.
 	UserID string `json:"user_id,omitempty"`
 	// EventID holds the value of the "event_id" field.
-	EventID      uuid.UUID `json:"event_id,omitempty"`
-	event_id     *uuid.UUID
-	user_id      *string
+	EventID      string `json:"event_id,omitempty"`
+	event_id     *ulid.ID
+	user_id      *ulid.ID
 	selectValues sql.SelectValues
 }
 
@@ -32,16 +31,14 @@ func (*UserStats) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case userstats.FieldUserID:
+		case userstats.FieldUserID, userstats.FieldEventID:
 			values[i] = new(sql.NullString)
 		case userstats.FieldID:
-			values[i] = new(ulid.ULID)
-		case userstats.FieldEventID:
-			values[i] = new(uuid.UUID)
+			values[i] = new(ulid.ID)
 		case userstats.ForeignKeys[0]: // event_id
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+			values[i] = &sql.NullScanner{S: new(ulid.ID)}
 		case userstats.ForeignKeys[1]: // user_id
-			values[i] = new(sql.NullString)
+			values[i] = &sql.NullScanner{S: new(ulid.ID)}
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -58,7 +55,7 @@ func (us *UserStats) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case userstats.FieldID:
-			if value, ok := values[i].(*ulid.ULID); !ok {
+			if value, ok := values[i].(*ulid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
 				us.ID = *value
@@ -70,24 +67,24 @@ func (us *UserStats) assignValues(columns []string, values []any) error {
 				us.UserID = value.String
 			}
 		case userstats.FieldEventID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field event_id", values[i])
-			} else if value != nil {
-				us.EventID = *value
+			} else if value.Valid {
+				us.EventID = value.String
 			}
 		case userstats.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field event_id", values[i])
 			} else if value.Valid {
-				us.event_id = new(uuid.UUID)
-				*us.event_id = *value.S.(*uuid.UUID)
+				us.event_id = new(ulid.ID)
+				*us.event_id = *value.S.(*ulid.ID)
 			}
 		case userstats.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				us.user_id = new(string)
-				*us.user_id = value.String
+				us.user_id = new(ulid.ID)
+				*us.user_id = *value.S.(*ulid.ID)
 			}
 		default:
 			us.selectValues.Set(columns[i], values[i])
@@ -129,7 +126,7 @@ func (us *UserStats) String() string {
 	builder.WriteString(us.UserID)
 	builder.WriteString(", ")
 	builder.WriteString("event_id=")
-	builder.WriteString(fmt.Sprintf("%v", us.EventID))
+	builder.WriteString(us.EventID)
 	builder.WriteByte(')')
 	return builder.String()
 }

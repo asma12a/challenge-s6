@@ -6,7 +6,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
 // Event holds the schema definition for the Event entity.
@@ -17,8 +17,12 @@ type Event struct {
 // Fields of the Event.
 func (Event) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("id", uuid.UUID{}).
-			Default(uuid.New),
+		field.String("id").GoType(ulid.ID("")).
+			DefaultFunc(
+				func() ulid.ID {
+					return ulid.MustNew("")
+				},
+			),
 		field.String("name").NotEmpty(),
 		field.String("address").NotEmpty(),
 		field.Int16("event_code").Positive(),

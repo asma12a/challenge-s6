@@ -5,52 +5,51 @@ package userstats
 import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/asma12a/challenge-s6/ent/predicate"
-	"github.com/google/uuid"
-	ulid "github.com/oklog/ulid/v2"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id ulid.ULID) predicate.UserStats {
+func ID(id ulid.ID) predicate.UserStats {
 	return predicate.UserStats(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id ulid.ULID) predicate.UserStats {
+func IDEQ(id ulid.ID) predicate.UserStats {
 	return predicate.UserStats(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id ulid.ULID) predicate.UserStats {
+func IDNEQ(id ulid.ID) predicate.UserStats {
 	return predicate.UserStats(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...ulid.ULID) predicate.UserStats {
+func IDIn(ids ...ulid.ID) predicate.UserStats {
 	return predicate.UserStats(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...ulid.ULID) predicate.UserStats {
+func IDNotIn(ids ...ulid.ID) predicate.UserStats {
 	return predicate.UserStats(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id ulid.ULID) predicate.UserStats {
+func IDGT(id ulid.ID) predicate.UserStats {
 	return predicate.UserStats(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id ulid.ULID) predicate.UserStats {
+func IDGTE(id ulid.ID) predicate.UserStats {
 	return predicate.UserStats(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id ulid.ULID) predicate.UserStats {
+func IDLT(id ulid.ID) predicate.UserStats {
 	return predicate.UserStats(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id ulid.ULID) predicate.UserStats {
+func IDLTE(id ulid.ID) predicate.UserStats {
 	return predicate.UserStats(sql.FieldLTE(FieldID, id))
 }
 
@@ -60,7 +59,7 @@ func UserID(v string) predicate.UserStats {
 }
 
 // EventID applies equality check predicate on the "event_id" field. It's identical to EventIDEQ.
-func EventID(v uuid.UUID) predicate.UserStats {
+func EventID(v string) predicate.UserStats {
 	return predicate.UserStats(sql.FieldEQ(FieldEventID, v))
 }
 
@@ -130,43 +129,68 @@ func UserIDContainsFold(v string) predicate.UserStats {
 }
 
 // EventIDEQ applies the EQ predicate on the "event_id" field.
-func EventIDEQ(v uuid.UUID) predicate.UserStats {
+func EventIDEQ(v string) predicate.UserStats {
 	return predicate.UserStats(sql.FieldEQ(FieldEventID, v))
 }
 
 // EventIDNEQ applies the NEQ predicate on the "event_id" field.
-func EventIDNEQ(v uuid.UUID) predicate.UserStats {
+func EventIDNEQ(v string) predicate.UserStats {
 	return predicate.UserStats(sql.FieldNEQ(FieldEventID, v))
 }
 
 // EventIDIn applies the In predicate on the "event_id" field.
-func EventIDIn(vs ...uuid.UUID) predicate.UserStats {
+func EventIDIn(vs ...string) predicate.UserStats {
 	return predicate.UserStats(sql.FieldIn(FieldEventID, vs...))
 }
 
 // EventIDNotIn applies the NotIn predicate on the "event_id" field.
-func EventIDNotIn(vs ...uuid.UUID) predicate.UserStats {
+func EventIDNotIn(vs ...string) predicate.UserStats {
 	return predicate.UserStats(sql.FieldNotIn(FieldEventID, vs...))
 }
 
 // EventIDGT applies the GT predicate on the "event_id" field.
-func EventIDGT(v uuid.UUID) predicate.UserStats {
+func EventIDGT(v string) predicate.UserStats {
 	return predicate.UserStats(sql.FieldGT(FieldEventID, v))
 }
 
 // EventIDGTE applies the GTE predicate on the "event_id" field.
-func EventIDGTE(v uuid.UUID) predicate.UserStats {
+func EventIDGTE(v string) predicate.UserStats {
 	return predicate.UserStats(sql.FieldGTE(FieldEventID, v))
 }
 
 // EventIDLT applies the LT predicate on the "event_id" field.
-func EventIDLT(v uuid.UUID) predicate.UserStats {
+func EventIDLT(v string) predicate.UserStats {
 	return predicate.UserStats(sql.FieldLT(FieldEventID, v))
 }
 
 // EventIDLTE applies the LTE predicate on the "event_id" field.
-func EventIDLTE(v uuid.UUID) predicate.UserStats {
+func EventIDLTE(v string) predicate.UserStats {
 	return predicate.UserStats(sql.FieldLTE(FieldEventID, v))
+}
+
+// EventIDContains applies the Contains predicate on the "event_id" field.
+func EventIDContains(v string) predicate.UserStats {
+	return predicate.UserStats(sql.FieldContains(FieldEventID, v))
+}
+
+// EventIDHasPrefix applies the HasPrefix predicate on the "event_id" field.
+func EventIDHasPrefix(v string) predicate.UserStats {
+	return predicate.UserStats(sql.FieldHasPrefix(FieldEventID, v))
+}
+
+// EventIDHasSuffix applies the HasSuffix predicate on the "event_id" field.
+func EventIDHasSuffix(v string) predicate.UserStats {
+	return predicate.UserStats(sql.FieldHasSuffix(FieldEventID, v))
+}
+
+// EventIDEqualFold applies the EqualFold predicate on the "event_id" field.
+func EventIDEqualFold(v string) predicate.UserStats {
+	return predicate.UserStats(sql.FieldEqualFold(FieldEventID, v))
+}
+
+// EventIDContainsFold applies the ContainsFold predicate on the "event_id" field.
+func EventIDContainsFold(v string) predicate.UserStats {
+	return predicate.UserStats(sql.FieldContainsFold(FieldEventID, v))
 }
 
 // And groups predicates with the AND operator between them.

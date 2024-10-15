@@ -11,9 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/asma12a/challenge-s6/ent/event"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/userstats"
-	"github.com/google/uuid"
-	ulid "github.com/oklog/ulid/v2"
 )
 
 // EventCreate is the builder for creating a Event entity.
@@ -90,13 +89,13 @@ func (ec *EventCreate) SetNillableIsFinished(b *bool) *EventCreate {
 }
 
 // SetID sets the "id" field.
-func (ec *EventCreate) SetID(u uuid.UUID) *EventCreate {
+func (ec *EventCreate) SetID(u ulid.ID) *EventCreate {
 	ec.mutation.SetID(u)
 	return ec
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (ec *EventCreate) SetNillableID(u *uuid.UUID) *EventCreate {
+func (ec *EventCreate) SetNillableID(u *ulid.ID) *EventCreate {
 	if u != nil {
 		ec.SetID(*u)
 	}
@@ -104,14 +103,14 @@ func (ec *EventCreate) SetNillableID(u *uuid.UUID) *EventCreate {
 }
 
 // AddUserStatsIDIDs adds the "user_stats_id" edge to the UserStats entity by IDs.
-func (ec *EventCreate) AddUserStatsIDIDs(ids ...ulid.ULID) *EventCreate {
+func (ec *EventCreate) AddUserStatsIDIDs(ids ...ulid.ID) *EventCreate {
 	ec.mutation.AddUserStatsIDIDs(ids...)
 	return ec
 }
 
 // AddUserStatsID adds the "user_stats_id" edges to the UserStats entity.
 func (ec *EventCreate) AddUserStatsID(u ...*UserStats) *EventCreate {
-	ids := make([]ulid.ULID, len(u))
+	ids := make([]ulid.ID, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
@@ -229,7 +228,7 @@ func (ec *EventCreate) sqlSave(ctx context.Context) (*Event, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+		if id, ok := _spec.ID.Value.(*ulid.ID); ok {
 			_node.ID = *id
 		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
 			return nil, err
@@ -243,7 +242,7 @@ func (ec *EventCreate) sqlSave(ctx context.Context) (*Event, error) {
 func (ec *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Event{config: ec.config}
-		_spec = sqlgraph.NewCreateSpec(event.Table, sqlgraph.NewFieldSpec(event.FieldID, field.TypeUUID))
+		_spec = sqlgraph.NewCreateSpec(event.Table, sqlgraph.NewFieldSpec(event.FieldID, field.TypeString))
 	)
 	if id, ok := ec.mutation.ID(); ok {
 		_node.ID = id
@@ -285,7 +284,7 @@ func (ec *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 			Columns: []string{event.UserStatsIDColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
