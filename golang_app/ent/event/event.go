@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/google/uuid"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -28,8 +28,17 @@ const (
 	FieldIsPublic = "is_public"
 	// FieldIsFinished holds the string denoting the is_finished field in the database.
 	FieldIsFinished = "is_finished"
+	// EdgeEventType holds the string denoting the event_type edge name in mutations.
+	EdgeEventType = "event_type"
 	// Table holds the table name of the event in the database.
 	Table = "events"
+	// EventTypeTable is the table that holds the event_type relation/edge.
+	EventTypeTable = "events"
+	// EventTypeInverseTable is the table name for the EventType entity.
+	// It exists in this package in order to avoid circular dependency with the "eventtype" package.
+	EventTypeInverseTable = "event_types"
+	// EventTypeColumn is the table column denoting the event_type relation/edge.
+	EventTypeColumn = "event_type_event"
 )
 
 // Columns holds all SQL columns for event fields.
@@ -44,10 +53,21 @@ var Columns = []string{
 	FieldIsFinished,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the "events"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"event_type_event",
+}
+
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -70,7 +90,9 @@ var (
 	// DefaultIsFinished holds the default value on creation for the "is_finished" field.
 	DefaultIsFinished bool
 	// DefaultID holds the default value on creation for the "id" field.
-	DefaultID func() uuid.UUID
+	DefaultID func() string
+	// IDValidator is a validator for the "id" field. It is called by the builders before save.
+	IDValidator func(string) error
 )
 
 // OrderOption defines the ordering options for the Event queries.
@@ -114,4 +136,18 @@ func ByIsPublic(opts ...sql.OrderTermOption) OrderOption {
 // ByIsFinished orders the results by the is_finished field.
 func ByIsFinished(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIsFinished, opts...).ToFunc()
+}
+
+// ByEventTypeField orders the results by event_type field.
+func ByEventTypeField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEventTypeStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newEventTypeStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(EventTypeInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, EventTypeTable, EventTypeColumn),
+	)
 }

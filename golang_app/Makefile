@@ -11,7 +11,7 @@ docker-dev: deps
 		docker-compose up
 
 # Migrate Ent scheme to database
-migrate:
+migration:
 	go run database/migrate/main.go
 
 # Start dev server if using docker container only for DB and adminer
@@ -19,5 +19,9 @@ migrate:
 # as per the docs https://github.com/cosmtrek/air
 start:
 	air
+
+generate:
+	go generate ./ent
+
 
 .PHONY: start migrate docker-dev

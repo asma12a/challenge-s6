@@ -10,14 +10,14 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/asma12a/challenge-s6/ent/event"
-	"github.com/google/uuid"
+	"github.com/asma12a/challenge-s6/ent/eventtype"
 )
 
 // Event is the model entity for the Event schema.
 type Event struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID uuid.UUID `json:"id,omitempty"`
+	ID string `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Address holds the value of the "address" field.
@@ -31,8 +31,32 @@ type Event struct {
 	// IsPublic holds the value of the "is_public" field.
 	IsPublic bool `json:"is_public,omitempty"`
 	// IsFinished holds the value of the "is_finished" field.
-	IsFinished   bool `json:"is_finished,omitempty"`
-	selectValues sql.SelectValues
+	IsFinished bool `json:"is_finished,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the EventQuery when eager-loading is set.
+	Edges            EventEdges `json:"edges"`
+	event_type_event *string
+	selectValues     sql.SelectValues
+}
+
+// EventEdges holds the relations/edges for other nodes in the graph.
+type EventEdges struct {
+	// EventType holds the value of the event_type edge.
+	EventType *EventType `json:"event_type,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// EventTypeOrErr returns the EventType value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e EventEdges) EventTypeOrErr() (*EventType, error) {
+	if e.EventType != nil {
+		return e.EventType, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: eventtype.Label}
+	}
+	return nil, &NotLoadedError{edge: "event_type"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -44,12 +68,12 @@ func (*Event) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case event.FieldEventCode:
 			values[i] = new(sql.NullInt64)
-		case event.FieldName, event.FieldAddress, event.FieldDate:
+		case event.FieldID, event.FieldName, event.FieldAddress, event.FieldDate:
 			values[i] = new(sql.NullString)
 		case event.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
-		case event.FieldID:
-			values[i] = new(uuid.UUID)
+		case event.ForeignKeys[0]: // event_type_event
+			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -66,10 +90,10 @@ func (e *Event) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case event.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value != nil {
-				e.ID = *value
+			} else if value.Valid {
+				e.ID = value.String
 			}
 		case event.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -113,6 +137,13 @@ func (e *Event) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				e.IsFinished = value.Bool
 			}
+		case event.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field event_type_event", values[i])
+			} else if value.Valid {
+				e.event_type_event = new(string)
+				*e.event_type_event = value.String
+			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
 		}
@@ -124,6 +155,11 @@ func (e *Event) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (e *Event) Value(name string) (ent.Value, error) {
 	return e.selectValues.Get(name)
+}
+
+// QueryEventType queries the "event_type" edge of the Event entity.
+func (e *Event) QueryEventType() *EventTypeQuery {
+	return NewEventClient(e.config).QueryEventType(e)
 }
 
 // Update returns a builder for updating this Event.

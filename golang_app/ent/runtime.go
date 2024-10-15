@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/asma12a/challenge-s6/ent/event"
+	"github.com/asma12a/challenge-s6/ent/eventtype"
 	"github.com/asma12a/challenge-s6/ent/schema"
 	"github.com/asma12a/challenge-s6/ent/user"
-	"github.com/google/uuid"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -48,7 +48,21 @@ func init() {
 	// eventDescID is the schema descriptor for id field.
 	eventDescID := eventFields[0].Descriptor()
 	// event.DefaultID holds the default value on creation for the id field.
-	event.DefaultID = eventDescID.Default.(func() uuid.UUID)
+	event.DefaultID = eventDescID.Default.(func() string)
+	// event.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	event.IDValidator = eventDescID.Validators[0].(func(string) error)
+	eventtypeFields := schema.EventType{}.Fields()
+	_ = eventtypeFields
+	// eventtypeDescName is the schema descriptor for name field.
+	eventtypeDescName := eventtypeFields[1].Descriptor()
+	// eventtype.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	eventtype.NameValidator = eventtypeDescName.Validators[0].(func(string) error)
+	// eventtypeDescID is the schema descriptor for id field.
+	eventtypeDescID := eventtypeFields[0].Descriptor()
+	// eventtype.DefaultID holds the default value on creation for the id field.
+	eventtype.DefaultID = eventtypeDescID.Default.(func() string)
+	// eventtype.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	eventtype.IDValidator = eventtypeDescID.Validators[0].(func(string) error)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescPassword is the schema descriptor for password field.

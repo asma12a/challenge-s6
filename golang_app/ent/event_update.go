@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/asma12a/challenge-s6/ent/event"
+	"github.com/asma12a/challenge-s6/ent/eventtype"
 	"github.com/asma12a/challenge-s6/ent/predicate"
 )
 
@@ -133,9 +134,34 @@ func (eu *EventUpdate) SetNillableIsFinished(b *bool) *EventUpdate {
 	return eu
 }
 
+// SetEventTypeID sets the "event_type" edge to the EventType entity by ID.
+func (eu *EventUpdate) SetEventTypeID(id string) *EventUpdate {
+	eu.mutation.SetEventTypeID(id)
+	return eu
+}
+
+// SetNillableEventTypeID sets the "event_type" edge to the EventType entity by ID if the given value is not nil.
+func (eu *EventUpdate) SetNillableEventTypeID(id *string) *EventUpdate {
+	if id != nil {
+		eu = eu.SetEventTypeID(*id)
+	}
+	return eu
+}
+
+// SetEventType sets the "event_type" edge to the EventType entity.
+func (eu *EventUpdate) SetEventType(e *EventType) *EventUpdate {
+	return eu.SetEventTypeID(e.ID)
+}
+
 // Mutation returns the EventMutation object of the builder.
 func (eu *EventUpdate) Mutation() *EventMutation {
 	return eu.mutation
+}
+
+// ClearEventType clears the "event_type" edge to the EventType entity.
+func (eu *EventUpdate) ClearEventType() *EventUpdate {
+	eu.mutation.ClearEventType()
+	return eu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -194,7 +220,7 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := eu.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(event.Table, event.Columns, sqlgraph.NewFieldSpec(event.FieldID, field.TypeUUID))
+	_spec := sqlgraph.NewUpdateSpec(event.Table, event.Columns, sqlgraph.NewFieldSpec(event.FieldID, field.TypeString))
 	if ps := eu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -225,6 +251,35 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := eu.mutation.IsFinished(); ok {
 		_spec.SetField(event.FieldIsFinished, field.TypeBool, value)
+	}
+	if eu.mutation.EventTypeCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   event.EventTypeTable,
+			Columns: []string{event.EventTypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventtype.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.EventTypeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   event.EventTypeTable,
+			Columns: []string{event.EventTypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventtype.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, eu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -351,9 +406,34 @@ func (euo *EventUpdateOne) SetNillableIsFinished(b *bool) *EventUpdateOne {
 	return euo
 }
 
+// SetEventTypeID sets the "event_type" edge to the EventType entity by ID.
+func (euo *EventUpdateOne) SetEventTypeID(id string) *EventUpdateOne {
+	euo.mutation.SetEventTypeID(id)
+	return euo
+}
+
+// SetNillableEventTypeID sets the "event_type" edge to the EventType entity by ID if the given value is not nil.
+func (euo *EventUpdateOne) SetNillableEventTypeID(id *string) *EventUpdateOne {
+	if id != nil {
+		euo = euo.SetEventTypeID(*id)
+	}
+	return euo
+}
+
+// SetEventType sets the "event_type" edge to the EventType entity.
+func (euo *EventUpdateOne) SetEventType(e *EventType) *EventUpdateOne {
+	return euo.SetEventTypeID(e.ID)
+}
+
 // Mutation returns the EventMutation object of the builder.
 func (euo *EventUpdateOne) Mutation() *EventMutation {
 	return euo.mutation
+}
+
+// ClearEventType clears the "event_type" edge to the EventType entity.
+func (euo *EventUpdateOne) ClearEventType() *EventUpdateOne {
+	euo.mutation.ClearEventType()
+	return euo
 }
 
 // Where appends a list predicates to the EventUpdate builder.
@@ -425,7 +505,7 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 	if err := euo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(event.Table, event.Columns, sqlgraph.NewFieldSpec(event.FieldID, field.TypeUUID))
+	_spec := sqlgraph.NewUpdateSpec(event.Table, event.Columns, sqlgraph.NewFieldSpec(event.FieldID, field.TypeString))
 	id, ok := euo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Event.id" for update`)}
@@ -473,6 +553,35 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 	}
 	if value, ok := euo.mutation.IsFinished(); ok {
 		_spec.SetField(event.FieldIsFinished, field.TypeBool, value)
+	}
+	if euo.mutation.EventTypeCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   event.EventTypeTable,
+			Columns: []string{event.EventTypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventtype.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.EventTypeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   event.EventTypeTable,
+			Columns: []string{event.EventTypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventtype.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Event{config: euo.config}
 	_spec.Assign = _node.assignValues

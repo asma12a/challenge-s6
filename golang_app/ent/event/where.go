@@ -6,53 +6,63 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/asma12a/challenge-s6/ent/predicate"
-	"github.com/google/uuid"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id uuid.UUID) predicate.Event {
+func ID(id string) predicate.Event {
 	return predicate.Event(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id uuid.UUID) predicate.Event {
+func IDEQ(id string) predicate.Event {
 	return predicate.Event(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id uuid.UUID) predicate.Event {
+func IDNEQ(id string) predicate.Event {
 	return predicate.Event(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...uuid.UUID) predicate.Event {
+func IDIn(ids ...string) predicate.Event {
 	return predicate.Event(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...uuid.UUID) predicate.Event {
+func IDNotIn(ids ...string) predicate.Event {
 	return predicate.Event(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id uuid.UUID) predicate.Event {
+func IDGT(id string) predicate.Event {
 	return predicate.Event(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id uuid.UUID) predicate.Event {
+func IDGTE(id string) predicate.Event {
 	return predicate.Event(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id uuid.UUID) predicate.Event {
+func IDLT(id string) predicate.Event {
 	return predicate.Event(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id uuid.UUID) predicate.Event {
+func IDLTE(id string) predicate.Event {
 	return predicate.Event(sql.FieldLTE(FieldID, id))
+}
+
+// IDEqualFold applies the EqualFold predicate on the ID field.
+func IDEqualFold(id string) predicate.Event {
+	return predicate.Event(sql.FieldEqualFold(FieldID, id))
+}
+
+// IDContainsFold applies the ContainsFold predicate on the ID field.
+func IDContainsFold(id string) predicate.Event {
+	return predicate.Event(sql.FieldContainsFold(FieldID, id))
 }
 
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
@@ -383,6 +393,29 @@ func IsFinishedEQ(v bool) predicate.Event {
 // IsFinishedNEQ applies the NEQ predicate on the "is_finished" field.
 func IsFinishedNEQ(v bool) predicate.Event {
 	return predicate.Event(sql.FieldNEQ(FieldIsFinished, v))
+}
+
+// HasEventType applies the HasEdge predicate on the "event_type" edge.
+func HasEventType() predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, EventTypeTable, EventTypeColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasEventTypeWith applies the HasEdge predicate on the "event_type" edge with a given conditions (other predicates).
+func HasEventTypeWith(preds ...predicate.EventType) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		step := newEventTypeStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

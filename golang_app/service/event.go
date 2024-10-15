@@ -6,7 +6,6 @@ import (
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/entity"
-	"github.com/google/uuid"
 )
 
 type Event struct {
@@ -19,47 +18,51 @@ func NewEventService(client *ent.Client) *Event {
 	}
 }
 
-func (repo *Event) Create(ctx context.Context, event *entity.Event) (*ent.Event, error) {
-	entEvent, err := repo.db.Event.Create().
+func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
+	_, err := repo.db.Event.Create().
 		SetName(event.Name).
 		SetAddress(event.Address).
 		SetEventCode(event.EventCode).
 		SetDate(event.Date).
-		SetIsPublic(event.IsPublic).
-		SetIsFinished(event.IsFinished).
+		SetEventTypeID(event.Edges.EventType.ID).
 		Save(ctx)
 
 	if err != nil {
-		return nil, entity.ErrCannotBeCreated
+		return entity.ErrCannotBeCreated
 	}
 
-	return entEvent, nil
+	return nil
 }
 
-func (e *Event) FindOne(ctx context.Context, id uuid.UUID) (*ent.Event, error) {
-	return e.db.Event.Query().Where(event.IDEQ(id)).Only(ctx)
+func (e *Event) FindOne(ctx context.Context, id string) (*entity.Event, error) {
+	event, err := e.db.Event.Query().Where(event.IDEQ(id)).WithEventType().
+		Only(ctx)
+
+	if err != nil {
+		return nil, entity.ErrNotFound
+	}
+	return &entity.Event{Event: *event}, nil
 }
 
-// Update a pet
-func (repo *Event) Update(ctx context.Context, event *entity.Event) (*ent.Event, error) {
+func (repo *Event) Update(ctx context.Context, event *entity.Event) (*entity.Event, error) {
 
 	// Prepare the update query
-	entEvent, err := repo.db.Event.
+	e, err := repo.db.Event.
 		UpdateOneID(event.ID).
 		SetName(event.Name).
 		SetAddress(event.Address).
 		SetEventCode(event.EventCode).
 		SetDate(event.Date).
-		SetIsPublic(event.IsPublic).
-		SetIsFinished(event.IsFinished).Save(ctx)
+		SetEventTypeID(event.Edges.EventType.ID).
+		Save(ctx)
 
 	if err != nil {
 		return nil, entity.ErrInvalidEntity
 	}
-	return entEvent, nil
+	return &entity.Event{Event: *e}, nil
 }
 
-func (e *Event) Delete(ctx context.Context, id uuid.UUID) error {
+func (e *Event) Delete(ctx context.Context, id string) error {
 	err := e.db.Event.DeleteOneID(id).Exec(ctx)
 	if err != nil {
 		return entity.ErrCannotBeDeleted

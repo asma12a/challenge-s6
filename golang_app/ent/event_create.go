@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/asma12a/challenge-s6/ent/event"
-	"github.com/google/uuid"
+	"github.com/asma12a/challenge-s6/ent/eventtype"
 )
 
 // EventCreate is the builder for creating a Event entity.
@@ -88,17 +88,36 @@ func (ec *EventCreate) SetNillableIsFinished(b *bool) *EventCreate {
 }
 
 // SetID sets the "id" field.
-func (ec *EventCreate) SetID(u uuid.UUID) *EventCreate {
-	ec.mutation.SetID(u)
+func (ec *EventCreate) SetID(s string) *EventCreate {
+	ec.mutation.SetID(s)
 	return ec
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (ec *EventCreate) SetNillableID(u *uuid.UUID) *EventCreate {
-	if u != nil {
-		ec.SetID(*u)
+func (ec *EventCreate) SetNillableID(s *string) *EventCreate {
+	if s != nil {
+		ec.SetID(*s)
 	}
 	return ec
+}
+
+// SetEventTypeID sets the "event_type" edge to the EventType entity by ID.
+func (ec *EventCreate) SetEventTypeID(id string) *EventCreate {
+	ec.mutation.SetEventTypeID(id)
+	return ec
+}
+
+// SetNillableEventTypeID sets the "event_type" edge to the EventType entity by ID if the given value is not nil.
+func (ec *EventCreate) SetNillableEventTypeID(id *string) *EventCreate {
+	if id != nil {
+		ec = ec.SetEventTypeID(*id)
+	}
+	return ec
+}
+
+// SetEventType sets the "event_type" edge to the EventType entity.
+func (ec *EventCreate) SetEventType(e *EventType) *EventCreate {
+	return ec.SetEventTypeID(e.ID)
 }
 
 // Mutation returns the EventMutation object of the builder.
@@ -197,6 +216,11 @@ func (ec *EventCreate) check() error {
 	if _, ok := ec.mutation.IsFinished(); !ok {
 		return &ValidationError{Name: "is_finished", err: errors.New(`ent: missing required field "Event.is_finished"`)}
 	}
+	if v, ok := ec.mutation.ID(); ok {
+		if err := event.IDValidator(v); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Event.id": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -212,10 +236,10 @@ func (ec *EventCreate) sqlSave(ctx context.Context) (*Event, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
+		if id, ok := _spec.ID.Value.(string); ok {
+			_node.ID = id
+		} else {
+			return nil, fmt.Errorf("unexpected Event.ID type: %T", _spec.ID.Value)
 		}
 	}
 	ec.mutation.id = &_node.ID
@@ -226,11 +250,11 @@ func (ec *EventCreate) sqlSave(ctx context.Context) (*Event, error) {
 func (ec *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Event{config: ec.config}
-		_spec = sqlgraph.NewCreateSpec(event.Table, sqlgraph.NewFieldSpec(event.FieldID, field.TypeUUID))
+		_spec = sqlgraph.NewCreateSpec(event.Table, sqlgraph.NewFieldSpec(event.FieldID, field.TypeString))
 	)
 	if id, ok := ec.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := ec.mutation.Name(); ok {
 		_spec.SetField(event.FieldName, field.TypeString, value)
@@ -259,6 +283,23 @@ func (ec *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 	if value, ok := ec.mutation.IsFinished(); ok {
 		_spec.SetField(event.FieldIsFinished, field.TypeBool, value)
 		_node.IsFinished = value
+	}
+	if nodes := ec.mutation.EventTypeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   event.EventTypeTable,
+			Columns: []string{event.EventTypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventtype.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.event_type_event = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
