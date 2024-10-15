@@ -19,8 +19,10 @@ func (User) Fields() []ent.Field {
 				return ulid.Make().String()
 			},
 		).NotEmpty().Unique().Immutable(),
-		field.String("password").NotEmpty(),
+		field.String("name").NotEmpty(),
 		field.String("email").NotEmpty(),
+		field.String("password").NotEmpty(),
+		field.String("role").Default("user").NotEmpty(),
 	}
 }
 
