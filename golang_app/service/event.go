@@ -25,6 +25,7 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
 		SetEventCode(event.EventCode).
 		SetDate(event.Date).
 		SetEventTypeID(event.Edges.EventType.ID).
+		SetSportID(event.Edges.Sport.ID).
 		Save(ctx)
 
 	if err != nil {
@@ -54,6 +55,7 @@ func (repo *Event) Update(ctx context.Context, event *entity.Event) (*entity.Eve
 		SetEventCode(event.EventCode).
 		SetDate(event.Date).
 		SetEventTypeID(event.Edges.EventType.ID).
+		SetSportID(event.Edges.Sport.ID).
 		Save(ctx)
 
 	if err != nil {

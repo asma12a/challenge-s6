@@ -14,6 +14,7 @@ import (
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/eventtype"
 	"github.com/asma12a/challenge-s6/ent/predicate"
+	"github.com/asma12a/challenge-s6/ent/sport"
 )
 
 // EventUpdate is the builder for updating Event entities.
@@ -153,6 +154,25 @@ func (eu *EventUpdate) SetEventType(e *EventType) *EventUpdate {
 	return eu.SetEventTypeID(e.ID)
 }
 
+// SetSportID sets the "sport" edge to the Sport entity by ID.
+func (eu *EventUpdate) SetSportID(id string) *EventUpdate {
+	eu.mutation.SetSportID(id)
+	return eu
+}
+
+// SetNillableSportID sets the "sport" edge to the Sport entity by ID if the given value is not nil.
+func (eu *EventUpdate) SetNillableSportID(id *string) *EventUpdate {
+	if id != nil {
+		eu = eu.SetSportID(*id)
+	}
+	return eu
+}
+
+// SetSport sets the "sport" edge to the Sport entity.
+func (eu *EventUpdate) SetSport(s *Sport) *EventUpdate {
+	return eu.SetSportID(s.ID)
+}
+
 // Mutation returns the EventMutation object of the builder.
 func (eu *EventUpdate) Mutation() *EventMutation {
 	return eu.mutation
@@ -161,6 +181,12 @@ func (eu *EventUpdate) Mutation() *EventMutation {
 // ClearEventType clears the "event_type" edge to the EventType entity.
 func (eu *EventUpdate) ClearEventType() *EventUpdate {
 	eu.mutation.ClearEventType()
+	return eu
+}
+
+// ClearSport clears the "sport" edge to the Sport entity.
+func (eu *EventUpdate) ClearSport() *EventUpdate {
+	eu.mutation.ClearSport()
 	return eu
 }
 
@@ -274,6 +300,35 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(eventtype.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if eu.mutation.SportCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   event.SportTable,
+			Columns: []string{event.SportColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sport.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.SportIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   event.SportTable,
+			Columns: []string{event.SportColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sport.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -425,6 +480,25 @@ func (euo *EventUpdateOne) SetEventType(e *EventType) *EventUpdateOne {
 	return euo.SetEventTypeID(e.ID)
 }
 
+// SetSportID sets the "sport" edge to the Sport entity by ID.
+func (euo *EventUpdateOne) SetSportID(id string) *EventUpdateOne {
+	euo.mutation.SetSportID(id)
+	return euo
+}
+
+// SetNillableSportID sets the "sport" edge to the Sport entity by ID if the given value is not nil.
+func (euo *EventUpdateOne) SetNillableSportID(id *string) *EventUpdateOne {
+	if id != nil {
+		euo = euo.SetSportID(*id)
+	}
+	return euo
+}
+
+// SetSport sets the "sport" edge to the Sport entity.
+func (euo *EventUpdateOne) SetSport(s *Sport) *EventUpdateOne {
+	return euo.SetSportID(s.ID)
+}
+
 // Mutation returns the EventMutation object of the builder.
 func (euo *EventUpdateOne) Mutation() *EventMutation {
 	return euo.mutation
@@ -433,6 +507,12 @@ func (euo *EventUpdateOne) Mutation() *EventMutation {
 // ClearEventType clears the "event_type" edge to the EventType entity.
 func (euo *EventUpdateOne) ClearEventType() *EventUpdateOne {
 	euo.mutation.ClearEventType()
+	return euo
+}
+
+// ClearSport clears the "sport" edge to the Sport entity.
+func (euo *EventUpdateOne) ClearSport() *EventUpdateOne {
+	euo.mutation.ClearSport()
 	return euo
 }
 
@@ -576,6 +656,35 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(eventtype.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if euo.mutation.SportCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   event.SportTable,
+			Columns: []string{event.SportColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sport.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.SportIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   event.SportTable,
+			Columns: []string{event.SportColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sport.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

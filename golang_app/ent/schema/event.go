@@ -38,5 +38,8 @@ func (Event) Edges() []ent.Edge {
 		edge.From("event_type", EventType.Type).
 			Ref("event").
 			Unique(),
+		edge.From("sport", Sport.Type).
+			Ref("event").
+			Unique(),
 	}
 }

@@ -418,6 +418,29 @@ func HasEventTypeWith(preds ...predicate.EventType) predicate.Event {
 	})
 }
 
+// HasSport applies the HasEdge predicate on the "sport" edge.
+func HasSport() predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, SportTable, SportColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSportWith applies the HasEdge predicate on the "sport" edge with a given conditions (other predicates).
+func HasSportWith(preds ...predicate.Sport) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		step := newSportStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Event) predicate.Event {
 	return predicate.Event(sql.AndPredicates(predicates...))

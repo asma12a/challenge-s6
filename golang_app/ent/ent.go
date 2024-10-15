@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/eventtype"
+	"github.com/asma12a/challenge-s6/ent/sport"
 	"github.com/asma12a/challenge-s6/ent/user"
 )
 
@@ -77,6 +78,7 @@ func checkColumn(table, column string) error {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			event.Table:     event.ValidColumn,
 			eventtype.Table: eventtype.ValidColumn,
+			sport.Table:     sport.ValidColumn,
 			user.Table:      user.ValidColumn,
 		})
 	})

@@ -6,7 +6,6 @@ import (
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/user"
 	"github.com/asma12a/challenge-s6/entity"
-	"github.com/google/uuid"
 )
 
 type User struct {
@@ -34,8 +33,8 @@ func (repo *User) Create(ctx context.Context, user *entity.User) (*ent.User, err
 	return entUser, nil
 }
 
-func (e *User) FindOne(ctx context.Context, id uuid.UUID ) (*ent.User, error) {
-	return e.db.User.Query().Where(user.IDEQ(id.String())).Only(ctx)
+func (e *User) FindOne(ctx context.Context, id string) (*ent.User, error) {
+	return e.db.User.Query().Where(user.IDEQ(id)).Only(ctx)
 }
 
 func (repo *User) Update(ctx context.Context, user *entity.User) (*ent.User, error) {
@@ -54,8 +53,8 @@ func (repo *User) Update(ctx context.Context, user *entity.User) (*ent.User, err
 	return entUser, nil
 }
 
-func (repo *User) Delete(ctx context.Context, id uuid.UUID) error {
-	err := repo.db.User.DeleteOneID(id.String()).Exec(ctx)
+func (repo *User) Delete(ctx context.Context, id string) error {
+	err := repo.db.User.DeleteOneID(id).Exec(ctx)
 	if err != nil {
 		return entity.ErrCannotBeDeleted
 	}

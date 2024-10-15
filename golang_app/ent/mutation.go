@@ -14,6 +14,7 @@ import (
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/eventtype"
 	"github.com/asma12a/challenge-s6/ent/predicate"
+	"github.com/asma12a/challenge-s6/ent/sport"
 	"github.com/asma12a/challenge-s6/ent/user"
 )
 
@@ -28,6 +29,7 @@ const (
 	// Node types.
 	TypeEvent     = "Event"
 	TypeEventType = "EventType"
+	TypeSport     = "Sport"
 	TypeUser      = "User"
 )
 
@@ -48,6 +50,8 @@ type EventMutation struct {
 	clearedFields     map[string]struct{}
 	event_type        *string
 	clearedevent_type bool
+	sport             *string
+	clearedsport      bool
 	done              bool
 	oldValue          func(context.Context) (*Event, error)
 	predicates        []predicate.Event
@@ -468,6 +472,45 @@ func (m *EventMutation) ResetEventType() {
 	m.clearedevent_type = false
 }
 
+// SetSportID sets the "sport" edge to the Sport entity by id.
+func (m *EventMutation) SetSportID(id string) {
+	m.sport = &id
+}
+
+// ClearSport clears the "sport" edge to the Sport entity.
+func (m *EventMutation) ClearSport() {
+	m.clearedsport = true
+}
+
+// SportCleared reports if the "sport" edge to the Sport entity was cleared.
+func (m *EventMutation) SportCleared() bool {
+	return m.clearedsport
+}
+
+// SportID returns the "sport" edge ID in the mutation.
+func (m *EventMutation) SportID() (id string, exists bool) {
+	if m.sport != nil {
+		return *m.sport, true
+	}
+	return
+}
+
+// SportIDs returns the "sport" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// SportID instead. It exists only for internal usage by the builders.
+func (m *EventMutation) SportIDs() (ids []string) {
+	if id := m.sport; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetSport resets all changes to the "sport" edge.
+func (m *EventMutation) ResetSport() {
+	m.sport = nil
+	m.clearedsport = false
+}
+
 // Where appends a list predicates to the EventMutation builder.
 func (m *EventMutation) Where(ps ...predicate.Event) {
 	m.predicates = append(m.predicates, ps...)
@@ -718,9 +761,12 @@ func (m *EventMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *EventMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.event_type != nil {
 		edges = append(edges, event.EdgeEventType)
+	}
+	if m.sport != nil {
+		edges = append(edges, event.EdgeSport)
 	}
 	return edges
 }
@@ -733,13 +779,17 @@ func (m *EventMutation) AddedIDs(name string) []ent.Value {
 		if id := m.event_type; id != nil {
 			return []ent.Value{*id}
 		}
+	case event.EdgeSport:
+		if id := m.sport; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *EventMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	return edges
 }
 
@@ -751,9 +801,12 @@ func (m *EventMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *EventMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearedevent_type {
 		edges = append(edges, event.EdgeEventType)
+	}
+	if m.clearedsport {
+		edges = append(edges, event.EdgeSport)
 	}
 	return edges
 }
@@ -764,6 +817,8 @@ func (m *EventMutation) EdgeCleared(name string) bool {
 	switch name {
 	case event.EdgeEventType:
 		return m.clearedevent_type
+	case event.EdgeSport:
+		return m.clearedsport
 	}
 	return false
 }
@@ -775,6 +830,9 @@ func (m *EventMutation) ClearEdge(name string) error {
 	case event.EdgeEventType:
 		m.ClearEventType()
 		return nil
+	case event.EdgeSport:
+		m.ClearSport()
+		return nil
 	}
 	return fmt.Errorf("unknown Event unique edge %s", name)
 }
@@ -785,6 +843,9 @@ func (m *EventMutation) ResetEdge(name string) error {
 	switch name {
 	case event.EdgeEventType:
 		m.ResetEventType()
+		return nil
+	case event.EdgeSport:
+		m.ResetSport()
 		return nil
 	}
 	return fmt.Errorf("unknown Event edge %s", name)
@@ -1213,6 +1274,507 @@ func (m *EventTypeMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown EventType edge %s", name)
+}
+
+// SportMutation represents an operation that mutates the Sport nodes in the graph.
+type SportMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *string
+	name          *string
+	image_url     *string
+	clearedFields map[string]struct{}
+	event         map[string]struct{}
+	removedevent  map[string]struct{}
+	clearedevent  bool
+	done          bool
+	oldValue      func(context.Context) (*Sport, error)
+	predicates    []predicate.Sport
+}
+
+var _ ent.Mutation = (*SportMutation)(nil)
+
+// sportOption allows management of the mutation configuration using functional options.
+type sportOption func(*SportMutation)
+
+// newSportMutation creates new mutation for the Sport entity.
+func newSportMutation(c config, op Op, opts ...sportOption) *SportMutation {
+	m := &SportMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeSport,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withSportID sets the ID field of the mutation.
+func withSportID(id string) sportOption {
+	return func(m *SportMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Sport
+		)
+		m.oldValue = func(ctx context.Context) (*Sport, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Sport.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withSport sets the old Sport of the mutation.
+func withSport(node *Sport) sportOption {
+	return func(m *SportMutation) {
+		m.oldValue = func(context.Context) (*Sport, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m SportMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m SportMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Sport entities.
+func (m *SportMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *SportMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *SportMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Sport.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetName sets the "name" field.
+func (m *SportMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *SportMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Sport entity.
+// If the Sport object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SportMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *SportMutation) ResetName() {
+	m.name = nil
+}
+
+// SetImageURL sets the "image_url" field.
+func (m *SportMutation) SetImageURL(s string) {
+	m.image_url = &s
+}
+
+// ImageURL returns the value of the "image_url" field in the mutation.
+func (m *SportMutation) ImageURL() (r string, exists bool) {
+	v := m.image_url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldImageURL returns the old "image_url" field's value of the Sport entity.
+// If the Sport object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SportMutation) OldImageURL(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldImageURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldImageURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldImageURL: %w", err)
+	}
+	return oldValue.ImageURL, nil
+}
+
+// ClearImageURL clears the value of the "image_url" field.
+func (m *SportMutation) ClearImageURL() {
+	m.image_url = nil
+	m.clearedFields[sport.FieldImageURL] = struct{}{}
+}
+
+// ImageURLCleared returns if the "image_url" field was cleared in this mutation.
+func (m *SportMutation) ImageURLCleared() bool {
+	_, ok := m.clearedFields[sport.FieldImageURL]
+	return ok
+}
+
+// ResetImageURL resets all changes to the "image_url" field.
+func (m *SportMutation) ResetImageURL() {
+	m.image_url = nil
+	delete(m.clearedFields, sport.FieldImageURL)
+}
+
+// AddEventIDs adds the "event" edge to the Event entity by ids.
+func (m *SportMutation) AddEventIDs(ids ...string) {
+	if m.event == nil {
+		m.event = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.event[ids[i]] = struct{}{}
+	}
+}
+
+// ClearEvent clears the "event" edge to the Event entity.
+func (m *SportMutation) ClearEvent() {
+	m.clearedevent = true
+}
+
+// EventCleared reports if the "event" edge to the Event entity was cleared.
+func (m *SportMutation) EventCleared() bool {
+	return m.clearedevent
+}
+
+// RemoveEventIDs removes the "event" edge to the Event entity by IDs.
+func (m *SportMutation) RemoveEventIDs(ids ...string) {
+	if m.removedevent == nil {
+		m.removedevent = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.event, ids[i])
+		m.removedevent[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedEvent returns the removed IDs of the "event" edge to the Event entity.
+func (m *SportMutation) RemovedEventIDs() (ids []string) {
+	for id := range m.removedevent {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// EventIDs returns the "event" edge IDs in the mutation.
+func (m *SportMutation) EventIDs() (ids []string) {
+	for id := range m.event {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetEvent resets all changes to the "event" edge.
+func (m *SportMutation) ResetEvent() {
+	m.event = nil
+	m.clearedevent = false
+	m.removedevent = nil
+}
+
+// Where appends a list predicates to the SportMutation builder.
+func (m *SportMutation) Where(ps ...predicate.Sport) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the SportMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *SportMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Sport, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *SportMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *SportMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Sport).
+func (m *SportMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *SportMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m.name != nil {
+		fields = append(fields, sport.FieldName)
+	}
+	if m.image_url != nil {
+		fields = append(fields, sport.FieldImageURL)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *SportMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case sport.FieldName:
+		return m.Name()
+	case sport.FieldImageURL:
+		return m.ImageURL()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *SportMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case sport.FieldName:
+		return m.OldName(ctx)
+	case sport.FieldImageURL:
+		return m.OldImageURL(ctx)
+	}
+	return nil, fmt.Errorf("unknown Sport field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SportMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case sport.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case sport.FieldImageURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetImageURL(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Sport field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *SportMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *SportMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SportMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Sport numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *SportMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(sport.FieldImageURL) {
+		fields = append(fields, sport.FieldImageURL)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *SportMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *SportMutation) ClearField(name string) error {
+	switch name {
+	case sport.FieldImageURL:
+		m.ClearImageURL()
+		return nil
+	}
+	return fmt.Errorf("unknown Sport nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *SportMutation) ResetField(name string) error {
+	switch name {
+	case sport.FieldName:
+		m.ResetName()
+		return nil
+	case sport.FieldImageURL:
+		m.ResetImageURL()
+		return nil
+	}
+	return fmt.Errorf("unknown Sport field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *SportMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.event != nil {
+		edges = append(edges, sport.EdgeEvent)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *SportMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case sport.EdgeEvent:
+		ids := make([]ent.Value, 0, len(m.event))
+		for id := range m.event {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *SportMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedevent != nil {
+		edges = append(edges, sport.EdgeEvent)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *SportMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case sport.EdgeEvent:
+		ids := make([]ent.Value, 0, len(m.removedevent))
+		for id := range m.removedevent {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *SportMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedevent {
+		edges = append(edges, sport.EdgeEvent)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *SportMutation) EdgeCleared(name string) bool {
+	switch name {
+	case sport.EdgeEvent:
+		return m.clearedevent
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *SportMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Sport unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *SportMutation) ResetEdge(name string) error {
+	switch name {
+	case sport.EdgeEvent:
+		m.ResetEvent()
+		return nil
+	}
+	return fmt.Errorf("unknown Sport edge %s", name)
 }
 
 // UserMutation represents an operation that mutates the User nodes in the graph.

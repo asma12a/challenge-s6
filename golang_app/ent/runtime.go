@@ -8,6 +8,7 @@ import (
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/eventtype"
 	"github.com/asma12a/challenge-s6/ent/schema"
+	"github.com/asma12a/challenge-s6/ent/sport"
 	"github.com/asma12a/challenge-s6/ent/user"
 )
 
@@ -63,6 +64,18 @@ func init() {
 	eventtype.DefaultID = eventtypeDescID.Default.(func() string)
 	// eventtype.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	eventtype.IDValidator = eventtypeDescID.Validators[0].(func(string) error)
+	sportFields := schema.Sport{}.Fields()
+	_ = sportFields
+	// sportDescName is the schema descriptor for name field.
+	sportDescName := sportFields[1].Descriptor()
+	// sport.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	sport.NameValidator = sportDescName.Validators[0].(func(string) error)
+	// sportDescID is the schema descriptor for id field.
+	sportDescID := sportFields[0].Descriptor()
+	// sport.DefaultID holds the default value on creation for the id field.
+	sport.DefaultID = sportDescID.Default.(func() string)
+	// sport.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	sport.IDValidator = sportDescID.Validators[0].(func(string) error)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescName is the schema descriptor for name field.

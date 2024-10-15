@@ -30,6 +30,8 @@ const (
 	FieldIsFinished = "is_finished"
 	// EdgeEventType holds the string denoting the event_type edge name in mutations.
 	EdgeEventType = "event_type"
+	// EdgeSport holds the string denoting the sport edge name in mutations.
+	EdgeSport = "sport"
 	// Table holds the table name of the event in the database.
 	Table = "events"
 	// EventTypeTable is the table that holds the event_type relation/edge.
@@ -39,6 +41,13 @@ const (
 	EventTypeInverseTable = "event_types"
 	// EventTypeColumn is the table column denoting the event_type relation/edge.
 	EventTypeColumn = "event_type_event"
+	// SportTable is the table that holds the sport relation/edge.
+	SportTable = "events"
+	// SportInverseTable is the table name for the Sport entity.
+	// It exists in this package in order to avoid circular dependency with the "sport" package.
+	SportInverseTable = "sports"
+	// SportColumn is the table column denoting the sport relation/edge.
+	SportColumn = "sport_event"
 )
 
 // Columns holds all SQL columns for event fields.
@@ -57,6 +66,7 @@ var Columns = []string{
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"event_type_event",
+	"sport_event",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -144,10 +154,24 @@ func ByEventTypeField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newEventTypeStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// BySportField orders the results by sport field.
+func BySportField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSportStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newEventTypeStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EventTypeInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, EventTypeTable, EventTypeColumn),
+	)
+}
+func newSportStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SportInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, SportTable, SportColumn),
 	)
 }

@@ -9,15 +9,15 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Event, serviceEventType service.EventType) {
+func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Event, serviceEventType service.EventType, serviceSport service.Sport) {
 	app.Get("/", listEvents(ctx, serviceEvent))
 	app.Get("/:eventId", getEvent(ctx, serviceEvent))
-	app.Post("/", createEvent(ctx, serviceEvent, serviceEventType))
-	app.Put("/:eventId", updateEvent(ctx, serviceEvent, serviceEventType))
+	app.Post("/", createEvent(ctx, serviceEvent, serviceEventType, serviceSport))
+	app.Put("/:eventId", updateEvent(ctx, serviceEvent, serviceEventType, serviceSport))
 	app.Delete("/:eventId", deleteEvent(ctx, serviceEvent))
 }
 
-func createEvent(ctx context.Context, serviceEvent service.Event, serviceEventType service.EventType) fiber.Handler {
+func createEvent(ctx context.Context, serviceEvent service.Event, serviceEventType service.EventType, serviceSport service.Sport) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var eventInput entity.Event // Utilisation de votre struct Event
 
@@ -44,6 +44,20 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceEventTy
 				"error_detail": err.Error(),
 			})
 		}
+		sportId := eventInput.Edges.Sport.ID
+		sport, err := serviceSport.FindOne(ctx, sportId)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+					"status":       "error",
+					"error_detail": "EventType not found",
+				})
+			}
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status":       "error",
+				"error_detail": err.Error(),
+			})
+		}
 
 		// Assurez-vous d'utiliser le bon type ici
 		newEvent := entity.NewEvent(
@@ -52,6 +66,7 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceEventTy
 			eventInput.EventCode,
 			eventInput.Date,
 			&eventType.EventType,
+			&sport.Sport,
 		)
 
 		err = serviceEvent.Create(ctx, newEvent)
@@ -89,12 +104,10 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 	}
 }
 
-func updateEvent(ctx context.Context, serviceEvent service.Event, serviceEventType service.EventType) fiber.Handler {
+func updateEvent(ctx context.Context, serviceEvent service.Event, serviceEventType service.EventType, serviceSport service.Sport) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// Récupère l'ID de l'événement à mettre à jour depuis les paramètres de la route
 		id := c.Params("eventId")
 
-		// Cherche l'événement à mettre à jour
 		existingEvent, err := serviceEvent.FindOne(ctx, id)
 		if err != nil {
 			if ent.IsNotFound(err) {
@@ -109,7 +122,6 @@ func updateEvent(ctx context.Context, serviceEvent service.Event, serviceEventTy
 			})
 		}
 
-		// Crée une nouvelle instance de EventInput pour récupérer les modifications
 		var eventInput entity.Event
 		err = c.BodyParser(&eventInput)
 		if err != nil {
@@ -119,7 +131,6 @@ func updateEvent(ctx context.Context, serviceEvent service.Event, serviceEventTy
 			})
 		}
 
-		// Si l'utilisateur souhaite modifier le type d'événement
 		if eventInput.Edges.EventType != nil {
 			eventTypeId := eventInput.Edges.EventType.ID
 			eventType, err := serviceEventType.FindOne(ctx, eventTypeId)
@@ -135,19 +146,33 @@ func updateEvent(ctx context.Context, serviceEvent service.Event, serviceEventTy
 					"error_detail": err.Error(),
 				})
 			}
-			// Assure-toi d'utiliser le bon type ici
-			existingEvent.Edges.EventType = &eventType.EventType // Utilise l'instance ent.EventType
+			existingEvent.Edges.EventType = &eventType.EventType
 		}
 
-		// Met à jour les autres champs
+		// Vérifie le sport
+		if eventInput.Edges.Sport != nil {
+			sportId := eventInput.Edges.Sport.ID
+			sport, err := serviceSport.FindOne(ctx, sportId)
+			if err != nil {
+				if ent.IsNotFound(err) {
+					return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+						"status":       "error",
+						"error_detail": "Sport not found",
+					})
+				}
+				return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+					"status":       "error",
+					"error_detail": err.Error(),
+				})
+			}
+			existingEvent.Edges.Sport = &sport.Sport
+		}
+
 		existingEvent.Name = eventInput.Name
 		existingEvent.Address = eventInput.Address
 		existingEvent.EventCode = eventInput.EventCode
 		existingEvent.Date = eventInput.Date
-		existingEvent.IsPublic = eventInput.IsPublic
-		existingEvent.IsFinished = eventInput.IsFinished
 
-		// Enregistre les modifications
 		_, err = serviceEvent.Update(ctx, existingEvent)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{

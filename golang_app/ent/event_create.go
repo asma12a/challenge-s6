@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/eventtype"
+	"github.com/asma12a/challenge-s6/ent/sport"
 )
 
 // EventCreate is the builder for creating a Event entity.
@@ -118,6 +119,25 @@ func (ec *EventCreate) SetNillableEventTypeID(id *string) *EventCreate {
 // SetEventType sets the "event_type" edge to the EventType entity.
 func (ec *EventCreate) SetEventType(e *EventType) *EventCreate {
 	return ec.SetEventTypeID(e.ID)
+}
+
+// SetSportID sets the "sport" edge to the Sport entity by ID.
+func (ec *EventCreate) SetSportID(id string) *EventCreate {
+	ec.mutation.SetSportID(id)
+	return ec
+}
+
+// SetNillableSportID sets the "sport" edge to the Sport entity by ID if the given value is not nil.
+func (ec *EventCreate) SetNillableSportID(id *string) *EventCreate {
+	if id != nil {
+		ec = ec.SetSportID(*id)
+	}
+	return ec
+}
+
+// SetSport sets the "sport" edge to the Sport entity.
+func (ec *EventCreate) SetSport(s *Sport) *EventCreate {
+	return ec.SetSportID(s.ID)
 }
 
 // Mutation returns the EventMutation object of the builder.
@@ -299,6 +319,23 @@ func (ec *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.event_type_event = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.SportIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   event.SportTable,
+			Columns: []string{event.SportColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sport.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.sport_event = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

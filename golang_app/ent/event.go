@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/eventtype"
+	"github.com/asma12a/challenge-s6/ent/sport"
 )
 
 // Event is the model entity for the Event schema.
@@ -36,6 +37,7 @@ type Event struct {
 	// The values are being populated by the EventQuery when eager-loading is set.
 	Edges            EventEdges `json:"edges"`
 	event_type_event *string
+	sport_event      *string
 	selectValues     sql.SelectValues
 }
 
@@ -43,9 +45,11 @@ type Event struct {
 type EventEdges struct {
 	// EventType holds the value of the event_type edge.
 	EventType *EventType `json:"event_type,omitempty"`
+	// Sport holds the value of the sport edge.
+	Sport *Sport `json:"sport,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // EventTypeOrErr returns the EventType value or an error if the edge
@@ -57,6 +61,17 @@ func (e EventEdges) EventTypeOrErr() (*EventType, error) {
 		return nil, &NotFoundError{label: eventtype.Label}
 	}
 	return nil, &NotLoadedError{edge: "event_type"}
+}
+
+// SportOrErr returns the Sport value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e EventEdges) SportOrErr() (*Sport, error) {
+	if e.Sport != nil {
+		return e.Sport, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: sport.Label}
+	}
+	return nil, &NotLoadedError{edge: "sport"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -73,6 +88,8 @@ func (*Event) scanValues(columns []string) ([]any, error) {
 		case event.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
 		case event.ForeignKeys[0]: // event_type_event
+			values[i] = new(sql.NullString)
+		case event.ForeignKeys[1]: // sport_event
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -144,6 +161,13 @@ func (e *Event) assignValues(columns []string, values []any) error {
 				e.event_type_event = new(string)
 				*e.event_type_event = value.String
 			}
+		case event.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field sport_event", values[i])
+			} else if value.Valid {
+				e.sport_event = new(string)
+				*e.sport_event = value.String
+			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
 		}
@@ -160,6 +184,11 @@ func (e *Event) Value(name string) (ent.Value, error) {
 // QueryEventType queries the "event_type" edge of the Event entity.
 func (e *Event) QueryEventType() *EventTypeQuery {
 	return NewEventClient(e.config).QueryEventType(e)
+}
+
+// QuerySport queries the "sport" edge of the Event entity.
+func (e *Event) QuerySport() *SportQuery {
+	return NewEventClient(e.config).QuerySport(e)
 }
 
 // Update returns a builder for updating this Event.

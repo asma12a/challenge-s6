@@ -61,13 +61,7 @@ func createUser(ctx context.Context, service service.User) fiber.Handler {
 
 func getUser(ctx context.Context, service service.User) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id, err := entity.StringToID(c.Params("userId"))
-		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status": "error",
-				"error":  err,
-			})
-		}
+		id := c.Params("userId")
 
 		user, err := service.FindOne(ctx, id)
 		if err != nil {
@@ -78,25 +72,19 @@ func getUser(ctx context.Context, service service.User) fiber.Handler {
 		}
 
 		return c.JSON(fiber.Map{
-			"status": "success",
+			"status":  "success",
 			"message": "User found",
-			"data":   user,
+			"data":    user,
 		})
 	}
 }
 
 func updateUser(ctx context.Context, service service.User) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id, err := entity.StringToID(c.Params("userId"))
-		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status": "error",
-				"error":  err,
-			})
-		}
+		id := c.Params("userId")
 
 		var userInput *entity.User
-		err = c.BodyParser(&userInput)
+		err := c.BodyParser(&userInput)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
@@ -117,7 +105,7 @@ func updateUser(ctx context.Context, service service.User) fiber.Handler {
 		user.Password = userInput.Password
 		user.Role = userInput.Role
 
-		updatedUser, err := service.Update(ctx,userInput)
+		updatedUser, err := service.Update(ctx, userInput)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
@@ -126,7 +114,7 @@ func updateUser(ctx context.Context, service service.User) fiber.Handler {
 		}
 
 		return c.JSON(fiber.Map{
-			"status": "success",
+			"status":  "success",
 			"message": "User updated",
 			"data":    updatedUser,
 		})
@@ -135,15 +123,9 @@ func updateUser(ctx context.Context, service service.User) fiber.Handler {
 
 func deleteUser(ctx context.Context, service service.User) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id, err := entity.StringToID(c.Params("userId"))
-		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status": "error",
-				"error":  err,
-			})
-		}
+		id := c.Params("userId")
 
-		err = service.Delete(ctx, id)
+		err := service.Delete(ctx, id)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
