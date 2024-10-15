@@ -21,3 +21,6 @@ start:
 	air
 
 .PHONY: start migrate docker-dev
+
+generate:
+	go generate ./ent
