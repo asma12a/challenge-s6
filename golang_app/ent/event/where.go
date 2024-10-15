@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/asma12a/challenge-s6/ent/predicate"
 	"github.com/google/uuid"
 )
@@ -383,6 +384,29 @@ func IsFinishedEQ(v bool) predicate.Event {
 // IsFinishedNEQ applies the NEQ predicate on the "is_finished" field.
 func IsFinishedNEQ(v bool) predicate.Event {
 	return predicate.Event(sql.FieldNEQ(FieldIsFinished, v))
+}
+
+// HasUserStatsID applies the HasEdge predicate on the "user_stats_id" edge.
+func HasUserStatsID() predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, UserStatsIDTable, UserStatsIDColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUserStatsIDWith applies the HasEdge predicate on the "user_stats_id" edge with a given conditions (other predicates).
+func HasUserStatsIDWith(preds ...predicate.UserStats) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		step := newUserStatsIDStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

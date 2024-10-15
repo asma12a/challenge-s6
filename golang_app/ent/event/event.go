@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/google/uuid"
 )
 
@@ -28,8 +29,17 @@ const (
 	FieldIsPublic = "is_public"
 	// FieldIsFinished holds the string denoting the is_finished field in the database.
 	FieldIsFinished = "is_finished"
+	// EdgeUserStatsID holds the string denoting the user_stats_id edge name in mutations.
+	EdgeUserStatsID = "user_stats_id"
 	// Table holds the table name of the event in the database.
 	Table = "events"
+	// UserStatsIDTable is the table that holds the user_stats_id relation/edge.
+	UserStatsIDTable = "user_stats"
+	// UserStatsIDInverseTable is the table name for the UserStats entity.
+	// It exists in this package in order to avoid circular dependency with the "userstats" package.
+	UserStatsIDInverseTable = "user_stats"
+	// UserStatsIDColumn is the table column denoting the user_stats_id relation/edge.
+	UserStatsIDColumn = "event_id"
 )
 
 // Columns holds all SQL columns for event fields.
@@ -114,4 +124,25 @@ func ByIsPublic(opts ...sql.OrderTermOption) OrderOption {
 // ByIsFinished orders the results by the is_finished field.
 func ByIsFinished(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIsFinished, opts...).ToFunc()
+}
+
+// ByUserStatsIDCount orders the results by user_stats_id count.
+func ByUserStatsIDCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newUserStatsIDStep(), opts...)
+	}
+}
+
+// ByUserStatsID orders the results by user_stats_id terms.
+func ByUserStatsID(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserStatsIDStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newUserStatsIDStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserStatsIDInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, UserStatsIDTable, UserStatsIDColumn),
+	)
 }

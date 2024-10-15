@@ -10,6 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/asma12a/challenge-s6/ent/user"
+	"github.com/asma12a/challenge-s6/ent/userstats"
+	ulid "github.com/oklog/ulid/v2"
 )
 
 // UserCreate is the builder for creating a User entity.
@@ -63,6 +65,21 @@ func (uc *UserCreate) SetNillableID(s *string) *UserCreate {
 		uc.SetID(*s)
 	}
 	return uc
+}
+
+// AddUserStatIDs adds the "user_stats" edge to the UserStats entity by IDs.
+func (uc *UserCreate) AddUserStatIDs(ids ...ulid.ULID) *UserCreate {
+	uc.mutation.AddUserStatIDs(ids...)
+	return uc
+}
+
+// AddUserStats adds the "user_stats" edges to the UserStats entity.
+func (uc *UserCreate) AddUserStats(u ...*UserStats) *UserCreate {
+	ids := make([]ulid.ULID, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uc.AddUserStatIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -199,6 +216,22 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeString, value)
 		_node.Role = value
+	}
+	if nodes := uc.mutation.UserStatsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserStatsTable,
+			Columns: []string{user.UserStatsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

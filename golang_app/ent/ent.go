@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/user"
+	"github.com/asma12a/challenge-s6/ent/userstats"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -74,8 +75,9 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			event.Table: event.ValidColumn,
-			user.Table:  user.ValidColumn,
+			event.Table:     event.ValidColumn,
+			user.Table:      user.ValidColumn,
+			userstats.Table: userstats.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

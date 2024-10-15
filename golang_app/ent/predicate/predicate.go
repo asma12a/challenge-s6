@@ -11,3 +11,6 @@ type Event func(*sql.Selector)
 
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
+
+// UserStats is the predicate function for userstats builders.
+type UserStats func(*sql.Selector)

@@ -11,7 +11,9 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/asma12a/challenge-s6/ent/event"
+	"github.com/asma12a/challenge-s6/ent/userstats"
 	"github.com/google/uuid"
+	ulid "github.com/oklog/ulid/v2"
 )
 
 // EventCreate is the builder for creating a Event entity.
@@ -99,6 +101,21 @@ func (ec *EventCreate) SetNillableID(u *uuid.UUID) *EventCreate {
 		ec.SetID(*u)
 	}
 	return ec
+}
+
+// AddUserStatsIDIDs adds the "user_stats_id" edge to the UserStats entity by IDs.
+func (ec *EventCreate) AddUserStatsIDIDs(ids ...ulid.ULID) *EventCreate {
+	ec.mutation.AddUserStatsIDIDs(ids...)
+	return ec
+}
+
+// AddUserStatsID adds the "user_stats_id" edges to the UserStats entity.
+func (ec *EventCreate) AddUserStatsID(u ...*UserStats) *EventCreate {
+	ids := make([]ulid.ULID, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return ec.AddUserStatsIDIDs(ids...)
 }
 
 // Mutation returns the EventMutation object of the builder.
@@ -259,6 +276,22 @@ func (ec *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 	if value, ok := ec.mutation.IsFinished(); ok {
 		_spec.SetField(event.FieldIsFinished, field.TypeBool, value)
 		_node.IsFinished = value
+	}
+	if nodes := ec.mutation.UserStatsIDIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.UserStatsIDTable,
+			Columns: []string{event.UserStatsIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

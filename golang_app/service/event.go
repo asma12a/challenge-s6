@@ -6,7 +6,6 @@ import (
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/entity"
-	"github.com/google/uuid"
 )
 
 type Event struct {
@@ -36,7 +35,7 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event) (*ent.Event,
 	return entEvent, nil
 }
 
-func (e *Event) FindOne(ctx context.Context, id uuid.UUID) (*ent.Event, error) {
+func (e *Event) FindOne(ctx context.Context, id entity.ID) (*ent.Event, error) {
 	return e.db.Event.Query().Where(event.IDEQ(id)).Only(ctx)
 }
 
@@ -59,7 +58,7 @@ func (repo *Event) Update(ctx context.Context, event *entity.Event) (*ent.Event,
 	return entEvent, nil
 }
 
-func (e *Event) Delete(ctx context.Context, id uuid.UUID) error {
+func (e *Event) Delete(ctx context.Context, id entity.ID) error {
 	err := e.db.Event.DeleteOneID(id).Exec(ctx)
 	if err != nil {
 		return entity.ErrCannotBeDeleted

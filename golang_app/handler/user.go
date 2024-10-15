@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"log"
 
 	"github.com/asma12a/challenge-s6/entity"
 	"github.com/asma12a/challenge-s6/service"
@@ -45,9 +46,8 @@ func createUser(ctx context.Context, service service.User) fiber.Handler {
 		createdUser, err := service.Create(ctx, newUser)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": err,
-				"error":        err.Error(),
+				"status": "error",
+				"error":  err.Error(),
 			})
 		}
 
@@ -78,9 +78,9 @@ func getUser(ctx context.Context, service service.User) fiber.Handler {
 		}
 
 		return c.JSON(fiber.Map{
-			"status": "success",
+			"status":  "success",
 			"message": "User found",
-			"data":   user,
+			"data":    user,
 		})
 	}
 }
@@ -117,7 +117,7 @@ func updateUser(ctx context.Context, service service.User) fiber.Handler {
 		user.Password = userInput.Password
 		user.Role = userInput.Role
 
-		updatedUser, err := service.Update(ctx,userInput)
+		updatedUser, err := service.Update(ctx, userInput)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
@@ -126,7 +126,7 @@ func updateUser(ctx context.Context, service service.User) fiber.Handler {
 		}
 
 		return c.JSON(fiber.Map{
-			"status": "success",
+			"status":  "success",
 			"message": "User updated",
 			"data":    updatedUser,
 		})
@@ -162,9 +162,10 @@ func listUsers(ctx context.Context, service service.User) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		users, err := service.List(ctx)
 		if err != nil {
+			log.Println(err)
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
-				"error":  err,
+				"error":  err.Error(),
 			})
 		}
 

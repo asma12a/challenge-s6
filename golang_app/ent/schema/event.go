@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 )
@@ -31,5 +32,7 @@ func (Event) Fields() []ent.Field {
 
 // Edges of the Event.
 func (Event) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.To("user_stats_id", UserStats.Type).StorageKey(edge.Column("event_id")),
+	}
 }

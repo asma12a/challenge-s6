@@ -31,8 +31,29 @@ type Event struct {
 	// IsPublic holds the value of the "is_public" field.
 	IsPublic bool `json:"is_public,omitempty"`
 	// IsFinished holds the value of the "is_finished" field.
-	IsFinished   bool `json:"is_finished,omitempty"`
+	IsFinished bool `json:"is_finished,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the EventQuery when eager-loading is set.
+	Edges        EventEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// EventEdges holds the relations/edges for other nodes in the graph.
+type EventEdges struct {
+	// UserStatsID holds the value of the user_stats_id edge.
+	UserStatsID []*UserStats `json:"user_stats_id,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// UserStatsIDOrErr returns the UserStatsID value or an error if the edge
+// was not loaded in eager-loading.
+func (e EventEdges) UserStatsIDOrErr() ([]*UserStats, error) {
+	if e.loadedTypes[0] {
+		return e.UserStatsID, nil
+	}
+	return nil, &NotLoadedError{edge: "user_stats_id"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -124,6 +145,11 @@ func (e *Event) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (e *Event) Value(name string) (ent.Value, error) {
 	return e.selectValues.Get(name)
+}
+
+// QueryUserStatsID queries the "user_stats_id" edge of the Event entity.
+func (e *Event) QueryUserStatsID() *UserStatsQuery {
+	return NewEventClient(e.config).QueryUserStatsID(e)
 }
 
 // Update returns a builder for updating this Event.
