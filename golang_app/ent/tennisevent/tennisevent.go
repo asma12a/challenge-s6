@@ -14,10 +14,10 @@ const (
 	FieldID = "id"
 	// FieldEventTennisID holds the string denoting the event_tennis_id field in the database.
 	FieldEventTennisID = "event_tennis_id"
-	// FieldTeamA holds the string denoting the team_a field in the database.
-	FieldTeamA = "team_a"
-	// FieldTeamB holds the string denoting the team_b field in the database.
-	FieldTeamB = "team_b"
+	// FieldTeamAID holds the string denoting the team_a_id field in the database.
+	FieldTeamAID = "team_a_id"
+	// FieldTeamBID holds the string denoting the team_b_id field in the database.
+	FieldTeamBID = "team_b_id"
 	// Table holds the table name of the tennisevent in the database.
 	Table = "tennis_events"
 )
@@ -26,8 +26,8 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldEventTennisID,
-	FieldTeamA,
-	FieldTeamB,
+	FieldTeamAID,
+	FieldTeamBID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -43,10 +43,10 @@ func ValidColumn(column string) bool {
 var (
 	// EventTennisIDValidator is a validator for the "event_tennis_id" field. It is called by the builders before save.
 	EventTennisIDValidator func(string) error
-	// TeamAValidator is a validator for the "team_A" field. It is called by the builders before save.
-	TeamAValidator func(string) error
-	// TeamBValidator is a validator for the "team_B" field. It is called by the builders before save.
-	TeamBValidator func(string) error
+	// TeamAIDValidator is a validator for the "team_A_id" field. It is called by the builders before save.
+	TeamAIDValidator func(string) error
+	// TeamBIDValidator is a validator for the "team_B_id" field. It is called by the builders before save.
+	TeamBIDValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() ulid.ID
 )
@@ -64,12 +64,12 @@ func ByEventTennisID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEventTennisID, opts...).ToFunc()
 }
 
-// ByTeamA orders the results by the team_A field.
-func ByTeamA(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTeamA, opts...).ToFunc()
+// ByTeamAID orders the results by the team_A_id field.
+func ByTeamAID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTeamAID, opts...).ToFunc()
 }
 
-// ByTeamB orders the results by the team_B field.
-func ByTeamB(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTeamB, opts...).ToFunc()
+// ByTeamBID orders the results by the team_B_id field.
+func ByTeamBID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTeamBID, opts...).ToFunc()
 }

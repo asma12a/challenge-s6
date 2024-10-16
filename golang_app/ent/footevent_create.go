@@ -26,15 +26,15 @@ func (fec *FootEventCreate) SetEventFootID(s string) *FootEventCreate {
 	return fec
 }
 
-// SetTeamA sets the "team_A" field.
-func (fec *FootEventCreate) SetTeamA(s string) *FootEventCreate {
-	fec.mutation.SetTeamA(s)
+// SetTeamAID sets the "team_A_id" field.
+func (fec *FootEventCreate) SetTeamAID(s string) *FootEventCreate {
+	fec.mutation.SetTeamAID(s)
 	return fec
 }
 
-// SetTeamB sets the "team_B" field.
-func (fec *FootEventCreate) SetTeamB(s string) *FootEventCreate {
-	fec.mutation.SetTeamB(s)
+// SetTeamBID sets the "team_B_id" field.
+func (fec *FootEventCreate) SetTeamBID(s string) *FootEventCreate {
+	fec.mutation.SetTeamBID(s)
 	return fec
 }
 
@@ -103,20 +103,20 @@ func (fec *FootEventCreate) check() error {
 			return &ValidationError{Name: "event_foot_id", err: fmt.Errorf(`ent: validator failed for field "FootEvent.event_foot_id": %w`, err)}
 		}
 	}
-	if _, ok := fec.mutation.TeamA(); !ok {
-		return &ValidationError{Name: "team_A", err: errors.New(`ent: missing required field "FootEvent.team_A"`)}
+	if _, ok := fec.mutation.TeamAID(); !ok {
+		return &ValidationError{Name: "team_A_id", err: errors.New(`ent: missing required field "FootEvent.team_A_id"`)}
 	}
-	if v, ok := fec.mutation.TeamA(); ok {
-		if err := footevent.TeamAValidator(v); err != nil {
-			return &ValidationError{Name: "team_A", err: fmt.Errorf(`ent: validator failed for field "FootEvent.team_A": %w`, err)}
+	if v, ok := fec.mutation.TeamAID(); ok {
+		if err := footevent.TeamAIDValidator(v); err != nil {
+			return &ValidationError{Name: "team_A_id", err: fmt.Errorf(`ent: validator failed for field "FootEvent.team_A_id": %w`, err)}
 		}
 	}
-	if _, ok := fec.mutation.TeamB(); !ok {
-		return &ValidationError{Name: "team_B", err: errors.New(`ent: missing required field "FootEvent.team_B"`)}
+	if _, ok := fec.mutation.TeamBID(); !ok {
+		return &ValidationError{Name: "team_B_id", err: errors.New(`ent: missing required field "FootEvent.team_B_id"`)}
 	}
-	if v, ok := fec.mutation.TeamB(); ok {
-		if err := footevent.TeamBValidator(v); err != nil {
-			return &ValidationError{Name: "team_B", err: fmt.Errorf(`ent: validator failed for field "FootEvent.team_B": %w`, err)}
+	if v, ok := fec.mutation.TeamBID(); ok {
+		if err := footevent.TeamBIDValidator(v); err != nil {
+			return &ValidationError{Name: "team_B_id", err: fmt.Errorf(`ent: validator failed for field "FootEvent.team_B_id": %w`, err)}
 		}
 	}
 	return nil
@@ -158,13 +158,13 @@ func (fec *FootEventCreate) createSpec() (*FootEvent, *sqlgraph.CreateSpec) {
 		_spec.SetField(footevent.FieldEventFootID, field.TypeString, value)
 		_node.EventFootID = value
 	}
-	if value, ok := fec.mutation.TeamA(); ok {
-		_spec.SetField(footevent.FieldTeamA, field.TypeString, value)
-		_node.TeamA = value
+	if value, ok := fec.mutation.TeamAID(); ok {
+		_spec.SetField(footevent.FieldTeamAID, field.TypeString, value)
+		_node.TeamAID = value
 	}
-	if value, ok := fec.mutation.TeamB(); ok {
-		_spec.SetField(footevent.FieldTeamB, field.TypeString, value)
-		_node.TeamB = value
+	if value, ok := fec.mutation.TeamBID(); ok {
+		_spec.SetField(footevent.FieldTeamBID, field.TypeString, value)
+		_node.TeamBID = value
 	}
 	return _node, _spec
 }

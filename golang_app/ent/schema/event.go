@@ -41,6 +41,7 @@ func (Event) Edges() []ent.Edge {
 		edge.To("foot_event", FootEvent.Type).StorageKey(edge.Column("event_foot_id")),
 		edge.To("basket_event", FootEvent.Type).StorageKey(edge.Column("event_basket_id")),
 		edge.To("tennis_event", FootEvent.Type).StorageKey(edge.Column("event_tennis_id")),
+		edge.To("running_event", FootEvent.Type).StorageKey(edge.Column("event_running_id")),
 
 		edge.From("event_type", EventType.Type).
 			Ref("events").

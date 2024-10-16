@@ -19,10 +19,10 @@ type TennisEvent struct {
 	ID ulid.ID `json:"id,omitempty"`
 	// EventTennisID holds the value of the "event_tennis_id" field.
 	EventTennisID string `json:"event_tennis_id,omitempty"`
-	// TeamA holds the value of the "team_A" field.
-	TeamA string `json:"team_A,omitempty"`
-	// TeamB holds the value of the "team_B" field.
-	TeamB        string `json:"team_B,omitempty"`
+	// TeamAID holds the value of the "team_A_id" field.
+	TeamAID string `json:"team_A_id,omitempty"`
+	// TeamBID holds the value of the "team_B_id" field.
+	TeamBID      string `json:"team_B_id,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -31,7 +31,7 @@ func (*TennisEvent) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case tennisevent.FieldEventTennisID, tennisevent.FieldTeamA, tennisevent.FieldTeamB:
+		case tennisevent.FieldEventTennisID, tennisevent.FieldTeamAID, tennisevent.FieldTeamBID:
 			values[i] = new(sql.NullString)
 		case tennisevent.FieldID:
 			values[i] = new(ulid.ID)
@@ -62,17 +62,17 @@ func (te *TennisEvent) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				te.EventTennisID = value.String
 			}
-		case tennisevent.FieldTeamA:
+		case tennisevent.FieldTeamAID:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field team_A", values[i])
+				return fmt.Errorf("unexpected type %T for field team_A_id", values[i])
 			} else if value.Valid {
-				te.TeamA = value.String
+				te.TeamAID = value.String
 			}
-		case tennisevent.FieldTeamB:
+		case tennisevent.FieldTeamBID:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field team_B", values[i])
+				return fmt.Errorf("unexpected type %T for field team_B_id", values[i])
 			} else if value.Valid {
-				te.TeamB = value.String
+				te.TeamBID = value.String
 			}
 		default:
 			te.selectValues.Set(columns[i], values[i])
@@ -113,11 +113,11 @@ func (te *TennisEvent) String() string {
 	builder.WriteString("event_tennis_id=")
 	builder.WriteString(te.EventTennisID)
 	builder.WriteString(", ")
-	builder.WriteString("team_A=")
-	builder.WriteString(te.TeamA)
+	builder.WriteString("team_A_id=")
+	builder.WriteString(te.TeamAID)
 	builder.WriteString(", ")
-	builder.WriteString("team_B=")
-	builder.WriteString(te.TeamB)
+	builder.WriteString("team_B_id=")
+	builder.WriteString(te.TeamBID)
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -41,30 +41,30 @@ func (beu *BasketEventUpdate) SetNillableEventBasketID(s *string) *BasketEventUp
 	return beu
 }
 
-// SetTeamA sets the "team_A" field.
-func (beu *BasketEventUpdate) SetTeamA(s string) *BasketEventUpdate {
-	beu.mutation.SetTeamA(s)
+// SetTeamAID sets the "team_A_id" field.
+func (beu *BasketEventUpdate) SetTeamAID(s string) *BasketEventUpdate {
+	beu.mutation.SetTeamAID(s)
 	return beu
 }
 
-// SetNillableTeamA sets the "team_A" field if the given value is not nil.
-func (beu *BasketEventUpdate) SetNillableTeamA(s *string) *BasketEventUpdate {
+// SetNillableTeamAID sets the "team_A_id" field if the given value is not nil.
+func (beu *BasketEventUpdate) SetNillableTeamAID(s *string) *BasketEventUpdate {
 	if s != nil {
-		beu.SetTeamA(*s)
+		beu.SetTeamAID(*s)
 	}
 	return beu
 }
 
-// SetTeamB sets the "team_B" field.
-func (beu *BasketEventUpdate) SetTeamB(s string) *BasketEventUpdate {
-	beu.mutation.SetTeamB(s)
+// SetTeamBID sets the "team_B_id" field.
+func (beu *BasketEventUpdate) SetTeamBID(s string) *BasketEventUpdate {
+	beu.mutation.SetTeamBID(s)
 	return beu
 }
 
-// SetNillableTeamB sets the "team_B" field if the given value is not nil.
-func (beu *BasketEventUpdate) SetNillableTeamB(s *string) *BasketEventUpdate {
+// SetNillableTeamBID sets the "team_B_id" field if the given value is not nil.
+func (beu *BasketEventUpdate) SetNillableTeamBID(s *string) *BasketEventUpdate {
 	if s != nil {
-		beu.SetTeamB(*s)
+		beu.SetTeamBID(*s)
 	}
 	return beu
 }
@@ -108,14 +108,14 @@ func (beu *BasketEventUpdate) check() error {
 			return &ValidationError{Name: "event_basket_id", err: fmt.Errorf(`ent: validator failed for field "BasketEvent.event_basket_id": %w`, err)}
 		}
 	}
-	if v, ok := beu.mutation.TeamA(); ok {
-		if err := basketevent.TeamAValidator(v); err != nil {
-			return &ValidationError{Name: "team_A", err: fmt.Errorf(`ent: validator failed for field "BasketEvent.team_A": %w`, err)}
+	if v, ok := beu.mutation.TeamAID(); ok {
+		if err := basketevent.TeamAIDValidator(v); err != nil {
+			return &ValidationError{Name: "team_A_id", err: fmt.Errorf(`ent: validator failed for field "BasketEvent.team_A_id": %w`, err)}
 		}
 	}
-	if v, ok := beu.mutation.TeamB(); ok {
-		if err := basketevent.TeamBValidator(v); err != nil {
-			return &ValidationError{Name: "team_B", err: fmt.Errorf(`ent: validator failed for field "BasketEvent.team_B": %w`, err)}
+	if v, ok := beu.mutation.TeamBID(); ok {
+		if err := basketevent.TeamBIDValidator(v); err != nil {
+			return &ValidationError{Name: "team_B_id", err: fmt.Errorf(`ent: validator failed for field "BasketEvent.team_B_id": %w`, err)}
 		}
 	}
 	return nil
@@ -136,11 +136,11 @@ func (beu *BasketEventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := beu.mutation.EventBasketID(); ok {
 		_spec.SetField(basketevent.FieldEventBasketID, field.TypeString, value)
 	}
-	if value, ok := beu.mutation.TeamA(); ok {
-		_spec.SetField(basketevent.FieldTeamA, field.TypeString, value)
+	if value, ok := beu.mutation.TeamAID(); ok {
+		_spec.SetField(basketevent.FieldTeamAID, field.TypeString, value)
 	}
-	if value, ok := beu.mutation.TeamB(); ok {
-		_spec.SetField(basketevent.FieldTeamB, field.TypeString, value)
+	if value, ok := beu.mutation.TeamBID(); ok {
+		_spec.SetField(basketevent.FieldTeamBID, field.TypeString, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, beu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -176,30 +176,30 @@ func (beuo *BasketEventUpdateOne) SetNillableEventBasketID(s *string) *BasketEve
 	return beuo
 }
 
-// SetTeamA sets the "team_A" field.
-func (beuo *BasketEventUpdateOne) SetTeamA(s string) *BasketEventUpdateOne {
-	beuo.mutation.SetTeamA(s)
+// SetTeamAID sets the "team_A_id" field.
+func (beuo *BasketEventUpdateOne) SetTeamAID(s string) *BasketEventUpdateOne {
+	beuo.mutation.SetTeamAID(s)
 	return beuo
 }
 
-// SetNillableTeamA sets the "team_A" field if the given value is not nil.
-func (beuo *BasketEventUpdateOne) SetNillableTeamA(s *string) *BasketEventUpdateOne {
+// SetNillableTeamAID sets the "team_A_id" field if the given value is not nil.
+func (beuo *BasketEventUpdateOne) SetNillableTeamAID(s *string) *BasketEventUpdateOne {
 	if s != nil {
-		beuo.SetTeamA(*s)
+		beuo.SetTeamAID(*s)
 	}
 	return beuo
 }
 
-// SetTeamB sets the "team_B" field.
-func (beuo *BasketEventUpdateOne) SetTeamB(s string) *BasketEventUpdateOne {
-	beuo.mutation.SetTeamB(s)
+// SetTeamBID sets the "team_B_id" field.
+func (beuo *BasketEventUpdateOne) SetTeamBID(s string) *BasketEventUpdateOne {
+	beuo.mutation.SetTeamBID(s)
 	return beuo
 }
 
-// SetNillableTeamB sets the "team_B" field if the given value is not nil.
-func (beuo *BasketEventUpdateOne) SetNillableTeamB(s *string) *BasketEventUpdateOne {
+// SetNillableTeamBID sets the "team_B_id" field if the given value is not nil.
+func (beuo *BasketEventUpdateOne) SetNillableTeamBID(s *string) *BasketEventUpdateOne {
 	if s != nil {
-		beuo.SetTeamB(*s)
+		beuo.SetTeamBID(*s)
 	}
 	return beuo
 }
@@ -256,14 +256,14 @@ func (beuo *BasketEventUpdateOne) check() error {
 			return &ValidationError{Name: "event_basket_id", err: fmt.Errorf(`ent: validator failed for field "BasketEvent.event_basket_id": %w`, err)}
 		}
 	}
-	if v, ok := beuo.mutation.TeamA(); ok {
-		if err := basketevent.TeamAValidator(v); err != nil {
-			return &ValidationError{Name: "team_A", err: fmt.Errorf(`ent: validator failed for field "BasketEvent.team_A": %w`, err)}
+	if v, ok := beuo.mutation.TeamAID(); ok {
+		if err := basketevent.TeamAIDValidator(v); err != nil {
+			return &ValidationError{Name: "team_A_id", err: fmt.Errorf(`ent: validator failed for field "BasketEvent.team_A_id": %w`, err)}
 		}
 	}
-	if v, ok := beuo.mutation.TeamB(); ok {
-		if err := basketevent.TeamBValidator(v); err != nil {
-			return &ValidationError{Name: "team_B", err: fmt.Errorf(`ent: validator failed for field "BasketEvent.team_B": %w`, err)}
+	if v, ok := beuo.mutation.TeamBID(); ok {
+		if err := basketevent.TeamBIDValidator(v); err != nil {
+			return &ValidationError{Name: "team_B_id", err: fmt.Errorf(`ent: validator failed for field "BasketEvent.team_B_id": %w`, err)}
 		}
 	}
 	return nil
@@ -301,11 +301,11 @@ func (beuo *BasketEventUpdateOne) sqlSave(ctx context.Context) (_node *BasketEve
 	if value, ok := beuo.mutation.EventBasketID(); ok {
 		_spec.SetField(basketevent.FieldEventBasketID, field.TypeString, value)
 	}
-	if value, ok := beuo.mutation.TeamA(); ok {
-		_spec.SetField(basketevent.FieldTeamA, field.TypeString, value)
+	if value, ok := beuo.mutation.TeamAID(); ok {
+		_spec.SetField(basketevent.FieldTeamAID, field.TypeString, value)
 	}
-	if value, ok := beuo.mutation.TeamB(); ok {
-		_spec.SetField(basketevent.FieldTeamB, field.TypeString, value)
+	if value, ok := beuo.mutation.TeamBID(); ok {
+		_spec.SetField(basketevent.FieldTeamBID, field.TypeString, value)
 	}
 	_node = &BasketEvent{config: beuo.config}
 	_spec.Assign = _node.assignValues

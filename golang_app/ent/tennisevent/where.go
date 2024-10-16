@@ -58,14 +58,14 @@ func EventTennisID(v string) predicate.TennisEvent {
 	return predicate.TennisEvent(sql.FieldEQ(FieldEventTennisID, v))
 }
 
-// TeamA applies equality check predicate on the "team_A" field. It's identical to TeamAEQ.
-func TeamA(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldEQ(FieldTeamA, v))
+// TeamAID applies equality check predicate on the "team_A_id" field. It's identical to TeamAIDEQ.
+func TeamAID(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldEQ(FieldTeamAID, v))
 }
 
-// TeamB applies equality check predicate on the "team_B" field. It's identical to TeamBEQ.
-func TeamB(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldEQ(FieldTeamB, v))
+// TeamBID applies equality check predicate on the "team_B_id" field. It's identical to TeamBIDEQ.
+func TeamBID(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldEQ(FieldTeamBID, v))
 }
 
 // EventTennisIDEQ applies the EQ predicate on the "event_tennis_id" field.
@@ -133,134 +133,134 @@ func EventTennisIDContainsFold(v string) predicate.TennisEvent {
 	return predicate.TennisEvent(sql.FieldContainsFold(FieldEventTennisID, v))
 }
 
-// TeamAEQ applies the EQ predicate on the "team_A" field.
-func TeamAEQ(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldEQ(FieldTeamA, v))
+// TeamAIDEQ applies the EQ predicate on the "team_A_id" field.
+func TeamAIDEQ(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldEQ(FieldTeamAID, v))
 }
 
-// TeamANEQ applies the NEQ predicate on the "team_A" field.
-func TeamANEQ(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldNEQ(FieldTeamA, v))
+// TeamAIDNEQ applies the NEQ predicate on the "team_A_id" field.
+func TeamAIDNEQ(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldNEQ(FieldTeamAID, v))
 }
 
-// TeamAIn applies the In predicate on the "team_A" field.
-func TeamAIn(vs ...string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldIn(FieldTeamA, vs...))
+// TeamAIDIn applies the In predicate on the "team_A_id" field.
+func TeamAIDIn(vs ...string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldIn(FieldTeamAID, vs...))
 }
 
-// TeamANotIn applies the NotIn predicate on the "team_A" field.
-func TeamANotIn(vs ...string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldNotIn(FieldTeamA, vs...))
+// TeamAIDNotIn applies the NotIn predicate on the "team_A_id" field.
+func TeamAIDNotIn(vs ...string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldNotIn(FieldTeamAID, vs...))
 }
 
-// TeamAGT applies the GT predicate on the "team_A" field.
-func TeamAGT(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldGT(FieldTeamA, v))
+// TeamAIDGT applies the GT predicate on the "team_A_id" field.
+func TeamAIDGT(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldGT(FieldTeamAID, v))
 }
 
-// TeamAGTE applies the GTE predicate on the "team_A" field.
-func TeamAGTE(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldGTE(FieldTeamA, v))
+// TeamAIDGTE applies the GTE predicate on the "team_A_id" field.
+func TeamAIDGTE(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldGTE(FieldTeamAID, v))
 }
 
-// TeamALT applies the LT predicate on the "team_A" field.
-func TeamALT(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldLT(FieldTeamA, v))
+// TeamAIDLT applies the LT predicate on the "team_A_id" field.
+func TeamAIDLT(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldLT(FieldTeamAID, v))
 }
 
-// TeamALTE applies the LTE predicate on the "team_A" field.
-func TeamALTE(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldLTE(FieldTeamA, v))
+// TeamAIDLTE applies the LTE predicate on the "team_A_id" field.
+func TeamAIDLTE(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldLTE(FieldTeamAID, v))
 }
 
-// TeamAContains applies the Contains predicate on the "team_A" field.
-func TeamAContains(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldContains(FieldTeamA, v))
+// TeamAIDContains applies the Contains predicate on the "team_A_id" field.
+func TeamAIDContains(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldContains(FieldTeamAID, v))
 }
 
-// TeamAHasPrefix applies the HasPrefix predicate on the "team_A" field.
-func TeamAHasPrefix(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldHasPrefix(FieldTeamA, v))
+// TeamAIDHasPrefix applies the HasPrefix predicate on the "team_A_id" field.
+func TeamAIDHasPrefix(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldHasPrefix(FieldTeamAID, v))
 }
 
-// TeamAHasSuffix applies the HasSuffix predicate on the "team_A" field.
-func TeamAHasSuffix(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldHasSuffix(FieldTeamA, v))
+// TeamAIDHasSuffix applies the HasSuffix predicate on the "team_A_id" field.
+func TeamAIDHasSuffix(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldHasSuffix(FieldTeamAID, v))
 }
 
-// TeamAEqualFold applies the EqualFold predicate on the "team_A" field.
-func TeamAEqualFold(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldEqualFold(FieldTeamA, v))
+// TeamAIDEqualFold applies the EqualFold predicate on the "team_A_id" field.
+func TeamAIDEqualFold(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldEqualFold(FieldTeamAID, v))
 }
 
-// TeamAContainsFold applies the ContainsFold predicate on the "team_A" field.
-func TeamAContainsFold(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldContainsFold(FieldTeamA, v))
+// TeamAIDContainsFold applies the ContainsFold predicate on the "team_A_id" field.
+func TeamAIDContainsFold(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldContainsFold(FieldTeamAID, v))
 }
 
-// TeamBEQ applies the EQ predicate on the "team_B" field.
-func TeamBEQ(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldEQ(FieldTeamB, v))
+// TeamBIDEQ applies the EQ predicate on the "team_B_id" field.
+func TeamBIDEQ(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldEQ(FieldTeamBID, v))
 }
 
-// TeamBNEQ applies the NEQ predicate on the "team_B" field.
-func TeamBNEQ(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldNEQ(FieldTeamB, v))
+// TeamBIDNEQ applies the NEQ predicate on the "team_B_id" field.
+func TeamBIDNEQ(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldNEQ(FieldTeamBID, v))
 }
 
-// TeamBIn applies the In predicate on the "team_B" field.
-func TeamBIn(vs ...string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldIn(FieldTeamB, vs...))
+// TeamBIDIn applies the In predicate on the "team_B_id" field.
+func TeamBIDIn(vs ...string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldIn(FieldTeamBID, vs...))
 }
 
-// TeamBNotIn applies the NotIn predicate on the "team_B" field.
-func TeamBNotIn(vs ...string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldNotIn(FieldTeamB, vs...))
+// TeamBIDNotIn applies the NotIn predicate on the "team_B_id" field.
+func TeamBIDNotIn(vs ...string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldNotIn(FieldTeamBID, vs...))
 }
 
-// TeamBGT applies the GT predicate on the "team_B" field.
-func TeamBGT(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldGT(FieldTeamB, v))
+// TeamBIDGT applies the GT predicate on the "team_B_id" field.
+func TeamBIDGT(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldGT(FieldTeamBID, v))
 }
 
-// TeamBGTE applies the GTE predicate on the "team_B" field.
-func TeamBGTE(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldGTE(FieldTeamB, v))
+// TeamBIDGTE applies the GTE predicate on the "team_B_id" field.
+func TeamBIDGTE(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldGTE(FieldTeamBID, v))
 }
 
-// TeamBLT applies the LT predicate on the "team_B" field.
-func TeamBLT(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldLT(FieldTeamB, v))
+// TeamBIDLT applies the LT predicate on the "team_B_id" field.
+func TeamBIDLT(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldLT(FieldTeamBID, v))
 }
 
-// TeamBLTE applies the LTE predicate on the "team_B" field.
-func TeamBLTE(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldLTE(FieldTeamB, v))
+// TeamBIDLTE applies the LTE predicate on the "team_B_id" field.
+func TeamBIDLTE(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldLTE(FieldTeamBID, v))
 }
 
-// TeamBContains applies the Contains predicate on the "team_B" field.
-func TeamBContains(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldContains(FieldTeamB, v))
+// TeamBIDContains applies the Contains predicate on the "team_B_id" field.
+func TeamBIDContains(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldContains(FieldTeamBID, v))
 }
 
-// TeamBHasPrefix applies the HasPrefix predicate on the "team_B" field.
-func TeamBHasPrefix(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldHasPrefix(FieldTeamB, v))
+// TeamBIDHasPrefix applies the HasPrefix predicate on the "team_B_id" field.
+func TeamBIDHasPrefix(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldHasPrefix(FieldTeamBID, v))
 }
 
-// TeamBHasSuffix applies the HasSuffix predicate on the "team_B" field.
-func TeamBHasSuffix(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldHasSuffix(FieldTeamB, v))
+// TeamBIDHasSuffix applies the HasSuffix predicate on the "team_B_id" field.
+func TeamBIDHasSuffix(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldHasSuffix(FieldTeamBID, v))
 }
 
-// TeamBEqualFold applies the EqualFold predicate on the "team_B" field.
-func TeamBEqualFold(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldEqualFold(FieldTeamB, v))
+// TeamBIDEqualFold applies the EqualFold predicate on the "team_B_id" field.
+func TeamBIDEqualFold(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldEqualFold(FieldTeamBID, v))
 }
 
-// TeamBContainsFold applies the ContainsFold predicate on the "team_B" field.
-func TeamBContainsFold(v string) predicate.TennisEvent {
-	return predicate.TennisEvent(sql.FieldContainsFold(FieldTeamB, v))
+// TeamBIDContainsFold applies the ContainsFold predicate on the "team_B_id" field.
+func TeamBIDContainsFold(v string) predicate.TennisEvent {
+	return predicate.TennisEvent(sql.FieldContainsFold(FieldTeamBID, v))
 }
 
 // And groups predicates with the AND operator between them.

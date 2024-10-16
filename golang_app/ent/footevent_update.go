@@ -41,30 +41,30 @@ func (feu *FootEventUpdate) SetNillableEventFootID(s *string) *FootEventUpdate {
 	return feu
 }
 
-// SetTeamA sets the "team_A" field.
-func (feu *FootEventUpdate) SetTeamA(s string) *FootEventUpdate {
-	feu.mutation.SetTeamA(s)
+// SetTeamAID sets the "team_A_id" field.
+func (feu *FootEventUpdate) SetTeamAID(s string) *FootEventUpdate {
+	feu.mutation.SetTeamAID(s)
 	return feu
 }
 
-// SetNillableTeamA sets the "team_A" field if the given value is not nil.
-func (feu *FootEventUpdate) SetNillableTeamA(s *string) *FootEventUpdate {
+// SetNillableTeamAID sets the "team_A_id" field if the given value is not nil.
+func (feu *FootEventUpdate) SetNillableTeamAID(s *string) *FootEventUpdate {
 	if s != nil {
-		feu.SetTeamA(*s)
+		feu.SetTeamAID(*s)
 	}
 	return feu
 }
 
-// SetTeamB sets the "team_B" field.
-func (feu *FootEventUpdate) SetTeamB(s string) *FootEventUpdate {
-	feu.mutation.SetTeamB(s)
+// SetTeamBID sets the "team_B_id" field.
+func (feu *FootEventUpdate) SetTeamBID(s string) *FootEventUpdate {
+	feu.mutation.SetTeamBID(s)
 	return feu
 }
 
-// SetNillableTeamB sets the "team_B" field if the given value is not nil.
-func (feu *FootEventUpdate) SetNillableTeamB(s *string) *FootEventUpdate {
+// SetNillableTeamBID sets the "team_B_id" field if the given value is not nil.
+func (feu *FootEventUpdate) SetNillableTeamBID(s *string) *FootEventUpdate {
 	if s != nil {
-		feu.SetTeamB(*s)
+		feu.SetTeamBID(*s)
 	}
 	return feu
 }
@@ -108,14 +108,14 @@ func (feu *FootEventUpdate) check() error {
 			return &ValidationError{Name: "event_foot_id", err: fmt.Errorf(`ent: validator failed for field "FootEvent.event_foot_id": %w`, err)}
 		}
 	}
-	if v, ok := feu.mutation.TeamA(); ok {
-		if err := footevent.TeamAValidator(v); err != nil {
-			return &ValidationError{Name: "team_A", err: fmt.Errorf(`ent: validator failed for field "FootEvent.team_A": %w`, err)}
+	if v, ok := feu.mutation.TeamAID(); ok {
+		if err := footevent.TeamAIDValidator(v); err != nil {
+			return &ValidationError{Name: "team_A_id", err: fmt.Errorf(`ent: validator failed for field "FootEvent.team_A_id": %w`, err)}
 		}
 	}
-	if v, ok := feu.mutation.TeamB(); ok {
-		if err := footevent.TeamBValidator(v); err != nil {
-			return &ValidationError{Name: "team_B", err: fmt.Errorf(`ent: validator failed for field "FootEvent.team_B": %w`, err)}
+	if v, ok := feu.mutation.TeamBID(); ok {
+		if err := footevent.TeamBIDValidator(v); err != nil {
+			return &ValidationError{Name: "team_B_id", err: fmt.Errorf(`ent: validator failed for field "FootEvent.team_B_id": %w`, err)}
 		}
 	}
 	return nil
@@ -136,11 +136,11 @@ func (feu *FootEventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := feu.mutation.EventFootID(); ok {
 		_spec.SetField(footevent.FieldEventFootID, field.TypeString, value)
 	}
-	if value, ok := feu.mutation.TeamA(); ok {
-		_spec.SetField(footevent.FieldTeamA, field.TypeString, value)
+	if value, ok := feu.mutation.TeamAID(); ok {
+		_spec.SetField(footevent.FieldTeamAID, field.TypeString, value)
 	}
-	if value, ok := feu.mutation.TeamB(); ok {
-		_spec.SetField(footevent.FieldTeamB, field.TypeString, value)
+	if value, ok := feu.mutation.TeamBID(); ok {
+		_spec.SetField(footevent.FieldTeamBID, field.TypeString, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, feu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -176,30 +176,30 @@ func (feuo *FootEventUpdateOne) SetNillableEventFootID(s *string) *FootEventUpda
 	return feuo
 }
 
-// SetTeamA sets the "team_A" field.
-func (feuo *FootEventUpdateOne) SetTeamA(s string) *FootEventUpdateOne {
-	feuo.mutation.SetTeamA(s)
+// SetTeamAID sets the "team_A_id" field.
+func (feuo *FootEventUpdateOne) SetTeamAID(s string) *FootEventUpdateOne {
+	feuo.mutation.SetTeamAID(s)
 	return feuo
 }
 
-// SetNillableTeamA sets the "team_A" field if the given value is not nil.
-func (feuo *FootEventUpdateOne) SetNillableTeamA(s *string) *FootEventUpdateOne {
+// SetNillableTeamAID sets the "team_A_id" field if the given value is not nil.
+func (feuo *FootEventUpdateOne) SetNillableTeamAID(s *string) *FootEventUpdateOne {
 	if s != nil {
-		feuo.SetTeamA(*s)
+		feuo.SetTeamAID(*s)
 	}
 	return feuo
 }
 
-// SetTeamB sets the "team_B" field.
-func (feuo *FootEventUpdateOne) SetTeamB(s string) *FootEventUpdateOne {
-	feuo.mutation.SetTeamB(s)
+// SetTeamBID sets the "team_B_id" field.
+func (feuo *FootEventUpdateOne) SetTeamBID(s string) *FootEventUpdateOne {
+	feuo.mutation.SetTeamBID(s)
 	return feuo
 }
 
-// SetNillableTeamB sets the "team_B" field if the given value is not nil.
-func (feuo *FootEventUpdateOne) SetNillableTeamB(s *string) *FootEventUpdateOne {
+// SetNillableTeamBID sets the "team_B_id" field if the given value is not nil.
+func (feuo *FootEventUpdateOne) SetNillableTeamBID(s *string) *FootEventUpdateOne {
 	if s != nil {
-		feuo.SetTeamB(*s)
+		feuo.SetTeamBID(*s)
 	}
 	return feuo
 }
@@ -256,14 +256,14 @@ func (feuo *FootEventUpdateOne) check() error {
 			return &ValidationError{Name: "event_foot_id", err: fmt.Errorf(`ent: validator failed for field "FootEvent.event_foot_id": %w`, err)}
 		}
 	}
-	if v, ok := feuo.mutation.TeamA(); ok {
-		if err := footevent.TeamAValidator(v); err != nil {
-			return &ValidationError{Name: "team_A", err: fmt.Errorf(`ent: validator failed for field "FootEvent.team_A": %w`, err)}
+	if v, ok := feuo.mutation.TeamAID(); ok {
+		if err := footevent.TeamAIDValidator(v); err != nil {
+			return &ValidationError{Name: "team_A_id", err: fmt.Errorf(`ent: validator failed for field "FootEvent.team_A_id": %w`, err)}
 		}
 	}
-	if v, ok := feuo.mutation.TeamB(); ok {
-		if err := footevent.TeamBValidator(v); err != nil {
-			return &ValidationError{Name: "team_B", err: fmt.Errorf(`ent: validator failed for field "FootEvent.team_B": %w`, err)}
+	if v, ok := feuo.mutation.TeamBID(); ok {
+		if err := footevent.TeamBIDValidator(v); err != nil {
+			return &ValidationError{Name: "team_B_id", err: fmt.Errorf(`ent: validator failed for field "FootEvent.team_B_id": %w`, err)}
 		}
 	}
 	return nil
@@ -301,11 +301,11 @@ func (feuo *FootEventUpdateOne) sqlSave(ctx context.Context) (_node *FootEvent, 
 	if value, ok := feuo.mutation.EventFootID(); ok {
 		_spec.SetField(footevent.FieldEventFootID, field.TypeString, value)
 	}
-	if value, ok := feuo.mutation.TeamA(); ok {
-		_spec.SetField(footevent.FieldTeamA, field.TypeString, value)
+	if value, ok := feuo.mutation.TeamAID(); ok {
+		_spec.SetField(footevent.FieldTeamAID, field.TypeString, value)
 	}
-	if value, ok := feuo.mutation.TeamB(); ok {
-		_spec.SetField(footevent.FieldTeamB, field.TypeString, value)
+	if value, ok := feuo.mutation.TeamBID(); ok {
+		_spec.SetField(footevent.FieldTeamBID, field.TypeString, value)
 	}
 	_node = &FootEvent{config: feuo.config}
 	_spec.Assign = _node.assignValues

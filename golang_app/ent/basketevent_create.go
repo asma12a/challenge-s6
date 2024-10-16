@@ -26,15 +26,15 @@ func (bec *BasketEventCreate) SetEventBasketID(s string) *BasketEventCreate {
 	return bec
 }
 
-// SetTeamA sets the "team_A" field.
-func (bec *BasketEventCreate) SetTeamA(s string) *BasketEventCreate {
-	bec.mutation.SetTeamA(s)
+// SetTeamAID sets the "team_A_id" field.
+func (bec *BasketEventCreate) SetTeamAID(s string) *BasketEventCreate {
+	bec.mutation.SetTeamAID(s)
 	return bec
 }
 
-// SetTeamB sets the "team_B" field.
-func (bec *BasketEventCreate) SetTeamB(s string) *BasketEventCreate {
-	bec.mutation.SetTeamB(s)
+// SetTeamBID sets the "team_B_id" field.
+func (bec *BasketEventCreate) SetTeamBID(s string) *BasketEventCreate {
+	bec.mutation.SetTeamBID(s)
 	return bec
 }
 
@@ -103,20 +103,20 @@ func (bec *BasketEventCreate) check() error {
 			return &ValidationError{Name: "event_basket_id", err: fmt.Errorf(`ent: validator failed for field "BasketEvent.event_basket_id": %w`, err)}
 		}
 	}
-	if _, ok := bec.mutation.TeamA(); !ok {
-		return &ValidationError{Name: "team_A", err: errors.New(`ent: missing required field "BasketEvent.team_A"`)}
+	if _, ok := bec.mutation.TeamAID(); !ok {
+		return &ValidationError{Name: "team_A_id", err: errors.New(`ent: missing required field "BasketEvent.team_A_id"`)}
 	}
-	if v, ok := bec.mutation.TeamA(); ok {
-		if err := basketevent.TeamAValidator(v); err != nil {
-			return &ValidationError{Name: "team_A", err: fmt.Errorf(`ent: validator failed for field "BasketEvent.team_A": %w`, err)}
+	if v, ok := bec.mutation.TeamAID(); ok {
+		if err := basketevent.TeamAIDValidator(v); err != nil {
+			return &ValidationError{Name: "team_A_id", err: fmt.Errorf(`ent: validator failed for field "BasketEvent.team_A_id": %w`, err)}
 		}
 	}
-	if _, ok := bec.mutation.TeamB(); !ok {
-		return &ValidationError{Name: "team_B", err: errors.New(`ent: missing required field "BasketEvent.team_B"`)}
+	if _, ok := bec.mutation.TeamBID(); !ok {
+		return &ValidationError{Name: "team_B_id", err: errors.New(`ent: missing required field "BasketEvent.team_B_id"`)}
 	}
-	if v, ok := bec.mutation.TeamB(); ok {
-		if err := basketevent.TeamBValidator(v); err != nil {
-			return &ValidationError{Name: "team_B", err: fmt.Errorf(`ent: validator failed for field "BasketEvent.team_B": %w`, err)}
+	if v, ok := bec.mutation.TeamBID(); ok {
+		if err := basketevent.TeamBIDValidator(v); err != nil {
+			return &ValidationError{Name: "team_B_id", err: fmt.Errorf(`ent: validator failed for field "BasketEvent.team_B_id": %w`, err)}
 		}
 	}
 	return nil
@@ -158,13 +158,13 @@ func (bec *BasketEventCreate) createSpec() (*BasketEvent, *sqlgraph.CreateSpec) 
 		_spec.SetField(basketevent.FieldEventBasketID, field.TypeString, value)
 		_node.EventBasketID = value
 	}
-	if value, ok := bec.mutation.TeamA(); ok {
-		_spec.SetField(basketevent.FieldTeamA, field.TypeString, value)
-		_node.TeamA = value
+	if value, ok := bec.mutation.TeamAID(); ok {
+		_spec.SetField(basketevent.FieldTeamAID, field.TypeString, value)
+		_node.TeamAID = value
 	}
-	if value, ok := bec.mutation.TeamB(); ok {
-		_spec.SetField(basketevent.FieldTeamB, field.TypeString, value)
-		_node.TeamB = value
+	if value, ok := bec.mutation.TeamBID(); ok {
+		_spec.SetField(basketevent.FieldTeamBID, field.TypeString, value)
+		_node.TeamBID = value
 	}
 	return _node, _spec
 }

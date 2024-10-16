@@ -21,8 +21,8 @@ func (TennisEvent) Fields() []ent.Field {
 				},
 			),
 		field.String("event_tennis_id").NotEmpty(),
-		field.String("team_A").NotEmpty(),
-		field.String("team_B").NotEmpty(),
+		field.String("team_A_id").NotEmpty(),
+		field.String("team_B_id").NotEmpty(),
 	}
 
 }

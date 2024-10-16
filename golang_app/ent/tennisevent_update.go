@@ -41,30 +41,30 @@ func (teu *TennisEventUpdate) SetNillableEventTennisID(s *string) *TennisEventUp
 	return teu
 }
 
-// SetTeamA sets the "team_A" field.
-func (teu *TennisEventUpdate) SetTeamA(s string) *TennisEventUpdate {
-	teu.mutation.SetTeamA(s)
+// SetTeamAID sets the "team_A_id" field.
+func (teu *TennisEventUpdate) SetTeamAID(s string) *TennisEventUpdate {
+	teu.mutation.SetTeamAID(s)
 	return teu
 }
 
-// SetNillableTeamA sets the "team_A" field if the given value is not nil.
-func (teu *TennisEventUpdate) SetNillableTeamA(s *string) *TennisEventUpdate {
+// SetNillableTeamAID sets the "team_A_id" field if the given value is not nil.
+func (teu *TennisEventUpdate) SetNillableTeamAID(s *string) *TennisEventUpdate {
 	if s != nil {
-		teu.SetTeamA(*s)
+		teu.SetTeamAID(*s)
 	}
 	return teu
 }
 
-// SetTeamB sets the "team_B" field.
-func (teu *TennisEventUpdate) SetTeamB(s string) *TennisEventUpdate {
-	teu.mutation.SetTeamB(s)
+// SetTeamBID sets the "team_B_id" field.
+func (teu *TennisEventUpdate) SetTeamBID(s string) *TennisEventUpdate {
+	teu.mutation.SetTeamBID(s)
 	return teu
 }
 
-// SetNillableTeamB sets the "team_B" field if the given value is not nil.
-func (teu *TennisEventUpdate) SetNillableTeamB(s *string) *TennisEventUpdate {
+// SetNillableTeamBID sets the "team_B_id" field if the given value is not nil.
+func (teu *TennisEventUpdate) SetNillableTeamBID(s *string) *TennisEventUpdate {
 	if s != nil {
-		teu.SetTeamB(*s)
+		teu.SetTeamBID(*s)
 	}
 	return teu
 }
@@ -108,14 +108,14 @@ func (teu *TennisEventUpdate) check() error {
 			return &ValidationError{Name: "event_tennis_id", err: fmt.Errorf(`ent: validator failed for field "TennisEvent.event_tennis_id": %w`, err)}
 		}
 	}
-	if v, ok := teu.mutation.TeamA(); ok {
-		if err := tennisevent.TeamAValidator(v); err != nil {
-			return &ValidationError{Name: "team_A", err: fmt.Errorf(`ent: validator failed for field "TennisEvent.team_A": %w`, err)}
+	if v, ok := teu.mutation.TeamAID(); ok {
+		if err := tennisevent.TeamAIDValidator(v); err != nil {
+			return &ValidationError{Name: "team_A_id", err: fmt.Errorf(`ent: validator failed for field "TennisEvent.team_A_id": %w`, err)}
 		}
 	}
-	if v, ok := teu.mutation.TeamB(); ok {
-		if err := tennisevent.TeamBValidator(v); err != nil {
-			return &ValidationError{Name: "team_B", err: fmt.Errorf(`ent: validator failed for field "TennisEvent.team_B": %w`, err)}
+	if v, ok := teu.mutation.TeamBID(); ok {
+		if err := tennisevent.TeamBIDValidator(v); err != nil {
+			return &ValidationError{Name: "team_B_id", err: fmt.Errorf(`ent: validator failed for field "TennisEvent.team_B_id": %w`, err)}
 		}
 	}
 	return nil
@@ -136,11 +136,11 @@ func (teu *TennisEventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := teu.mutation.EventTennisID(); ok {
 		_spec.SetField(tennisevent.FieldEventTennisID, field.TypeString, value)
 	}
-	if value, ok := teu.mutation.TeamA(); ok {
-		_spec.SetField(tennisevent.FieldTeamA, field.TypeString, value)
+	if value, ok := teu.mutation.TeamAID(); ok {
+		_spec.SetField(tennisevent.FieldTeamAID, field.TypeString, value)
 	}
-	if value, ok := teu.mutation.TeamB(); ok {
-		_spec.SetField(tennisevent.FieldTeamB, field.TypeString, value)
+	if value, ok := teu.mutation.TeamBID(); ok {
+		_spec.SetField(tennisevent.FieldTeamBID, field.TypeString, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, teu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -176,30 +176,30 @@ func (teuo *TennisEventUpdateOne) SetNillableEventTennisID(s *string) *TennisEve
 	return teuo
 }
 
-// SetTeamA sets the "team_A" field.
-func (teuo *TennisEventUpdateOne) SetTeamA(s string) *TennisEventUpdateOne {
-	teuo.mutation.SetTeamA(s)
+// SetTeamAID sets the "team_A_id" field.
+func (teuo *TennisEventUpdateOne) SetTeamAID(s string) *TennisEventUpdateOne {
+	teuo.mutation.SetTeamAID(s)
 	return teuo
 }
 
-// SetNillableTeamA sets the "team_A" field if the given value is not nil.
-func (teuo *TennisEventUpdateOne) SetNillableTeamA(s *string) *TennisEventUpdateOne {
+// SetNillableTeamAID sets the "team_A_id" field if the given value is not nil.
+func (teuo *TennisEventUpdateOne) SetNillableTeamAID(s *string) *TennisEventUpdateOne {
 	if s != nil {
-		teuo.SetTeamA(*s)
+		teuo.SetTeamAID(*s)
 	}
 	return teuo
 }
 
-// SetTeamB sets the "team_B" field.
-func (teuo *TennisEventUpdateOne) SetTeamB(s string) *TennisEventUpdateOne {
-	teuo.mutation.SetTeamB(s)
+// SetTeamBID sets the "team_B_id" field.
+func (teuo *TennisEventUpdateOne) SetTeamBID(s string) *TennisEventUpdateOne {
+	teuo.mutation.SetTeamBID(s)
 	return teuo
 }
 
-// SetNillableTeamB sets the "team_B" field if the given value is not nil.
-func (teuo *TennisEventUpdateOne) SetNillableTeamB(s *string) *TennisEventUpdateOne {
+// SetNillableTeamBID sets the "team_B_id" field if the given value is not nil.
+func (teuo *TennisEventUpdateOne) SetNillableTeamBID(s *string) *TennisEventUpdateOne {
 	if s != nil {
-		teuo.SetTeamB(*s)
+		teuo.SetTeamBID(*s)
 	}
 	return teuo
 }
@@ -256,14 +256,14 @@ func (teuo *TennisEventUpdateOne) check() error {
 			return &ValidationError{Name: "event_tennis_id", err: fmt.Errorf(`ent: validator failed for field "TennisEvent.event_tennis_id": %w`, err)}
 		}
 	}
-	if v, ok := teuo.mutation.TeamA(); ok {
-		if err := tennisevent.TeamAValidator(v); err != nil {
-			return &ValidationError{Name: "team_A", err: fmt.Errorf(`ent: validator failed for field "TennisEvent.team_A": %w`, err)}
+	if v, ok := teuo.mutation.TeamAID(); ok {
+		if err := tennisevent.TeamAIDValidator(v); err != nil {
+			return &ValidationError{Name: "team_A_id", err: fmt.Errorf(`ent: validator failed for field "TennisEvent.team_A_id": %w`, err)}
 		}
 	}
-	if v, ok := teuo.mutation.TeamB(); ok {
-		if err := tennisevent.TeamBValidator(v); err != nil {
-			return &ValidationError{Name: "team_B", err: fmt.Errorf(`ent: validator failed for field "TennisEvent.team_B": %w`, err)}
+	if v, ok := teuo.mutation.TeamBID(); ok {
+		if err := tennisevent.TeamBIDValidator(v); err != nil {
+			return &ValidationError{Name: "team_B_id", err: fmt.Errorf(`ent: validator failed for field "TennisEvent.team_B_id": %w`, err)}
 		}
 	}
 	return nil
@@ -301,11 +301,11 @@ func (teuo *TennisEventUpdateOne) sqlSave(ctx context.Context) (_node *TennisEve
 	if value, ok := teuo.mutation.EventTennisID(); ok {
 		_spec.SetField(tennisevent.FieldEventTennisID, field.TypeString, value)
 	}
-	if value, ok := teuo.mutation.TeamA(); ok {
-		_spec.SetField(tennisevent.FieldTeamA, field.TypeString, value)
+	if value, ok := teuo.mutation.TeamAID(); ok {
+		_spec.SetField(tennisevent.FieldTeamAID, field.TypeString, value)
 	}
-	if value, ok := teuo.mutation.TeamB(); ok {
-		_spec.SetField(tennisevent.FieldTeamB, field.TypeString, value)
+	if value, ok := teuo.mutation.TeamBID(); ok {
+		_spec.SetField(tennisevent.FieldTeamBID, field.TypeString, value)
 	}
 	_node = &TennisEvent{config: teuo.config}
 	_spec.Assign = _node.assignValues

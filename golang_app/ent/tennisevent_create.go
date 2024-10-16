@@ -26,15 +26,15 @@ func (tec *TennisEventCreate) SetEventTennisID(s string) *TennisEventCreate {
 	return tec
 }
 
-// SetTeamA sets the "team_A" field.
-func (tec *TennisEventCreate) SetTeamA(s string) *TennisEventCreate {
-	tec.mutation.SetTeamA(s)
+// SetTeamAID sets the "team_A_id" field.
+func (tec *TennisEventCreate) SetTeamAID(s string) *TennisEventCreate {
+	tec.mutation.SetTeamAID(s)
 	return tec
 }
 
-// SetTeamB sets the "team_B" field.
-func (tec *TennisEventCreate) SetTeamB(s string) *TennisEventCreate {
-	tec.mutation.SetTeamB(s)
+// SetTeamBID sets the "team_B_id" field.
+func (tec *TennisEventCreate) SetTeamBID(s string) *TennisEventCreate {
+	tec.mutation.SetTeamBID(s)
 	return tec
 }
 
@@ -103,20 +103,20 @@ func (tec *TennisEventCreate) check() error {
 			return &ValidationError{Name: "event_tennis_id", err: fmt.Errorf(`ent: validator failed for field "TennisEvent.event_tennis_id": %w`, err)}
 		}
 	}
-	if _, ok := tec.mutation.TeamA(); !ok {
-		return &ValidationError{Name: "team_A", err: errors.New(`ent: missing required field "TennisEvent.team_A"`)}
+	if _, ok := tec.mutation.TeamAID(); !ok {
+		return &ValidationError{Name: "team_A_id", err: errors.New(`ent: missing required field "TennisEvent.team_A_id"`)}
 	}
-	if v, ok := tec.mutation.TeamA(); ok {
-		if err := tennisevent.TeamAValidator(v); err != nil {
-			return &ValidationError{Name: "team_A", err: fmt.Errorf(`ent: validator failed for field "TennisEvent.team_A": %w`, err)}
+	if v, ok := tec.mutation.TeamAID(); ok {
+		if err := tennisevent.TeamAIDValidator(v); err != nil {
+			return &ValidationError{Name: "team_A_id", err: fmt.Errorf(`ent: validator failed for field "TennisEvent.team_A_id": %w`, err)}
 		}
 	}
-	if _, ok := tec.mutation.TeamB(); !ok {
-		return &ValidationError{Name: "team_B", err: errors.New(`ent: missing required field "TennisEvent.team_B"`)}
+	if _, ok := tec.mutation.TeamBID(); !ok {
+		return &ValidationError{Name: "team_B_id", err: errors.New(`ent: missing required field "TennisEvent.team_B_id"`)}
 	}
-	if v, ok := tec.mutation.TeamB(); ok {
-		if err := tennisevent.TeamBValidator(v); err != nil {
-			return &ValidationError{Name: "team_B", err: fmt.Errorf(`ent: validator failed for field "TennisEvent.team_B": %w`, err)}
+	if v, ok := tec.mutation.TeamBID(); ok {
+		if err := tennisevent.TeamBIDValidator(v); err != nil {
+			return &ValidationError{Name: "team_B_id", err: fmt.Errorf(`ent: validator failed for field "TennisEvent.team_B_id": %w`, err)}
 		}
 	}
 	return nil
@@ -158,13 +158,13 @@ func (tec *TennisEventCreate) createSpec() (*TennisEvent, *sqlgraph.CreateSpec) 
 		_spec.SetField(tennisevent.FieldEventTennisID, field.TypeString, value)
 		_node.EventTennisID = value
 	}
-	if value, ok := tec.mutation.TeamA(); ok {
-		_spec.SetField(tennisevent.FieldTeamA, field.TypeString, value)
-		_node.TeamA = value
+	if value, ok := tec.mutation.TeamAID(); ok {
+		_spec.SetField(tennisevent.FieldTeamAID, field.TypeString, value)
+		_node.TeamAID = value
 	}
-	if value, ok := tec.mutation.TeamB(); ok {
-		_spec.SetField(tennisevent.FieldTeamB, field.TypeString, value)
-		_node.TeamB = value
+	if value, ok := tec.mutation.TeamBID(); ok {
+		_spec.SetField(tennisevent.FieldTeamBID, field.TypeString, value)
+		_node.TeamBID = value
 	}
 	return _node, _spec
 }
