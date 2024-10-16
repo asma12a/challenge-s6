@@ -15,6 +15,7 @@ import (
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/eventtype"
 	"github.com/asma12a/challenge-s6/ent/predicate"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
 // EventTypeQuery is the builder for querying EventType entities.
@@ -107,8 +108,8 @@ func (etq *EventTypeQuery) FirstX(ctx context.Context) *EventType {
 
 // FirstID returns the first EventType ID from the query.
 // Returns a *NotFoundError when no EventType ID was found.
-func (etq *EventTypeQuery) FirstID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (etq *EventTypeQuery) FirstID(ctx context.Context) (id ulid.ID, err error) {
+	var ids []ulid.ID
 	if ids, err = etq.Limit(1).IDs(setContextOp(ctx, etq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
@@ -120,7 +121,7 @@ func (etq *EventTypeQuery) FirstID(ctx context.Context) (id string, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (etq *EventTypeQuery) FirstIDX(ctx context.Context) string {
+func (etq *EventTypeQuery) FirstIDX(ctx context.Context) ulid.ID {
 	id, err := etq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -158,8 +159,8 @@ func (etq *EventTypeQuery) OnlyX(ctx context.Context) *EventType {
 // OnlyID is like Only, but returns the only EventType ID in the query.
 // Returns a *NotSingularError when more than one EventType ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (etq *EventTypeQuery) OnlyID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (etq *EventTypeQuery) OnlyID(ctx context.Context) (id ulid.ID, err error) {
+	var ids []ulid.ID
 	if ids, err = etq.Limit(2).IDs(setContextOp(ctx, etq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
@@ -175,7 +176,7 @@ func (etq *EventTypeQuery) OnlyID(ctx context.Context) (id string, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (etq *EventTypeQuery) OnlyIDX(ctx context.Context) string {
+func (etq *EventTypeQuery) OnlyIDX(ctx context.Context) ulid.ID {
 	id, err := etq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -203,7 +204,7 @@ func (etq *EventTypeQuery) AllX(ctx context.Context) []*EventType {
 }
 
 // IDs executes the query and returns a list of EventType IDs.
-func (etq *EventTypeQuery) IDs(ctx context.Context) (ids []string, err error) {
+func (etq *EventTypeQuery) IDs(ctx context.Context) (ids []ulid.ID, err error) {
 	if etq.ctx.Unique == nil && etq.path != nil {
 		etq.Unique(true)
 	}
@@ -215,7 +216,7 @@ func (etq *EventTypeQuery) IDs(ctx context.Context) (ids []string, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (etq *EventTypeQuery) IDsX(ctx context.Context) []string {
+func (etq *EventTypeQuery) IDsX(ctx context.Context) []ulid.ID {
 	ids, err := etq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -405,7 +406,7 @@ func (etq *EventTypeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*E
 
 func (etq *EventTypeQuery) loadEvents(ctx context.Context, query *EventQuery, nodes []*EventType, init func(*EventType), assign func(*EventType, *Event)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[string]*EventType)
+	nodeids := make(map[ulid.ID]*EventType)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]

@@ -7,6 +7,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
 const (
@@ -32,6 +33,18 @@ const (
 	EdgeEventType = "event_type"
 	// EdgeSport holds the string denoting the sport edge name in mutations.
 	EdgeSport = "sport"
+	// EdgeUserStatsID holds the string denoting the user_stats_id edge name in mutations.
+	EdgeUserStatsID = "user_stats_id"
+	// EdgeFootEventID holds the string denoting the foot_event_id edge name in mutations.
+	EdgeFootEventID = "foot_event_id"
+	// EdgeBasketEventID holds the string denoting the basket_event_id edge name in mutations.
+	EdgeBasketEventID = "basket_event_id"
+	// EdgeTennisEventID holds the string denoting the tennis_event_id edge name in mutations.
+	EdgeTennisEventID = "tennis_event_id"
+	// EdgeRunningEventID holds the string denoting the running_event_id edge name in mutations.
+	EdgeRunningEventID = "running_event_id"
+	// EdgeTrainingEventID holds the string denoting the training_event_id edge name in mutations.
+	EdgeTrainingEventID = "training_event_id"
 	// Table holds the table name of the event in the database.
 	Table = "events"
 	// EventTypeTable is the table that holds the event_type relation/edge.
@@ -48,6 +61,48 @@ const (
 	SportInverseTable = "sports"
 	// SportColumn is the table column denoting the sport relation/edge.
 	SportColumn = "sport_id"
+	// UserStatsIDTable is the table that holds the user_stats_id relation/edge.
+	UserStatsIDTable = "user_stats"
+	// UserStatsIDInverseTable is the table name for the UserStats entity.
+	// It exists in this package in order to avoid circular dependency with the "userstats" package.
+	UserStatsIDInverseTable = "user_stats"
+	// UserStatsIDColumn is the table column denoting the user_stats_id relation/edge.
+	UserStatsIDColumn = "event_id"
+	// FootEventIDTable is the table that holds the foot_event_id relation/edge.
+	FootEventIDTable = "foot_events"
+	// FootEventIDInverseTable is the table name for the FootEvent entity.
+	// It exists in this package in order to avoid circular dependency with the "footevent" package.
+	FootEventIDInverseTable = "foot_events"
+	// FootEventIDColumn is the table column denoting the foot_event_id relation/edge.
+	FootEventIDColumn = "event_id"
+	// BasketEventIDTable is the table that holds the basket_event_id relation/edge.
+	BasketEventIDTable = "basket_events"
+	// BasketEventIDInverseTable is the table name for the BasketEvent entity.
+	// It exists in this package in order to avoid circular dependency with the "basketevent" package.
+	BasketEventIDInverseTable = "basket_events"
+	// BasketEventIDColumn is the table column denoting the basket_event_id relation/edge.
+	BasketEventIDColumn = "event_id"
+	// TennisEventIDTable is the table that holds the tennis_event_id relation/edge.
+	TennisEventIDTable = "tennis_events"
+	// TennisEventIDInverseTable is the table name for the TennisEvent entity.
+	// It exists in this package in order to avoid circular dependency with the "tennisevent" package.
+	TennisEventIDInverseTable = "tennis_events"
+	// TennisEventIDColumn is the table column denoting the tennis_event_id relation/edge.
+	TennisEventIDColumn = "event_id"
+	// RunningEventIDTable is the table that holds the running_event_id relation/edge.
+	RunningEventIDTable = "running_events"
+	// RunningEventIDInverseTable is the table name for the RunningEvent entity.
+	// It exists in this package in order to avoid circular dependency with the "runningevent" package.
+	RunningEventIDInverseTable = "running_events"
+	// RunningEventIDColumn is the table column denoting the running_event_id relation/edge.
+	RunningEventIDColumn = "event_id"
+	// TrainingEventIDTable is the table that holds the training_event_id relation/edge.
+	TrainingEventIDTable = "training_events"
+	// TrainingEventIDInverseTable is the table name for the TrainingEvent entity.
+	// It exists in this package in order to avoid circular dependency with the "trainingevent" package.
+	TrainingEventIDInverseTable = "training_events"
+	// TrainingEventIDColumn is the table column denoting the training_event_id relation/edge.
+	TrainingEventIDColumn = "event_id"
 )
 
 // Columns holds all SQL columns for event fields.
@@ -100,9 +155,7 @@ var (
 	// DefaultIsFinished holds the default value on creation for the "is_finished" field.
 	DefaultIsFinished bool
 	// DefaultID holds the default value on creation for the "id" field.
-	DefaultID func() string
-	// IDValidator is a validator for the "id" field. It is called by the builders before save.
-	IDValidator func(string) error
+	DefaultID func() ulid.ID
 )
 
 // OrderOption defines the ordering options for the Event queries.
@@ -161,6 +214,90 @@ func BySportField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newSportStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByUserStatsIDCount orders the results by user_stats_id count.
+func ByUserStatsIDCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newUserStatsIDStep(), opts...)
+	}
+}
+
+// ByUserStatsID orders the results by user_stats_id terms.
+func ByUserStatsID(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserStatsIDStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByFootEventIDCount orders the results by foot_event_id count.
+func ByFootEventIDCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newFootEventIDStep(), opts...)
+	}
+}
+
+// ByFootEventID orders the results by foot_event_id terms.
+func ByFootEventID(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newFootEventIDStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByBasketEventIDCount orders the results by basket_event_id count.
+func ByBasketEventIDCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newBasketEventIDStep(), opts...)
+	}
+}
+
+// ByBasketEventID orders the results by basket_event_id terms.
+func ByBasketEventID(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newBasketEventIDStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByTennisEventIDCount orders the results by tennis_event_id count.
+func ByTennisEventIDCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newTennisEventIDStep(), opts...)
+	}
+}
+
+// ByTennisEventID orders the results by tennis_event_id terms.
+func ByTennisEventID(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newTennisEventIDStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByRunningEventIDCount orders the results by running_event_id count.
+func ByRunningEventIDCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRunningEventIDStep(), opts...)
+	}
+}
+
+// ByRunningEventID orders the results by running_event_id terms.
+func ByRunningEventID(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRunningEventIDStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByTrainingEventIDCount orders the results by training_event_id count.
+func ByTrainingEventIDCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newTrainingEventIDStep(), opts...)
+	}
+}
+
+// ByTrainingEventID orders the results by training_event_id terms.
+func ByTrainingEventID(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newTrainingEventIDStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newEventTypeStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -173,5 +310,47 @@ func newSportStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SportInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, SportTable, SportColumn),
+	)
+}
+func newUserStatsIDStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserStatsIDInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, UserStatsIDTable, UserStatsIDColumn),
+	)
+}
+func newFootEventIDStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(FootEventIDInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, FootEventIDTable, FootEventIDColumn),
+	)
+}
+func newBasketEventIDStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(BasketEventIDInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, BasketEventIDTable, BasketEventIDColumn),
+	)
+}
+func newTennisEventIDStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(TennisEventIDInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, TennisEventIDTable, TennisEventIDColumn),
+	)
+}
+func newRunningEventIDStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RunningEventIDInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, RunningEventIDTable, RunningEventIDColumn),
+	)
+}
+func newTrainingEventIDStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(TrainingEventIDInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, TrainingEventIDTable, TrainingEventIDColumn),
 	)
 }

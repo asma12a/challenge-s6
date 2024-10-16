@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/asma12a/challenge-s6/ent"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
 	"github.com/asma12a/challenge-s6/presenter"
 	"github.com/asma12a/challenge-s6/service"
@@ -49,7 +50,13 @@ func createSport(ctx context.Context, serviceSport service.Sport) fiber.Handler 
 
 func getSport(ctx context.Context, serviceSport service.Sport) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id := c.Params("sportId")
+		id, err := ulid.Parse(c.Params("sportId"))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
 
 		sport, err := serviceSport.FindOne(ctx, id)
 		if err != nil {
@@ -78,7 +85,13 @@ func getSport(ctx context.Context, serviceSport service.Sport) fiber.Handler {
 
 func updateSport(ctx context.Context, serviceSport service.Sport) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id := c.Params("sportId")
+		id, err := ulid.Parse(c.Params("sportId"))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
 
 		existingSport, err := serviceSport.FindOne(ctx, id)
 		if err != nil {
@@ -120,9 +133,15 @@ func updateSport(ctx context.Context, serviceSport service.Sport) fiber.Handler 
 
 func deleteSport(ctx context.Context, serviceSport service.Sport) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id := c.Params("sportId")
+		id, err := ulid.Parse(c.Params("sportId"))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
 
-		err := serviceSport.Delete(ctx, id)
+		err = serviceSport.Delete(ctx, id)
 		if err != nil {
 			if ent.IsNotFound(err) {
 				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{

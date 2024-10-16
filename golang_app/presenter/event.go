@@ -2,11 +2,13 @@ package presenter
 
 import (
 	"time"
+
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
 // Event représente le type de présentation pour un événement.
 type Event struct {
-	ID         string    `json:"id,omitempty"`
+	ID         ulid.ID   `json:"id,omitempty"`
 	Name       string    `json:"name,omitempty"`
 	Address    string    `json:"address,omitempty"`
 	EventCode  int16     `json:"event_code,omitempty"`

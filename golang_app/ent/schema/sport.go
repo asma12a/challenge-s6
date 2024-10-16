@@ -4,7 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/oklog/ulid/v2"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
 type Sport struct {
@@ -13,11 +13,12 @@ type Sport struct {
 
 func (Sport) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").DefaultFunc(
-			func() string {
-				return ulid.Make().String()
-			},
-		).NotEmpty().Unique().Immutable(),
+		field.String("id").GoType(ulid.ID("")).
+			DefaultFunc(
+				func() ulid.ID {
+					return ulid.MustNew("")
+				},
+			),
 		field.String("name").NotEmpty(),
 		field.String("image_url").Optional(),
 	}

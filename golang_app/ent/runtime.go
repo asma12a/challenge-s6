@@ -5,17 +5,42 @@ package ent
 import (
 	"time"
 
+	"github.com/asma12a/challenge-s6/ent/basketevent"
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/eventtype"
+	"github.com/asma12a/challenge-s6/ent/footevent"
+	"github.com/asma12a/challenge-s6/ent/runningevent"
 	"github.com/asma12a/challenge-s6/ent/schema"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/sport"
+	"github.com/asma12a/challenge-s6/ent/tennisevent"
+	"github.com/asma12a/challenge-s6/ent/trainingevent"
 	"github.com/asma12a/challenge-s6/ent/user"
+	"github.com/asma12a/challenge-s6/ent/userstats"
 )
 
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	basketeventFields := schema.BasketEvent{}.Fields()
+	_ = basketeventFields
+	// basketeventDescEventID is the schema descriptor for event_id field.
+	basketeventDescEventID := basketeventFields[1].Descriptor()
+	// basketevent.EventIDValidator is a validator for the "event_id" field. It is called by the builders before save.
+	basketevent.EventIDValidator = basketeventDescEventID.Validators[0].(func(string) error)
+	// basketeventDescTeamAID is the schema descriptor for team_A_id field.
+	basketeventDescTeamAID := basketeventFields[2].Descriptor()
+	// basketevent.TeamAIDValidator is a validator for the "team_A_id" field. It is called by the builders before save.
+	basketevent.TeamAIDValidator = basketeventDescTeamAID.Validators[0].(func(string) error)
+	// basketeventDescTeamBID is the schema descriptor for team_B_id field.
+	basketeventDescTeamBID := basketeventFields[3].Descriptor()
+	// basketevent.TeamBIDValidator is a validator for the "team_B_id" field. It is called by the builders before save.
+	basketevent.TeamBIDValidator = basketeventDescTeamBID.Validators[0].(func(string) error)
+	// basketeventDescID is the schema descriptor for id field.
+	basketeventDescID := basketeventFields[0].Descriptor()
+	// basketevent.DefaultID holds the default value on creation for the id field.
+	basketevent.DefaultID = basketeventDescID.Default.(func() ulid.ID)
 	eventFields := schema.Event{}.Fields()
 	_ = eventFields
 	// eventDescName is the schema descriptor for name field.
@@ -49,9 +74,7 @@ func init() {
 	// eventDescID is the schema descriptor for id field.
 	eventDescID := eventFields[0].Descriptor()
 	// event.DefaultID holds the default value on creation for the id field.
-	event.DefaultID = eventDescID.Default.(func() string)
-	// event.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	event.IDValidator = eventDescID.Validators[0].(func(string) error)
+	event.DefaultID = eventDescID.Default.(func() ulid.ID)
 	eventtypeFields := schema.EventType{}.Fields()
 	_ = eventtypeFields
 	// eventtypeDescName is the schema descriptor for name field.
@@ -61,9 +84,39 @@ func init() {
 	// eventtypeDescID is the schema descriptor for id field.
 	eventtypeDescID := eventtypeFields[0].Descriptor()
 	// eventtype.DefaultID holds the default value on creation for the id field.
-	eventtype.DefaultID = eventtypeDescID.Default.(func() string)
-	// eventtype.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	eventtype.IDValidator = eventtypeDescID.Validators[0].(func(string) error)
+	eventtype.DefaultID = eventtypeDescID.Default.(func() ulid.ID)
+	footeventFields := schema.FootEvent{}.Fields()
+	_ = footeventFields
+	// footeventDescEventID is the schema descriptor for event_id field.
+	footeventDescEventID := footeventFields[1].Descriptor()
+	// footevent.EventIDValidator is a validator for the "event_id" field. It is called by the builders before save.
+	footevent.EventIDValidator = footeventDescEventID.Validators[0].(func(string) error)
+	// footeventDescTeamAID is the schema descriptor for team_A_id field.
+	footeventDescTeamAID := footeventFields[2].Descriptor()
+	// footevent.TeamAIDValidator is a validator for the "team_A_id" field. It is called by the builders before save.
+	footevent.TeamAIDValidator = footeventDescTeamAID.Validators[0].(func(string) error)
+	// footeventDescTeamBID is the schema descriptor for team_B_id field.
+	footeventDescTeamBID := footeventFields[3].Descriptor()
+	// footevent.TeamBIDValidator is a validator for the "team_B_id" field. It is called by the builders before save.
+	footevent.TeamBIDValidator = footeventDescTeamBID.Validators[0].(func(string) error)
+	// footeventDescID is the schema descriptor for id field.
+	footeventDescID := footeventFields[0].Descriptor()
+	// footevent.DefaultID holds the default value on creation for the id field.
+	footevent.DefaultID = footeventDescID.Default.(func() ulid.ID)
+	runningeventFields := schema.RunningEvent{}.Fields()
+	_ = runningeventFields
+	// runningeventDescEventID is the schema descriptor for event_id field.
+	runningeventDescEventID := runningeventFields[1].Descriptor()
+	// runningevent.EventIDValidator is a validator for the "event_id" field. It is called by the builders before save.
+	runningevent.EventIDValidator = runningeventDescEventID.Validators[0].(func(string) error)
+	// runningeventDescTeamID is the schema descriptor for team_id field.
+	runningeventDescTeamID := runningeventFields[2].Descriptor()
+	// runningevent.TeamIDValidator is a validator for the "team_id" field. It is called by the builders before save.
+	runningevent.TeamIDValidator = runningeventDescTeamID.Validators[0].(func(string) error)
+	// runningeventDescID is the schema descriptor for id field.
+	runningeventDescID := runningeventFields[0].Descriptor()
+	// runningevent.DefaultID holds the default value on creation for the id field.
+	runningevent.DefaultID = runningeventDescID.Default.(func() ulid.ID)
 	sportFields := schema.Sport{}.Fields()
 	_ = sportFields
 	// sportDescName is the schema descriptor for name field.
@@ -73,9 +126,39 @@ func init() {
 	// sportDescID is the schema descriptor for id field.
 	sportDescID := sportFields[0].Descriptor()
 	// sport.DefaultID holds the default value on creation for the id field.
-	sport.DefaultID = sportDescID.Default.(func() string)
-	// sport.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	sport.IDValidator = sportDescID.Validators[0].(func(string) error)
+	sport.DefaultID = sportDescID.Default.(func() ulid.ID)
+	tenniseventFields := schema.TennisEvent{}.Fields()
+	_ = tenniseventFields
+	// tenniseventDescEventID is the schema descriptor for event_id field.
+	tenniseventDescEventID := tenniseventFields[1].Descriptor()
+	// tennisevent.EventIDValidator is a validator for the "event_id" field. It is called by the builders before save.
+	tennisevent.EventIDValidator = tenniseventDescEventID.Validators[0].(func(string) error)
+	// tenniseventDescTeamAID is the schema descriptor for team_A_id field.
+	tenniseventDescTeamAID := tenniseventFields[2].Descriptor()
+	// tennisevent.TeamAIDValidator is a validator for the "team_A_id" field. It is called by the builders before save.
+	tennisevent.TeamAIDValidator = tenniseventDescTeamAID.Validators[0].(func(string) error)
+	// tenniseventDescTeamBID is the schema descriptor for team_B_id field.
+	tenniseventDescTeamBID := tenniseventFields[3].Descriptor()
+	// tennisevent.TeamBIDValidator is a validator for the "team_B_id" field. It is called by the builders before save.
+	tennisevent.TeamBIDValidator = tenniseventDescTeamBID.Validators[0].(func(string) error)
+	// tenniseventDescID is the schema descriptor for id field.
+	tenniseventDescID := tenniseventFields[0].Descriptor()
+	// tennisevent.DefaultID holds the default value on creation for the id field.
+	tennisevent.DefaultID = tenniseventDescID.Default.(func() ulid.ID)
+	trainingeventFields := schema.TrainingEvent{}.Fields()
+	_ = trainingeventFields
+	// trainingeventDescEventID is the schema descriptor for event_id field.
+	trainingeventDescEventID := trainingeventFields[1].Descriptor()
+	// trainingevent.EventIDValidator is a validator for the "event_id" field. It is called by the builders before save.
+	trainingevent.EventIDValidator = trainingeventDescEventID.Validators[0].(func(string) error)
+	// trainingeventDescTeamID is the schema descriptor for team_id field.
+	trainingeventDescTeamID := trainingeventFields[2].Descriptor()
+	// trainingevent.TeamIDValidator is a validator for the "team_id" field. It is called by the builders before save.
+	trainingevent.TeamIDValidator = trainingeventDescTeamID.Validators[0].(func(string) error)
+	// trainingeventDescID is the schema descriptor for id field.
+	trainingeventDescID := trainingeventFields[0].Descriptor()
+	// trainingevent.DefaultID holds the default value on creation for the id field.
+	trainingevent.DefaultID = trainingeventDescID.Default.(func() ulid.ID)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescName is the schema descriptor for name field.
@@ -99,7 +182,19 @@ func init() {
 	// userDescID is the schema descriptor for id field.
 	userDescID := userFields[0].Descriptor()
 	// user.DefaultID holds the default value on creation for the id field.
-	user.DefaultID = userDescID.Default.(func() string)
-	// user.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	user.IDValidator = userDescID.Validators[0].(func(string) error)
+	user.DefaultID = userDescID.Default.(func() ulid.ID)
+	userstatsFields := schema.UserStats{}.Fields()
+	_ = userstatsFields
+	// userstatsDescUserID is the schema descriptor for user_id field.
+	userstatsDescUserID := userstatsFields[1].Descriptor()
+	// userstats.UserIDValidator is a validator for the "user_id" field. It is called by the builders before save.
+	userstats.UserIDValidator = userstatsDescUserID.Validators[0].(func(string) error)
+	// userstatsDescEventID is the schema descriptor for event_id field.
+	userstatsDescEventID := userstatsFields[2].Descriptor()
+	// userstats.EventIDValidator is a validator for the "event_id" field. It is called by the builders before save.
+	userstats.EventIDValidator = userstatsDescEventID.Validators[0].(func(string) error)
+	// userstatsDescID is the schema descriptor for id field.
+	userstatsDescID := userstatsFields[0].Descriptor()
+	// userstats.DefaultID holds the default value on creation for the id field.
+	userstats.DefaultID = userstatsDescID.Default.(func() ulid.ID)
 }

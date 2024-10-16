@@ -36,27 +36,13 @@ func (Event) Fields() []ent.Field {
 // Edges of the Event.
 func (Event) Edges() []ent.Edge {
 	return []ent.Edge{
-<<<<<<< HEAD
 		edge.From("event_type", EventType.Type).Ref("events").Unique(),
 		edge.From("sport", Sport.Type).Ref("events").Unique(),
-=======
 		edge.To("user_stats_id", UserStats.Type).StorageKey(edge.Column("event_id")),
 		edge.To("foot_event_id", FootEvent.Type).StorageKey(edge.Column("event_id")),
 		edge.To("basket_event_id", BasketEvent.Type).StorageKey(edge.Column("event_id")),
 		edge.To("tennis_event_id", TennisEvent.Type).StorageKey(edge.Column("event_id")),
 		edge.To("running_event_id", RunningEvent.Type).StorageKey(edge.Column("event_id")),
 		edge.To("training_event_id", TrainingEvent.Type).StorageKey(edge.Column("event_id")),
-
-		edge.From("event_type", EventType.Type).
-			Ref("events").
-			Field("event_type_id").
-			Required().
-			Unique(),
-		edge.From("sport", Sport.Type).
-			Ref("events").
-			Field("sport_id").
-			Required().
-			Unique(),
->>>>>>> d2995807ca8aaad0af8d19410ad2458843606c60
 	}
 }

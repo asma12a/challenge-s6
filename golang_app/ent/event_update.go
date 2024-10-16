@@ -11,10 +11,17 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/asma12a/challenge-s6/ent/basketevent"
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/eventtype"
+	"github.com/asma12a/challenge-s6/ent/footevent"
 	"github.com/asma12a/challenge-s6/ent/predicate"
+	"github.com/asma12a/challenge-s6/ent/runningevent"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/sport"
+	"github.com/asma12a/challenge-s6/ent/tennisevent"
+	"github.com/asma12a/challenge-s6/ent/trainingevent"
+	"github.com/asma12a/challenge-s6/ent/userstats"
 )
 
 // EventUpdate is the builder for updating Event entities.
@@ -136,13 +143,13 @@ func (eu *EventUpdate) SetNillableIsFinished(b *bool) *EventUpdate {
 }
 
 // SetEventTypeID sets the "event_type" edge to the EventType entity by ID.
-func (eu *EventUpdate) SetEventTypeID(id string) *EventUpdate {
+func (eu *EventUpdate) SetEventTypeID(id ulid.ID) *EventUpdate {
 	eu.mutation.SetEventTypeID(id)
 	return eu
 }
 
 // SetNillableEventTypeID sets the "event_type" edge to the EventType entity by ID if the given value is not nil.
-func (eu *EventUpdate) SetNillableEventTypeID(id *string) *EventUpdate {
+func (eu *EventUpdate) SetNillableEventTypeID(id *ulid.ID) *EventUpdate {
 	if id != nil {
 		eu = eu.SetEventTypeID(*id)
 	}
@@ -155,13 +162,13 @@ func (eu *EventUpdate) SetEventType(e *EventType) *EventUpdate {
 }
 
 // SetSportID sets the "sport" edge to the Sport entity by ID.
-func (eu *EventUpdate) SetSportID(id string) *EventUpdate {
+func (eu *EventUpdate) SetSportID(id ulid.ID) *EventUpdate {
 	eu.mutation.SetSportID(id)
 	return eu
 }
 
 // SetNillableSportID sets the "sport" edge to the Sport entity by ID if the given value is not nil.
-func (eu *EventUpdate) SetNillableSportID(id *string) *EventUpdate {
+func (eu *EventUpdate) SetNillableSportID(id *ulid.ID) *EventUpdate {
 	if id != nil {
 		eu = eu.SetSportID(*id)
 	}
@@ -171,6 +178,96 @@ func (eu *EventUpdate) SetNillableSportID(id *string) *EventUpdate {
 // SetSport sets the "sport" edge to the Sport entity.
 func (eu *EventUpdate) SetSport(s *Sport) *EventUpdate {
 	return eu.SetSportID(s.ID)
+}
+
+// AddUserStatsIDIDs adds the "user_stats_id" edge to the UserStats entity by IDs.
+func (eu *EventUpdate) AddUserStatsIDIDs(ids ...ulid.ID) *EventUpdate {
+	eu.mutation.AddUserStatsIDIDs(ids...)
+	return eu
+}
+
+// AddUserStatsID adds the "user_stats_id" edges to the UserStats entity.
+func (eu *EventUpdate) AddUserStatsID(u ...*UserStats) *EventUpdate {
+	ids := make([]ulid.ID, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return eu.AddUserStatsIDIDs(ids...)
+}
+
+// AddFootEventIDIDs adds the "foot_event_id" edge to the FootEvent entity by IDs.
+func (eu *EventUpdate) AddFootEventIDIDs(ids ...ulid.ID) *EventUpdate {
+	eu.mutation.AddFootEventIDIDs(ids...)
+	return eu
+}
+
+// AddFootEventID adds the "foot_event_id" edges to the FootEvent entity.
+func (eu *EventUpdate) AddFootEventID(f ...*FootEvent) *EventUpdate {
+	ids := make([]ulid.ID, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return eu.AddFootEventIDIDs(ids...)
+}
+
+// AddBasketEventIDIDs adds the "basket_event_id" edge to the BasketEvent entity by IDs.
+func (eu *EventUpdate) AddBasketEventIDIDs(ids ...ulid.ID) *EventUpdate {
+	eu.mutation.AddBasketEventIDIDs(ids...)
+	return eu
+}
+
+// AddBasketEventID adds the "basket_event_id" edges to the BasketEvent entity.
+func (eu *EventUpdate) AddBasketEventID(b ...*BasketEvent) *EventUpdate {
+	ids := make([]ulid.ID, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
+	}
+	return eu.AddBasketEventIDIDs(ids...)
+}
+
+// AddTennisEventIDIDs adds the "tennis_event_id" edge to the TennisEvent entity by IDs.
+func (eu *EventUpdate) AddTennisEventIDIDs(ids ...ulid.ID) *EventUpdate {
+	eu.mutation.AddTennisEventIDIDs(ids...)
+	return eu
+}
+
+// AddTennisEventID adds the "tennis_event_id" edges to the TennisEvent entity.
+func (eu *EventUpdate) AddTennisEventID(t ...*TennisEvent) *EventUpdate {
+	ids := make([]ulid.ID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return eu.AddTennisEventIDIDs(ids...)
+}
+
+// AddRunningEventIDIDs adds the "running_event_id" edge to the RunningEvent entity by IDs.
+func (eu *EventUpdate) AddRunningEventIDIDs(ids ...ulid.ID) *EventUpdate {
+	eu.mutation.AddRunningEventIDIDs(ids...)
+	return eu
+}
+
+// AddRunningEventID adds the "running_event_id" edges to the RunningEvent entity.
+func (eu *EventUpdate) AddRunningEventID(r ...*RunningEvent) *EventUpdate {
+	ids := make([]ulid.ID, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return eu.AddRunningEventIDIDs(ids...)
+}
+
+// AddTrainingEventIDIDs adds the "training_event_id" edge to the TrainingEvent entity by IDs.
+func (eu *EventUpdate) AddTrainingEventIDIDs(ids ...ulid.ID) *EventUpdate {
+	eu.mutation.AddTrainingEventIDIDs(ids...)
+	return eu
+}
+
+// AddTrainingEventID adds the "training_event_id" edges to the TrainingEvent entity.
+func (eu *EventUpdate) AddTrainingEventID(t ...*TrainingEvent) *EventUpdate {
+	ids := make([]ulid.ID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return eu.AddTrainingEventIDIDs(ids...)
 }
 
 // Mutation returns the EventMutation object of the builder.
@@ -188,6 +285,132 @@ func (eu *EventUpdate) ClearEventType() *EventUpdate {
 func (eu *EventUpdate) ClearSport() *EventUpdate {
 	eu.mutation.ClearSport()
 	return eu
+}
+
+// ClearUserStatsID clears all "user_stats_id" edges to the UserStats entity.
+func (eu *EventUpdate) ClearUserStatsID() *EventUpdate {
+	eu.mutation.ClearUserStatsID()
+	return eu
+}
+
+// RemoveUserStatsIDIDs removes the "user_stats_id" edge to UserStats entities by IDs.
+func (eu *EventUpdate) RemoveUserStatsIDIDs(ids ...ulid.ID) *EventUpdate {
+	eu.mutation.RemoveUserStatsIDIDs(ids...)
+	return eu
+}
+
+// RemoveUserStatsID removes "user_stats_id" edges to UserStats entities.
+func (eu *EventUpdate) RemoveUserStatsID(u ...*UserStats) *EventUpdate {
+	ids := make([]ulid.ID, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return eu.RemoveUserStatsIDIDs(ids...)
+}
+
+// ClearFootEventID clears all "foot_event_id" edges to the FootEvent entity.
+func (eu *EventUpdate) ClearFootEventID() *EventUpdate {
+	eu.mutation.ClearFootEventID()
+	return eu
+}
+
+// RemoveFootEventIDIDs removes the "foot_event_id" edge to FootEvent entities by IDs.
+func (eu *EventUpdate) RemoveFootEventIDIDs(ids ...ulid.ID) *EventUpdate {
+	eu.mutation.RemoveFootEventIDIDs(ids...)
+	return eu
+}
+
+// RemoveFootEventID removes "foot_event_id" edges to FootEvent entities.
+func (eu *EventUpdate) RemoveFootEventID(f ...*FootEvent) *EventUpdate {
+	ids := make([]ulid.ID, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return eu.RemoveFootEventIDIDs(ids...)
+}
+
+// ClearBasketEventID clears all "basket_event_id" edges to the BasketEvent entity.
+func (eu *EventUpdate) ClearBasketEventID() *EventUpdate {
+	eu.mutation.ClearBasketEventID()
+	return eu
+}
+
+// RemoveBasketEventIDIDs removes the "basket_event_id" edge to BasketEvent entities by IDs.
+func (eu *EventUpdate) RemoveBasketEventIDIDs(ids ...ulid.ID) *EventUpdate {
+	eu.mutation.RemoveBasketEventIDIDs(ids...)
+	return eu
+}
+
+// RemoveBasketEventID removes "basket_event_id" edges to BasketEvent entities.
+func (eu *EventUpdate) RemoveBasketEventID(b ...*BasketEvent) *EventUpdate {
+	ids := make([]ulid.ID, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
+	}
+	return eu.RemoveBasketEventIDIDs(ids...)
+}
+
+// ClearTennisEventID clears all "tennis_event_id" edges to the TennisEvent entity.
+func (eu *EventUpdate) ClearTennisEventID() *EventUpdate {
+	eu.mutation.ClearTennisEventID()
+	return eu
+}
+
+// RemoveTennisEventIDIDs removes the "tennis_event_id" edge to TennisEvent entities by IDs.
+func (eu *EventUpdate) RemoveTennisEventIDIDs(ids ...ulid.ID) *EventUpdate {
+	eu.mutation.RemoveTennisEventIDIDs(ids...)
+	return eu
+}
+
+// RemoveTennisEventID removes "tennis_event_id" edges to TennisEvent entities.
+func (eu *EventUpdate) RemoveTennisEventID(t ...*TennisEvent) *EventUpdate {
+	ids := make([]ulid.ID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return eu.RemoveTennisEventIDIDs(ids...)
+}
+
+// ClearRunningEventID clears all "running_event_id" edges to the RunningEvent entity.
+func (eu *EventUpdate) ClearRunningEventID() *EventUpdate {
+	eu.mutation.ClearRunningEventID()
+	return eu
+}
+
+// RemoveRunningEventIDIDs removes the "running_event_id" edge to RunningEvent entities by IDs.
+func (eu *EventUpdate) RemoveRunningEventIDIDs(ids ...ulid.ID) *EventUpdate {
+	eu.mutation.RemoveRunningEventIDIDs(ids...)
+	return eu
+}
+
+// RemoveRunningEventID removes "running_event_id" edges to RunningEvent entities.
+func (eu *EventUpdate) RemoveRunningEventID(r ...*RunningEvent) *EventUpdate {
+	ids := make([]ulid.ID, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return eu.RemoveRunningEventIDIDs(ids...)
+}
+
+// ClearTrainingEventID clears all "training_event_id" edges to the TrainingEvent entity.
+func (eu *EventUpdate) ClearTrainingEventID() *EventUpdate {
+	eu.mutation.ClearTrainingEventID()
+	return eu
+}
+
+// RemoveTrainingEventIDIDs removes the "training_event_id" edge to TrainingEvent entities by IDs.
+func (eu *EventUpdate) RemoveTrainingEventIDIDs(ids ...ulid.ID) *EventUpdate {
+	eu.mutation.RemoveTrainingEventIDIDs(ids...)
+	return eu
+}
+
+// RemoveTrainingEventID removes "training_event_id" edges to TrainingEvent entities.
+func (eu *EventUpdate) RemoveTrainingEventID(t ...*TrainingEvent) *EventUpdate {
+	ids := make([]ulid.ID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return eu.RemoveTrainingEventIDIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -336,6 +559,276 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if eu.mutation.UserStatsIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.UserStatsIDTable,
+			Columns: []string{event.UserStatsIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.RemovedUserStatsIDIDs(); len(nodes) > 0 && !eu.mutation.UserStatsIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.UserStatsIDTable,
+			Columns: []string{event.UserStatsIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.UserStatsIDIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.UserStatsIDTable,
+			Columns: []string{event.UserStatsIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if eu.mutation.FootEventIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.FootEventIDTable,
+			Columns: []string{event.FootEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(footevent.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.RemovedFootEventIDIDs(); len(nodes) > 0 && !eu.mutation.FootEventIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.FootEventIDTable,
+			Columns: []string{event.FootEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(footevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.FootEventIDIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.FootEventIDTable,
+			Columns: []string{event.FootEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(footevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if eu.mutation.BasketEventIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.BasketEventIDTable,
+			Columns: []string{event.BasketEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(basketevent.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.RemovedBasketEventIDIDs(); len(nodes) > 0 && !eu.mutation.BasketEventIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.BasketEventIDTable,
+			Columns: []string{event.BasketEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(basketevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.BasketEventIDIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.BasketEventIDTable,
+			Columns: []string{event.BasketEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(basketevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if eu.mutation.TennisEventIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.TennisEventIDTable,
+			Columns: []string{event.TennisEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tennisevent.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.RemovedTennisEventIDIDs(); len(nodes) > 0 && !eu.mutation.TennisEventIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.TennisEventIDTable,
+			Columns: []string{event.TennisEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tennisevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.TennisEventIDIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.TennisEventIDTable,
+			Columns: []string{event.TennisEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tennisevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if eu.mutation.RunningEventIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.RunningEventIDTable,
+			Columns: []string{event.RunningEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(runningevent.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.RemovedRunningEventIDIDs(); len(nodes) > 0 && !eu.mutation.RunningEventIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.RunningEventIDTable,
+			Columns: []string{event.RunningEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(runningevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.RunningEventIDIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.RunningEventIDTable,
+			Columns: []string{event.RunningEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(runningevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if eu.mutation.TrainingEventIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.TrainingEventIDTable,
+			Columns: []string{event.TrainingEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trainingevent.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.RemovedTrainingEventIDIDs(); len(nodes) > 0 && !eu.mutation.TrainingEventIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.TrainingEventIDTable,
+			Columns: []string{event.TrainingEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trainingevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.TrainingEventIDIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.TrainingEventIDTable,
+			Columns: []string{event.TrainingEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trainingevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, eu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{event.Label}
@@ -462,13 +955,13 @@ func (euo *EventUpdateOne) SetNillableIsFinished(b *bool) *EventUpdateOne {
 }
 
 // SetEventTypeID sets the "event_type" edge to the EventType entity by ID.
-func (euo *EventUpdateOne) SetEventTypeID(id string) *EventUpdateOne {
+func (euo *EventUpdateOne) SetEventTypeID(id ulid.ID) *EventUpdateOne {
 	euo.mutation.SetEventTypeID(id)
 	return euo
 }
 
 // SetNillableEventTypeID sets the "event_type" edge to the EventType entity by ID if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableEventTypeID(id *string) *EventUpdateOne {
+func (euo *EventUpdateOne) SetNillableEventTypeID(id *ulid.ID) *EventUpdateOne {
 	if id != nil {
 		euo = euo.SetEventTypeID(*id)
 	}
@@ -481,13 +974,13 @@ func (euo *EventUpdateOne) SetEventType(e *EventType) *EventUpdateOne {
 }
 
 // SetSportID sets the "sport" edge to the Sport entity by ID.
-func (euo *EventUpdateOne) SetSportID(id string) *EventUpdateOne {
+func (euo *EventUpdateOne) SetSportID(id ulid.ID) *EventUpdateOne {
 	euo.mutation.SetSportID(id)
 	return euo
 }
 
 // SetNillableSportID sets the "sport" edge to the Sport entity by ID if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableSportID(id *string) *EventUpdateOne {
+func (euo *EventUpdateOne) SetNillableSportID(id *ulid.ID) *EventUpdateOne {
 	if id != nil {
 		euo = euo.SetSportID(*id)
 	}
@@ -497,6 +990,96 @@ func (euo *EventUpdateOne) SetNillableSportID(id *string) *EventUpdateOne {
 // SetSport sets the "sport" edge to the Sport entity.
 func (euo *EventUpdateOne) SetSport(s *Sport) *EventUpdateOne {
 	return euo.SetSportID(s.ID)
+}
+
+// AddUserStatsIDIDs adds the "user_stats_id" edge to the UserStats entity by IDs.
+func (euo *EventUpdateOne) AddUserStatsIDIDs(ids ...ulid.ID) *EventUpdateOne {
+	euo.mutation.AddUserStatsIDIDs(ids...)
+	return euo
+}
+
+// AddUserStatsID adds the "user_stats_id" edges to the UserStats entity.
+func (euo *EventUpdateOne) AddUserStatsID(u ...*UserStats) *EventUpdateOne {
+	ids := make([]ulid.ID, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return euo.AddUserStatsIDIDs(ids...)
+}
+
+// AddFootEventIDIDs adds the "foot_event_id" edge to the FootEvent entity by IDs.
+func (euo *EventUpdateOne) AddFootEventIDIDs(ids ...ulid.ID) *EventUpdateOne {
+	euo.mutation.AddFootEventIDIDs(ids...)
+	return euo
+}
+
+// AddFootEventID adds the "foot_event_id" edges to the FootEvent entity.
+func (euo *EventUpdateOne) AddFootEventID(f ...*FootEvent) *EventUpdateOne {
+	ids := make([]ulid.ID, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return euo.AddFootEventIDIDs(ids...)
+}
+
+// AddBasketEventIDIDs adds the "basket_event_id" edge to the BasketEvent entity by IDs.
+func (euo *EventUpdateOne) AddBasketEventIDIDs(ids ...ulid.ID) *EventUpdateOne {
+	euo.mutation.AddBasketEventIDIDs(ids...)
+	return euo
+}
+
+// AddBasketEventID adds the "basket_event_id" edges to the BasketEvent entity.
+func (euo *EventUpdateOne) AddBasketEventID(b ...*BasketEvent) *EventUpdateOne {
+	ids := make([]ulid.ID, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
+	}
+	return euo.AddBasketEventIDIDs(ids...)
+}
+
+// AddTennisEventIDIDs adds the "tennis_event_id" edge to the TennisEvent entity by IDs.
+func (euo *EventUpdateOne) AddTennisEventIDIDs(ids ...ulid.ID) *EventUpdateOne {
+	euo.mutation.AddTennisEventIDIDs(ids...)
+	return euo
+}
+
+// AddTennisEventID adds the "tennis_event_id" edges to the TennisEvent entity.
+func (euo *EventUpdateOne) AddTennisEventID(t ...*TennisEvent) *EventUpdateOne {
+	ids := make([]ulid.ID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return euo.AddTennisEventIDIDs(ids...)
+}
+
+// AddRunningEventIDIDs adds the "running_event_id" edge to the RunningEvent entity by IDs.
+func (euo *EventUpdateOne) AddRunningEventIDIDs(ids ...ulid.ID) *EventUpdateOne {
+	euo.mutation.AddRunningEventIDIDs(ids...)
+	return euo
+}
+
+// AddRunningEventID adds the "running_event_id" edges to the RunningEvent entity.
+func (euo *EventUpdateOne) AddRunningEventID(r ...*RunningEvent) *EventUpdateOne {
+	ids := make([]ulid.ID, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return euo.AddRunningEventIDIDs(ids...)
+}
+
+// AddTrainingEventIDIDs adds the "training_event_id" edge to the TrainingEvent entity by IDs.
+func (euo *EventUpdateOne) AddTrainingEventIDIDs(ids ...ulid.ID) *EventUpdateOne {
+	euo.mutation.AddTrainingEventIDIDs(ids...)
+	return euo
+}
+
+// AddTrainingEventID adds the "training_event_id" edges to the TrainingEvent entity.
+func (euo *EventUpdateOne) AddTrainingEventID(t ...*TrainingEvent) *EventUpdateOne {
+	ids := make([]ulid.ID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return euo.AddTrainingEventIDIDs(ids...)
 }
 
 // Mutation returns the EventMutation object of the builder.
@@ -514,6 +1097,132 @@ func (euo *EventUpdateOne) ClearEventType() *EventUpdateOne {
 func (euo *EventUpdateOne) ClearSport() *EventUpdateOne {
 	euo.mutation.ClearSport()
 	return euo
+}
+
+// ClearUserStatsID clears all "user_stats_id" edges to the UserStats entity.
+func (euo *EventUpdateOne) ClearUserStatsID() *EventUpdateOne {
+	euo.mutation.ClearUserStatsID()
+	return euo
+}
+
+// RemoveUserStatsIDIDs removes the "user_stats_id" edge to UserStats entities by IDs.
+func (euo *EventUpdateOne) RemoveUserStatsIDIDs(ids ...ulid.ID) *EventUpdateOne {
+	euo.mutation.RemoveUserStatsIDIDs(ids...)
+	return euo
+}
+
+// RemoveUserStatsID removes "user_stats_id" edges to UserStats entities.
+func (euo *EventUpdateOne) RemoveUserStatsID(u ...*UserStats) *EventUpdateOne {
+	ids := make([]ulid.ID, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return euo.RemoveUserStatsIDIDs(ids...)
+}
+
+// ClearFootEventID clears all "foot_event_id" edges to the FootEvent entity.
+func (euo *EventUpdateOne) ClearFootEventID() *EventUpdateOne {
+	euo.mutation.ClearFootEventID()
+	return euo
+}
+
+// RemoveFootEventIDIDs removes the "foot_event_id" edge to FootEvent entities by IDs.
+func (euo *EventUpdateOne) RemoveFootEventIDIDs(ids ...ulid.ID) *EventUpdateOne {
+	euo.mutation.RemoveFootEventIDIDs(ids...)
+	return euo
+}
+
+// RemoveFootEventID removes "foot_event_id" edges to FootEvent entities.
+func (euo *EventUpdateOne) RemoveFootEventID(f ...*FootEvent) *EventUpdateOne {
+	ids := make([]ulid.ID, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return euo.RemoveFootEventIDIDs(ids...)
+}
+
+// ClearBasketEventID clears all "basket_event_id" edges to the BasketEvent entity.
+func (euo *EventUpdateOne) ClearBasketEventID() *EventUpdateOne {
+	euo.mutation.ClearBasketEventID()
+	return euo
+}
+
+// RemoveBasketEventIDIDs removes the "basket_event_id" edge to BasketEvent entities by IDs.
+func (euo *EventUpdateOne) RemoveBasketEventIDIDs(ids ...ulid.ID) *EventUpdateOne {
+	euo.mutation.RemoveBasketEventIDIDs(ids...)
+	return euo
+}
+
+// RemoveBasketEventID removes "basket_event_id" edges to BasketEvent entities.
+func (euo *EventUpdateOne) RemoveBasketEventID(b ...*BasketEvent) *EventUpdateOne {
+	ids := make([]ulid.ID, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
+	}
+	return euo.RemoveBasketEventIDIDs(ids...)
+}
+
+// ClearTennisEventID clears all "tennis_event_id" edges to the TennisEvent entity.
+func (euo *EventUpdateOne) ClearTennisEventID() *EventUpdateOne {
+	euo.mutation.ClearTennisEventID()
+	return euo
+}
+
+// RemoveTennisEventIDIDs removes the "tennis_event_id" edge to TennisEvent entities by IDs.
+func (euo *EventUpdateOne) RemoveTennisEventIDIDs(ids ...ulid.ID) *EventUpdateOne {
+	euo.mutation.RemoveTennisEventIDIDs(ids...)
+	return euo
+}
+
+// RemoveTennisEventID removes "tennis_event_id" edges to TennisEvent entities.
+func (euo *EventUpdateOne) RemoveTennisEventID(t ...*TennisEvent) *EventUpdateOne {
+	ids := make([]ulid.ID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return euo.RemoveTennisEventIDIDs(ids...)
+}
+
+// ClearRunningEventID clears all "running_event_id" edges to the RunningEvent entity.
+func (euo *EventUpdateOne) ClearRunningEventID() *EventUpdateOne {
+	euo.mutation.ClearRunningEventID()
+	return euo
+}
+
+// RemoveRunningEventIDIDs removes the "running_event_id" edge to RunningEvent entities by IDs.
+func (euo *EventUpdateOne) RemoveRunningEventIDIDs(ids ...ulid.ID) *EventUpdateOne {
+	euo.mutation.RemoveRunningEventIDIDs(ids...)
+	return euo
+}
+
+// RemoveRunningEventID removes "running_event_id" edges to RunningEvent entities.
+func (euo *EventUpdateOne) RemoveRunningEventID(r ...*RunningEvent) *EventUpdateOne {
+	ids := make([]ulid.ID, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return euo.RemoveRunningEventIDIDs(ids...)
+}
+
+// ClearTrainingEventID clears all "training_event_id" edges to the TrainingEvent entity.
+func (euo *EventUpdateOne) ClearTrainingEventID() *EventUpdateOne {
+	euo.mutation.ClearTrainingEventID()
+	return euo
+}
+
+// RemoveTrainingEventIDIDs removes the "training_event_id" edge to TrainingEvent entities by IDs.
+func (euo *EventUpdateOne) RemoveTrainingEventIDIDs(ids ...ulid.ID) *EventUpdateOne {
+	euo.mutation.RemoveTrainingEventIDIDs(ids...)
+	return euo
+}
+
+// RemoveTrainingEventID removes "training_event_id" edges to TrainingEvent entities.
+func (euo *EventUpdateOne) RemoveTrainingEventID(t ...*TrainingEvent) *EventUpdateOne {
+	ids := make([]ulid.ID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return euo.RemoveTrainingEventIDIDs(ids...)
 }
 
 // Where appends a list predicates to the EventUpdate builder.
@@ -685,6 +1394,276 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(sport.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if euo.mutation.UserStatsIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.UserStatsIDTable,
+			Columns: []string{event.UserStatsIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.RemovedUserStatsIDIDs(); len(nodes) > 0 && !euo.mutation.UserStatsIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.UserStatsIDTable,
+			Columns: []string{event.UserStatsIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.UserStatsIDIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.UserStatsIDTable,
+			Columns: []string{event.UserStatsIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if euo.mutation.FootEventIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.FootEventIDTable,
+			Columns: []string{event.FootEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(footevent.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.RemovedFootEventIDIDs(); len(nodes) > 0 && !euo.mutation.FootEventIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.FootEventIDTable,
+			Columns: []string{event.FootEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(footevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.FootEventIDIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.FootEventIDTable,
+			Columns: []string{event.FootEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(footevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if euo.mutation.BasketEventIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.BasketEventIDTable,
+			Columns: []string{event.BasketEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(basketevent.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.RemovedBasketEventIDIDs(); len(nodes) > 0 && !euo.mutation.BasketEventIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.BasketEventIDTable,
+			Columns: []string{event.BasketEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(basketevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.BasketEventIDIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.BasketEventIDTable,
+			Columns: []string{event.BasketEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(basketevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if euo.mutation.TennisEventIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.TennisEventIDTable,
+			Columns: []string{event.TennisEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tennisevent.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.RemovedTennisEventIDIDs(); len(nodes) > 0 && !euo.mutation.TennisEventIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.TennisEventIDTable,
+			Columns: []string{event.TennisEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tennisevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.TennisEventIDIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.TennisEventIDTable,
+			Columns: []string{event.TennisEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tennisevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if euo.mutation.RunningEventIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.RunningEventIDTable,
+			Columns: []string{event.RunningEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(runningevent.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.RemovedRunningEventIDIDs(); len(nodes) > 0 && !euo.mutation.RunningEventIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.RunningEventIDTable,
+			Columns: []string{event.RunningEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(runningevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.RunningEventIDIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.RunningEventIDTable,
+			Columns: []string{event.RunningEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(runningevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if euo.mutation.TrainingEventIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.TrainingEventIDTable,
+			Columns: []string{event.TrainingEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trainingevent.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.RemovedTrainingEventIDIDs(); len(nodes) > 0 && !euo.mutation.TrainingEventIDCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.TrainingEventIDTable,
+			Columns: []string{event.TrainingEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trainingevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.TrainingEventIDIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.TrainingEventIDTable,
+			Columns: []string{event.TrainingEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trainingevent.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

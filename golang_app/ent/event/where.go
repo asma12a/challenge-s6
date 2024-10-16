@@ -8,61 +8,52 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/asma12a/challenge-s6/ent/predicate"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id string) predicate.Event {
+func ID(id ulid.ID) predicate.Event {
 	return predicate.Event(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id string) predicate.Event {
+func IDEQ(id ulid.ID) predicate.Event {
 	return predicate.Event(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id string) predicate.Event {
+func IDNEQ(id ulid.ID) predicate.Event {
 	return predicate.Event(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...string) predicate.Event {
+func IDIn(ids ...ulid.ID) predicate.Event {
 	return predicate.Event(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...string) predicate.Event {
+func IDNotIn(ids ...ulid.ID) predicate.Event {
 	return predicate.Event(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id string) predicate.Event {
+func IDGT(id ulid.ID) predicate.Event {
 	return predicate.Event(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id string) predicate.Event {
+func IDGTE(id ulid.ID) predicate.Event {
 	return predicate.Event(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id string) predicate.Event {
+func IDLT(id ulid.ID) predicate.Event {
 	return predicate.Event(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id string) predicate.Event {
+func IDLTE(id ulid.ID) predicate.Event {
 	return predicate.Event(sql.FieldLTE(FieldID, id))
-}
-
-// IDEqualFold applies the EqualFold predicate on the ID field.
-func IDEqualFold(id string) predicate.Event {
-	return predicate.Event(sql.FieldEqualFold(FieldID, id))
-}
-
-// IDContainsFold applies the ContainsFold predicate on the ID field.
-func IDContainsFold(id string) predicate.Event {
-	return predicate.Event(sql.FieldContainsFold(FieldID, id))
 }
 
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
@@ -433,6 +424,144 @@ func HasSport() predicate.Event {
 func HasSportWith(preds ...predicate.Sport) predicate.Event {
 	return predicate.Event(func(s *sql.Selector) {
 		step := newSportStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasUserStatsID applies the HasEdge predicate on the "user_stats_id" edge.
+func HasUserStatsID() predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, UserStatsIDTable, UserStatsIDColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUserStatsIDWith applies the HasEdge predicate on the "user_stats_id" edge with a given conditions (other predicates).
+func HasUserStatsIDWith(preds ...predicate.UserStats) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		step := newUserStatsIDStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasFootEventID applies the HasEdge predicate on the "foot_event_id" edge.
+func HasFootEventID() predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, FootEventIDTable, FootEventIDColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasFootEventIDWith applies the HasEdge predicate on the "foot_event_id" edge with a given conditions (other predicates).
+func HasFootEventIDWith(preds ...predicate.FootEvent) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		step := newFootEventIDStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasBasketEventID applies the HasEdge predicate on the "basket_event_id" edge.
+func HasBasketEventID() predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, BasketEventIDTable, BasketEventIDColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasBasketEventIDWith applies the HasEdge predicate on the "basket_event_id" edge with a given conditions (other predicates).
+func HasBasketEventIDWith(preds ...predicate.BasketEvent) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		step := newBasketEventIDStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasTennisEventID applies the HasEdge predicate on the "tennis_event_id" edge.
+func HasTennisEventID() predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, TennisEventIDTable, TennisEventIDColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasTennisEventIDWith applies the HasEdge predicate on the "tennis_event_id" edge with a given conditions (other predicates).
+func HasTennisEventIDWith(preds ...predicate.TennisEvent) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		step := newTennisEventIDStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasRunningEventID applies the HasEdge predicate on the "running_event_id" edge.
+func HasRunningEventID() predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, RunningEventIDTable, RunningEventIDColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRunningEventIDWith applies the HasEdge predicate on the "running_event_id" edge with a given conditions (other predicates).
+func HasRunningEventIDWith(preds ...predicate.RunningEvent) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		step := newRunningEventIDStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasTrainingEventID applies the HasEdge predicate on the "training_event_id" edge.
+func HasTrainingEventID() predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, TrainingEventIDTable, TrainingEventIDColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasTrainingEventIDWith applies the HasEdge predicate on the "training_event_id" edge with a given conditions (other predicates).
+func HasTrainingEventIDWith(preds ...predicate.TrainingEvent) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		step := newTrainingEventIDStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

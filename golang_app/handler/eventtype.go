@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/asma12a/challenge-s6/ent"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
 	"github.com/asma12a/challenge-s6/presenter"
 	"github.com/asma12a/challenge-s6/service"
@@ -48,8 +49,13 @@ func createEventType(ctx context.Context, serviceEventType service.EventType) fi
 
 func getEventType(ctx context.Context, serviceEventType service.EventType) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id := c.Params("eventTypeId")
-
+		id, err := ulid.Parse(c.Params("eventTypeId"))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
 		eventType, err := serviceEventType.FindOne(ctx, id)
 		if err != nil {
 			if ent.IsNotFound(err) {
@@ -76,8 +82,13 @@ func getEventType(ctx context.Context, serviceEventType service.EventType) fiber
 
 func updateEventType(ctx context.Context, serviceEventType service.EventType) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id := c.Params("eventTypeId")
-
+		id, err := ulid.Parse(c.Params("eventTypeId"))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
 		existingEventType, err := serviceEventType.FindOne(ctx, id)
 		if err != nil {
 			if ent.IsNotFound(err) {
@@ -117,9 +128,14 @@ func updateEventType(ctx context.Context, serviceEventType service.EventType) fi
 
 func deleteEventType(ctx context.Context, serviceEventType service.EventType) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id := c.Params("eventTypeId")
-
-		err := serviceEventType.Delete(ctx, id)
+		id, err := ulid.Parse(c.Params("eventTypeId"))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+		err = serviceEventType.Delete(ctx, id)
 		if err != nil {
 			if ent.IsNotFound(err) {
 				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{

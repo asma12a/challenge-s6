@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -11,22 +12,35 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/asma12a/challenge-s6/ent/basketevent"
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/eventtype"
+	"github.com/asma12a/challenge-s6/ent/footevent"
 	"github.com/asma12a/challenge-s6/ent/predicate"
+	"github.com/asma12a/challenge-s6/ent/runningevent"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/sport"
+	"github.com/asma12a/challenge-s6/ent/tennisevent"
+	"github.com/asma12a/challenge-s6/ent/trainingevent"
+	"github.com/asma12a/challenge-s6/ent/userstats"
 )
 
 // EventQuery is the builder for querying Event entities.
 type EventQuery struct {
 	config
-	ctx           *QueryContext
-	order         []event.OrderOption
-	inters        []Interceptor
-	predicates    []predicate.Event
-	withEventType *EventTypeQuery
-	withSport     *SportQuery
-	withFKs       bool
+	ctx                 *QueryContext
+	order               []event.OrderOption
+	inters              []Interceptor
+	predicates          []predicate.Event
+	withEventType       *EventTypeQuery
+	withSport           *SportQuery
+	withUserStatsID     *UserStatsQuery
+	withFootEventID     *FootEventQuery
+	withBasketEventID   *BasketEventQuery
+	withTennisEventID   *TennisEventQuery
+	withRunningEventID  *RunningEventQuery
+	withTrainingEventID *TrainingEventQuery
+	withFKs             bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -107,6 +121,138 @@ func (eq *EventQuery) QuerySport() *SportQuery {
 	return query
 }
 
+// QueryUserStatsID chains the current query on the "user_stats_id" edge.
+func (eq *EventQuery) QueryUserStatsID() *UserStatsQuery {
+	query := (&UserStatsClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, selector),
+			sqlgraph.To(userstats.Table, userstats.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, event.UserStatsIDTable, event.UserStatsIDColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryFootEventID chains the current query on the "foot_event_id" edge.
+func (eq *EventQuery) QueryFootEventID() *FootEventQuery {
+	query := (&FootEventClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, selector),
+			sqlgraph.To(footevent.Table, footevent.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, event.FootEventIDTable, event.FootEventIDColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryBasketEventID chains the current query on the "basket_event_id" edge.
+func (eq *EventQuery) QueryBasketEventID() *BasketEventQuery {
+	query := (&BasketEventClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, selector),
+			sqlgraph.To(basketevent.Table, basketevent.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, event.BasketEventIDTable, event.BasketEventIDColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryTennisEventID chains the current query on the "tennis_event_id" edge.
+func (eq *EventQuery) QueryTennisEventID() *TennisEventQuery {
+	query := (&TennisEventClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, selector),
+			sqlgraph.To(tennisevent.Table, tennisevent.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, event.TennisEventIDTable, event.TennisEventIDColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryRunningEventID chains the current query on the "running_event_id" edge.
+func (eq *EventQuery) QueryRunningEventID() *RunningEventQuery {
+	query := (&RunningEventClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, selector),
+			sqlgraph.To(runningevent.Table, runningevent.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, event.RunningEventIDTable, event.RunningEventIDColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryTrainingEventID chains the current query on the "training_event_id" edge.
+func (eq *EventQuery) QueryTrainingEventID() *TrainingEventQuery {
+	query := (&TrainingEventClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, selector),
+			sqlgraph.To(trainingevent.Table, trainingevent.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, event.TrainingEventIDTable, event.TrainingEventIDColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first Event entity from the query.
 // Returns a *NotFoundError when no Event was found.
 func (eq *EventQuery) First(ctx context.Context) (*Event, error) {
@@ -131,8 +277,8 @@ func (eq *EventQuery) FirstX(ctx context.Context) *Event {
 
 // FirstID returns the first Event ID from the query.
 // Returns a *NotFoundError when no Event ID was found.
-func (eq *EventQuery) FirstID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (eq *EventQuery) FirstID(ctx context.Context) (id ulid.ID, err error) {
+	var ids []ulid.ID
 	if ids, err = eq.Limit(1).IDs(setContextOp(ctx, eq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
@@ -144,7 +290,7 @@ func (eq *EventQuery) FirstID(ctx context.Context) (id string, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (eq *EventQuery) FirstIDX(ctx context.Context) string {
+func (eq *EventQuery) FirstIDX(ctx context.Context) ulid.ID {
 	id, err := eq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -182,8 +328,8 @@ func (eq *EventQuery) OnlyX(ctx context.Context) *Event {
 // OnlyID is like Only, but returns the only Event ID in the query.
 // Returns a *NotSingularError when more than one Event ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (eq *EventQuery) OnlyID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (eq *EventQuery) OnlyID(ctx context.Context) (id ulid.ID, err error) {
+	var ids []ulid.ID
 	if ids, err = eq.Limit(2).IDs(setContextOp(ctx, eq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
@@ -199,7 +345,7 @@ func (eq *EventQuery) OnlyID(ctx context.Context) (id string, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (eq *EventQuery) OnlyIDX(ctx context.Context) string {
+func (eq *EventQuery) OnlyIDX(ctx context.Context) ulid.ID {
 	id, err := eq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -227,7 +373,7 @@ func (eq *EventQuery) AllX(ctx context.Context) []*Event {
 }
 
 // IDs executes the query and returns a list of Event IDs.
-func (eq *EventQuery) IDs(ctx context.Context) (ids []string, err error) {
+func (eq *EventQuery) IDs(ctx context.Context) (ids []ulid.ID, err error) {
 	if eq.ctx.Unique == nil && eq.path != nil {
 		eq.Unique(true)
 	}
@@ -239,7 +385,7 @@ func (eq *EventQuery) IDs(ctx context.Context) (ids []string, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (eq *EventQuery) IDsX(ctx context.Context) []string {
+func (eq *EventQuery) IDsX(ctx context.Context) []ulid.ID {
 	ids, err := eq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -294,13 +440,19 @@ func (eq *EventQuery) Clone() *EventQuery {
 		return nil
 	}
 	return &EventQuery{
-		config:        eq.config,
-		ctx:           eq.ctx.Clone(),
-		order:         append([]event.OrderOption{}, eq.order...),
-		inters:        append([]Interceptor{}, eq.inters...),
-		predicates:    append([]predicate.Event{}, eq.predicates...),
-		withEventType: eq.withEventType.Clone(),
-		withSport:     eq.withSport.Clone(),
+		config:              eq.config,
+		ctx:                 eq.ctx.Clone(),
+		order:               append([]event.OrderOption{}, eq.order...),
+		inters:              append([]Interceptor{}, eq.inters...),
+		predicates:          append([]predicate.Event{}, eq.predicates...),
+		withEventType:       eq.withEventType.Clone(),
+		withSport:           eq.withSport.Clone(),
+		withUserStatsID:     eq.withUserStatsID.Clone(),
+		withFootEventID:     eq.withFootEventID.Clone(),
+		withBasketEventID:   eq.withBasketEventID.Clone(),
+		withTennisEventID:   eq.withTennisEventID.Clone(),
+		withRunningEventID:  eq.withRunningEventID.Clone(),
+		withTrainingEventID: eq.withTrainingEventID.Clone(),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
@@ -326,6 +478,72 @@ func (eq *EventQuery) WithSport(opts ...func(*SportQuery)) *EventQuery {
 		opt(query)
 	}
 	eq.withSport = query
+	return eq
+}
+
+// WithUserStatsID tells the query-builder to eager-load the nodes that are connected to
+// the "user_stats_id" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EventQuery) WithUserStatsID(opts ...func(*UserStatsQuery)) *EventQuery {
+	query := (&UserStatsClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withUserStatsID = query
+	return eq
+}
+
+// WithFootEventID tells the query-builder to eager-load the nodes that are connected to
+// the "foot_event_id" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EventQuery) WithFootEventID(opts ...func(*FootEventQuery)) *EventQuery {
+	query := (&FootEventClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withFootEventID = query
+	return eq
+}
+
+// WithBasketEventID tells the query-builder to eager-load the nodes that are connected to
+// the "basket_event_id" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EventQuery) WithBasketEventID(opts ...func(*BasketEventQuery)) *EventQuery {
+	query := (&BasketEventClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withBasketEventID = query
+	return eq
+}
+
+// WithTennisEventID tells the query-builder to eager-load the nodes that are connected to
+// the "tennis_event_id" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EventQuery) WithTennisEventID(opts ...func(*TennisEventQuery)) *EventQuery {
+	query := (&TennisEventClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withTennisEventID = query
+	return eq
+}
+
+// WithRunningEventID tells the query-builder to eager-load the nodes that are connected to
+// the "running_event_id" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EventQuery) WithRunningEventID(opts ...func(*RunningEventQuery)) *EventQuery {
+	query := (&RunningEventClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withRunningEventID = query
+	return eq
+}
+
+// WithTrainingEventID tells the query-builder to eager-load the nodes that are connected to
+// the "training_event_id" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EventQuery) WithTrainingEventID(opts ...func(*TrainingEventQuery)) *EventQuery {
+	query := (&TrainingEventClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withTrainingEventID = query
 	return eq
 }
 
@@ -408,9 +626,15 @@ func (eq *EventQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Event,
 		nodes       = []*Event{}
 		withFKs     = eq.withFKs
 		_spec       = eq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [8]bool{
 			eq.withEventType != nil,
 			eq.withSport != nil,
+			eq.withUserStatsID != nil,
+			eq.withFootEventID != nil,
+			eq.withBasketEventID != nil,
+			eq.withTennisEventID != nil,
+			eq.withRunningEventID != nil,
+			eq.withTrainingEventID != nil,
 		}
 	)
 	if eq.withEventType != nil || eq.withSport != nil {
@@ -449,12 +673,54 @@ func (eq *EventQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Event,
 			return nil, err
 		}
 	}
+	if query := eq.withUserStatsID; query != nil {
+		if err := eq.loadUserStatsID(ctx, query, nodes,
+			func(n *Event) { n.Edges.UserStatsID = []*UserStats{} },
+			func(n *Event, e *UserStats) { n.Edges.UserStatsID = append(n.Edges.UserStatsID, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := eq.withFootEventID; query != nil {
+		if err := eq.loadFootEventID(ctx, query, nodes,
+			func(n *Event) { n.Edges.FootEventID = []*FootEvent{} },
+			func(n *Event, e *FootEvent) { n.Edges.FootEventID = append(n.Edges.FootEventID, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := eq.withBasketEventID; query != nil {
+		if err := eq.loadBasketEventID(ctx, query, nodes,
+			func(n *Event) { n.Edges.BasketEventID = []*BasketEvent{} },
+			func(n *Event, e *BasketEvent) { n.Edges.BasketEventID = append(n.Edges.BasketEventID, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := eq.withTennisEventID; query != nil {
+		if err := eq.loadTennisEventID(ctx, query, nodes,
+			func(n *Event) { n.Edges.TennisEventID = []*TennisEvent{} },
+			func(n *Event, e *TennisEvent) { n.Edges.TennisEventID = append(n.Edges.TennisEventID, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := eq.withRunningEventID; query != nil {
+		if err := eq.loadRunningEventID(ctx, query, nodes,
+			func(n *Event) { n.Edges.RunningEventID = []*RunningEvent{} },
+			func(n *Event, e *RunningEvent) { n.Edges.RunningEventID = append(n.Edges.RunningEventID, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := eq.withTrainingEventID; query != nil {
+		if err := eq.loadTrainingEventID(ctx, query, nodes,
+			func(n *Event) { n.Edges.TrainingEventID = []*TrainingEvent{} },
+			func(n *Event, e *TrainingEvent) { n.Edges.TrainingEventID = append(n.Edges.TrainingEventID, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
 }
 
 func (eq *EventQuery) loadEventType(ctx context.Context, query *EventTypeQuery, nodes []*Event, init func(*Event), assign func(*Event, *EventType)) error {
-	ids := make([]string, 0, len(nodes))
-	nodeids := make(map[string][]*Event)
+	ids := make([]ulid.ID, 0, len(nodes))
+	nodeids := make(map[ulid.ID][]*Event)
 	for i := range nodes {
 		if nodes[i].event_type_id == nil {
 			continue
@@ -485,8 +751,8 @@ func (eq *EventQuery) loadEventType(ctx context.Context, query *EventTypeQuery, 
 	return nil
 }
 func (eq *EventQuery) loadSport(ctx context.Context, query *SportQuery, nodes []*Event, init func(*Event), assign func(*Event, *Sport)) error {
-	ids := make([]string, 0, len(nodes))
-	nodeids := make(map[string][]*Event)
+	ids := make([]ulid.ID, 0, len(nodes))
+	nodeids := make(map[ulid.ID][]*Event)
 	for i := range nodes {
 		if nodes[i].sport_id == nil {
 			continue
@@ -513,6 +779,192 @@ func (eq *EventQuery) loadSport(ctx context.Context, query *SportQuery, nodes []
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
+	}
+	return nil
+}
+func (eq *EventQuery) loadUserStatsID(ctx context.Context, query *UserStatsQuery, nodes []*Event, init func(*Event), assign func(*Event, *UserStats)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[ulid.ID]*Event)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.UserStats(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(event.UserStatsIDColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.event_id
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "event_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "event_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (eq *EventQuery) loadFootEventID(ctx context.Context, query *FootEventQuery, nodes []*Event, init func(*Event), assign func(*Event, *FootEvent)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[ulid.ID]*Event)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.FootEvent(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(event.FootEventIDColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.event_id
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "event_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "event_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (eq *EventQuery) loadBasketEventID(ctx context.Context, query *BasketEventQuery, nodes []*Event, init func(*Event), assign func(*Event, *BasketEvent)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[ulid.ID]*Event)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.BasketEvent(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(event.BasketEventIDColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.event_id
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "event_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "event_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (eq *EventQuery) loadTennisEventID(ctx context.Context, query *TennisEventQuery, nodes []*Event, init func(*Event), assign func(*Event, *TennisEvent)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[ulid.ID]*Event)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.TennisEvent(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(event.TennisEventIDColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.event_id
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "event_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "event_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (eq *EventQuery) loadRunningEventID(ctx context.Context, query *RunningEventQuery, nodes []*Event, init func(*Event), assign func(*Event, *RunningEvent)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[ulid.ID]*Event)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.RunningEvent(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(event.RunningEventIDColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.event_id
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "event_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "event_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (eq *EventQuery) loadTrainingEventID(ctx context.Context, query *TrainingEventQuery, nodes []*Event, init func(*Event), assign func(*Event, *TrainingEvent)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[ulid.ID]*Event)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.TrainingEvent(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(event.TrainingEventIDColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.event_id
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "event_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "event_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

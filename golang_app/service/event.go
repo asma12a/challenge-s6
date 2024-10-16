@@ -19,7 +19,7 @@ func NewEventService(client *ent.Client) *Event {
 	}
 }
 
-func (repo *Event) Create(ctx context.Context, event *entity.Event, eventTypeId string, sportId string) error {
+func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
 	_, err := repo.db.Event.Create().
 		SetName(event.Name).
 		SetAddress(event.Address).
@@ -36,13 +36,8 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event, eventTypeId 
 	return nil
 }
 
-<<<<<<< HEAD
-func (e *Event) FindOne(ctx context.Context, id string) (*entity.Event, error) {
-	event, err := e.db.Event.Query().Where(event.IDEQ(id)).WithEventType().WithSport().
-=======
 func (e *Event) FindOne(ctx context.Context, id ulid.ID) (*entity.Event, error) {
 	event, err := e.db.Event.Query().Where(event.IDEQ(id)).WithEventType().
->>>>>>> d2995807ca8aaad0af8d19410ad2458843606c60
 		Only(ctx)
 
 	if err != nil {

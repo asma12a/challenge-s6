@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/predicate"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/sport"
 )
 
@@ -107,8 +108,8 @@ func (sq *SportQuery) FirstX(ctx context.Context) *Sport {
 
 // FirstID returns the first Sport ID from the query.
 // Returns a *NotFoundError when no Sport ID was found.
-func (sq *SportQuery) FirstID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (sq *SportQuery) FirstID(ctx context.Context) (id ulid.ID, err error) {
+	var ids []ulid.ID
 	if ids, err = sq.Limit(1).IDs(setContextOp(ctx, sq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
@@ -120,7 +121,7 @@ func (sq *SportQuery) FirstID(ctx context.Context) (id string, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (sq *SportQuery) FirstIDX(ctx context.Context) string {
+func (sq *SportQuery) FirstIDX(ctx context.Context) ulid.ID {
 	id, err := sq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -158,8 +159,8 @@ func (sq *SportQuery) OnlyX(ctx context.Context) *Sport {
 // OnlyID is like Only, but returns the only Sport ID in the query.
 // Returns a *NotSingularError when more than one Sport ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (sq *SportQuery) OnlyID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (sq *SportQuery) OnlyID(ctx context.Context) (id ulid.ID, err error) {
+	var ids []ulid.ID
 	if ids, err = sq.Limit(2).IDs(setContextOp(ctx, sq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
@@ -175,7 +176,7 @@ func (sq *SportQuery) OnlyID(ctx context.Context) (id string, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (sq *SportQuery) OnlyIDX(ctx context.Context) string {
+func (sq *SportQuery) OnlyIDX(ctx context.Context) ulid.ID {
 	id, err := sq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -203,7 +204,7 @@ func (sq *SportQuery) AllX(ctx context.Context) []*Sport {
 }
 
 // IDs executes the query and returns a list of Sport IDs.
-func (sq *SportQuery) IDs(ctx context.Context) (ids []string, err error) {
+func (sq *SportQuery) IDs(ctx context.Context) (ids []ulid.ID, err error) {
 	if sq.ctx.Unique == nil && sq.path != nil {
 		sq.Unique(true)
 	}
@@ -215,7 +216,7 @@ func (sq *SportQuery) IDs(ctx context.Context) (ids []string, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (sq *SportQuery) IDsX(ctx context.Context) []string {
+func (sq *SportQuery) IDsX(ctx context.Context) []ulid.ID {
 	ids, err := sq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -405,7 +406,7 @@ func (sq *SportQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Sport,
 
 func (sq *SportQuery) loadEvents(ctx context.Context, query *EventQuery, nodes []*Sport, init func(*Sport), assign func(*Sport, *Event)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[string]*Sport)
+	nodeids := make(map[ulid.ID]*Sport)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]

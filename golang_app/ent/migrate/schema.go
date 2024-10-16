@@ -8,9 +8,30 @@ import (
 )
 
 var (
+	// BasketEventsColumns holds the columns for the "basket_events" table.
+	BasketEventsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString},
+		{Name: "event_id", Type: field.TypeString},
+		{Name: "team_a_id", Type: field.TypeString},
+		{Name: "team_b_id", Type: field.TypeString},
+	}
+	// BasketEventsTable holds the schema information for the "basket_events" table.
+	BasketEventsTable = &schema.Table{
+		Name:       "basket_events",
+		Columns:    BasketEventsColumns,
+		PrimaryKey: []*schema.Column{BasketEventsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "basket_events_events_basket_event_id",
+				Columns:    []*schema.Column{BasketEventsColumns[1]},
+				RefColumns: []*schema.Column{EventsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// EventsColumns holds the columns for the "events" table.
 	EventsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "id", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
 		{Name: "address", Type: field.TypeString},
 		{Name: "event_code", Type: field.TypeInt16},
@@ -43,7 +64,7 @@ var (
 	}
 	// EventTypesColumns holds the columns for the "event_types" table.
 	EventTypesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "id", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
 	}
 	// EventTypesTable holds the schema information for the "event_types" table.
@@ -52,9 +73,50 @@ var (
 		Columns:    EventTypesColumns,
 		PrimaryKey: []*schema.Column{EventTypesColumns[0]},
 	}
+	// FootEventsColumns holds the columns for the "foot_events" table.
+	FootEventsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString},
+		{Name: "event_id", Type: field.TypeString},
+		{Name: "team_a_id", Type: field.TypeString},
+		{Name: "team_b_id", Type: field.TypeString},
+	}
+	// FootEventsTable holds the schema information for the "foot_events" table.
+	FootEventsTable = &schema.Table{
+		Name:       "foot_events",
+		Columns:    FootEventsColumns,
+		PrimaryKey: []*schema.Column{FootEventsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "foot_events_events_foot_event_id",
+				Columns:    []*schema.Column{FootEventsColumns[1]},
+				RefColumns: []*schema.Column{EventsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// RunningEventsColumns holds the columns for the "running_events" table.
+	RunningEventsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString},
+		{Name: "event_id", Type: field.TypeString},
+		{Name: "team_id", Type: field.TypeString},
+	}
+	// RunningEventsTable holds the schema information for the "running_events" table.
+	RunningEventsTable = &schema.Table{
+		Name:       "running_events",
+		Columns:    RunningEventsColumns,
+		PrimaryKey: []*schema.Column{RunningEventsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "running_events_events_running_event_id",
+				Columns:    []*schema.Column{RunningEventsColumns[1]},
+				RefColumns: []*schema.Column{EventsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// SportsColumns holds the columns for the "sports" table.
 	SportsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "id", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
 		{Name: "image_url", Type: field.TypeString, Nullable: true},
 	}
@@ -64,9 +126,50 @@ var (
 		Columns:    SportsColumns,
 		PrimaryKey: []*schema.Column{SportsColumns[0]},
 	}
+	// TennisEventsColumns holds the columns for the "tennis_events" table.
+	TennisEventsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString},
+		{Name: "event_id", Type: field.TypeString},
+		{Name: "team_a_id", Type: field.TypeString},
+		{Name: "team_b_id", Type: field.TypeString},
+	}
+	// TennisEventsTable holds the schema information for the "tennis_events" table.
+	TennisEventsTable = &schema.Table{
+		Name:       "tennis_events",
+		Columns:    TennisEventsColumns,
+		PrimaryKey: []*schema.Column{TennisEventsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "tennis_events_events_tennis_event_id",
+				Columns:    []*schema.Column{TennisEventsColumns[1]},
+				RefColumns: []*schema.Column{EventsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// TrainingEventsColumns holds the columns for the "training_events" table.
+	TrainingEventsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString},
+		{Name: "event_id", Type: field.TypeString},
+		{Name: "team_id", Type: field.TypeString},
+	}
+	// TrainingEventsTable holds the schema information for the "training_events" table.
+	TrainingEventsTable = &schema.Table{
+		Name:       "training_events",
+		Columns:    TrainingEventsColumns,
+		PrimaryKey: []*schema.Column{TrainingEventsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "training_events_events_training_event_id",
+				Columns:    []*schema.Column{TrainingEventsColumns[1]},
+				RefColumns: []*schema.Column{EventsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "id", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
 		{Name: "email", Type: field.TypeString},
 		{Name: "password", Type: field.TypeString},
@@ -78,16 +181,55 @@ var (
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
 	}
+	// UserStatsColumns holds the columns for the "user_stats" table.
+	UserStatsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString},
+		{Name: "user_id", Type: field.TypeString},
+		{Name: "event_id", Type: field.TypeString},
+	}
+	// UserStatsTable holds the schema information for the "user_stats" table.
+	UserStatsTable = &schema.Table{
+		Name:       "user_stats",
+		Columns:    UserStatsColumns,
+		PrimaryKey: []*schema.Column{UserStatsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_stats_events_user_stats_id",
+				Columns:    []*schema.Column{UserStatsColumns[2]},
+				RefColumns: []*schema.Column{EventsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "user_stats_users_user_stats",
+				Columns:    []*schema.Column{UserStatsColumns[1]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		BasketEventsTable,
 		EventsTable,
 		EventTypesTable,
+		FootEventsTable,
+		RunningEventsTable,
 		SportsTable,
+		TennisEventsTable,
+		TrainingEventsTable,
 		UsersTable,
+		UserStatsTable,
 	}
 )
 
 func init() {
+	BasketEventsTable.ForeignKeys[0].RefTable = EventsTable
 	EventsTable.ForeignKeys[0].RefTable = EventTypesTable
 	EventsTable.ForeignKeys[1].RefTable = SportsTable
+	FootEventsTable.ForeignKeys[0].RefTable = EventsTable
+	RunningEventsTable.ForeignKeys[0].RefTable = EventsTable
+	TennisEventsTable.ForeignKeys[0].RefTable = EventsTable
+	TrainingEventsTable.ForeignKeys[0].RefTable = EventsTable
+	UserStatsTable.ForeignKeys[0].RefTable = EventsTable
+	UserStatsTable.ForeignKeys[1].RefTable = UsersTable
 }

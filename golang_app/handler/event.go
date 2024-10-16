@@ -72,7 +72,7 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceEventTy
 			sport.ID,
 		)
 
-		err = serviceEvent.Create(ctx, newEvent, eventType.ID, sport.ID)
+		err = serviceEvent.Create(ctx, newEvent)
 		if err != nil {
 
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
@@ -88,6 +88,7 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceEventTy
 func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		id, err := ulid.Parse(c.Params("eventId"))
+
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
@@ -233,8 +234,8 @@ func deleteEvent(ctx context.Context, service service.Event) fiber.Handler {
 			})
 		}
 
-		del_err := service.Delete(ctx, id)
-		if del_err != nil {
+		err = service.Delete(ctx, id)
+		if err != nil {
 			if ent.IsNotFound(err) {
 				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 					"status":       "error",

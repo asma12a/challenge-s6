@@ -10,9 +10,16 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/asma12a/challenge-s6/ent/basketevent"
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/eventtype"
+	"github.com/asma12a/challenge-s6/ent/footevent"
+	"github.com/asma12a/challenge-s6/ent/runningevent"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/sport"
+	"github.com/asma12a/challenge-s6/ent/tennisevent"
+	"github.com/asma12a/challenge-s6/ent/trainingevent"
+	"github.com/asma12a/challenge-s6/ent/userstats"
 )
 
 // EventCreate is the builder for creating a Event entity.
@@ -89,27 +96,27 @@ func (ec *EventCreate) SetNillableIsFinished(b *bool) *EventCreate {
 }
 
 // SetID sets the "id" field.
-func (ec *EventCreate) SetID(s string) *EventCreate {
-	ec.mutation.SetID(s)
+func (ec *EventCreate) SetID(u ulid.ID) *EventCreate {
+	ec.mutation.SetID(u)
 	return ec
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (ec *EventCreate) SetNillableID(s *string) *EventCreate {
-	if s != nil {
-		ec.SetID(*s)
+func (ec *EventCreate) SetNillableID(u *ulid.ID) *EventCreate {
+	if u != nil {
+		ec.SetID(*u)
 	}
 	return ec
 }
 
 // SetEventTypeID sets the "event_type" edge to the EventType entity by ID.
-func (ec *EventCreate) SetEventTypeID(id string) *EventCreate {
+func (ec *EventCreate) SetEventTypeID(id ulid.ID) *EventCreate {
 	ec.mutation.SetEventTypeID(id)
 	return ec
 }
 
 // SetNillableEventTypeID sets the "event_type" edge to the EventType entity by ID if the given value is not nil.
-func (ec *EventCreate) SetNillableEventTypeID(id *string) *EventCreate {
+func (ec *EventCreate) SetNillableEventTypeID(id *ulid.ID) *EventCreate {
 	if id != nil {
 		ec = ec.SetEventTypeID(*id)
 	}
@@ -122,13 +129,13 @@ func (ec *EventCreate) SetEventType(e *EventType) *EventCreate {
 }
 
 // SetSportID sets the "sport" edge to the Sport entity by ID.
-func (ec *EventCreate) SetSportID(id string) *EventCreate {
+func (ec *EventCreate) SetSportID(id ulid.ID) *EventCreate {
 	ec.mutation.SetSportID(id)
 	return ec
 }
 
 // SetNillableSportID sets the "sport" edge to the Sport entity by ID if the given value is not nil.
-func (ec *EventCreate) SetNillableSportID(id *string) *EventCreate {
+func (ec *EventCreate) SetNillableSportID(id *ulid.ID) *EventCreate {
 	if id != nil {
 		ec = ec.SetSportID(*id)
 	}
@@ -138,6 +145,96 @@ func (ec *EventCreate) SetNillableSportID(id *string) *EventCreate {
 // SetSport sets the "sport" edge to the Sport entity.
 func (ec *EventCreate) SetSport(s *Sport) *EventCreate {
 	return ec.SetSportID(s.ID)
+}
+
+// AddUserStatsIDIDs adds the "user_stats_id" edge to the UserStats entity by IDs.
+func (ec *EventCreate) AddUserStatsIDIDs(ids ...ulid.ID) *EventCreate {
+	ec.mutation.AddUserStatsIDIDs(ids...)
+	return ec
+}
+
+// AddUserStatsID adds the "user_stats_id" edges to the UserStats entity.
+func (ec *EventCreate) AddUserStatsID(u ...*UserStats) *EventCreate {
+	ids := make([]ulid.ID, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return ec.AddUserStatsIDIDs(ids...)
+}
+
+// AddFootEventIDIDs adds the "foot_event_id" edge to the FootEvent entity by IDs.
+func (ec *EventCreate) AddFootEventIDIDs(ids ...ulid.ID) *EventCreate {
+	ec.mutation.AddFootEventIDIDs(ids...)
+	return ec
+}
+
+// AddFootEventID adds the "foot_event_id" edges to the FootEvent entity.
+func (ec *EventCreate) AddFootEventID(f ...*FootEvent) *EventCreate {
+	ids := make([]ulid.ID, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return ec.AddFootEventIDIDs(ids...)
+}
+
+// AddBasketEventIDIDs adds the "basket_event_id" edge to the BasketEvent entity by IDs.
+func (ec *EventCreate) AddBasketEventIDIDs(ids ...ulid.ID) *EventCreate {
+	ec.mutation.AddBasketEventIDIDs(ids...)
+	return ec
+}
+
+// AddBasketEventID adds the "basket_event_id" edges to the BasketEvent entity.
+func (ec *EventCreate) AddBasketEventID(b ...*BasketEvent) *EventCreate {
+	ids := make([]ulid.ID, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
+	}
+	return ec.AddBasketEventIDIDs(ids...)
+}
+
+// AddTennisEventIDIDs adds the "tennis_event_id" edge to the TennisEvent entity by IDs.
+func (ec *EventCreate) AddTennisEventIDIDs(ids ...ulid.ID) *EventCreate {
+	ec.mutation.AddTennisEventIDIDs(ids...)
+	return ec
+}
+
+// AddTennisEventID adds the "tennis_event_id" edges to the TennisEvent entity.
+func (ec *EventCreate) AddTennisEventID(t ...*TennisEvent) *EventCreate {
+	ids := make([]ulid.ID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return ec.AddTennisEventIDIDs(ids...)
+}
+
+// AddRunningEventIDIDs adds the "running_event_id" edge to the RunningEvent entity by IDs.
+func (ec *EventCreate) AddRunningEventIDIDs(ids ...ulid.ID) *EventCreate {
+	ec.mutation.AddRunningEventIDIDs(ids...)
+	return ec
+}
+
+// AddRunningEventID adds the "running_event_id" edges to the RunningEvent entity.
+func (ec *EventCreate) AddRunningEventID(r ...*RunningEvent) *EventCreate {
+	ids := make([]ulid.ID, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return ec.AddRunningEventIDIDs(ids...)
+}
+
+// AddTrainingEventIDIDs adds the "training_event_id" edge to the TrainingEvent entity by IDs.
+func (ec *EventCreate) AddTrainingEventIDIDs(ids ...ulid.ID) *EventCreate {
+	ec.mutation.AddTrainingEventIDIDs(ids...)
+	return ec
+}
+
+// AddTrainingEventID adds the "training_event_id" edges to the TrainingEvent entity.
+func (ec *EventCreate) AddTrainingEventID(t ...*TrainingEvent) *EventCreate {
+	ids := make([]ulid.ID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return ec.AddTrainingEventIDIDs(ids...)
 }
 
 // Mutation returns the EventMutation object of the builder.
@@ -236,11 +333,6 @@ func (ec *EventCreate) check() error {
 	if _, ok := ec.mutation.IsFinished(); !ok {
 		return &ValidationError{Name: "is_finished", err: errors.New(`ent: missing required field "Event.is_finished"`)}
 	}
-	if v, ok := ec.mutation.ID(); ok {
-		if err := event.IDValidator(v); err != nil {
-			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Event.id": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -256,10 +348,10 @@ func (ec *EventCreate) sqlSave(ctx context.Context) (*Event, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(string); ok {
-			_node.ID = id
-		} else {
-			return nil, fmt.Errorf("unexpected Event.ID type: %T", _spec.ID.Value)
+		if id, ok := _spec.ID.Value.(*ulid.ID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
 		}
 	}
 	ec.mutation.id = &_node.ID
@@ -274,7 +366,7 @@ func (ec *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 	)
 	if id, ok := ec.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = id
+		_spec.ID.Value = &id
 	}
 	if value, ok := ec.mutation.Name(); ok {
 		_spec.SetField(event.FieldName, field.TypeString, value)
@@ -336,6 +428,102 @@ func (ec *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.sport_id = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.UserStatsIDIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.UserStatsIDTable,
+			Columns: []string{event.UserStatsIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.FootEventIDIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.FootEventIDTable,
+			Columns: []string{event.FootEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(footevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.BasketEventIDIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.BasketEventIDTable,
+			Columns: []string{event.BasketEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(basketevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.TennisEventIDIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.TennisEventIDTable,
+			Columns: []string{event.TennisEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tennisevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.RunningEventIDIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.RunningEventIDTable,
+			Columns: []string{event.RunningEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(runningevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.TrainingEventIDIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.TrainingEventIDTable,
+			Columns: []string{event.TrainingEventIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trainingevent.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
