@@ -37,6 +37,7 @@ var ForeignKeys = []string{
 	"event_basket_id",
 	"event_tennis_id",
 	"event_running_id",
+	"event_training_id",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

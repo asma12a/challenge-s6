@@ -22,12 +22,13 @@ type FootEvent struct {
 	// TeamAID holds the value of the "team_A_id" field.
 	TeamAID string `json:"team_A_id,omitempty"`
 	// TeamBID holds the value of the "team_B_id" field.
-	TeamBID          string `json:"team_B_id,omitempty"`
-	event_foot_id    *ulid.ID
-	event_basket_id  *ulid.ID
-	event_tennis_id  *ulid.ID
-	event_running_id *ulid.ID
-	selectValues     sql.SelectValues
+	TeamBID           string `json:"team_B_id,omitempty"`
+	event_foot_id     *ulid.ID
+	event_basket_id   *ulid.ID
+	event_tennis_id   *ulid.ID
+	event_running_id  *ulid.ID
+	event_training_id *ulid.ID
+	selectValues      sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -46,6 +47,8 @@ func (*FootEvent) scanValues(columns []string) ([]any, error) {
 		case footevent.ForeignKeys[2]: // event_tennis_id
 			values[i] = &sql.NullScanner{S: new(ulid.ID)}
 		case footevent.ForeignKeys[3]: // event_running_id
+			values[i] = &sql.NullScanner{S: new(ulid.ID)}
+		case footevent.ForeignKeys[4]: // event_training_id
 			values[i] = &sql.NullScanner{S: new(ulid.ID)}
 		default:
 			values[i] = new(sql.UnknownType)
@@ -113,6 +116,13 @@ func (fe *FootEvent) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				fe.event_running_id = new(ulid.ID)
 				*fe.event_running_id = *value.S.(*ulid.ID)
+			}
+		case footevent.ForeignKeys[4]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field event_training_id", values[i])
+			} else if value.Valid {
+				fe.event_training_id = new(ulid.ID)
+				*fe.event_training_id = *value.S.(*ulid.ID)
 			}
 		default:
 			fe.selectValues.Set(columns[i], values[i])
