@@ -135,16 +135,30 @@ func (eu *EventUpdate) SetNillableIsFinished(b *bool) *EventUpdate {
 	return eu
 }
 
-// SetEventTypeID sets the "event_type" edge to the EventType entity by ID.
-func (eu *EventUpdate) SetEventTypeID(id string) *EventUpdate {
-	eu.mutation.SetEventTypeID(id)
+// SetEventTypeID sets the "event_type_id" field.
+func (eu *EventUpdate) SetEventTypeID(s string) *EventUpdate {
+	eu.mutation.SetEventTypeID(s)
 	return eu
 }
 
-// SetNillableEventTypeID sets the "event_type" edge to the EventType entity by ID if the given value is not nil.
-func (eu *EventUpdate) SetNillableEventTypeID(id *string) *EventUpdate {
-	if id != nil {
-		eu = eu.SetEventTypeID(*id)
+// SetNillableEventTypeID sets the "event_type_id" field if the given value is not nil.
+func (eu *EventUpdate) SetNillableEventTypeID(s *string) *EventUpdate {
+	if s != nil {
+		eu.SetEventTypeID(*s)
+	}
+	return eu
+}
+
+// SetSportID sets the "sport_id" field.
+func (eu *EventUpdate) SetSportID(s string) *EventUpdate {
+	eu.mutation.SetSportID(s)
+	return eu
+}
+
+// SetNillableSportID sets the "sport_id" field if the given value is not nil.
+func (eu *EventUpdate) SetNillableSportID(s *string) *EventUpdate {
+	if s != nil {
+		eu.SetSportID(*s)
 	}
 	return eu
 }
@@ -152,20 +166,6 @@ func (eu *EventUpdate) SetNillableEventTypeID(id *string) *EventUpdate {
 // SetEventType sets the "event_type" edge to the EventType entity.
 func (eu *EventUpdate) SetEventType(e *EventType) *EventUpdate {
 	return eu.SetEventTypeID(e.ID)
-}
-
-// SetSportID sets the "sport" edge to the Sport entity by ID.
-func (eu *EventUpdate) SetSportID(id string) *EventUpdate {
-	eu.mutation.SetSportID(id)
-	return eu
-}
-
-// SetNillableSportID sets the "sport" edge to the Sport entity by ID if the given value is not nil.
-func (eu *EventUpdate) SetNillableSportID(id *string) *EventUpdate {
-	if id != nil {
-		eu = eu.SetSportID(*id)
-	}
-	return eu
 }
 
 // SetSport sets the "sport" edge to the Sport entity.
@@ -238,6 +238,22 @@ func (eu *EventUpdate) check() error {
 		if err := event.DateValidator(v); err != nil {
 			return &ValidationError{Name: "date", err: fmt.Errorf(`ent: validator failed for field "Event.date": %w`, err)}
 		}
+	}
+	if v, ok := eu.mutation.EventTypeID(); ok {
+		if err := event.EventTypeIDValidator(v); err != nil {
+			return &ValidationError{Name: "event_type_id", err: fmt.Errorf(`ent: validator failed for field "Event.event_type_id": %w`, err)}
+		}
+	}
+	if v, ok := eu.mutation.SportID(); ok {
+		if err := event.SportIDValidator(v); err != nil {
+			return &ValidationError{Name: "sport_id", err: fmt.Errorf(`ent: validator failed for field "Event.sport_id": %w`, err)}
+		}
+	}
+	if eu.mutation.EventTypeCleared() && len(eu.mutation.EventTypeIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "Event.event_type"`)
+	}
+	if eu.mutation.SportCleared() && len(eu.mutation.SportIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "Event.sport"`)
 	}
 	return nil
 }
@@ -461,16 +477,30 @@ func (euo *EventUpdateOne) SetNillableIsFinished(b *bool) *EventUpdateOne {
 	return euo
 }
 
-// SetEventTypeID sets the "event_type" edge to the EventType entity by ID.
-func (euo *EventUpdateOne) SetEventTypeID(id string) *EventUpdateOne {
-	euo.mutation.SetEventTypeID(id)
+// SetEventTypeID sets the "event_type_id" field.
+func (euo *EventUpdateOne) SetEventTypeID(s string) *EventUpdateOne {
+	euo.mutation.SetEventTypeID(s)
 	return euo
 }
 
-// SetNillableEventTypeID sets the "event_type" edge to the EventType entity by ID if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableEventTypeID(id *string) *EventUpdateOne {
-	if id != nil {
-		euo = euo.SetEventTypeID(*id)
+// SetNillableEventTypeID sets the "event_type_id" field if the given value is not nil.
+func (euo *EventUpdateOne) SetNillableEventTypeID(s *string) *EventUpdateOne {
+	if s != nil {
+		euo.SetEventTypeID(*s)
+	}
+	return euo
+}
+
+// SetSportID sets the "sport_id" field.
+func (euo *EventUpdateOne) SetSportID(s string) *EventUpdateOne {
+	euo.mutation.SetSportID(s)
+	return euo
+}
+
+// SetNillableSportID sets the "sport_id" field if the given value is not nil.
+func (euo *EventUpdateOne) SetNillableSportID(s *string) *EventUpdateOne {
+	if s != nil {
+		euo.SetSportID(*s)
 	}
 	return euo
 }
@@ -478,20 +508,6 @@ func (euo *EventUpdateOne) SetNillableEventTypeID(id *string) *EventUpdateOne {
 // SetEventType sets the "event_type" edge to the EventType entity.
 func (euo *EventUpdateOne) SetEventType(e *EventType) *EventUpdateOne {
 	return euo.SetEventTypeID(e.ID)
-}
-
-// SetSportID sets the "sport" edge to the Sport entity by ID.
-func (euo *EventUpdateOne) SetSportID(id string) *EventUpdateOne {
-	euo.mutation.SetSportID(id)
-	return euo
-}
-
-// SetNillableSportID sets the "sport" edge to the Sport entity by ID if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableSportID(id *string) *EventUpdateOne {
-	if id != nil {
-		euo = euo.SetSportID(*id)
-	}
-	return euo
 }
 
 // SetSport sets the "sport" edge to the Sport entity.
@@ -577,6 +593,22 @@ func (euo *EventUpdateOne) check() error {
 		if err := event.DateValidator(v); err != nil {
 			return &ValidationError{Name: "date", err: fmt.Errorf(`ent: validator failed for field "Event.date": %w`, err)}
 		}
+	}
+	if v, ok := euo.mutation.EventTypeID(); ok {
+		if err := event.EventTypeIDValidator(v); err != nil {
+			return &ValidationError{Name: "event_type_id", err: fmt.Errorf(`ent: validator failed for field "Event.event_type_id": %w`, err)}
+		}
+	}
+	if v, ok := euo.mutation.SportID(); ok {
+		if err := event.SportIDValidator(v); err != nil {
+			return &ValidationError{Name: "sport_id", err: fmt.Errorf(`ent: validator failed for field "Event.sport_id": %w`, err)}
+		}
+	}
+	if euo.mutation.EventTypeCleared() && len(euo.mutation.EventTypeIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "Event.event_type"`)
+	}
+	if euo.mutation.SportCleared() && len(euo.mutation.SportIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "Event.sport"`)
 	}
 	return nil
 }

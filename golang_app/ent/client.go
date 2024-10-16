@@ -500,15 +500,15 @@ func (c *EventTypeClient) GetX(ctx context.Context, id string) *EventType {
 	return obj
 }
 
-// QueryEvent queries the event edge of a EventType.
-func (c *EventTypeClient) QueryEvent(et *EventType) *EventQuery {
+// QueryEvents queries the events edge of a EventType.
+func (c *EventTypeClient) QueryEvents(et *EventType) *EventQuery {
 	query := (&EventClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := et.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(eventtype.Table, eventtype.FieldID, id),
 			sqlgraph.To(event.Table, event.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, eventtype.EventTable, eventtype.EventColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, eventtype.EventsTable, eventtype.EventsColumn),
 		)
 		fromV = sqlgraph.Neighbors(et.driver.Dialect(), step)
 		return fromV, nil
@@ -649,15 +649,15 @@ func (c *SportClient) GetX(ctx context.Context, id string) *Sport {
 	return obj
 }
 
-// QueryEvent queries the event edge of a Sport.
-func (c *SportClient) QueryEvent(s *Sport) *EventQuery {
+// QueryEvents queries the events edge of a Sport.
+func (c *SportClient) QueryEvents(s *Sport) *EventQuery {
 	query := (&EventClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := s.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(sport.Table, sport.FieldID, id),
 			sqlgraph.To(event.Table, event.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, sport.EventTable, sport.EventColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, sport.EventsTable, sport.EventsColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil

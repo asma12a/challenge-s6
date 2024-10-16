@@ -28,6 +28,6 @@ func (Sport) Fields() []ent.Field {
 // Edges of the Sport.
 func (Sport) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("event", Event.Type),
+		edge.To("events", Event.Type),
 	}
 }

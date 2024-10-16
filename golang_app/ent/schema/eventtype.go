@@ -24,9 +24,9 @@ func (EventType) Fields() []ent.Field {
 	}
 }
 
-// Edges of the User.
+// Edges of the EventType.
 func (EventType) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("event", Event.Type),
+		edge.To("events", Event.Type), // Un EventType peut avoir plusieurs événements
 	}
 }

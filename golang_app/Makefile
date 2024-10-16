@@ -26,3 +26,5 @@ generate:
 
 .PHONY: start migrate docker-dev
 
+run:
+	docker compose up -d

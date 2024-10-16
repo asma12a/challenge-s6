@@ -26,20 +26,25 @@ func (Event) Fields() []ent.Field {
 		field.String("address").NotEmpty(),
 		field.Int16("event_code").Positive(),
 		field.String("date").NotEmpty(),
-		field.Time("created_at").
-			Default(time.Now),
+		field.Time("created_at").Default(time.Now),
 		field.Bool("is_public").Default(false),
 		field.Bool("is_finished").Default(false),
+		field.String("event_type_id").NotEmpty(),
+		field.String("sport_id").NotEmpty(),
 	}
 }
 
 func (Event) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("event_type", EventType.Type).
-			Ref("event").
+			Ref("events").
+			Field("event_type_id").
+			Required().
 			Unique(),
 		edge.From("sport", Sport.Type).
-			Ref("event").
+			Ref("events").
+			Field("sport_id").
+			Required().
 			Unique(),
 	}
 }

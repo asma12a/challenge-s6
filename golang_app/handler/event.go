@@ -30,7 +30,7 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceEventTy
 			})
 		}
 
-		eventTypeId := eventInput.Edges.EventType.ID
+		eventTypeId := eventInput.EventTypeID
 		eventType, err := serviceEventType.FindOne(ctx, eventTypeId)
 		if err != nil {
 			if ent.IsNotFound(err) {
@@ -44,7 +44,7 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceEventTy
 				"error_detail": err.Error(),
 			})
 		}
-		sportId := eventInput.Edges.Sport.ID
+		sportId := eventInput.SportID
 		sport, err := serviceSport.FindOne(ctx, sportId)
 		if err != nil {
 			if ent.IsNotFound(err) {
@@ -59,14 +59,13 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceEventTy
 			})
 		}
 
-		// Assurez-vous d'utiliser le bon type ici
 		newEvent := entity.NewEvent(
 			eventInput.Name,
 			eventInput.Address,
 			eventInput.EventCode,
 			eventInput.Date,
-			&eventType.EventType,
-			&sport.Sport,
+			eventType.ID,
+			sport.ID,
 		)
 
 		err = serviceEvent.Create(ctx, newEvent)
@@ -131,8 +130,8 @@ func updateEvent(ctx context.Context, serviceEvent service.Event, serviceEventTy
 			})
 		}
 
-		if eventInput.Edges.EventType != nil {
-			eventTypeId := eventInput.Edges.EventType.ID
+		if eventInput.EventTypeID != "" {
+			eventTypeId := eventInput.EventTypeID
 			eventType, err := serviceEventType.FindOne(ctx, eventTypeId)
 			if err != nil {
 				if ent.IsNotFound(err) {
@@ -146,12 +145,11 @@ func updateEvent(ctx context.Context, serviceEvent service.Event, serviceEventTy
 					"error_detail": err.Error(),
 				})
 			}
-			existingEvent.Edges.EventType = &eventType.EventType
+			existingEvent.EventTypeID = eventType.ID
 		}
 
-		// Vérifie le sport
-		if eventInput.Edges.Sport != nil {
-			sportId := eventInput.Edges.Sport.ID
+		if eventInput.SportID != "" {
+			sportId := eventInput.SportID
 			sport, err := serviceSport.FindOne(ctx, sportId)
 			if err != nil {
 				if ent.IsNotFound(err) {
@@ -165,7 +163,7 @@ func updateEvent(ctx context.Context, serviceEvent service.Event, serviceEventTy
 					"error_detail": err.Error(),
 				})
 			}
-			existingEvent.Edges.Sport = &sport.Sport
+			existingEvent.SportID = sport.ID
 		}
 
 		existingEvent.Name = eventInput.Name

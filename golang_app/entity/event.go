@@ -8,17 +8,15 @@ type Event struct {
 	ent.Event
 }
 
-func NewEvent(name string, address string, eventCode int16, date string, eventType *ent.EventType, sport *ent.Sport) *Event {
+func NewEvent(name string, address string, eventCode int16, date string, eventTypeId string, sportId string) *Event {
 	return &Event{
 		Event: ent.Event{
-			Name:      name,
-			Address:   address,
-			EventCode: eventCode,
-			Date:      date,
-			Edges: ent.EventEdges{
-				EventType: eventType,
-				Sport:     sport,
-			},
+			Name:        name,
+			Address:     address,
+			EventCode:   eventCode,
+			Date:        date,
+			EventTypeID: eventTypeId,
+			SportID:     sportId,
 		},
 	}
 }

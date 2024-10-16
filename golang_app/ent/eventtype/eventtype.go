@@ -14,17 +14,17 @@ const (
 	FieldID = "id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// EdgeEvent holds the string denoting the event edge name in mutations.
-	EdgeEvent = "event"
+	// EdgeEvents holds the string denoting the events edge name in mutations.
+	EdgeEvents = "events"
 	// Table holds the table name of the eventtype in the database.
 	Table = "event_types"
-	// EventTable is the table that holds the event relation/edge.
-	EventTable = "events"
-	// EventInverseTable is the table name for the Event entity.
+	// EventsTable is the table that holds the events relation/edge.
+	EventsTable = "events"
+	// EventsInverseTable is the table name for the Event entity.
 	// It exists in this package in order to avoid circular dependency with the "event" package.
-	EventInverseTable = "events"
-	// EventColumn is the table column denoting the event relation/edge.
-	EventColumn = "event_type_event"
+	EventsInverseTable = "events"
+	// EventsColumn is the table column denoting the events relation/edge.
+	EventsColumn = "event_type_id"
 )
 
 // Columns holds all SQL columns for eventtype fields.
@@ -65,23 +65,23 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByEventCount orders the results by event count.
-func ByEventCount(opts ...sql.OrderTermOption) OrderOption {
+// ByEventsCount orders the results by events count.
+func ByEventsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newEventStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newEventsStep(), opts...)
 	}
 }
 
-// ByEvent orders the results by event terms.
-func ByEvent(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByEvents orders the results by events terms.
+func ByEvents(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEventStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newEventsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newEventStep() *sqlgraph.Step {
+func newEventsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(EventInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, EventTable, EventColumn),
+		sqlgraph.To(EventsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, EventsTable, EventsColumn),
 	)
 }

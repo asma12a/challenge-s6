@@ -40,14 +40,14 @@ func (etc *EventTypeCreate) SetNillableID(s *string) *EventTypeCreate {
 	return etc
 }
 
-// AddEventIDs adds the "event" edge to the Event entity by IDs.
+// AddEventIDs adds the "events" edge to the Event entity by IDs.
 func (etc *EventTypeCreate) AddEventIDs(ids ...string) *EventTypeCreate {
 	etc.mutation.AddEventIDs(ids...)
 	return etc
 }
 
-// AddEvent adds the "event" edges to the Event entity.
-func (etc *EventTypeCreate) AddEvent(e ...*Event) *EventTypeCreate {
+// AddEvents adds the "events" edges to the Event entity.
+func (etc *EventTypeCreate) AddEvents(e ...*Event) *EventTypeCreate {
 	ids := make([]string, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -150,12 +150,12 @@ func (etc *EventTypeCreate) createSpec() (*EventType, *sqlgraph.CreateSpec) {
 		_spec.SetField(eventtype.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if nodes := etc.mutation.EventIDs(); len(nodes) > 0 {
+	if nodes := etc.mutation.EventsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   eventtype.EventTable,
-			Columns: []string{eventtype.EventColumn},
+			Table:   eventtype.EventsTable,
+			Columns: []string{eventtype.EventsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),

@@ -24,8 +24,8 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
 		SetAddress(event.Address).
 		SetEventCode(event.EventCode).
 		SetDate(event.Date).
-		SetEventTypeID(event.Edges.EventType.ID).
-		SetSportID(event.Edges.Sport.ID).
+		SetEventTypeID(event.EventTypeID).
+		SetSportID(event.SportID).
 		Save(ctx)
 
 	if err != nil {

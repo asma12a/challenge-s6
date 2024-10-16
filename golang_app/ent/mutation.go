@@ -433,27 +433,87 @@ func (m *EventMutation) ResetIsFinished() {
 	m.is_finished = nil
 }
 
-// SetEventTypeID sets the "event_type" edge to the EventType entity by id.
-func (m *EventMutation) SetEventTypeID(id string) {
-	m.event_type = &id
+// SetEventTypeID sets the "event_type_id" field.
+func (m *EventMutation) SetEventTypeID(s string) {
+	m.event_type = &s
+}
+
+// EventTypeID returns the value of the "event_type_id" field in the mutation.
+func (m *EventMutation) EventTypeID() (r string, exists bool) {
+	v := m.event_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEventTypeID returns the old "event_type_id" field's value of the Event entity.
+// If the Event object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EventMutation) OldEventTypeID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEventTypeID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEventTypeID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEventTypeID: %w", err)
+	}
+	return oldValue.EventTypeID, nil
+}
+
+// ResetEventTypeID resets all changes to the "event_type_id" field.
+func (m *EventMutation) ResetEventTypeID() {
+	m.event_type = nil
+}
+
+// SetSportID sets the "sport_id" field.
+func (m *EventMutation) SetSportID(s string) {
+	m.sport = &s
+}
+
+// SportID returns the value of the "sport_id" field in the mutation.
+func (m *EventMutation) SportID() (r string, exists bool) {
+	v := m.sport
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSportID returns the old "sport_id" field's value of the Event entity.
+// If the Event object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EventMutation) OldSportID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSportID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSportID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSportID: %w", err)
+	}
+	return oldValue.SportID, nil
+}
+
+// ResetSportID resets all changes to the "sport_id" field.
+func (m *EventMutation) ResetSportID() {
+	m.sport = nil
 }
 
 // ClearEventType clears the "event_type" edge to the EventType entity.
 func (m *EventMutation) ClearEventType() {
 	m.clearedevent_type = true
+	m.clearedFields[event.FieldEventTypeID] = struct{}{}
 }
 
 // EventTypeCleared reports if the "event_type" edge to the EventType entity was cleared.
 func (m *EventMutation) EventTypeCleared() bool {
 	return m.clearedevent_type
-}
-
-// EventTypeID returns the "event_type" edge ID in the mutation.
-func (m *EventMutation) EventTypeID() (id string, exists bool) {
-	if m.event_type != nil {
-		return *m.event_type, true
-	}
-	return
 }
 
 // EventTypeIDs returns the "event_type" edge IDs in the mutation.
@@ -472,27 +532,15 @@ func (m *EventMutation) ResetEventType() {
 	m.clearedevent_type = false
 }
 
-// SetSportID sets the "sport" edge to the Sport entity by id.
-func (m *EventMutation) SetSportID(id string) {
-	m.sport = &id
-}
-
 // ClearSport clears the "sport" edge to the Sport entity.
 func (m *EventMutation) ClearSport() {
 	m.clearedsport = true
+	m.clearedFields[event.FieldSportID] = struct{}{}
 }
 
 // SportCleared reports if the "sport" edge to the Sport entity was cleared.
 func (m *EventMutation) SportCleared() bool {
 	return m.clearedsport
-}
-
-// SportID returns the "sport" edge ID in the mutation.
-func (m *EventMutation) SportID() (id string, exists bool) {
-	if m.sport != nil {
-		return *m.sport, true
-	}
-	return
 }
 
 // SportIDs returns the "sport" edge IDs in the mutation.
@@ -545,7 +593,7 @@ func (m *EventMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EventMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 9)
 	if m.name != nil {
 		fields = append(fields, event.FieldName)
 	}
@@ -566,6 +614,12 @@ func (m *EventMutation) Fields() []string {
 	}
 	if m.is_finished != nil {
 		fields = append(fields, event.FieldIsFinished)
+	}
+	if m.event_type != nil {
+		fields = append(fields, event.FieldEventTypeID)
+	}
+	if m.sport != nil {
+		fields = append(fields, event.FieldSportID)
 	}
 	return fields
 }
@@ -589,6 +643,10 @@ func (m *EventMutation) Field(name string) (ent.Value, bool) {
 		return m.IsPublic()
 	case event.FieldIsFinished:
 		return m.IsFinished()
+	case event.FieldEventTypeID:
+		return m.EventTypeID()
+	case event.FieldSportID:
+		return m.SportID()
 	}
 	return nil, false
 }
@@ -612,6 +670,10 @@ func (m *EventMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldIsPublic(ctx)
 	case event.FieldIsFinished:
 		return m.OldIsFinished(ctx)
+	case event.FieldEventTypeID:
+		return m.OldEventTypeID(ctx)
+	case event.FieldSportID:
+		return m.OldSportID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Event field %s", name)
 }
@@ -669,6 +731,20 @@ func (m *EventMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetIsFinished(v)
+		return nil
+	case event.FieldEventTypeID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEventTypeID(v)
+		return nil
+	case event.FieldSportID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSportID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Event field %s", name)
@@ -754,6 +830,12 @@ func (m *EventMutation) ResetField(name string) error {
 		return nil
 	case event.FieldIsFinished:
 		m.ResetIsFinished()
+		return nil
+	case event.FieldEventTypeID:
+		m.ResetEventTypeID()
+		return nil
+	case event.FieldSportID:
+		m.ResetSportID()
 		return nil
 	}
 	return fmt.Errorf("unknown Event field %s", name)
@@ -859,9 +941,9 @@ type EventTypeMutation struct {
 	id            *string
 	name          *string
 	clearedFields map[string]struct{}
-	event         map[string]struct{}
-	removedevent  map[string]struct{}
-	clearedevent  bool
+	events        map[string]struct{}
+	removedevents map[string]struct{}
+	clearedevents bool
 	done          bool
 	oldValue      func(context.Context) (*EventType, error)
 	predicates    []predicate.EventType
@@ -1007,58 +1089,58 @@ func (m *EventTypeMutation) ResetName() {
 	m.name = nil
 }
 
-// AddEventIDs adds the "event" edge to the Event entity by ids.
+// AddEventIDs adds the "events" edge to the Event entity by ids.
 func (m *EventTypeMutation) AddEventIDs(ids ...string) {
-	if m.event == nil {
-		m.event = make(map[string]struct{})
+	if m.events == nil {
+		m.events = make(map[string]struct{})
 	}
 	for i := range ids {
-		m.event[ids[i]] = struct{}{}
+		m.events[ids[i]] = struct{}{}
 	}
 }
 
-// ClearEvent clears the "event" edge to the Event entity.
-func (m *EventTypeMutation) ClearEvent() {
-	m.clearedevent = true
+// ClearEvents clears the "events" edge to the Event entity.
+func (m *EventTypeMutation) ClearEvents() {
+	m.clearedevents = true
 }
 
-// EventCleared reports if the "event" edge to the Event entity was cleared.
-func (m *EventTypeMutation) EventCleared() bool {
-	return m.clearedevent
+// EventsCleared reports if the "events" edge to the Event entity was cleared.
+func (m *EventTypeMutation) EventsCleared() bool {
+	return m.clearedevents
 }
 
-// RemoveEventIDs removes the "event" edge to the Event entity by IDs.
+// RemoveEventIDs removes the "events" edge to the Event entity by IDs.
 func (m *EventTypeMutation) RemoveEventIDs(ids ...string) {
-	if m.removedevent == nil {
-		m.removedevent = make(map[string]struct{})
+	if m.removedevents == nil {
+		m.removedevents = make(map[string]struct{})
 	}
 	for i := range ids {
-		delete(m.event, ids[i])
-		m.removedevent[ids[i]] = struct{}{}
+		delete(m.events, ids[i])
+		m.removedevents[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedEvent returns the removed IDs of the "event" edge to the Event entity.
-func (m *EventTypeMutation) RemovedEventIDs() (ids []string) {
-	for id := range m.removedevent {
+// RemovedEvents returns the removed IDs of the "events" edge to the Event entity.
+func (m *EventTypeMutation) RemovedEventsIDs() (ids []string) {
+	for id := range m.removedevents {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// EventIDs returns the "event" edge IDs in the mutation.
-func (m *EventTypeMutation) EventIDs() (ids []string) {
-	for id := range m.event {
+// EventsIDs returns the "events" edge IDs in the mutation.
+func (m *EventTypeMutation) EventsIDs() (ids []string) {
+	for id := range m.events {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetEvent resets all changes to the "event" edge.
-func (m *EventTypeMutation) ResetEvent() {
-	m.event = nil
-	m.clearedevent = false
-	m.removedevent = nil
+// ResetEvents resets all changes to the "events" edge.
+func (m *EventTypeMutation) ResetEvents() {
+	m.events = nil
+	m.clearedevents = false
+	m.removedevents = nil
 }
 
 // Where appends a list predicates to the EventTypeMutation builder.
@@ -1195,8 +1277,8 @@ func (m *EventTypeMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *EventTypeMutation) AddedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.event != nil {
-		edges = append(edges, eventtype.EdgeEvent)
+	if m.events != nil {
+		edges = append(edges, eventtype.EdgeEvents)
 	}
 	return edges
 }
@@ -1205,9 +1287,9 @@ func (m *EventTypeMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *EventTypeMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case eventtype.EdgeEvent:
-		ids := make([]ent.Value, 0, len(m.event))
-		for id := range m.event {
+	case eventtype.EdgeEvents:
+		ids := make([]ent.Value, 0, len(m.events))
+		for id := range m.events {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1218,8 +1300,8 @@ func (m *EventTypeMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *EventTypeMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.removedevent != nil {
-		edges = append(edges, eventtype.EdgeEvent)
+	if m.removedevents != nil {
+		edges = append(edges, eventtype.EdgeEvents)
 	}
 	return edges
 }
@@ -1228,9 +1310,9 @@ func (m *EventTypeMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *EventTypeMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case eventtype.EdgeEvent:
-		ids := make([]ent.Value, 0, len(m.removedevent))
-		for id := range m.removedevent {
+	case eventtype.EdgeEvents:
+		ids := make([]ent.Value, 0, len(m.removedevents))
+		for id := range m.removedevents {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1241,8 +1323,8 @@ func (m *EventTypeMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *EventTypeMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.clearedevent {
-		edges = append(edges, eventtype.EdgeEvent)
+	if m.clearedevents {
+		edges = append(edges, eventtype.EdgeEvents)
 	}
 	return edges
 }
@@ -1251,8 +1333,8 @@ func (m *EventTypeMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *EventTypeMutation) EdgeCleared(name string) bool {
 	switch name {
-	case eventtype.EdgeEvent:
-		return m.clearedevent
+	case eventtype.EdgeEvents:
+		return m.clearedevents
 	}
 	return false
 }
@@ -1269,8 +1351,8 @@ func (m *EventTypeMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *EventTypeMutation) ResetEdge(name string) error {
 	switch name {
-	case eventtype.EdgeEvent:
-		m.ResetEvent()
+	case eventtype.EdgeEvents:
+		m.ResetEvents()
 		return nil
 	}
 	return fmt.Errorf("unknown EventType edge %s", name)
@@ -1285,9 +1367,9 @@ type SportMutation struct {
 	name          *string
 	image_url     *string
 	clearedFields map[string]struct{}
-	event         map[string]struct{}
-	removedevent  map[string]struct{}
-	clearedevent  bool
+	events        map[string]struct{}
+	removedevents map[string]struct{}
+	clearedevents bool
 	done          bool
 	oldValue      func(context.Context) (*Sport, error)
 	predicates    []predicate.Sport
@@ -1482,58 +1564,58 @@ func (m *SportMutation) ResetImageURL() {
 	delete(m.clearedFields, sport.FieldImageURL)
 }
 
-// AddEventIDs adds the "event" edge to the Event entity by ids.
+// AddEventIDs adds the "events" edge to the Event entity by ids.
 func (m *SportMutation) AddEventIDs(ids ...string) {
-	if m.event == nil {
-		m.event = make(map[string]struct{})
+	if m.events == nil {
+		m.events = make(map[string]struct{})
 	}
 	for i := range ids {
-		m.event[ids[i]] = struct{}{}
+		m.events[ids[i]] = struct{}{}
 	}
 }
 
-// ClearEvent clears the "event" edge to the Event entity.
-func (m *SportMutation) ClearEvent() {
-	m.clearedevent = true
+// ClearEvents clears the "events" edge to the Event entity.
+func (m *SportMutation) ClearEvents() {
+	m.clearedevents = true
 }
 
-// EventCleared reports if the "event" edge to the Event entity was cleared.
-func (m *SportMutation) EventCleared() bool {
-	return m.clearedevent
+// EventsCleared reports if the "events" edge to the Event entity was cleared.
+func (m *SportMutation) EventsCleared() bool {
+	return m.clearedevents
 }
 
-// RemoveEventIDs removes the "event" edge to the Event entity by IDs.
+// RemoveEventIDs removes the "events" edge to the Event entity by IDs.
 func (m *SportMutation) RemoveEventIDs(ids ...string) {
-	if m.removedevent == nil {
-		m.removedevent = make(map[string]struct{})
+	if m.removedevents == nil {
+		m.removedevents = make(map[string]struct{})
 	}
 	for i := range ids {
-		delete(m.event, ids[i])
-		m.removedevent[ids[i]] = struct{}{}
+		delete(m.events, ids[i])
+		m.removedevents[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedEvent returns the removed IDs of the "event" edge to the Event entity.
-func (m *SportMutation) RemovedEventIDs() (ids []string) {
-	for id := range m.removedevent {
+// RemovedEvents returns the removed IDs of the "events" edge to the Event entity.
+func (m *SportMutation) RemovedEventsIDs() (ids []string) {
+	for id := range m.removedevents {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// EventIDs returns the "event" edge IDs in the mutation.
-func (m *SportMutation) EventIDs() (ids []string) {
-	for id := range m.event {
+// EventsIDs returns the "events" edge IDs in the mutation.
+func (m *SportMutation) EventsIDs() (ids []string) {
+	for id := range m.events {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetEvent resets all changes to the "event" edge.
-func (m *SportMutation) ResetEvent() {
-	m.event = nil
-	m.clearedevent = false
-	m.removedevent = nil
+// ResetEvents resets all changes to the "events" edge.
+func (m *SportMutation) ResetEvents() {
+	m.events = nil
+	m.clearedevents = false
+	m.removedevents = nil
 }
 
 // Where appends a list predicates to the SportMutation builder.
@@ -1696,8 +1778,8 @@ func (m *SportMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *SportMutation) AddedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.event != nil {
-		edges = append(edges, sport.EdgeEvent)
+	if m.events != nil {
+		edges = append(edges, sport.EdgeEvents)
 	}
 	return edges
 }
@@ -1706,9 +1788,9 @@ func (m *SportMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *SportMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case sport.EdgeEvent:
-		ids := make([]ent.Value, 0, len(m.event))
-		for id := range m.event {
+	case sport.EdgeEvents:
+		ids := make([]ent.Value, 0, len(m.events))
+		for id := range m.events {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1719,8 +1801,8 @@ func (m *SportMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *SportMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.removedevent != nil {
-		edges = append(edges, sport.EdgeEvent)
+	if m.removedevents != nil {
+		edges = append(edges, sport.EdgeEvents)
 	}
 	return edges
 }
@@ -1729,9 +1811,9 @@ func (m *SportMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *SportMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case sport.EdgeEvent:
-		ids := make([]ent.Value, 0, len(m.removedevent))
-		for id := range m.removedevent {
+	case sport.EdgeEvents:
+		ids := make([]ent.Value, 0, len(m.removedevents))
+		for id := range m.removedevents {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1742,8 +1824,8 @@ func (m *SportMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *SportMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.clearedevent {
-		edges = append(edges, sport.EdgeEvent)
+	if m.clearedevents {
+		edges = append(edges, sport.EdgeEvents)
 	}
 	return edges
 }
@@ -1752,8 +1834,8 @@ func (m *SportMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *SportMutation) EdgeCleared(name string) bool {
 	switch name {
-	case sport.EdgeEvent:
-		return m.clearedevent
+	case sport.EdgeEvents:
+		return m.clearedevents
 	}
 	return false
 }
@@ -1770,8 +1852,8 @@ func (m *SportMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *SportMutation) ResetEdge(name string) error {
 	switch name {
-	case sport.EdgeEvent:
-		m.ResetEvent()
+	case sport.EdgeEvents:
+		m.ResetEvents()
 		return nil
 	}
 	return fmt.Errorf("unknown Sport edge %s", name)

@@ -54,14 +54,14 @@ func (sc *SportCreate) SetNillableID(s *string) *SportCreate {
 	return sc
 }
 
-// AddEventIDs adds the "event" edge to the Event entity by IDs.
+// AddEventIDs adds the "events" edge to the Event entity by IDs.
 func (sc *SportCreate) AddEventIDs(ids ...string) *SportCreate {
 	sc.mutation.AddEventIDs(ids...)
 	return sc
 }
 
-// AddEvent adds the "event" edges to the Event entity.
-func (sc *SportCreate) AddEvent(e ...*Event) *SportCreate {
+// AddEvents adds the "events" edges to the Event entity.
+func (sc *SportCreate) AddEvents(e ...*Event) *SportCreate {
 	ids := make([]string, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -168,12 +168,12 @@ func (sc *SportCreate) createSpec() (*Sport, *sqlgraph.CreateSpec) {
 		_spec.SetField(sport.FieldImageURL, field.TypeString, value)
 		_node.ImageURL = value
 	}
-	if nodes := sc.mutation.EventIDs(); len(nodes) > 0 {
+	if nodes := sc.mutation.EventsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   sport.EventTable,
-			Columns: []string{sport.EventColumn},
+			Table:   sport.EventsTable,
+			Columns: []string{sport.EventsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),

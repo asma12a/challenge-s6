@@ -62,14 +62,14 @@ func (su *SportUpdate) ClearImageURL() *SportUpdate {
 	return su
 }
 
-// AddEventIDs adds the "event" edge to the Event entity by IDs.
+// AddEventIDs adds the "events" edge to the Event entity by IDs.
 func (su *SportUpdate) AddEventIDs(ids ...string) *SportUpdate {
 	su.mutation.AddEventIDs(ids...)
 	return su
 }
 
-// AddEvent adds the "event" edges to the Event entity.
-func (su *SportUpdate) AddEvent(e ...*Event) *SportUpdate {
+// AddEvents adds the "events" edges to the Event entity.
+func (su *SportUpdate) AddEvents(e ...*Event) *SportUpdate {
 	ids := make([]string, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -82,20 +82,20 @@ func (su *SportUpdate) Mutation() *SportMutation {
 	return su.mutation
 }
 
-// ClearEvent clears all "event" edges to the Event entity.
-func (su *SportUpdate) ClearEvent() *SportUpdate {
-	su.mutation.ClearEvent()
+// ClearEvents clears all "events" edges to the Event entity.
+func (su *SportUpdate) ClearEvents() *SportUpdate {
+	su.mutation.ClearEvents()
 	return su
 }
 
-// RemoveEventIDs removes the "event" edge to Event entities by IDs.
+// RemoveEventIDs removes the "events" edge to Event entities by IDs.
 func (su *SportUpdate) RemoveEventIDs(ids ...string) *SportUpdate {
 	su.mutation.RemoveEventIDs(ids...)
 	return su
 }
 
-// RemoveEvent removes "event" edges to Event entities.
-func (su *SportUpdate) RemoveEvent(e ...*Event) *SportUpdate {
+// RemoveEvents removes "events" edges to Event entities.
+func (su *SportUpdate) RemoveEvents(e ...*Event) *SportUpdate {
 	ids := make([]string, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -161,12 +161,12 @@ func (su *SportUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if su.mutation.ImageURLCleared() {
 		_spec.ClearField(sport.FieldImageURL, field.TypeString)
 	}
-	if su.mutation.EventCleared() {
+	if su.mutation.EventsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   sport.EventTable,
-			Columns: []string{sport.EventColumn},
+			Table:   sport.EventsTable,
+			Columns: []string{sport.EventsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),
@@ -174,12 +174,12 @@ func (su *SportUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := su.mutation.RemovedEventIDs(); len(nodes) > 0 && !su.mutation.EventCleared() {
+	if nodes := su.mutation.RemovedEventsIDs(); len(nodes) > 0 && !su.mutation.EventsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   sport.EventTable,
-			Columns: []string{sport.EventColumn},
+			Table:   sport.EventsTable,
+			Columns: []string{sport.EventsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),
@@ -190,12 +190,12 @@ func (su *SportUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := su.mutation.EventIDs(); len(nodes) > 0 {
+	if nodes := su.mutation.EventsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   sport.EventTable,
-			Columns: []string{sport.EventColumn},
+			Table:   sport.EventsTable,
+			Columns: []string{sport.EventsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),
@@ -260,14 +260,14 @@ func (suo *SportUpdateOne) ClearImageURL() *SportUpdateOne {
 	return suo
 }
 
-// AddEventIDs adds the "event" edge to the Event entity by IDs.
+// AddEventIDs adds the "events" edge to the Event entity by IDs.
 func (suo *SportUpdateOne) AddEventIDs(ids ...string) *SportUpdateOne {
 	suo.mutation.AddEventIDs(ids...)
 	return suo
 }
 
-// AddEvent adds the "event" edges to the Event entity.
-func (suo *SportUpdateOne) AddEvent(e ...*Event) *SportUpdateOne {
+// AddEvents adds the "events" edges to the Event entity.
+func (suo *SportUpdateOne) AddEvents(e ...*Event) *SportUpdateOne {
 	ids := make([]string, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -280,20 +280,20 @@ func (suo *SportUpdateOne) Mutation() *SportMutation {
 	return suo.mutation
 }
 
-// ClearEvent clears all "event" edges to the Event entity.
-func (suo *SportUpdateOne) ClearEvent() *SportUpdateOne {
-	suo.mutation.ClearEvent()
+// ClearEvents clears all "events" edges to the Event entity.
+func (suo *SportUpdateOne) ClearEvents() *SportUpdateOne {
+	suo.mutation.ClearEvents()
 	return suo
 }
 
-// RemoveEventIDs removes the "event" edge to Event entities by IDs.
+// RemoveEventIDs removes the "events" edge to Event entities by IDs.
 func (suo *SportUpdateOne) RemoveEventIDs(ids ...string) *SportUpdateOne {
 	suo.mutation.RemoveEventIDs(ids...)
 	return suo
 }
 
-// RemoveEvent removes "event" edges to Event entities.
-func (suo *SportUpdateOne) RemoveEvent(e ...*Event) *SportUpdateOne {
+// RemoveEvents removes "events" edges to Event entities.
+func (suo *SportUpdateOne) RemoveEvents(e ...*Event) *SportUpdateOne {
 	ids := make([]string, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -389,12 +389,12 @@ func (suo *SportUpdateOne) sqlSave(ctx context.Context) (_node *Sport, err error
 	if suo.mutation.ImageURLCleared() {
 		_spec.ClearField(sport.FieldImageURL, field.TypeString)
 	}
-	if suo.mutation.EventCleared() {
+	if suo.mutation.EventsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   sport.EventTable,
-			Columns: []string{sport.EventColumn},
+			Table:   sport.EventsTable,
+			Columns: []string{sport.EventsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),
@@ -402,12 +402,12 @@ func (suo *SportUpdateOne) sqlSave(ctx context.Context) (_node *Sport, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := suo.mutation.RemovedEventIDs(); len(nodes) > 0 && !suo.mutation.EventCleared() {
+	if nodes := suo.mutation.RemovedEventsIDs(); len(nodes) > 0 && !suo.mutation.EventsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   sport.EventTable,
-			Columns: []string{sport.EventColumn},
+			Table:   sport.EventsTable,
+			Columns: []string{sport.EventsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),
@@ -418,12 +418,12 @@ func (suo *SportUpdateOne) sqlSave(ctx context.Context) (_node *Sport, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := suo.mutation.EventIDs(); len(nodes) > 0 {
+	if nodes := suo.mutation.EventsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   sport.EventTable,
-			Columns: []string{sport.EventColumn},
+			Table:   sport.EventsTable,
+			Columns: []string{sport.EventsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),

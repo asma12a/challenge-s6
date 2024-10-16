@@ -28,20 +28,20 @@ type Sport struct {
 
 // SportEdges holds the relations/edges for other nodes in the graph.
 type SportEdges struct {
-	// Event holds the value of the event edge.
-	Event []*Event `json:"event,omitempty"`
+	// Events holds the value of the events edge.
+	Events []*Event `json:"events,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
-// EventOrErr returns the Event value or an error if the edge
+// EventsOrErr returns the Events value or an error if the edge
 // was not loaded in eager-loading.
-func (e SportEdges) EventOrErr() ([]*Event, error) {
+func (e SportEdges) EventsOrErr() ([]*Event, error) {
 	if e.loadedTypes[0] {
-		return e.Event, nil
+		return e.Events, nil
 	}
-	return nil, &NotLoadedError{edge: "event"}
+	return nil, &NotLoadedError{edge: "events"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -97,9 +97,9 @@ func (s *Sport) Value(name string) (ent.Value, error) {
 	return s.selectValues.Get(name)
 }
 
-// QueryEvent queries the "event" edge of the Sport entity.
-func (s *Sport) QueryEvent() *EventQuery {
-	return NewSportClient(s.config).QueryEvent(s)
+// QueryEvents queries the "events" edge of the Sport entity.
+func (s *Sport) QueryEvents() *EventQuery {
+	return NewSportClient(s.config).QueryEvents(s)
 }
 
 // Update returns a builder for updating this Sport.

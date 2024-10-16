@@ -24,7 +24,7 @@ type SportQuery struct {
 	order      []sport.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Sport
-	withEvent  *EventQuery
+	withEvents *EventQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -61,8 +61,8 @@ func (sq *SportQuery) Order(o ...sport.OrderOption) *SportQuery {
 	return sq
 }
 
-// QueryEvent chains the current query on the "event" edge.
-func (sq *SportQuery) QueryEvent() *EventQuery {
+// QueryEvents chains the current query on the "events" edge.
+func (sq *SportQuery) QueryEvents() *EventQuery {
 	query := (&EventClient{config: sq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := sq.prepareQuery(ctx); err != nil {
@@ -75,7 +75,7 @@ func (sq *SportQuery) QueryEvent() *EventQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(sport.Table, sport.FieldID, selector),
 			sqlgraph.To(event.Table, event.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, sport.EventTable, sport.EventColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, sport.EventsTable, sport.EventsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -275,21 +275,21 @@ func (sq *SportQuery) Clone() *SportQuery {
 		order:      append([]sport.OrderOption{}, sq.order...),
 		inters:     append([]Interceptor{}, sq.inters...),
 		predicates: append([]predicate.Sport{}, sq.predicates...),
-		withEvent:  sq.withEvent.Clone(),
+		withEvents: sq.withEvents.Clone(),
 		// clone intermediate query.
 		sql:  sq.sql.Clone(),
 		path: sq.path,
 	}
 }
 
-// WithEvent tells the query-builder to eager-load the nodes that are connected to
-// the "event" edge. The optional arguments are used to configure the query builder of the edge.
-func (sq *SportQuery) WithEvent(opts ...func(*EventQuery)) *SportQuery {
+// WithEvents tells the query-builder to eager-load the nodes that are connected to
+// the "events" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *SportQuery) WithEvents(opts ...func(*EventQuery)) *SportQuery {
 	query := (&EventClient{config: sq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	sq.withEvent = query
+	sq.withEvents = query
 	return sq
 }
 
@@ -372,7 +372,7 @@ func (sq *SportQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Sport,
 		nodes       = []*Sport{}
 		_spec       = sq.querySpec()
 		loadedTypes = [1]bool{
-			sq.withEvent != nil,
+			sq.withEvents != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -393,17 +393,17 @@ func (sq *SportQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Sport,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := sq.withEvent; query != nil {
-		if err := sq.loadEvent(ctx, query, nodes,
-			func(n *Sport) { n.Edges.Event = []*Event{} },
-			func(n *Sport, e *Event) { n.Edges.Event = append(n.Edges.Event, e) }); err != nil {
+	if query := sq.withEvents; query != nil {
+		if err := sq.loadEvents(ctx, query, nodes,
+			func(n *Sport) { n.Edges.Events = []*Event{} },
+			func(n *Sport, e *Event) { n.Edges.Events = append(n.Edges.Events, e) }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (sq *SportQuery) loadEvent(ctx context.Context, query *EventQuery, nodes []*Sport, init func(*Sport), assign func(*Sport, *Event)) error {
+func (sq *SportQuery) loadEvents(ctx context.Context, query *EventQuery, nodes []*Sport, init func(*Sport), assign func(*Sport, *Event)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[string]*Sport)
 	for i := range nodes {
@@ -413,22 +413,21 @@ func (sq *SportQuery) loadEvent(ctx context.Context, query *EventQuery, nodes []
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(event.FieldSportID)
+	}
 	query.Where(predicate.Event(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(sport.EventColumn), fks...))
+		s.Where(sql.InValues(s.C(sport.EventsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.sport_event
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "sport_event" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		fk := n.SportID
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "sport_event" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "sport_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

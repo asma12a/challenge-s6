@@ -26,20 +26,20 @@ type EventType struct {
 
 // EventTypeEdges holds the relations/edges for other nodes in the graph.
 type EventTypeEdges struct {
-	// Event holds the value of the event edge.
-	Event []*Event `json:"event,omitempty"`
+	// Events holds the value of the events edge.
+	Events []*Event `json:"events,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
-// EventOrErr returns the Event value or an error if the edge
+// EventsOrErr returns the Events value or an error if the edge
 // was not loaded in eager-loading.
-func (e EventTypeEdges) EventOrErr() ([]*Event, error) {
+func (e EventTypeEdges) EventsOrErr() ([]*Event, error) {
 	if e.loadedTypes[0] {
-		return e.Event, nil
+		return e.Events, nil
 	}
-	return nil, &NotLoadedError{edge: "event"}
+	return nil, &NotLoadedError{edge: "events"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -89,9 +89,9 @@ func (et *EventType) Value(name string) (ent.Value, error) {
 	return et.selectValues.Get(name)
 }
 
-// QueryEvent queries the "event" edge of the EventType entity.
-func (et *EventType) QueryEvent() *EventQuery {
-	return NewEventTypeClient(et.config).QueryEvent(et)
+// QueryEvents queries the "events" edge of the EventType entity.
+func (et *EventType) QueryEvents() *EventQuery {
+	return NewEventTypeClient(et.config).QueryEvents(et)
 }
 
 // Update returns a builder for updating this EventType.
