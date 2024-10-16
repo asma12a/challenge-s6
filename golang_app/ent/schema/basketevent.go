@@ -20,7 +20,7 @@ func (BasketEvent) Fields() []ent.Field {
 					return ulid.MustNew("")
 				},
 			),
-		field.String("event_basket_id").NotEmpty(),
+		field.String("event_id").NotEmpty(),
 		field.String("team_A_id").NotEmpty(),
 		field.String("team_B_id").NotEmpty(),
 	}

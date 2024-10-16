@@ -20,7 +20,7 @@ func (RunningEvent) Fields() []ent.Field {
 					return ulid.MustNew("")
 				},
 			),
-		field.String("event_running_id").NotEmpty(),
+		field.String("event_id").NotEmpty(),
 		field.String("team_id").NotEmpty(),
 	}
 

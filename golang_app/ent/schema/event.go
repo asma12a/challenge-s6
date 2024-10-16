@@ -38,11 +38,11 @@ func (Event) Fields() []ent.Field {
 func (Event) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("user_stats_id", UserStats.Type).StorageKey(edge.Column("event_id")),
-		edge.To("foot_event", FootEvent.Type).StorageKey(edge.Column("event_foot_id")),
-		edge.To("basket_event", FootEvent.Type).StorageKey(edge.Column("event_basket_id")),
-		edge.To("tennis_event", FootEvent.Type).StorageKey(edge.Column("event_tennis_id")),
-		edge.To("running_event", FootEvent.Type).StorageKey(edge.Column("event_running_id")),
-		edge.To("training_event", FootEvent.Type).StorageKey(edge.Column("event_training_id")),
+		edge.To("foot_event_id", FootEvent.Type).StorageKey(edge.Column("event_id")),
+		edge.To("basket_event_id", BasketEvent.Type).StorageKey(edge.Column("event_id")),
+		edge.To("tennis_event_id", TennisEvent.Type).StorageKey(edge.Column("event_id")),
+		edge.To("running_event_id", RunningEvent.Type).StorageKey(edge.Column("event_id")),
+		edge.To("training_event_id", TrainingEvent.Type).StorageKey(edge.Column("event_id")),
 
 		edge.From("event_type", EventType.Type).
 			Ref("events").
