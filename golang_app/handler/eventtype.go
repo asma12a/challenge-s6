@@ -5,6 +5,7 @@ import (
 
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/entity"
+	"github.com/asma12a/challenge-s6/presenter"
 	"github.com/asma12a/challenge-s6/service"
 	"github.com/gofiber/fiber/v2"
 )
@@ -64,7 +65,12 @@ func getEventType(ctx context.Context, serviceEventType service.EventType) fiber
 			})
 		}
 
-		return c.JSON(eventType)
+		toJ := presenter.EventType{
+			ID:   eventType.ID,
+			Name: eventType.Name,
+		}
+
+		return c.JSON(toJ)
 	}
 }
 
@@ -141,6 +147,14 @@ func listEventTypes(ctx context.Context, serviceEventType service.EventType) fib
 				"error": err.Error(),
 			})
 		}
-		return c.JSON(eventTypes)
+		toJ := make([]presenter.EventType, len(eventTypes))
+
+		for i, eventType := range eventTypes {
+			toJ[i] = presenter.EventType{
+				ID:   eventType.ID,
+				Name: eventType.Name,
+			}
+		}
+		return c.JSON(toJ)
 	}
 }
