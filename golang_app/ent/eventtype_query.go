@@ -24,7 +24,7 @@ type EventTypeQuery struct {
 	order      []eventtype.OrderOption
 	inters     []Interceptor
 	predicates []predicate.EventType
-	withEvent  *EventQuery
+	withEvents *EventQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -61,8 +61,8 @@ func (etq *EventTypeQuery) Order(o ...eventtype.OrderOption) *EventTypeQuery {
 	return etq
 }
 
-// QueryEvent chains the current query on the "event" edge.
-func (etq *EventTypeQuery) QueryEvent() *EventQuery {
+// QueryEvents chains the current query on the "events" edge.
+func (etq *EventTypeQuery) QueryEvents() *EventQuery {
 	query := (&EventClient{config: etq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := etq.prepareQuery(ctx); err != nil {
@@ -75,7 +75,7 @@ func (etq *EventTypeQuery) QueryEvent() *EventQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(eventtype.Table, eventtype.FieldID, selector),
 			sqlgraph.To(event.Table, event.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, eventtype.EventTable, eventtype.EventColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, eventtype.EventsTable, eventtype.EventsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(etq.driver.Dialect(), step)
 		return fromU, nil
@@ -275,21 +275,21 @@ func (etq *EventTypeQuery) Clone() *EventTypeQuery {
 		order:      append([]eventtype.OrderOption{}, etq.order...),
 		inters:     append([]Interceptor{}, etq.inters...),
 		predicates: append([]predicate.EventType{}, etq.predicates...),
-		withEvent:  etq.withEvent.Clone(),
+		withEvents: etq.withEvents.Clone(),
 		// clone intermediate query.
 		sql:  etq.sql.Clone(),
 		path: etq.path,
 	}
 }
 
-// WithEvent tells the query-builder to eager-load the nodes that are connected to
-// the "event" edge. The optional arguments are used to configure the query builder of the edge.
-func (etq *EventTypeQuery) WithEvent(opts ...func(*EventQuery)) *EventTypeQuery {
+// WithEvents tells the query-builder to eager-load the nodes that are connected to
+// the "events" edge. The optional arguments are used to configure the query builder of the edge.
+func (etq *EventTypeQuery) WithEvents(opts ...func(*EventQuery)) *EventTypeQuery {
 	query := (&EventClient{config: etq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	etq.withEvent = query
+	etq.withEvents = query
 	return etq
 }
 
@@ -372,7 +372,7 @@ func (etq *EventTypeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*E
 		nodes       = []*EventType{}
 		_spec       = etq.querySpec()
 		loadedTypes = [1]bool{
-			etq.withEvent != nil,
+			etq.withEvents != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -393,17 +393,17 @@ func (etq *EventTypeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*E
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := etq.withEvent; query != nil {
-		if err := etq.loadEvent(ctx, query, nodes,
-			func(n *EventType) { n.Edges.Event = []*Event{} },
-			func(n *EventType, e *Event) { n.Edges.Event = append(n.Edges.Event, e) }); err != nil {
+	if query := etq.withEvents; query != nil {
+		if err := etq.loadEvents(ctx, query, nodes,
+			func(n *EventType) { n.Edges.Events = []*Event{} },
+			func(n *EventType, e *Event) { n.Edges.Events = append(n.Edges.Events, e) }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (etq *EventTypeQuery) loadEvent(ctx context.Context, query *EventQuery, nodes []*EventType, init func(*EventType), assign func(*EventType, *Event)) error {
+func (etq *EventTypeQuery) loadEvents(ctx context.Context, query *EventQuery, nodes []*EventType, init func(*EventType), assign func(*EventType, *Event)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[string]*EventType)
 	for i := range nodes {
@@ -413,22 +413,21 @@ func (etq *EventTypeQuery) loadEvent(ctx context.Context, query *EventQuery, nod
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(event.FieldEventTypeID)
+	}
 	query.Where(predicate.Event(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(eventtype.EventColumn), fks...))
+		s.Where(sql.InValues(s.C(eventtype.EventsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.event_type_event
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "event_type_event" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		fk := n.EventTypeID
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "event_type_event" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "event_type_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

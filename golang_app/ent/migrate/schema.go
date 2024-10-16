@@ -18,7 +18,8 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "is_public", Type: field.TypeBool, Default: false},
 		{Name: "is_finished", Type: field.TypeBool, Default: false},
-		{Name: "event_type_event", Type: field.TypeString, Nullable: true},
+		{Name: "event_type_id", Type: field.TypeString},
+		{Name: "sport_id", Type: field.TypeString},
 	}
 	// EventsTable holds the schema information for the "events" table.
 	EventsTable = &schema.Table{
@@ -27,10 +28,16 @@ var (
 		PrimaryKey: []*schema.Column{EventsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "events_event_types_event",
+				Symbol:     "events_event_types_events",
 				Columns:    []*schema.Column{EventsColumns[8]},
 				RefColumns: []*schema.Column{EventTypesColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "events_sports_events",
+				Columns:    []*schema.Column{EventsColumns[9]},
+				RefColumns: []*schema.Column{SportsColumns[0]},
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
@@ -44,6 +51,18 @@ var (
 		Name:       "event_types",
 		Columns:    EventTypesColumns,
 		PrimaryKey: []*schema.Column{EventTypesColumns[0]},
+	}
+	// SportsColumns holds the columns for the "sports" table.
+	SportsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "image_url", Type: field.TypeString, Nullable: true},
+	}
+	// SportsTable holds the schema information for the "sports" table.
+	SportsTable = &schema.Table{
+		Name:       "sports",
+		Columns:    SportsColumns,
+		PrimaryKey: []*schema.Column{SportsColumns[0]},
 	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
@@ -89,6 +108,7 @@ var (
 	Tables = []*schema.Table{
 		EventsTable,
 		EventTypesTable,
+		SportsTable,
 		UsersTable,
 		UserStatsTable,
 	}
@@ -96,6 +116,7 @@ var (
 
 func init() {
 	EventsTable.ForeignKeys[0].RefTable = EventTypesTable
+	EventsTable.ForeignKeys[1].RefTable = SportsTable
 	UserStatsTable.ForeignKeys[0].RefTable = EventsTable
 	UserStatsTable.ForeignKeys[1].RefTable = UsersTable
 }

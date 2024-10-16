@@ -12,6 +12,9 @@ type Event func(*sql.Selector)
 // EventType is the predicate function for eventtype builders.
 type EventType func(*sql.Selector)
 
+// Sport is the predicate function for sport builders.
+type Sport func(*sql.Selector)
+
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
 

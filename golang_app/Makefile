@@ -26,5 +26,5 @@ generate:
 
 .PHONY: start migrate docker-dev
 
-generate:
-	go generate ./ent
+run:
+	docker compose up -d

@@ -13,6 +13,7 @@ import (
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/eventtype"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
+	"github.com/asma12a/challenge-s6/ent/sport"
 	"github.com/asma12a/challenge-s6/ent/userstats"
 )
 
@@ -89,6 +90,18 @@ func (ec *EventCreate) SetNillableIsFinished(b *bool) *EventCreate {
 	return ec
 }
 
+// SetEventTypeID sets the "event_type_id" field.
+func (ec *EventCreate) SetEventTypeID(s string) *EventCreate {
+	ec.mutation.SetEventTypeID(s)
+	return ec
+}
+
+// SetSportID sets the "sport_id" field.
+func (ec *EventCreate) SetSportID(s string) *EventCreate {
+	ec.mutation.SetSportID(s)
+	return ec
+}
+
 // SetID sets the "id" field.
 func (ec *EventCreate) SetID(u ulid.ID) *EventCreate {
 	ec.mutation.SetID(u)
@@ -118,23 +131,14 @@ func (ec *EventCreate) AddUserStatsID(u ...*UserStats) *EventCreate {
 	return ec.AddUserStatsIDIDs(ids...)
 }
 
-// SetEventTypeID sets the "event_type" edge to the EventType entity by ID.
-func (ec *EventCreate) SetEventTypeID(id string) *EventCreate {
-	ec.mutation.SetEventTypeID(id)
-	return ec
-}
-
-// SetNillableEventTypeID sets the "event_type" edge to the EventType entity by ID if the given value is not nil.
-func (ec *EventCreate) SetNillableEventTypeID(id *string) *EventCreate {
-	if id != nil {
-		ec = ec.SetEventTypeID(*id)
-	}
-	return ec
-}
-
 // SetEventType sets the "event_type" edge to the EventType entity.
 func (ec *EventCreate) SetEventType(e *EventType) *EventCreate {
 	return ec.SetEventTypeID(e.ID)
+}
+
+// SetSport sets the "sport" edge to the Sport entity.
+func (ec *EventCreate) SetSport(s *Sport) *EventCreate {
+	return ec.SetSportID(s.ID)
 }
 
 // Mutation returns the EventMutation object of the builder.
@@ -233,6 +237,28 @@ func (ec *EventCreate) check() error {
 	if _, ok := ec.mutation.IsFinished(); !ok {
 		return &ValidationError{Name: "is_finished", err: errors.New(`ent: missing required field "Event.is_finished"`)}
 	}
+	if _, ok := ec.mutation.EventTypeID(); !ok {
+		return &ValidationError{Name: "event_type_id", err: errors.New(`ent: missing required field "Event.event_type_id"`)}
+	}
+	if v, ok := ec.mutation.EventTypeID(); ok {
+		if err := event.EventTypeIDValidator(v); err != nil {
+			return &ValidationError{Name: "event_type_id", err: fmt.Errorf(`ent: validator failed for field "Event.event_type_id": %w`, err)}
+		}
+	}
+	if _, ok := ec.mutation.SportID(); !ok {
+		return &ValidationError{Name: "sport_id", err: errors.New(`ent: missing required field "Event.sport_id"`)}
+	}
+	if v, ok := ec.mutation.SportID(); ok {
+		if err := event.SportIDValidator(v); err != nil {
+			return &ValidationError{Name: "sport_id", err: fmt.Errorf(`ent: validator failed for field "Event.sport_id": %w`, err)}
+		}
+	}
+	if len(ec.mutation.EventTypeIDs()) == 0 {
+		return &ValidationError{Name: "event_type", err: errors.New(`ent: missing required edge "Event.event_type"`)}
+	}
+	if len(ec.mutation.SportIDs()) == 0 {
+		return &ValidationError{Name: "sport", err: errors.New(`ent: missing required edge "Event.sport"`)}
+	}
 	return nil
 }
 
@@ -326,7 +352,24 @@ func (ec *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.event_type_event = &nodes[0]
+		_node.EventTypeID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.SportIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   event.SportTable,
+			Columns: []string{event.SportColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sport.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.SportID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

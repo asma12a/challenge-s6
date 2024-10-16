@@ -29,10 +29,16 @@ const (
 	FieldIsPublic = "is_public"
 	// FieldIsFinished holds the string denoting the is_finished field in the database.
 	FieldIsFinished = "is_finished"
+	// FieldEventTypeID holds the string denoting the event_type_id field in the database.
+	FieldEventTypeID = "event_type_id"
+	// FieldSportID holds the string denoting the sport_id field in the database.
+	FieldSportID = "sport_id"
 	// EdgeUserStatsID holds the string denoting the user_stats_id edge name in mutations.
 	EdgeUserStatsID = "user_stats_id"
 	// EdgeEventType holds the string denoting the event_type edge name in mutations.
 	EdgeEventType = "event_type"
+	// EdgeSport holds the string denoting the sport edge name in mutations.
+	EdgeSport = "sport"
 	// Table holds the table name of the event in the database.
 	Table = "events"
 	// UserStatsIDTable is the table that holds the user_stats_id relation/edge.
@@ -48,7 +54,14 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "eventtype" package.
 	EventTypeInverseTable = "event_types"
 	// EventTypeColumn is the table column denoting the event_type relation/edge.
-	EventTypeColumn = "event_type_event"
+	EventTypeColumn = "event_type_id"
+	// SportTable is the table that holds the sport relation/edge.
+	SportTable = "events"
+	// SportInverseTable is the table name for the Sport entity.
+	// It exists in this package in order to avoid circular dependency with the "sport" package.
+	SportInverseTable = "sports"
+	// SportColumn is the table column denoting the sport relation/edge.
+	SportColumn = "sport_id"
 )
 
 // Columns holds all SQL columns for event fields.
@@ -61,23 +74,14 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldIsPublic,
 	FieldIsFinished,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "events"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"event_type_event",
+	FieldEventTypeID,
+	FieldSportID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -99,6 +103,10 @@ var (
 	DefaultIsPublic bool
 	// DefaultIsFinished holds the default value on creation for the "is_finished" field.
 	DefaultIsFinished bool
+	// EventTypeIDValidator is a validator for the "event_type_id" field. It is called by the builders before save.
+	EventTypeIDValidator func(string) error
+	// SportIDValidator is a validator for the "sport_id" field. It is called by the builders before save.
+	SportIDValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() ulid.ID
 )
@@ -146,6 +154,16 @@ func ByIsFinished(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIsFinished, opts...).ToFunc()
 }
 
+// ByEventTypeID orders the results by the event_type_id field.
+func ByEventTypeID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEventTypeID, opts...).ToFunc()
+}
+
+// BySportID orders the results by the sport_id field.
+func BySportID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSportID, opts...).ToFunc()
+}
+
 // ByUserStatsIDCount orders the results by user_stats_id count.
 func ByUserStatsIDCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -166,6 +184,13 @@ func ByEventTypeField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newEventTypeStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// BySportField orders the results by sport field.
+func BySportField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSportStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newUserStatsIDStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -178,5 +203,12 @@ func newEventTypeStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EventTypeInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, EventTypeTable, EventTypeColumn),
+	)
+}
+func newSportStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SportInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, SportTable, SportColumn),
 	)
 }

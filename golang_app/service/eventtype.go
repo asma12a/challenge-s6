@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"log"
 
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/eventtype"
@@ -20,7 +19,6 @@ func NewEventTypeService(client *ent.Client) *EventType {
 }
 
 func (repo *EventType) Create(ctx context.Context, et *entity.EventType) error {
-	log.Println(et)
 	_, err := repo.db.EventType.Create().
 		SetName(et.Name).
 		Save(ctx)

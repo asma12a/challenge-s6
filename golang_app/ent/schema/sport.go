@@ -7,13 +7,13 @@ import (
 	"github.com/oklog/ulid/v2"
 )
 
-// EventType holds the schema definition for the EventType entity.
-type EventType struct {
+// Sport holds the schema definition for the Sport entity.
+type Sport struct {
 	ent.Schema
 }
 
-// Fields of the EventType.
-func (EventType) Fields() []ent.Field {
+// Fields of the Sport.
+func (Sport) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("id").DefaultFunc(
 			func() string {
@@ -21,12 +21,13 @@ func (EventType) Fields() []ent.Field {
 			},
 		).NotEmpty().Unique().Immutable(),
 		field.String("name").NotEmpty(),
+		field.String("image_url").Optional(),
 	}
 }
 
-// Edges of the EventType.
-func (EventType) Edges() []ent.Edge {
+// Edges of the Sport.
+func (Sport) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("events", Event.Type), // Un EventType peut avoir plusieurs événements
+		edge.To("events", Event.Type),
 	}
 }

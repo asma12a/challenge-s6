@@ -91,6 +91,16 @@ func IsFinished(v bool) predicate.Event {
 	return predicate.Event(sql.FieldEQ(FieldIsFinished, v))
 }
 
+// EventTypeID applies equality check predicate on the "event_type_id" field. It's identical to EventTypeIDEQ.
+func EventTypeID(v string) predicate.Event {
+	return predicate.Event(sql.FieldEQ(FieldEventTypeID, v))
+}
+
+// SportID applies equality check predicate on the "sport_id" field. It's identical to SportIDEQ.
+func SportID(v string) predicate.Event {
+	return predicate.Event(sql.FieldEQ(FieldSportID, v))
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Event {
 	return predicate.Event(sql.FieldEQ(FieldName, v))
@@ -386,6 +396,136 @@ func IsFinishedNEQ(v bool) predicate.Event {
 	return predicate.Event(sql.FieldNEQ(FieldIsFinished, v))
 }
 
+// EventTypeIDEQ applies the EQ predicate on the "event_type_id" field.
+func EventTypeIDEQ(v string) predicate.Event {
+	return predicate.Event(sql.FieldEQ(FieldEventTypeID, v))
+}
+
+// EventTypeIDNEQ applies the NEQ predicate on the "event_type_id" field.
+func EventTypeIDNEQ(v string) predicate.Event {
+	return predicate.Event(sql.FieldNEQ(FieldEventTypeID, v))
+}
+
+// EventTypeIDIn applies the In predicate on the "event_type_id" field.
+func EventTypeIDIn(vs ...string) predicate.Event {
+	return predicate.Event(sql.FieldIn(FieldEventTypeID, vs...))
+}
+
+// EventTypeIDNotIn applies the NotIn predicate on the "event_type_id" field.
+func EventTypeIDNotIn(vs ...string) predicate.Event {
+	return predicate.Event(sql.FieldNotIn(FieldEventTypeID, vs...))
+}
+
+// EventTypeIDGT applies the GT predicate on the "event_type_id" field.
+func EventTypeIDGT(v string) predicate.Event {
+	return predicate.Event(sql.FieldGT(FieldEventTypeID, v))
+}
+
+// EventTypeIDGTE applies the GTE predicate on the "event_type_id" field.
+func EventTypeIDGTE(v string) predicate.Event {
+	return predicate.Event(sql.FieldGTE(FieldEventTypeID, v))
+}
+
+// EventTypeIDLT applies the LT predicate on the "event_type_id" field.
+func EventTypeIDLT(v string) predicate.Event {
+	return predicate.Event(sql.FieldLT(FieldEventTypeID, v))
+}
+
+// EventTypeIDLTE applies the LTE predicate on the "event_type_id" field.
+func EventTypeIDLTE(v string) predicate.Event {
+	return predicate.Event(sql.FieldLTE(FieldEventTypeID, v))
+}
+
+// EventTypeIDContains applies the Contains predicate on the "event_type_id" field.
+func EventTypeIDContains(v string) predicate.Event {
+	return predicate.Event(sql.FieldContains(FieldEventTypeID, v))
+}
+
+// EventTypeIDHasPrefix applies the HasPrefix predicate on the "event_type_id" field.
+func EventTypeIDHasPrefix(v string) predicate.Event {
+	return predicate.Event(sql.FieldHasPrefix(FieldEventTypeID, v))
+}
+
+// EventTypeIDHasSuffix applies the HasSuffix predicate on the "event_type_id" field.
+func EventTypeIDHasSuffix(v string) predicate.Event {
+	return predicate.Event(sql.FieldHasSuffix(FieldEventTypeID, v))
+}
+
+// EventTypeIDEqualFold applies the EqualFold predicate on the "event_type_id" field.
+func EventTypeIDEqualFold(v string) predicate.Event {
+	return predicate.Event(sql.FieldEqualFold(FieldEventTypeID, v))
+}
+
+// EventTypeIDContainsFold applies the ContainsFold predicate on the "event_type_id" field.
+func EventTypeIDContainsFold(v string) predicate.Event {
+	return predicate.Event(sql.FieldContainsFold(FieldEventTypeID, v))
+}
+
+// SportIDEQ applies the EQ predicate on the "sport_id" field.
+func SportIDEQ(v string) predicate.Event {
+	return predicate.Event(sql.FieldEQ(FieldSportID, v))
+}
+
+// SportIDNEQ applies the NEQ predicate on the "sport_id" field.
+func SportIDNEQ(v string) predicate.Event {
+	return predicate.Event(sql.FieldNEQ(FieldSportID, v))
+}
+
+// SportIDIn applies the In predicate on the "sport_id" field.
+func SportIDIn(vs ...string) predicate.Event {
+	return predicate.Event(sql.FieldIn(FieldSportID, vs...))
+}
+
+// SportIDNotIn applies the NotIn predicate on the "sport_id" field.
+func SportIDNotIn(vs ...string) predicate.Event {
+	return predicate.Event(sql.FieldNotIn(FieldSportID, vs...))
+}
+
+// SportIDGT applies the GT predicate on the "sport_id" field.
+func SportIDGT(v string) predicate.Event {
+	return predicate.Event(sql.FieldGT(FieldSportID, v))
+}
+
+// SportIDGTE applies the GTE predicate on the "sport_id" field.
+func SportIDGTE(v string) predicate.Event {
+	return predicate.Event(sql.FieldGTE(FieldSportID, v))
+}
+
+// SportIDLT applies the LT predicate on the "sport_id" field.
+func SportIDLT(v string) predicate.Event {
+	return predicate.Event(sql.FieldLT(FieldSportID, v))
+}
+
+// SportIDLTE applies the LTE predicate on the "sport_id" field.
+func SportIDLTE(v string) predicate.Event {
+	return predicate.Event(sql.FieldLTE(FieldSportID, v))
+}
+
+// SportIDContains applies the Contains predicate on the "sport_id" field.
+func SportIDContains(v string) predicate.Event {
+	return predicate.Event(sql.FieldContains(FieldSportID, v))
+}
+
+// SportIDHasPrefix applies the HasPrefix predicate on the "sport_id" field.
+func SportIDHasPrefix(v string) predicate.Event {
+	return predicate.Event(sql.FieldHasPrefix(FieldSportID, v))
+}
+
+// SportIDHasSuffix applies the HasSuffix predicate on the "sport_id" field.
+func SportIDHasSuffix(v string) predicate.Event {
+	return predicate.Event(sql.FieldHasSuffix(FieldSportID, v))
+}
+
+// SportIDEqualFold applies the EqualFold predicate on the "sport_id" field.
+func SportIDEqualFold(v string) predicate.Event {
+	return predicate.Event(sql.FieldEqualFold(FieldSportID, v))
+}
+
+// SportIDContainsFold applies the ContainsFold predicate on the "sport_id" field.
+func SportIDContainsFold(v string) predicate.Event {
+	return predicate.Event(sql.FieldContainsFold(FieldSportID, v))
+}
+
 // HasUserStatsID applies the HasEdge predicate on the "user_stats_id" edge.
 func HasUserStatsID() predicate.Event {
 	return predicate.Event(func(s *sql.Selector) {
@@ -424,6 +564,29 @@ func HasEventType() predicate.Event {
 func HasEventTypeWith(preds ...predicate.EventType) predicate.Event {
 	return predicate.Event(func(s *sql.Selector) {
 		step := newEventTypeStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSport applies the HasEdge predicate on the "sport" edge.
+func HasSport() predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, SportTable, SportColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSportWith applies the HasEdge predicate on the "sport" edge with a given conditions (other predicates).
+func HasSportWith(preds ...predicate.Sport) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		step := newSportStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

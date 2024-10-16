@@ -43,14 +43,14 @@ func (etu *EventTypeUpdate) SetNillableName(s *string) *EventTypeUpdate {
 	return etu
 }
 
-// AddEventIDs adds the "event" edge to the Event entity by IDs.
+// AddEventIDs adds the "events" edge to the Event entity by IDs.
 func (etu *EventTypeUpdate) AddEventIDs(ids ...ulid.ID) *EventTypeUpdate {
 	etu.mutation.AddEventIDs(ids...)
 	return etu
 }
 
-// AddEvent adds the "event" edges to the Event entity.
-func (etu *EventTypeUpdate) AddEvent(e ...*Event) *EventTypeUpdate {
+// AddEvents adds the "events" edges to the Event entity.
+func (etu *EventTypeUpdate) AddEvents(e ...*Event) *EventTypeUpdate {
 	ids := make([]ulid.ID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -63,20 +63,20 @@ func (etu *EventTypeUpdate) Mutation() *EventTypeMutation {
 	return etu.mutation
 }
 
-// ClearEvent clears all "event" edges to the Event entity.
-func (etu *EventTypeUpdate) ClearEvent() *EventTypeUpdate {
-	etu.mutation.ClearEvent()
+// ClearEvents clears all "events" edges to the Event entity.
+func (etu *EventTypeUpdate) ClearEvents() *EventTypeUpdate {
+	etu.mutation.ClearEvents()
 	return etu
 }
 
-// RemoveEventIDs removes the "event" edge to Event entities by IDs.
+// RemoveEventIDs removes the "events" edge to Event entities by IDs.
 func (etu *EventTypeUpdate) RemoveEventIDs(ids ...ulid.ID) *EventTypeUpdate {
 	etu.mutation.RemoveEventIDs(ids...)
 	return etu
 }
 
-// RemoveEvent removes "event" edges to Event entities.
-func (etu *EventTypeUpdate) RemoveEvent(e ...*Event) *EventTypeUpdate {
+// RemoveEvents removes "events" edges to Event entities.
+func (etu *EventTypeUpdate) RemoveEvents(e ...*Event) *EventTypeUpdate {
 	ids := make([]ulid.ID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -136,12 +136,12 @@ func (etu *EventTypeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := etu.mutation.Name(); ok {
 		_spec.SetField(eventtype.FieldName, field.TypeString, value)
 	}
-	if etu.mutation.EventCleared() {
+	if etu.mutation.EventsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   eventtype.EventTable,
-			Columns: []string{eventtype.EventColumn},
+			Table:   eventtype.EventsTable,
+			Columns: []string{eventtype.EventsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),
@@ -149,12 +149,12 @@ func (etu *EventTypeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := etu.mutation.RemovedEventIDs(); len(nodes) > 0 && !etu.mutation.EventCleared() {
+	if nodes := etu.mutation.RemovedEventsIDs(); len(nodes) > 0 && !etu.mutation.EventsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   eventtype.EventTable,
-			Columns: []string{eventtype.EventColumn},
+			Table:   eventtype.EventsTable,
+			Columns: []string{eventtype.EventsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),
@@ -165,12 +165,12 @@ func (etu *EventTypeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := etu.mutation.EventIDs(); len(nodes) > 0 {
+	if nodes := etu.mutation.EventsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   eventtype.EventTable,
-			Columns: []string{eventtype.EventColumn},
+			Table:   eventtype.EventsTable,
+			Columns: []string{eventtype.EventsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),
@@ -215,14 +215,14 @@ func (etuo *EventTypeUpdateOne) SetNillableName(s *string) *EventTypeUpdateOne {
 	return etuo
 }
 
-// AddEventIDs adds the "event" edge to the Event entity by IDs.
+// AddEventIDs adds the "events" edge to the Event entity by IDs.
 func (etuo *EventTypeUpdateOne) AddEventIDs(ids ...ulid.ID) *EventTypeUpdateOne {
 	etuo.mutation.AddEventIDs(ids...)
 	return etuo
 }
 
-// AddEvent adds the "event" edges to the Event entity.
-func (etuo *EventTypeUpdateOne) AddEvent(e ...*Event) *EventTypeUpdateOne {
+// AddEvents adds the "events" edges to the Event entity.
+func (etuo *EventTypeUpdateOne) AddEvents(e ...*Event) *EventTypeUpdateOne {
 	ids := make([]ulid.ID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -235,20 +235,20 @@ func (etuo *EventTypeUpdateOne) Mutation() *EventTypeMutation {
 	return etuo.mutation
 }
 
-// ClearEvent clears all "event" edges to the Event entity.
-func (etuo *EventTypeUpdateOne) ClearEvent() *EventTypeUpdateOne {
-	etuo.mutation.ClearEvent()
+// ClearEvents clears all "events" edges to the Event entity.
+func (etuo *EventTypeUpdateOne) ClearEvents() *EventTypeUpdateOne {
+	etuo.mutation.ClearEvents()
 	return etuo
 }
 
-// RemoveEventIDs removes the "event" edge to Event entities by IDs.
+// RemoveEventIDs removes the "events" edge to Event entities by IDs.
 func (etuo *EventTypeUpdateOne) RemoveEventIDs(ids ...ulid.ID) *EventTypeUpdateOne {
 	etuo.mutation.RemoveEventIDs(ids...)
 	return etuo
 }
 
-// RemoveEvent removes "event" edges to Event entities.
-func (etuo *EventTypeUpdateOne) RemoveEvent(e ...*Event) *EventTypeUpdateOne {
+// RemoveEvents removes "events" edges to Event entities.
+func (etuo *EventTypeUpdateOne) RemoveEvents(e ...*Event) *EventTypeUpdateOne {
 	ids := make([]ulid.ID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -338,12 +338,12 @@ func (etuo *EventTypeUpdateOne) sqlSave(ctx context.Context) (_node *EventType, 
 	if value, ok := etuo.mutation.Name(); ok {
 		_spec.SetField(eventtype.FieldName, field.TypeString, value)
 	}
-	if etuo.mutation.EventCleared() {
+	if etuo.mutation.EventsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   eventtype.EventTable,
-			Columns: []string{eventtype.EventColumn},
+			Table:   eventtype.EventsTable,
+			Columns: []string{eventtype.EventsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),
@@ -351,12 +351,12 @@ func (etuo *EventTypeUpdateOne) sqlSave(ctx context.Context) (_node *EventType, 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := etuo.mutation.RemovedEventIDs(); len(nodes) > 0 && !etuo.mutation.EventCleared() {
+	if nodes := etuo.mutation.RemovedEventsIDs(); len(nodes) > 0 && !etuo.mutation.EventsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   eventtype.EventTable,
-			Columns: []string{eventtype.EventColumn},
+			Table:   eventtype.EventsTable,
+			Columns: []string{eventtype.EventsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),
@@ -367,12 +367,12 @@ func (etuo *EventTypeUpdateOne) sqlSave(ctx context.Context) (_node *EventType, 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := etuo.mutation.EventIDs(); len(nodes) > 0 {
+	if nodes := etuo.mutation.EventsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   eventtype.EventTable,
-			Columns: []string{eventtype.EventColumn},
+			Table:   eventtype.EventsTable,
+			Columns: []string{eventtype.EventsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),

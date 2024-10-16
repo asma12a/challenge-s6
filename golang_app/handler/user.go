@@ -97,8 +97,8 @@ func updateUser(ctx context.Context, service service.User) fiber.Handler {
 		}
 
 		var userInput *entity.User
-		err = c.BodyParser(&userInput)
-		if err != nil {
+
+		if err := c.BodyParser(&userInput); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
 				"error":  err,
@@ -144,8 +144,7 @@ func deleteUser(ctx context.Context, service service.User) fiber.Handler {
 			})
 		}
 
-		err = service.Delete(ctx, id)
-		if err != nil {
+		if err := service.Delete(ctx, id); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
 				"error":  err,

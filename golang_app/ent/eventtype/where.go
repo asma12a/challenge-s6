@@ -133,21 +133,21 @@ func NameContainsFold(v string) predicate.EventType {
 	return predicate.EventType(sql.FieldContainsFold(FieldName, v))
 }
 
-// HasEvent applies the HasEdge predicate on the "event" edge.
-func HasEvent() predicate.EventType {
+// HasEvents applies the HasEdge predicate on the "events" edge.
+func HasEvents() predicate.EventType {
 	return predicate.EventType(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, EventTable, EventColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, EventsTable, EventsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasEventWith applies the HasEdge predicate on the "event" edge with a given conditions (other predicates).
-func HasEventWith(preds ...predicate.Event) predicate.EventType {
+// HasEventsWith applies the HasEdge predicate on the "events" edge with a given conditions (other predicates).
+func HasEventsWith(preds ...predicate.Event) predicate.EventType {
 	return predicate.EventType(func(s *sql.Selector) {
-		step := newEventStep()
+		step := newEventsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

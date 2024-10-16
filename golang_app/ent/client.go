@@ -18,6 +18,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/eventtype"
+	"github.com/asma12a/challenge-s6/ent/sport"
 	"github.com/asma12a/challenge-s6/ent/user"
 	"github.com/asma12a/challenge-s6/ent/userstats"
 )
@@ -31,6 +32,8 @@ type Client struct {
 	Event *EventClient
 	// EventType is the client for interacting with the EventType builders.
 	EventType *EventTypeClient
+	// Sport is the client for interacting with the Sport builders.
+	Sport *SportClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 	// UserStats is the client for interacting with the UserStats builders.
@@ -48,6 +51,7 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Event = NewEventClient(c.config)
 	c.EventType = NewEventTypeClient(c.config)
+	c.Sport = NewSportClient(c.config)
 	c.User = NewUserClient(c.config)
 	c.UserStats = NewUserStatsClient(c.config)
 }
@@ -144,6 +148,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:    cfg,
 		Event:     NewEventClient(cfg),
 		EventType: NewEventTypeClient(cfg),
+		Sport:     NewSportClient(cfg),
 		User:      NewUserClient(cfg),
 		UserStats: NewUserStatsClient(cfg),
 	}, nil
@@ -167,6 +172,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:    cfg,
 		Event:     NewEventClient(cfg),
 		EventType: NewEventTypeClient(cfg),
+		Sport:     NewSportClient(cfg),
 		User:      NewUserClient(cfg),
 		UserStats: NewUserStatsClient(cfg),
 	}, nil
@@ -199,6 +205,7 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	c.Event.Use(hooks...)
 	c.EventType.Use(hooks...)
+	c.Sport.Use(hooks...)
 	c.User.Use(hooks...)
 	c.UserStats.Use(hooks...)
 }
@@ -208,6 +215,7 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Event.Intercept(interceptors...)
 	c.EventType.Intercept(interceptors...)
+	c.Sport.Intercept(interceptors...)
 	c.User.Intercept(interceptors...)
 	c.UserStats.Intercept(interceptors...)
 }
@@ -219,6 +227,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Event.mutate(ctx, m)
 	case *EventTypeMutation:
 		return c.EventType.mutate(ctx, m)
+	case *SportMutation:
+		return c.Sport.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
 	case *UserStatsMutation:
@@ -368,6 +378,22 @@ func (c *EventClient) QueryEventType(e *Event) *EventTypeQuery {
 	return query
 }
 
+// QuerySport queries the sport edge of a Event.
+func (c *EventClient) QuerySport(e *Event) *SportQuery {
+	query := (&SportClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, id),
+			sqlgraph.To(sport.Table, sport.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, event.SportTable, event.SportColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *EventClient) Hooks() []Hook {
 	return c.hooks.Event
@@ -501,15 +527,15 @@ func (c *EventTypeClient) GetX(ctx context.Context, id string) *EventType {
 	return obj
 }
 
-// QueryEvent queries the event edge of a EventType.
-func (c *EventTypeClient) QueryEvent(et *EventType) *EventQuery {
+// QueryEvents queries the events edge of a EventType.
+func (c *EventTypeClient) QueryEvents(et *EventType) *EventQuery {
 	query := (&EventClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := et.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(eventtype.Table, eventtype.FieldID, id),
 			sqlgraph.To(event.Table, event.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, eventtype.EventTable, eventtype.EventColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, eventtype.EventsTable, eventtype.EventsColumn),
 		)
 		fromV = sqlgraph.Neighbors(et.driver.Dialect(), step)
 		return fromV, nil
@@ -539,6 +565,155 @@ func (c *EventTypeClient) mutate(ctx context.Context, m *EventTypeMutation) (Val
 		return (&EventTypeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown EventType mutation op: %q", m.Op())
+	}
+}
+
+// SportClient is a client for the Sport schema.
+type SportClient struct {
+	config
+}
+
+// NewSportClient returns a client for the Sport from the given config.
+func NewSportClient(c config) *SportClient {
+	return &SportClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `sport.Hooks(f(g(h())))`.
+func (c *SportClient) Use(hooks ...Hook) {
+	c.hooks.Sport = append(c.hooks.Sport, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `sport.Intercept(f(g(h())))`.
+func (c *SportClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Sport = append(c.inters.Sport, interceptors...)
+}
+
+// Create returns a builder for creating a Sport entity.
+func (c *SportClient) Create() *SportCreate {
+	mutation := newSportMutation(c.config, OpCreate)
+	return &SportCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Sport entities.
+func (c *SportClient) CreateBulk(builders ...*SportCreate) *SportCreateBulk {
+	return &SportCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *SportClient) MapCreateBulk(slice any, setFunc func(*SportCreate, int)) *SportCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &SportCreateBulk{err: fmt.Errorf("calling to SportClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*SportCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &SportCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Sport.
+func (c *SportClient) Update() *SportUpdate {
+	mutation := newSportMutation(c.config, OpUpdate)
+	return &SportUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SportClient) UpdateOne(s *Sport) *SportUpdateOne {
+	mutation := newSportMutation(c.config, OpUpdateOne, withSport(s))
+	return &SportUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SportClient) UpdateOneID(id string) *SportUpdateOne {
+	mutation := newSportMutation(c.config, OpUpdateOne, withSportID(id))
+	return &SportUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Sport.
+func (c *SportClient) Delete() *SportDelete {
+	mutation := newSportMutation(c.config, OpDelete)
+	return &SportDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SportClient) DeleteOne(s *Sport) *SportDeleteOne {
+	return c.DeleteOneID(s.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SportClient) DeleteOneID(id string) *SportDeleteOne {
+	builder := c.Delete().Where(sport.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SportDeleteOne{builder}
+}
+
+// Query returns a query builder for Sport.
+func (c *SportClient) Query() *SportQuery {
+	return &SportQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSport},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Sport entity by its id.
+func (c *SportClient) Get(ctx context.Context, id string) (*Sport, error) {
+	return c.Query().Where(sport.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SportClient) GetX(ctx context.Context, id string) *Sport {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryEvents queries the events edge of a Sport.
+func (c *SportClient) QueryEvents(s *Sport) *EventQuery {
+	query := (&EventClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sport.Table, sport.FieldID, id),
+			sqlgraph.To(event.Table, event.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, sport.EventsTable, sport.EventsColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *SportClient) Hooks() []Hook {
+	return c.hooks.Sport
+}
+
+// Interceptors returns the client interceptors.
+func (c *SportClient) Interceptors() []Interceptor {
+	return c.inters.Sport
+}
+
+func (c *SportClient) mutate(ctx context.Context, m *SportMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SportCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SportUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SportUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SportDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Sport mutation op: %q", m.Op())
 	}
 }
 
@@ -827,9 +1002,9 @@ func (c *UserStatsClient) mutate(ctx context.Context, m *UserStatsMutation) (Val
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Event, EventType, User, UserStats []ent.Hook
+		Event, EventType, Sport, User, UserStats []ent.Hook
 	}
 	inters struct {
-		Event, EventType, User, UserStats []ent.Interceptor
+		Event, EventType, Sport, User, UserStats []ent.Interceptor
 	}
 )

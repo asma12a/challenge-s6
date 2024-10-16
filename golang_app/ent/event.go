@@ -12,6 +12,7 @@ import (
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/eventtype"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
+	"github.com/asma12a/challenge-s6/ent/sport"
 )
 
 // Event is the model entity for the Event schema.
@@ -33,11 +34,14 @@ type Event struct {
 	IsPublic bool `json:"is_public,omitempty"`
 	// IsFinished holds the value of the "is_finished" field.
 	IsFinished bool `json:"is_finished,omitempty"`
+	// EventTypeID holds the value of the "event_type_id" field.
+	EventTypeID string `json:"event_type_id,omitempty"`
+	// SportID holds the value of the "sport_id" field.
+	SportID string `json:"sport_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EventQuery when eager-loading is set.
-	Edges            EventEdges `json:"edges"`
-	event_type_event *string
-	selectValues     sql.SelectValues
+	Edges        EventEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // EventEdges holds the relations/edges for other nodes in the graph.
@@ -46,9 +50,11 @@ type EventEdges struct {
 	UserStatsID []*UserStats `json:"user_stats_id,omitempty"`
 	// EventType holds the value of the event_type edge.
 	EventType *EventType `json:"event_type,omitempty"`
+	// Sport holds the value of the sport edge.
+	Sport *Sport `json:"sport,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // UserStatsIDOrErr returns the UserStatsID value or an error if the edge
@@ -71,6 +77,17 @@ func (e EventEdges) EventTypeOrErr() (*EventType, error) {
 	return nil, &NotLoadedError{edge: "event_type"}
 }
 
+// SportOrErr returns the Sport value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e EventEdges) SportOrErr() (*Sport, error) {
+	if e.Sport != nil {
+		return e.Sport, nil
+	} else if e.loadedTypes[2] {
+		return nil, &NotFoundError{label: sport.Label}
+	}
+	return nil, &NotLoadedError{edge: "sport"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Event) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -80,14 +97,12 @@ func (*Event) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case event.FieldEventCode:
 			values[i] = new(sql.NullInt64)
-		case event.FieldName, event.FieldAddress, event.FieldDate:
+		case event.FieldName, event.FieldAddress, event.FieldDate, event.FieldEventTypeID, event.FieldSportID:
 			values[i] = new(sql.NullString)
 		case event.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
 		case event.FieldID:
 			values[i] = new(ulid.ID)
-		case event.ForeignKeys[0]: // event_type_event
-			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -151,12 +166,17 @@ func (e *Event) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				e.IsFinished = value.Bool
 			}
-		case event.ForeignKeys[0]:
+		case event.FieldEventTypeID:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field event_type_event", values[i])
+				return fmt.Errorf("unexpected type %T for field event_type_id", values[i])
 			} else if value.Valid {
-				e.event_type_event = new(string)
-				*e.event_type_event = value.String
+				e.EventTypeID = value.String
+			}
+		case event.FieldSportID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field sport_id", values[i])
+			} else if value.Valid {
+				e.SportID = value.String
 			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
@@ -179,6 +199,11 @@ func (e *Event) QueryUserStatsID() *UserStatsQuery {
 // QueryEventType queries the "event_type" edge of the Event entity.
 func (e *Event) QueryEventType() *EventTypeQuery {
 	return NewEventClient(e.config).QueryEventType(e)
+}
+
+// QuerySport queries the "sport" edge of the Event entity.
+func (e *Event) QuerySport() *SportQuery {
+	return NewEventClient(e.config).QuerySport(e)
 }
 
 // Update returns a builder for updating this Event.
@@ -224,6 +249,12 @@ func (e *Event) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("is_finished=")
 	builder.WriteString(fmt.Sprintf("%v", e.IsFinished))
+	builder.WriteString(", ")
+	builder.WriteString("event_type_id=")
+	builder.WriteString(e.EventTypeID)
+	builder.WriteString(", ")
+	builder.WriteString("sport_id=")
+	builder.WriteString(e.SportID)
 	builder.WriteByte(')')
 	return builder.String()
 }
