@@ -26,6 +26,7 @@ type EventQuery struct {
 	predicates    []predicate.Event
 	withEventType *EventTypeQuery
 	withSport     *SportQuery
+	withFKs       bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -405,12 +406,19 @@ func (eq *EventQuery) prepareQuery(ctx context.Context) error {
 func (eq *EventQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Event, error) {
 	var (
 		nodes       = []*Event{}
+		withFKs     = eq.withFKs
 		_spec       = eq.querySpec()
 		loadedTypes = [2]bool{
 			eq.withEventType != nil,
 			eq.withSport != nil,
 		}
 	)
+	if eq.withEventType != nil || eq.withSport != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, event.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Event).scanValues(nil, columns)
 	}
@@ -448,7 +456,10 @@ func (eq *EventQuery) loadEventType(ctx context.Context, query *EventTypeQuery, 
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*Event)
 	for i := range nodes {
-		fk := nodes[i].EventTypeID
+		if nodes[i].event_type_id == nil {
+			continue
+		}
+		fk := *nodes[i].event_type_id
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -477,7 +488,10 @@ func (eq *EventQuery) loadSport(ctx context.Context, query *SportQuery, nodes []
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*Event)
 	for i := range nodes {
-		fk := nodes[i].SportID
+		if nodes[i].sport_id == nil {
+			continue
+		}
+		fk := *nodes[i].sport_id
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -527,12 +541,6 @@ func (eq *EventQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != event.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
-		}
-		if eq.withEventType != nil {
-			_spec.Node.AddColumnOnce(event.FieldEventTypeID)
-		}
-		if eq.withSport != nil {
-			_spec.Node.AddColumnOnce(event.FieldSportID)
 		}
 	}
 	if ps := eq.predicates; len(ps) > 0 {

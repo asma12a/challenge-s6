@@ -7,12 +7,10 @@ import (
 	"github.com/oklog/ulid/v2"
 )
 
-// Sport holds the schema definition for the Sport entity.
 type Sport struct {
 	ent.Schema
 }
 
-// Fields of the Sport.
 func (Sport) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("id").DefaultFunc(
@@ -25,9 +23,8 @@ func (Sport) Fields() []ent.Field {
 	}
 }
 
-// Edges of the Sport.
 func (Sport) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("events", Event.Type),
+		edge.To("events", Event.Type).StorageKey(edge.Column("sport_id")),
 	}
 }

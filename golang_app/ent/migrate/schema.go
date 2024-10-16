@@ -18,8 +18,8 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "is_public", Type: field.TypeBool, Default: false},
 		{Name: "is_finished", Type: field.TypeBool, Default: false},
-		{Name: "event_type_id", Type: field.TypeString},
-		{Name: "sport_id", Type: field.TypeString},
+		{Name: "event_type_id", Type: field.TypeString, Nullable: true},
+		{Name: "sport_id", Type: field.TypeString, Nullable: true},
 	}
 	// EventsTable holds the schema information for the "events" table.
 	EventsTable = &schema.Table{
@@ -31,13 +31,13 @@ var (
 				Symbol:     "events_event_types_events",
 				Columns:    []*schema.Column{EventsColumns[8]},
 				RefColumns: []*schema.Column{EventTypesColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "events_sports_events",
 				Columns:    []*schema.Column{EventsColumns[9]},
 				RefColumns: []*schema.Column{SportsColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.SetNull,
 			},
 		},
 	}

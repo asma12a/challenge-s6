@@ -20,17 +20,17 @@ func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Ev
 
 func createEvent(ctx context.Context, serviceEvent service.Event, serviceEventType service.EventType, serviceSport service.Sport) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var eventInput entity.Event // Utilisation de votre struct Event
+		var eventInput entity.Event
 
-		// Parse le corps de la requête JSON
 		err := c.BodyParser(&eventInput)
+
 		if err != nil {
+
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
 				"error":  err.Error(),
 			})
 		}
-
 		eventTypeId := eventInput.EventTypeID
 		eventType, err := serviceEventType.FindOne(ctx, eventTypeId)
 		if err != nil {
@@ -40,18 +40,20 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceEventTy
 					"error_detail": "EventType not found",
 				})
 			}
+
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status":       "error",
 				"error_detail": err.Error(),
 			})
 		}
+
 		sportId := eventInput.SportID
 		sport, err := serviceSport.FindOne(ctx, sportId)
 		if err != nil {
 			if ent.IsNotFound(err) {
 				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 					"status":       "error",
-					"error_detail": "EventType not found",
+					"error_detail": "Sport not found",
 				})
 			}
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
@@ -69,8 +71,9 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceEventTy
 			sport.ID,
 		)
 
-		err = serviceEvent.Create(ctx, newEvent)
+		err = serviceEvent.Create(ctx, newEvent, eventType.ID, sport.ID)
 		if err != nil {
+
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status":       "error",
 				"error_detail": err.Error(),
@@ -100,17 +103,25 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 			})
 		}
 
+		// Mapper les données de event vers presenter.Event
 		toJ := presenter.Event{
-			ID:          event.ID,
-			Name:        event.Name,
-			Address:     event.Address,
-			EventCode:   event.EventCode,
-			Date:        event.Date,
-			CreatedAt:   event.CreatedAt,
-			IsPublic:    event.IsPublic,
-			IsFinished:  event.IsFinished,
-			EventTypeID: event.EventTypeID,
-			SportID:     event.SportID,
+			ID:         event.ID,
+			Name:       event.Name,
+			Address:    event.Address,
+			EventCode:  event.EventCode,
+			Date:       event.Date,
+			CreatedAt:  event.CreatedAt,
+			IsPublic:   event.IsPublic,
+			IsFinished: event.IsFinished,
+			EventType: presenter.EventType{
+				ID:   event.Edges.EventType.ID,
+				Name: event.Edges.EventType.Name,
+			},
+			Sport: presenter.Sport{
+				ID:       event.Edges.Sport.ID,
+				Name:     event.Edges.Sport.Name,
+				ImageURL: event.Edges.Sport.ImageURL,
+			},
 		}
 
 		return c.JSON(toJ)
@@ -234,16 +245,23 @@ func listEvents(ctx context.Context, service service.Event) fiber.Handler {
 
 		for i, event := range events {
 			toJ[i] = presenter.Event{
-				ID:          event.ID,
-				Name:        event.Name,
-				Address:     event.Address,
-				EventCode:   event.EventCode,
-				Date:        event.Date,
-				CreatedAt:   event.CreatedAt,
-				IsPublic:    event.IsPublic,
-				IsFinished:  event.IsFinished,
-				EventTypeID: event.EventTypeID,
-				SportID:     event.SportID,
+				ID:         event.ID,
+				Name:       event.Name,
+				Address:    event.Address,
+				EventCode:  event.EventCode,
+				Date:       event.Date,
+				CreatedAt:  event.CreatedAt,
+				IsPublic:   event.IsPublic,
+				IsFinished: event.IsFinished,
+				EventType: presenter.EventType{
+					ID:   event.Edges.EventType.ID,
+					Name: event.Edges.EventType.Name,
+				},
+				Sport: presenter.Sport{
+					ID:       event.Edges.Sport.ID,
+					Name:     event.Edges.Sport.Name,
+					ImageURL: event.Edges.Sport.ImageURL, // Optional
+				},
 			}
 		}
 

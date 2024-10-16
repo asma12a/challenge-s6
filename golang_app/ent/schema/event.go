@@ -29,22 +29,13 @@ func (Event) Fields() []ent.Field {
 		field.Time("created_at").Default(time.Now),
 		field.Bool("is_public").Default(false),
 		field.Bool("is_finished").Default(false),
-		field.String("event_type_id").NotEmpty(),
-		field.String("sport_id").NotEmpty(),
 	}
 }
 
+// Edges of the Event.
 func (Event) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("event_type", EventType.Type).
-			Ref("events").
-			Field("event_type_id").
-			Required().
-			Unique(),
-		edge.From("sport", Sport.Type).
-			Ref("events").
-			Field("sport_id").
-			Required().
-			Unique(),
+		edge.From("event_type", EventType.Type).Ref("events").Unique(),
+		edge.From("sport", Sport.Type).Ref("events").Unique(),
 	}
 }

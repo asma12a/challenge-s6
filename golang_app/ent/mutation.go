@@ -433,87 +433,27 @@ func (m *EventMutation) ResetIsFinished() {
 	m.is_finished = nil
 }
 
-// SetEventTypeID sets the "event_type_id" field.
-func (m *EventMutation) SetEventTypeID(s string) {
-	m.event_type = &s
-}
-
-// EventTypeID returns the value of the "event_type_id" field in the mutation.
-func (m *EventMutation) EventTypeID() (r string, exists bool) {
-	v := m.event_type
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldEventTypeID returns the old "event_type_id" field's value of the Event entity.
-// If the Event object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EventMutation) OldEventTypeID(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldEventTypeID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldEventTypeID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldEventTypeID: %w", err)
-	}
-	return oldValue.EventTypeID, nil
-}
-
-// ResetEventTypeID resets all changes to the "event_type_id" field.
-func (m *EventMutation) ResetEventTypeID() {
-	m.event_type = nil
-}
-
-// SetSportID sets the "sport_id" field.
-func (m *EventMutation) SetSportID(s string) {
-	m.sport = &s
-}
-
-// SportID returns the value of the "sport_id" field in the mutation.
-func (m *EventMutation) SportID() (r string, exists bool) {
-	v := m.sport
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldSportID returns the old "sport_id" field's value of the Event entity.
-// If the Event object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EventMutation) OldSportID(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSportID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSportID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSportID: %w", err)
-	}
-	return oldValue.SportID, nil
-}
-
-// ResetSportID resets all changes to the "sport_id" field.
-func (m *EventMutation) ResetSportID() {
-	m.sport = nil
+// SetEventTypeID sets the "event_type" edge to the EventType entity by id.
+func (m *EventMutation) SetEventTypeID(id string) {
+	m.event_type = &id
 }
 
 // ClearEventType clears the "event_type" edge to the EventType entity.
 func (m *EventMutation) ClearEventType() {
 	m.clearedevent_type = true
-	m.clearedFields[event.FieldEventTypeID] = struct{}{}
 }
 
 // EventTypeCleared reports if the "event_type" edge to the EventType entity was cleared.
 func (m *EventMutation) EventTypeCleared() bool {
 	return m.clearedevent_type
+}
+
+// EventTypeID returns the "event_type" edge ID in the mutation.
+func (m *EventMutation) EventTypeID() (id string, exists bool) {
+	if m.event_type != nil {
+		return *m.event_type, true
+	}
+	return
 }
 
 // EventTypeIDs returns the "event_type" edge IDs in the mutation.
@@ -532,15 +472,27 @@ func (m *EventMutation) ResetEventType() {
 	m.clearedevent_type = false
 }
 
+// SetSportID sets the "sport" edge to the Sport entity by id.
+func (m *EventMutation) SetSportID(id string) {
+	m.sport = &id
+}
+
 // ClearSport clears the "sport" edge to the Sport entity.
 func (m *EventMutation) ClearSport() {
 	m.clearedsport = true
-	m.clearedFields[event.FieldSportID] = struct{}{}
 }
 
 // SportCleared reports if the "sport" edge to the Sport entity was cleared.
 func (m *EventMutation) SportCleared() bool {
 	return m.clearedsport
+}
+
+// SportID returns the "sport" edge ID in the mutation.
+func (m *EventMutation) SportID() (id string, exists bool) {
+	if m.sport != nil {
+		return *m.sport, true
+	}
+	return
 }
 
 // SportIDs returns the "sport" edge IDs in the mutation.
@@ -593,7 +545,7 @@ func (m *EventMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EventMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 7)
 	if m.name != nil {
 		fields = append(fields, event.FieldName)
 	}
@@ -614,12 +566,6 @@ func (m *EventMutation) Fields() []string {
 	}
 	if m.is_finished != nil {
 		fields = append(fields, event.FieldIsFinished)
-	}
-	if m.event_type != nil {
-		fields = append(fields, event.FieldEventTypeID)
-	}
-	if m.sport != nil {
-		fields = append(fields, event.FieldSportID)
 	}
 	return fields
 }
@@ -643,10 +589,6 @@ func (m *EventMutation) Field(name string) (ent.Value, bool) {
 		return m.IsPublic()
 	case event.FieldIsFinished:
 		return m.IsFinished()
-	case event.FieldEventTypeID:
-		return m.EventTypeID()
-	case event.FieldSportID:
-		return m.SportID()
 	}
 	return nil, false
 }
@@ -670,10 +612,6 @@ func (m *EventMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldIsPublic(ctx)
 	case event.FieldIsFinished:
 		return m.OldIsFinished(ctx)
-	case event.FieldEventTypeID:
-		return m.OldEventTypeID(ctx)
-	case event.FieldSportID:
-		return m.OldSportID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Event field %s", name)
 }
@@ -731,20 +669,6 @@ func (m *EventMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetIsFinished(v)
-		return nil
-	case event.FieldEventTypeID:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetEventTypeID(v)
-		return nil
-	case event.FieldSportID:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetSportID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Event field %s", name)
@@ -830,12 +754,6 @@ func (m *EventMutation) ResetField(name string) error {
 		return nil
 	case event.FieldIsFinished:
 		m.ResetIsFinished()
-		return nil
-	case event.FieldEventTypeID:
-		m.ResetEventTypeID()
-		return nil
-	case event.FieldSportID:
-		m.ResetSportID()
 		return nil
 	}
 	return fmt.Errorf("unknown Event field %s", name)

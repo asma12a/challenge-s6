@@ -413,9 +413,7 @@ func (etq *EventTypeQuery) loadEvents(ctx context.Context, query *EventQuery, no
 			init(nodes[i])
 		}
 	}
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(event.FieldEventTypeID)
-	}
+	query.withFKs = true
 	query.Where(predicate.Event(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(eventtype.EventsColumn), fks...))
 	}))
@@ -424,10 +422,13 @@ func (etq *EventTypeQuery) loadEvents(ctx context.Context, query *EventQuery, no
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.EventTypeID
-		node, ok := nodeids[fk]
+		fk := n.event_type_id
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "event_type_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "event_type_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "event_type_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

@@ -46,14 +46,6 @@ func init() {
 	eventDescIsFinished := eventFields[7].Descriptor()
 	// event.DefaultIsFinished holds the default value on creation for the is_finished field.
 	event.DefaultIsFinished = eventDescIsFinished.Default.(bool)
-	// eventDescEventTypeID is the schema descriptor for event_type_id field.
-	eventDescEventTypeID := eventFields[8].Descriptor()
-	// event.EventTypeIDValidator is a validator for the "event_type_id" field. It is called by the builders before save.
-	event.EventTypeIDValidator = eventDescEventTypeID.Validators[0].(func(string) error)
-	// eventDescSportID is the schema descriptor for sport_id field.
-	eventDescSportID := eventFields[9].Descriptor()
-	// event.SportIDValidator is a validator for the "sport_id" field. It is called by the builders before save.
-	event.SportIDValidator = eventDescSportID.Validators[0].(func(string) error)
 	// eventDescID is the schema descriptor for id field.
 	eventDescID := eventFields[0].Descriptor()
 	// event.DefaultID holds the default value on creation for the id field.

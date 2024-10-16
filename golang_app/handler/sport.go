@@ -67,8 +67,9 @@ func getSport(ctx context.Context, serviceSport service.Sport) fiber.Handler {
 		}
 
 		toJ := presenter.Sport{
-			ID:   sport.ID,
-			Name: sport.Name,
+			ID:       sport.ID,
+			Name:     sport.Name,
+			ImageURL: sport.ImageURL,
 		}
 
 		return c.JSON(toJ)
@@ -150,12 +151,13 @@ func listSports(ctx context.Context, serviceSport service.Sport) fiber.Handler {
 			})
 		}
 
-		toJ := make([]presenter.EventType, len(sports))
+		toJ := make([]presenter.Sport, len(sports))
 
 		for i, sport := range sports {
-			toJ[i] = presenter.EventType{
-				ID:   sport.ID,
-				Name: sport.Name,
+			toJ[i] = presenter.Sport{
+				ID:       sport.ID,
+				Name:     sport.Name,
+				ImageURL: sport.ImageURL,
 			}
 		}
 		return c.JSON(toJ)

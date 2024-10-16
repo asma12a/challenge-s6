@@ -413,9 +413,7 @@ func (sq *SportQuery) loadEvents(ctx context.Context, query *EventQuery, nodes [
 			init(nodes[i])
 		}
 	}
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(event.FieldSportID)
-	}
+	query.withFKs = true
 	query.Where(predicate.Event(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(sport.EventsColumn), fks...))
 	}))
@@ -424,10 +422,13 @@ func (sq *SportQuery) loadEvents(ctx context.Context, query *EventQuery, nodes [
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.SportID
-		node, ok := nodeids[fk]
+		fk := n.sport_id
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "sport_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "sport_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "sport_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
