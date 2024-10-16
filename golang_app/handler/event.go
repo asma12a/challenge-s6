@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/asma12a/challenge-s6/ent"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
 	"github.com/asma12a/challenge-s6/presenter"
 	"github.com/asma12a/challenge-s6/service"
@@ -75,8 +76,8 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceEventTy
 		if err != nil {
 
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": err.Error(),
+				"status": "error",
+				"error":  err.Error(),
 			})
 		}
 
@@ -86,7 +87,13 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceEventTy
 
 func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id := c.Params("eventId")
+		id, err := ulid.Parse(c.Params("eventId"))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
 
 		event, err := service.FindOne(ctx, id)
 		if err != nil {
@@ -130,7 +137,14 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 
 func updateEvent(ctx context.Context, serviceEvent service.Event, serviceEventType service.EventType, serviceSport service.Sport) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id := c.Params("eventId")
+		// Récupère l'ID de l'événement à mettre à jour depuis les paramètres de la route
+		id, err := ulid.Parse(c.Params("eventId"))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
 
 		existingEvent, err := serviceEvent.FindOne(ctx, id)
 		if err != nil {
@@ -210,10 +224,17 @@ func updateEvent(ctx context.Context, serviceEvent service.Event, serviceEventTy
 
 func deleteEvent(ctx context.Context, service service.Event) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id := c.Params("eventId")
-
-		err := service.Delete(ctx, id)
+		// id := c.Params("eventId")
+		id, err := ulid.Parse(c.Params("eventId"))
 		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+
+		del_err := service.Delete(ctx, id)
+		if del_err != nil {
 			if ent.IsNotFound(err) {
 				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 					"status":       "error",

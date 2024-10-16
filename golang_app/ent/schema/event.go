@@ -6,7 +6,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/oklog/ulid/v2"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
 // Event holds the schema definition for the Event entity.
@@ -17,11 +17,12 @@ type Event struct {
 // Fields of the Event.
 func (Event) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").DefaultFunc(
-			func() string {
-				return ulid.Make().String()
-			},
-		).NotEmpty().Unique().Immutable(),
+		field.String("id").GoType(ulid.ID("")).
+			DefaultFunc(
+				func() ulid.ID {
+					return ulid.MustNew("")
+				},
+			),
 		field.String("name").NotEmpty(),
 		field.String("address").NotEmpty(),
 		field.Int16("event_code").Positive(),
@@ -35,7 +36,27 @@ func (Event) Fields() []ent.Field {
 // Edges of the Event.
 func (Event) Edges() []ent.Edge {
 	return []ent.Edge{
+<<<<<<< HEAD
 		edge.From("event_type", EventType.Type).Ref("events").Unique(),
 		edge.From("sport", Sport.Type).Ref("events").Unique(),
+=======
+		edge.To("user_stats_id", UserStats.Type).StorageKey(edge.Column("event_id")),
+		edge.To("foot_event_id", FootEvent.Type).StorageKey(edge.Column("event_id")),
+		edge.To("basket_event_id", BasketEvent.Type).StorageKey(edge.Column("event_id")),
+		edge.To("tennis_event_id", TennisEvent.Type).StorageKey(edge.Column("event_id")),
+		edge.To("running_event_id", RunningEvent.Type).StorageKey(edge.Column("event_id")),
+		edge.To("training_event_id", TrainingEvent.Type).StorageKey(edge.Column("event_id")),
+
+		edge.From("event_type", EventType.Type).
+			Ref("events").
+			Field("event_type_id").
+			Required().
+			Unique(),
+		edge.From("sport", Sport.Type).
+			Ref("events").
+			Field("sport_id").
+			Required().
+			Unique(),
+>>>>>>> d2995807ca8aaad0af8d19410ad2458843606c60
 	}
 }
