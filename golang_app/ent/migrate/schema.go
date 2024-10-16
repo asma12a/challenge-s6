@@ -29,9 +29,9 @@ var (
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "email", Type: field.TypeString},
+		{Name: "email", Type: field.TypeString, Unique: true},
 		{Name: "password", Type: field.TypeString},
-		{Name: "role", Type: field.TypeString, Default: "user"},
+		{Name: "role", Type: field.TypeJSON},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{

@@ -731,7 +731,8 @@ type UserMutation struct {
 	name          *string
 	email         *string
 	password      *string
-	role          *string
+	role          *[]string
+	appendrole    []string
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*User, error)
@@ -951,12 +952,13 @@ func (m *UserMutation) ResetPassword() {
 }
 
 // SetRole sets the "role" field.
-func (m *UserMutation) SetRole(s string) {
+func (m *UserMutation) SetRole(s []string) {
 	m.role = &s
+	m.appendrole = nil
 }
 
 // Role returns the value of the "role" field in the mutation.
-func (m *UserMutation) Role() (r string, exists bool) {
+func (m *UserMutation) Role() (r []string, exists bool) {
 	v := m.role
 	if v == nil {
 		return
@@ -967,7 +969,7 @@ func (m *UserMutation) Role() (r string, exists bool) {
 // OldRole returns the old "role" field's value of the User entity.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldRole(ctx context.Context) (v string, err error) {
+func (m *UserMutation) OldRole(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldRole is only allowed on UpdateOne operations")
 	}
@@ -981,9 +983,23 @@ func (m *UserMutation) OldRole(ctx context.Context) (v string, err error) {
 	return oldValue.Role, nil
 }
 
+// AppendRole adds s to the "role" field.
+func (m *UserMutation) AppendRole(s []string) {
+	m.appendrole = append(m.appendrole, s...)
+}
+
+// AppendedRole returns the list of values that were appended to the "role" field in this mutation.
+func (m *UserMutation) AppendedRole() ([]string, bool) {
+	if len(m.appendrole) == 0 {
+		return nil, false
+	}
+	return m.appendrole, true
+}
+
 // ResetRole resets all changes to the "role" field.
 func (m *UserMutation) ResetRole() {
 	m.role = nil
+	m.appendrole = nil
 }
 
 // Where appends a list predicates to the UserMutation builder.
@@ -1097,7 +1113,7 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		m.SetPassword(v)
 		return nil
 	case user.FieldRole:
-		v, ok := value.(string)
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

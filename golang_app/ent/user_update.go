@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/asma12a/challenge-s6/ent/predicate"
 	"github.com/asma12a/challenge-s6/ent/user"
@@ -70,16 +71,14 @@ func (uu *UserUpdate) SetNillablePassword(s *string) *UserUpdate {
 }
 
 // SetRole sets the "role" field.
-func (uu *UserUpdate) SetRole(s string) *UserUpdate {
+func (uu *UserUpdate) SetRole(s []string) *UserUpdate {
 	uu.mutation.SetRole(s)
 	return uu
 }
 
-// SetNillableRole sets the "role" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableRole(s *string) *UserUpdate {
-	if s != nil {
-		uu.SetRole(*s)
-	}
+// AppendRole appends s to the "role" field.
+func (uu *UserUpdate) AppendRole(s []string) *UserUpdate {
+	uu.mutation.AppendRole(s)
 	return uu
 }
 
@@ -132,11 +131,6 @@ func (uu *UserUpdate) check() error {
 			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "User.password": %w`, err)}
 		}
 	}
-	if v, ok := uu.mutation.Role(); ok {
-		if err := user.RoleValidator(v); err != nil {
-			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "User.role": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -162,7 +156,12 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 	}
 	if value, ok := uu.mutation.Role(); ok {
-		_spec.SetField(user.FieldRole, field.TypeString, value)
+		_spec.SetField(user.FieldRole, field.TypeJSON, value)
+	}
+	if value, ok := uu.mutation.AppendedRole(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, user.FieldRole, value)
+		})
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -227,16 +226,14 @@ func (uuo *UserUpdateOne) SetNillablePassword(s *string) *UserUpdateOne {
 }
 
 // SetRole sets the "role" field.
-func (uuo *UserUpdateOne) SetRole(s string) *UserUpdateOne {
+func (uuo *UserUpdateOne) SetRole(s []string) *UserUpdateOne {
 	uuo.mutation.SetRole(s)
 	return uuo
 }
 
-// SetNillableRole sets the "role" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableRole(s *string) *UserUpdateOne {
-	if s != nil {
-		uuo.SetRole(*s)
-	}
+// AppendRole appends s to the "role" field.
+func (uuo *UserUpdateOne) AppendRole(s []string) *UserUpdateOne {
+	uuo.mutation.AppendRole(s)
 	return uuo
 }
 
@@ -302,11 +299,6 @@ func (uuo *UserUpdateOne) check() error {
 			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "User.password": %w`, err)}
 		}
 	}
-	if v, ok := uuo.mutation.Role(); ok {
-		if err := user.RoleValidator(v); err != nil {
-			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "User.role": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -349,7 +341,12 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 	}
 	if value, ok := uuo.mutation.Role(); ok {
-		_spec.SetField(user.FieldRole, field.TypeString, value)
+		_spec.SetField(user.FieldRole, field.TypeJSON, value)
+	}
+	if value, ok := uuo.mutation.AppendedRole(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, user.FieldRole, value)
+		})
 	}
 	_node = &User{config: uuo.config}
 	_spec.Assign = _node.assignValues

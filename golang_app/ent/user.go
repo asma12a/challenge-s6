@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -23,7 +24,7 @@ type User struct {
 	// Password holds the value of the "password" field.
 	Password string `json:"password,omitempty"`
 	// Role holds the value of the "role" field.
-	Role         string `json:"role,omitempty"`
+	Role         []string `json:"role,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -32,7 +33,9 @@ func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldID, user.FieldName, user.FieldEmail, user.FieldPassword, user.FieldRole:
+		case user.FieldRole:
+			values[i] = new([]byte)
+		case user.FieldID, user.FieldName, user.FieldEmail, user.FieldPassword:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -74,10 +77,12 @@ func (u *User) assignValues(columns []string, values []any) error {
 				u.Password = value.String
 			}
 		case user.FieldRole:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field role", values[i])
-			} else if value.Valid {
-				u.Role = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &u.Role); err != nil {
+					return fmt.Errorf("unmarshal field role: %w", err)
+				}
 			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
@@ -125,7 +130,7 @@ func (u *User) String() string {
 	builder.WriteString(u.Password)
 	builder.WriteString(", ")
 	builder.WriteString("role=")
-	builder.WriteString(u.Role)
+	builder.WriteString(fmt.Sprintf("%v", u.Role))
 	builder.WriteByte(')')
 	return builder.String()
 }

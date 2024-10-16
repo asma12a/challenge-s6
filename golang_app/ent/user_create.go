@@ -38,16 +38,8 @@ func (uc *UserCreate) SetPassword(s string) *UserCreate {
 }
 
 // SetRole sets the "role" field.
-func (uc *UserCreate) SetRole(s string) *UserCreate {
+func (uc *UserCreate) SetRole(s []string) *UserCreate {
 	uc.mutation.SetRole(s)
-	return uc
-}
-
-// SetNillableRole sets the "role" field if the given value is not nil.
-func (uc *UserCreate) SetNillableRole(s *string) *UserCreate {
-	if s != nil {
-		uc.SetRole(*s)
-	}
 	return uc
 }
 
@@ -139,11 +131,6 @@ func (uc *UserCreate) check() error {
 	if _, ok := uc.mutation.Role(); !ok {
 		return &ValidationError{Name: "role", err: errors.New(`ent: missing required field "User.role"`)}
 	}
-	if v, ok := uc.mutation.Role(); ok {
-		if err := user.RoleValidator(v); err != nil {
-			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "User.role": %w`, err)}
-		}
-	}
 	if v, ok := uc.mutation.ID(); ok {
 		if err := user.IDValidator(v); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "User.id": %w`, err)}
@@ -197,7 +184,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_node.Password = value
 	}
 	if value, ok := uc.mutation.Role(); ok {
-		_spec.SetField(user.FieldRole, field.TypeString, value)
+		_spec.SetField(user.FieldRole, field.TypeJSON, value)
 		_node.Role = value
 	}
 	return _node, _spec

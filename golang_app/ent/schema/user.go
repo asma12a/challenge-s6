@@ -20,9 +20,9 @@ func (User) Fields() []ent.Field {
 			},
 		).NotEmpty().Unique().Immutable(),
 		field.String("name").NotEmpty(),
-		field.String("email").NotEmpty(),
+		field.String("email").NotEmpty().Unique(),
 		field.String("password").NotEmpty(),
-		field.String("role").Default("user").NotEmpty(),
+		field.JSON("role", []string{}).Default([]string{"user"}),
 	}
 }
 

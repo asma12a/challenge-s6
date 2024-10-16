@@ -24,10 +24,12 @@ func (repo *User) Create(ctx context.Context, user *entity.User) (*ent.User, err
 		SetName(user.Name).
 		SetEmail(user.Email).
 		SetPassword(user.Password).
-		SetRole(user.Role).
 		Save(ctx)
 
 	if err != nil {
+		if ent.IsConstraintError(err) {
+			return nil, entity.ErrEmailAlreadyRegistred
+		}
 		return nil, entity.ErrCannotBeCreated
 	}
 
@@ -49,7 +51,7 @@ func (repo *User) Update(ctx context.Context, user *entity.User) (*ent.User, err
 		SetRole(user.Role).Save(ctx)
 
 	if err != nil {
-		return nil, entity.ErrInvalidEntity
+		return nil, entity.ErrCannotBeUpdated
 	}
 	return entUser, nil
 }

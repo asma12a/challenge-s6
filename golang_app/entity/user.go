@@ -9,13 +9,12 @@ type User struct {
 	ent.User
 }
 
-func NewUser(email string, name string, password string, role string) (*User, error) {
+func NewUser(email string, name string, password string) (*User, error) {
 	user := &User{
 		ent.User{
 			Email: email,
 			Name:  name,
 			Password: password,
-			Role: role,
 		},
 	}
 
