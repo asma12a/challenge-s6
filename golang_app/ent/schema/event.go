@@ -38,6 +38,7 @@ func (Event) Fields() []ent.Field {
 func (Event) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("user_stats_id", UserStats.Type).StorageKey(edge.Column("event_id")),
+		edge.To("foot_event", FootEvent.Type).StorageKey(edge.Column("event_foot_id")),
 		edge.From("event_type", EventType.Type).
 			Ref("events").
 			Field("event_type_id").
