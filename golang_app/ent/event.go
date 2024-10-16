@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/eventtype"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/sport"
 )
 
@@ -18,7 +19,7 @@ import (
 type Event struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID string `json:"id,omitempty"`
+	ID ulid.ID `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Address holds the value of the "address" field.
@@ -45,13 +46,24 @@ type Event struct {
 
 // EventEdges holds the relations/edges for other nodes in the graph.
 type EventEdges struct {
+	// UserStatsID holds the value of the user_stats_id edge.
+	UserStatsID []*UserStats `json:"user_stats_id,omitempty"`
 	// EventType holds the value of the event_type edge.
 	EventType *EventType `json:"event_type,omitempty"`
 	// Sport holds the value of the sport edge.
 	Sport *Sport `json:"sport,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
+}
+
+// UserStatsIDOrErr returns the UserStatsID value or an error if the edge
+// was not loaded in eager-loading.
+func (e EventEdges) UserStatsIDOrErr() ([]*UserStats, error) {
+	if e.loadedTypes[0] {
+		return e.UserStatsID, nil
+	}
+	return nil, &NotLoadedError{edge: "user_stats_id"}
 }
 
 // EventTypeOrErr returns the EventType value or an error if the edge
@@ -59,7 +71,7 @@ type EventEdges struct {
 func (e EventEdges) EventTypeOrErr() (*EventType, error) {
 	if e.EventType != nil {
 		return e.EventType, nil
-	} else if e.loadedTypes[0] {
+	} else if e.loadedTypes[1] {
 		return nil, &NotFoundError{label: eventtype.Label}
 	}
 	return nil, &NotLoadedError{edge: "event_type"}
@@ -70,7 +82,7 @@ func (e EventEdges) EventTypeOrErr() (*EventType, error) {
 func (e EventEdges) SportOrErr() (*Sport, error) {
 	if e.Sport != nil {
 		return e.Sport, nil
-	} else if e.loadedTypes[1] {
+	} else if e.loadedTypes[2] {
 		return nil, &NotFoundError{label: sport.Label}
 	}
 	return nil, &NotLoadedError{edge: "sport"}
@@ -85,10 +97,12 @@ func (*Event) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case event.FieldEventCode:
 			values[i] = new(sql.NullInt64)
-		case event.FieldID, event.FieldName, event.FieldAddress, event.FieldDate, event.FieldEventTypeID, event.FieldSportID:
+		case event.FieldName, event.FieldAddress, event.FieldDate, event.FieldEventTypeID, event.FieldSportID:
 			values[i] = new(sql.NullString)
 		case event.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
+		case event.FieldID:
+			values[i] = new(ulid.ID)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -105,10 +119,10 @@ func (e *Event) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case event.FieldID:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*ulid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value.Valid {
-				e.ID = value.String
+			} else if value != nil {
+				e.ID = *value
 			}
 		case event.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -175,6 +189,11 @@ func (e *Event) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (e *Event) Value(name string) (ent.Value, error) {
 	return e.selectValues.Get(name)
+}
+
+// QueryUserStatsID queries the "user_stats_id" edge of the Event entity.
+func (e *Event) QueryUserStatsID() *UserStatsQuery {
+	return NewEventClient(e.config).QueryUserStatsID(e)
 }
 
 // QueryEventType queries the "event_type" edge of the Event entity.

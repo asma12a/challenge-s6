@@ -7,6 +7,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
 const (
@@ -32,12 +33,21 @@ const (
 	FieldEventTypeID = "event_type_id"
 	// FieldSportID holds the string denoting the sport_id field in the database.
 	FieldSportID = "sport_id"
+	// EdgeUserStatsID holds the string denoting the user_stats_id edge name in mutations.
+	EdgeUserStatsID = "user_stats_id"
 	// EdgeEventType holds the string denoting the event_type edge name in mutations.
 	EdgeEventType = "event_type"
 	// EdgeSport holds the string denoting the sport edge name in mutations.
 	EdgeSport = "sport"
 	// Table holds the table name of the event in the database.
 	Table = "events"
+	// UserStatsIDTable is the table that holds the user_stats_id relation/edge.
+	UserStatsIDTable = "user_stats"
+	// UserStatsIDInverseTable is the table name for the UserStats entity.
+	// It exists in this package in order to avoid circular dependency with the "userstats" package.
+	UserStatsIDInverseTable = "user_stats"
+	// UserStatsIDColumn is the table column denoting the user_stats_id relation/edge.
+	UserStatsIDColumn = "event_id"
 	// EventTypeTable is the table that holds the event_type relation/edge.
 	EventTypeTable = "events"
 	// EventTypeInverseTable is the table name for the EventType entity.
@@ -98,9 +108,7 @@ var (
 	// SportIDValidator is a validator for the "sport_id" field. It is called by the builders before save.
 	SportIDValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
-	DefaultID func() string
-	// IDValidator is a validator for the "id" field. It is called by the builders before save.
-	IDValidator func(string) error
+	DefaultID func() ulid.ID
 )
 
 // OrderOption defines the ordering options for the Event queries.
@@ -156,6 +164,20 @@ func BySportID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSportID, opts...).ToFunc()
 }
 
+// ByUserStatsIDCount orders the results by user_stats_id count.
+func ByUserStatsIDCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newUserStatsIDStep(), opts...)
+	}
+}
+
+// ByUserStatsID orders the results by user_stats_id terms.
+func ByUserStatsID(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserStatsIDStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByEventTypeField orders the results by event_type field.
 func ByEventTypeField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -168,6 +190,13 @@ func BySportField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newSportStep(), sql.OrderByField(field, opts...))
 	}
+}
+func newUserStatsIDStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserStatsIDInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, UserStatsIDTable, UserStatsIDColumn),
+	)
 }
 func newEventTypeStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(

@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/eventtype"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
 // EventTypeCreate is the builder for creating a EventType entity.
@@ -41,14 +42,14 @@ func (etc *EventTypeCreate) SetNillableID(s *string) *EventTypeCreate {
 }
 
 // AddEventIDs adds the "events" edge to the Event entity by IDs.
-func (etc *EventTypeCreate) AddEventIDs(ids ...string) *EventTypeCreate {
+func (etc *EventTypeCreate) AddEventIDs(ids ...ulid.ID) *EventTypeCreate {
 	etc.mutation.AddEventIDs(ids...)
 	return etc
 }
 
 // AddEvents adds the "events" edges to the Event entity.
 func (etc *EventTypeCreate) AddEvents(e ...*Event) *EventTypeCreate {
-	ids := make([]string, len(e))
+	ids := make([]ulid.ID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}

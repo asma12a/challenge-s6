@@ -13,6 +13,7 @@ import (
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/eventtype"
 	"github.com/asma12a/challenge-s6/ent/predicate"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
 // EventTypeUpdate is the builder for updating EventType entities.
@@ -43,14 +44,14 @@ func (etu *EventTypeUpdate) SetNillableName(s *string) *EventTypeUpdate {
 }
 
 // AddEventIDs adds the "events" edge to the Event entity by IDs.
-func (etu *EventTypeUpdate) AddEventIDs(ids ...string) *EventTypeUpdate {
+func (etu *EventTypeUpdate) AddEventIDs(ids ...ulid.ID) *EventTypeUpdate {
 	etu.mutation.AddEventIDs(ids...)
 	return etu
 }
 
 // AddEvents adds the "events" edges to the Event entity.
 func (etu *EventTypeUpdate) AddEvents(e ...*Event) *EventTypeUpdate {
-	ids := make([]string, len(e))
+	ids := make([]ulid.ID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
@@ -69,14 +70,14 @@ func (etu *EventTypeUpdate) ClearEvents() *EventTypeUpdate {
 }
 
 // RemoveEventIDs removes the "events" edge to Event entities by IDs.
-func (etu *EventTypeUpdate) RemoveEventIDs(ids ...string) *EventTypeUpdate {
+func (etu *EventTypeUpdate) RemoveEventIDs(ids ...ulid.ID) *EventTypeUpdate {
 	etu.mutation.RemoveEventIDs(ids...)
 	return etu
 }
 
 // RemoveEvents removes "events" edges to Event entities.
 func (etu *EventTypeUpdate) RemoveEvents(e ...*Event) *EventTypeUpdate {
-	ids := make([]string, len(e))
+	ids := make([]ulid.ID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
@@ -215,14 +216,14 @@ func (etuo *EventTypeUpdateOne) SetNillableName(s *string) *EventTypeUpdateOne {
 }
 
 // AddEventIDs adds the "events" edge to the Event entity by IDs.
-func (etuo *EventTypeUpdateOne) AddEventIDs(ids ...string) *EventTypeUpdateOne {
+func (etuo *EventTypeUpdateOne) AddEventIDs(ids ...ulid.ID) *EventTypeUpdateOne {
 	etuo.mutation.AddEventIDs(ids...)
 	return etuo
 }
 
 // AddEvents adds the "events" edges to the Event entity.
 func (etuo *EventTypeUpdateOne) AddEvents(e ...*Event) *EventTypeUpdateOne {
-	ids := make([]string, len(e))
+	ids := make([]ulid.ID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
@@ -241,14 +242,14 @@ func (etuo *EventTypeUpdateOne) ClearEvents() *EventTypeUpdateOne {
 }
 
 // RemoveEventIDs removes the "events" edge to Event entities by IDs.
-func (etuo *EventTypeUpdateOne) RemoveEventIDs(ids ...string) *EventTypeUpdateOne {
+func (etuo *EventTypeUpdateOne) RemoveEventIDs(ids ...ulid.ID) *EventTypeUpdateOne {
 	etuo.mutation.RemoveEventIDs(ids...)
 	return etuo
 }
 
 // RemoveEvents removes "events" edges to Event entities.
 func (etuo *EventTypeUpdateOne) RemoveEvents(e ...*Event) *EventTypeUpdateOne {
-	ids := make([]string, len(e))
+	ids := make([]ulid.ID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}

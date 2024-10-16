@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/predicate"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/sport"
 )
 
@@ -63,14 +64,14 @@ func (su *SportUpdate) ClearImageURL() *SportUpdate {
 }
 
 // AddEventIDs adds the "events" edge to the Event entity by IDs.
-func (su *SportUpdate) AddEventIDs(ids ...string) *SportUpdate {
+func (su *SportUpdate) AddEventIDs(ids ...ulid.ID) *SportUpdate {
 	su.mutation.AddEventIDs(ids...)
 	return su
 }
 
 // AddEvents adds the "events" edges to the Event entity.
 func (su *SportUpdate) AddEvents(e ...*Event) *SportUpdate {
-	ids := make([]string, len(e))
+	ids := make([]ulid.ID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
@@ -89,14 +90,14 @@ func (su *SportUpdate) ClearEvents() *SportUpdate {
 }
 
 // RemoveEventIDs removes the "events" edge to Event entities by IDs.
-func (su *SportUpdate) RemoveEventIDs(ids ...string) *SportUpdate {
+func (su *SportUpdate) RemoveEventIDs(ids ...ulid.ID) *SportUpdate {
 	su.mutation.RemoveEventIDs(ids...)
 	return su
 }
 
 // RemoveEvents removes "events" edges to Event entities.
 func (su *SportUpdate) RemoveEvents(e ...*Event) *SportUpdate {
-	ids := make([]string, len(e))
+	ids := make([]ulid.ID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
@@ -261,14 +262,14 @@ func (suo *SportUpdateOne) ClearImageURL() *SportUpdateOne {
 }
 
 // AddEventIDs adds the "events" edge to the Event entity by IDs.
-func (suo *SportUpdateOne) AddEventIDs(ids ...string) *SportUpdateOne {
+func (suo *SportUpdateOne) AddEventIDs(ids ...ulid.ID) *SportUpdateOne {
 	suo.mutation.AddEventIDs(ids...)
 	return suo
 }
 
 // AddEvents adds the "events" edges to the Event entity.
 func (suo *SportUpdateOne) AddEvents(e ...*Event) *SportUpdateOne {
-	ids := make([]string, len(e))
+	ids := make([]ulid.ID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
@@ -287,14 +288,14 @@ func (suo *SportUpdateOne) ClearEvents() *SportUpdateOne {
 }
 
 // RemoveEventIDs removes the "events" edge to Event entities by IDs.
-func (suo *SportUpdateOne) RemoveEventIDs(ids ...string) *SportUpdateOne {
+func (suo *SportUpdateOne) RemoveEventIDs(ids ...ulid.ID) *SportUpdateOne {
 	suo.mutation.RemoveEventIDs(ids...)
 	return suo
 }
 
 // RemoveEvents removes "events" edges to Event entities.
 func (suo *SportUpdateOne) RemoveEvents(e ...*Event) *SportUpdateOne {
-	ids := make([]string, len(e))
+	ids := make([]ulid.ID, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}

@@ -4,6 +4,8 @@ package user
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
 const (
@@ -19,8 +21,17 @@ const (
 	FieldPassword = "password"
 	// FieldRole holds the string denoting the role field in the database.
 	FieldRole = "role"
+	// EdgeUserStats holds the string denoting the user_stats edge name in mutations.
+	EdgeUserStats = "user_stats"
 	// Table holds the table name of the user in the database.
 	Table = "users"
+	// UserStatsTable is the table that holds the user_stats relation/edge.
+	UserStatsTable = "user_stats"
+	// UserStatsInverseTable is the table name for the UserStats entity.
+	// It exists in this package in order to avoid circular dependency with the "userstats" package.
+	UserStatsInverseTable = "user_stats"
+	// UserStatsColumn is the table column denoting the user_stats relation/edge.
+	UserStatsColumn = "user_id"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -54,9 +65,7 @@ var (
 	// RoleValidator is a validator for the "role" field. It is called by the builders before save.
 	RoleValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
-	DefaultID func() string
-	// IDValidator is a validator for the "id" field. It is called by the builders before save.
-	IDValidator func(string) error
+	DefaultID func() ulid.ID
 )
 
 // OrderOption defines the ordering options for the User queries.
@@ -85,4 +94,25 @@ func ByPassword(opts ...sql.OrderTermOption) OrderOption {
 // ByRole orders the results by the role field.
 func ByRole(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRole, opts...).ToFunc()
+}
+
+// ByUserStatsCount orders the results by user_stats count.
+func ByUserStatsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newUserStatsStep(), opts...)
+	}
+}
+
+// ByUserStats orders the results by user_stats terms.
+func ByUserStats(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserStatsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newUserStatsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserStatsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, UserStatsTable, UserStatsColumn),
+	)
 }

@@ -12,7 +12,9 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/eventtype"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/sport"
+	"github.com/asma12a/challenge-s6/ent/userstats"
 )
 
 // EventCreate is the builder for creating a Event entity.
@@ -101,17 +103,32 @@ func (ec *EventCreate) SetSportID(s string) *EventCreate {
 }
 
 // SetID sets the "id" field.
-func (ec *EventCreate) SetID(s string) *EventCreate {
-	ec.mutation.SetID(s)
+func (ec *EventCreate) SetID(u ulid.ID) *EventCreate {
+	ec.mutation.SetID(u)
 	return ec
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (ec *EventCreate) SetNillableID(s *string) *EventCreate {
-	if s != nil {
-		ec.SetID(*s)
+func (ec *EventCreate) SetNillableID(u *ulid.ID) *EventCreate {
+	if u != nil {
+		ec.SetID(*u)
 	}
 	return ec
+}
+
+// AddUserStatsIDIDs adds the "user_stats_id" edge to the UserStats entity by IDs.
+func (ec *EventCreate) AddUserStatsIDIDs(ids ...ulid.ID) *EventCreate {
+	ec.mutation.AddUserStatsIDIDs(ids...)
+	return ec
+}
+
+// AddUserStatsID adds the "user_stats_id" edges to the UserStats entity.
+func (ec *EventCreate) AddUserStatsID(u ...*UserStats) *EventCreate {
+	ids := make([]ulid.ID, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return ec.AddUserStatsIDIDs(ids...)
 }
 
 // SetEventType sets the "event_type" edge to the EventType entity.
@@ -236,11 +253,6 @@ func (ec *EventCreate) check() error {
 			return &ValidationError{Name: "sport_id", err: fmt.Errorf(`ent: validator failed for field "Event.sport_id": %w`, err)}
 		}
 	}
-	if v, ok := ec.mutation.ID(); ok {
-		if err := event.IDValidator(v); err != nil {
-			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Event.id": %w`, err)}
-		}
-	}
 	if len(ec.mutation.EventTypeIDs()) == 0 {
 		return &ValidationError{Name: "event_type", err: errors.New(`ent: missing required edge "Event.event_type"`)}
 	}
@@ -262,10 +274,10 @@ func (ec *EventCreate) sqlSave(ctx context.Context) (*Event, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(string); ok {
-			_node.ID = id
-		} else {
-			return nil, fmt.Errorf("unexpected Event.ID type: %T", _spec.ID.Value)
+		if id, ok := _spec.ID.Value.(*ulid.ID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
 		}
 	}
 	ec.mutation.id = &_node.ID
@@ -280,7 +292,7 @@ func (ec *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 	)
 	if id, ok := ec.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = id
+		_spec.ID.Value = &id
 	}
 	if value, ok := ec.mutation.Name(); ok {
 		_spec.SetField(event.FieldName, field.TypeString, value)
@@ -309,6 +321,22 @@ func (ec *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 	if value, ok := ec.mutation.IsFinished(); ok {
 		_spec.SetField(event.FieldIsFinished, field.TypeBool, value)
 		_node.IsFinished = value
+	}
+	if nodes := ec.mutation.UserStatsIDIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.UserStatsIDTable,
+			Columns: []string{event.UserStatsIDColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ec.mutation.EventTypeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

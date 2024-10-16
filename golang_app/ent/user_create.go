@@ -9,7 +9,9 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/user"
+	"github.com/asma12a/challenge-s6/ent/userstats"
 )
 
 // UserCreate is the builder for creating a User entity.
@@ -52,17 +54,32 @@ func (uc *UserCreate) SetNillableRole(s *string) *UserCreate {
 }
 
 // SetID sets the "id" field.
-func (uc *UserCreate) SetID(s string) *UserCreate {
-	uc.mutation.SetID(s)
+func (uc *UserCreate) SetID(u ulid.ID) *UserCreate {
+	uc.mutation.SetID(u)
 	return uc
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (uc *UserCreate) SetNillableID(s *string) *UserCreate {
-	if s != nil {
-		uc.SetID(*s)
+func (uc *UserCreate) SetNillableID(u *ulid.ID) *UserCreate {
+	if u != nil {
+		uc.SetID(*u)
 	}
 	return uc
+}
+
+// AddUserStatIDs adds the "user_stats" edge to the UserStats entity by IDs.
+func (uc *UserCreate) AddUserStatIDs(ids ...ulid.ID) *UserCreate {
+	uc.mutation.AddUserStatIDs(ids...)
+	return uc
+}
+
+// AddUserStats adds the "user_stats" edges to the UserStats entity.
+func (uc *UserCreate) AddUserStats(u ...*UserStats) *UserCreate {
+	ids := make([]ulid.ID, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uc.AddUserStatIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -144,11 +161,6 @@ func (uc *UserCreate) check() error {
 			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "User.role": %w`, err)}
 		}
 	}
-	if v, ok := uc.mutation.ID(); ok {
-		if err := user.IDValidator(v); err != nil {
-			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "User.id": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -164,10 +176,10 @@ func (uc *UserCreate) sqlSave(ctx context.Context) (*User, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(string); ok {
-			_node.ID = id
-		} else {
-			return nil, fmt.Errorf("unexpected User.ID type: %T", _spec.ID.Value)
+		if id, ok := _spec.ID.Value.(*ulid.ID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
 		}
 	}
 	uc.mutation.id = &_node.ID
@@ -182,7 +194,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	)
 	if id, ok := uc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = id
+		_spec.ID.Value = &id
 	}
 	if value, ok := uc.mutation.Name(); ok {
 		_spec.SetField(user.FieldName, field.TypeString, value)
@@ -199,6 +211,22 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeString, value)
 		_node.Role = value
+	}
+	if nodes := uc.mutation.UserStatsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserStatsTable,
+			Columns: []string{user.UserStatsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

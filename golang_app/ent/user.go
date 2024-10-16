@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/user"
 )
 
@@ -15,7 +16,7 @@ import (
 type User struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID string `json:"id,omitempty"`
+	ID ulid.ID `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Email holds the value of the "email" field.
@@ -23,8 +24,29 @@ type User struct {
 	// Password holds the value of the "password" field.
 	Password string `json:"password,omitempty"`
 	// Role holds the value of the "role" field.
-	Role         string `json:"role,omitempty"`
+	Role string `json:"role,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UserQuery when eager-loading is set.
+	Edges        UserEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// UserEdges holds the relations/edges for other nodes in the graph.
+type UserEdges struct {
+	// UserStats holds the value of the user_stats edge.
+	UserStats []*UserStats `json:"user_stats,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// UserStatsOrErr returns the UserStats value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) UserStatsOrErr() ([]*UserStats, error) {
+	if e.loadedTypes[0] {
+		return e.UserStats, nil
+	}
+	return nil, &NotLoadedError{edge: "user_stats"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -32,8 +54,10 @@ func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldID, user.FieldName, user.FieldEmail, user.FieldPassword, user.FieldRole:
+		case user.FieldName, user.FieldEmail, user.FieldPassword, user.FieldRole:
 			values[i] = new(sql.NullString)
+		case user.FieldID:
+			values[i] = new(ulid.ID)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -50,10 +74,10 @@ func (u *User) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case user.FieldID:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*ulid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value.Valid {
-				u.ID = value.String
+			} else if value != nil {
+				u.ID = *value
 			}
 		case user.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -90,6 +114,11 @@ func (u *User) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
+}
+
+// QueryUserStats queries the "user_stats" edge of the User entity.
+func (u *User) QueryUserStats() *UserStatsQuery {
+	return NewUserClient(u.config).QueryUserStats(u)
 }
 
 // Update returns a builder for updating this User.

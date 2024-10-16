@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/asma12a/challenge-s6/ent"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/user"
 	"github.com/asma12a/challenge-s6/entity"
 )
@@ -33,7 +34,7 @@ func (repo *User) Create(ctx context.Context, user *entity.User) (*ent.User, err
 	return entUser, nil
 }
 
-func (e *User) FindOne(ctx context.Context, id string) (*ent.User, error) {
+func (e *User) FindOne(ctx context.Context, id ulid.ID) (*ent.User, error) {
 	return e.db.User.Query().Where(user.IDEQ(id)).Only(ctx)
 }
 
@@ -53,7 +54,7 @@ func (repo *User) Update(ctx context.Context, user *entity.User) (*ent.User, err
 	return entUser, nil
 }
 
-func (repo *User) Delete(ctx context.Context, id string) error {
+func (repo *User) Delete(ctx context.Context, id ulid.ID) error {
 	err := repo.db.User.DeleteOneID(id).Exec(ctx)
 	if err != nil {
 		return entity.ErrCannotBeDeleted

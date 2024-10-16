@@ -10,6 +10,7 @@ import (
 	"reflect"
 
 	"github.com/asma12a/challenge-s6/ent/migrate"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -19,6 +20,7 @@ import (
 	"github.com/asma12a/challenge-s6/ent/eventtype"
 	"github.com/asma12a/challenge-s6/ent/sport"
 	"github.com/asma12a/challenge-s6/ent/user"
+	"github.com/asma12a/challenge-s6/ent/userstats"
 )
 
 // Client is the client that holds all ent builders.
@@ -34,6 +36,8 @@ type Client struct {
 	Sport *SportClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// UserStats is the client for interacting with the UserStats builders.
+	UserStats *UserStatsClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -49,6 +53,7 @@ func (c *Client) init() {
 	c.EventType = NewEventTypeClient(c.config)
 	c.Sport = NewSportClient(c.config)
 	c.User = NewUserClient(c.config)
+	c.UserStats = NewUserStatsClient(c.config)
 }
 
 type (
@@ -145,6 +150,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		EventType: NewEventTypeClient(cfg),
 		Sport:     NewSportClient(cfg),
 		User:      NewUserClient(cfg),
+		UserStats: NewUserStatsClient(cfg),
 	}, nil
 }
 
@@ -168,6 +174,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		EventType: NewEventTypeClient(cfg),
 		Sport:     NewSportClient(cfg),
 		User:      NewUserClient(cfg),
+		UserStats: NewUserStatsClient(cfg),
 	}, nil
 }
 
@@ -200,6 +207,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.EventType.Use(hooks...)
 	c.Sport.Use(hooks...)
 	c.User.Use(hooks...)
+	c.UserStats.Use(hooks...)
 }
 
 // Intercept adds the query interceptors to all the entity clients.
@@ -209,6 +217,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.EventType.Intercept(interceptors...)
 	c.Sport.Intercept(interceptors...)
 	c.User.Intercept(interceptors...)
+	c.UserStats.Intercept(interceptors...)
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -222,6 +231,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Sport.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
+	case *UserStatsMutation:
+		return c.UserStats.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -288,7 +299,7 @@ func (c *EventClient) UpdateOne(e *Event) *EventUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *EventClient) UpdateOneID(id string) *EventUpdateOne {
+func (c *EventClient) UpdateOneID(id ulid.ID) *EventUpdateOne {
 	mutation := newEventMutation(c.config, OpUpdateOne, withEventID(id))
 	return &EventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -305,7 +316,7 @@ func (c *EventClient) DeleteOne(e *Event) *EventDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *EventClient) DeleteOneID(id string) *EventDeleteOne {
+func (c *EventClient) DeleteOneID(id ulid.ID) *EventDeleteOne {
 	builder := c.Delete().Where(event.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -322,17 +333,33 @@ func (c *EventClient) Query() *EventQuery {
 }
 
 // Get returns a Event entity by its id.
-func (c *EventClient) Get(ctx context.Context, id string) (*Event, error) {
+func (c *EventClient) Get(ctx context.Context, id ulid.ID) (*Event, error) {
 	return c.Query().Where(event.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *EventClient) GetX(ctx context.Context, id string) *Event {
+func (c *EventClient) GetX(ctx context.Context, id ulid.ID) *Event {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryUserStatsID queries the user_stats_id edge of a Event.
+func (c *EventClient) QueryUserStatsID(e *Event) *UserStatsQuery {
+	query := (&UserStatsClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, id),
+			sqlgraph.To(userstats.Table, userstats.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, event.UserStatsIDTable, event.UserStatsIDColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // QueryEventType queries the event_type edge of a Event.
@@ -751,7 +778,7 @@ func (c *UserClient) UpdateOne(u *User) *UserUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *UserClient) UpdateOneID(id string) *UserUpdateOne {
+func (c *UserClient) UpdateOneID(id ulid.ID) *UserUpdateOne {
 	mutation := newUserMutation(c.config, OpUpdateOne, withUserID(id))
 	return &UserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -768,7 +795,7 @@ func (c *UserClient) DeleteOne(u *User) *UserDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *UserClient) DeleteOneID(id string) *UserDeleteOne {
+func (c *UserClient) DeleteOneID(id ulid.ID) *UserDeleteOne {
 	builder := c.Delete().Where(user.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -785,17 +812,33 @@ func (c *UserClient) Query() *UserQuery {
 }
 
 // Get returns a User entity by its id.
-func (c *UserClient) Get(ctx context.Context, id string) (*User, error) {
+func (c *UserClient) Get(ctx context.Context, id ulid.ID) (*User, error) {
 	return c.Query().Where(user.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *UserClient) GetX(ctx context.Context, id string) *User {
+func (c *UserClient) GetX(ctx context.Context, id ulid.ID) *User {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryUserStats queries the user_stats edge of a User.
+func (c *UserClient) QueryUserStats(u *User) *UserStatsQuery {
+	query := (&UserStatsClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(userstats.Table, userstats.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.UserStatsTable, user.UserStatsColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.
@@ -823,12 +866,145 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 	}
 }
 
+// UserStatsClient is a client for the UserStats schema.
+type UserStatsClient struct {
+	config
+}
+
+// NewUserStatsClient returns a client for the UserStats from the given config.
+func NewUserStatsClient(c config) *UserStatsClient {
+	return &UserStatsClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `userstats.Hooks(f(g(h())))`.
+func (c *UserStatsClient) Use(hooks ...Hook) {
+	c.hooks.UserStats = append(c.hooks.UserStats, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `userstats.Intercept(f(g(h())))`.
+func (c *UserStatsClient) Intercept(interceptors ...Interceptor) {
+	c.inters.UserStats = append(c.inters.UserStats, interceptors...)
+}
+
+// Create returns a builder for creating a UserStats entity.
+func (c *UserStatsClient) Create() *UserStatsCreate {
+	mutation := newUserStatsMutation(c.config, OpCreate)
+	return &UserStatsCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of UserStats entities.
+func (c *UserStatsClient) CreateBulk(builders ...*UserStatsCreate) *UserStatsCreateBulk {
+	return &UserStatsCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *UserStatsClient) MapCreateBulk(slice any, setFunc func(*UserStatsCreate, int)) *UserStatsCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &UserStatsCreateBulk{err: fmt.Errorf("calling to UserStatsClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*UserStatsCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &UserStatsCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for UserStats.
+func (c *UserStatsClient) Update() *UserStatsUpdate {
+	mutation := newUserStatsMutation(c.config, OpUpdate)
+	return &UserStatsUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *UserStatsClient) UpdateOne(us *UserStats) *UserStatsUpdateOne {
+	mutation := newUserStatsMutation(c.config, OpUpdateOne, withUserStats(us))
+	return &UserStatsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *UserStatsClient) UpdateOneID(id ulid.ID) *UserStatsUpdateOne {
+	mutation := newUserStatsMutation(c.config, OpUpdateOne, withUserStatsID(id))
+	return &UserStatsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for UserStats.
+func (c *UserStatsClient) Delete() *UserStatsDelete {
+	mutation := newUserStatsMutation(c.config, OpDelete)
+	return &UserStatsDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *UserStatsClient) DeleteOne(us *UserStats) *UserStatsDeleteOne {
+	return c.DeleteOneID(us.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *UserStatsClient) DeleteOneID(id ulid.ID) *UserStatsDeleteOne {
+	builder := c.Delete().Where(userstats.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &UserStatsDeleteOne{builder}
+}
+
+// Query returns a query builder for UserStats.
+func (c *UserStatsClient) Query() *UserStatsQuery {
+	return &UserStatsQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeUserStats},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a UserStats entity by its id.
+func (c *UserStatsClient) Get(ctx context.Context, id ulid.ID) (*UserStats, error) {
+	return c.Query().Where(userstats.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *UserStatsClient) GetX(ctx context.Context, id ulid.ID) *UserStats {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *UserStatsClient) Hooks() []Hook {
+	return c.hooks.UserStats
+}
+
+// Interceptors returns the client interceptors.
+func (c *UserStatsClient) Interceptors() []Interceptor {
+	return c.inters.UserStats
+}
+
+func (c *UserStatsClient) mutate(ctx context.Context, m *UserStatsMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UserStatsCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UserStatsUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UserStatsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UserStatsDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown UserStats mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Event, EventType, Sport, User []ent.Hook
+		Event, EventType, Sport, User, UserStats []ent.Hook
 	}
 	inters struct {
-		Event, EventType, Sport, User []ent.Interceptor
+		Event, EventType, Sport, User, UserStats []ent.Interceptor
 	}
 )

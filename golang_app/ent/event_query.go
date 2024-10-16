@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -14,18 +15,21 @@ import (
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/eventtype"
 	"github.com/asma12a/challenge-s6/ent/predicate"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/sport"
+	"github.com/asma12a/challenge-s6/ent/userstats"
 )
 
 // EventQuery is the builder for querying Event entities.
 type EventQuery struct {
 	config
-	ctx           *QueryContext
-	order         []event.OrderOption
-	inters        []Interceptor
-	predicates    []predicate.Event
-	withEventType *EventTypeQuery
-	withSport     *SportQuery
+	ctx             *QueryContext
+	order           []event.OrderOption
+	inters          []Interceptor
+	predicates      []predicate.Event
+	withUserStatsID *UserStatsQuery
+	withEventType   *EventTypeQuery
+	withSport       *SportQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -60,6 +64,28 @@ func (eq *EventQuery) Unique(unique bool) *EventQuery {
 func (eq *EventQuery) Order(o ...event.OrderOption) *EventQuery {
 	eq.order = append(eq.order, o...)
 	return eq
+}
+
+// QueryUserStatsID chains the current query on the "user_stats_id" edge.
+func (eq *EventQuery) QueryUserStatsID() *UserStatsQuery {
+	query := (&UserStatsClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, selector),
+			sqlgraph.To(userstats.Table, userstats.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, event.UserStatsIDTable, event.UserStatsIDColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // QueryEventType chains the current query on the "event_type" edge.
@@ -130,8 +156,8 @@ func (eq *EventQuery) FirstX(ctx context.Context) *Event {
 
 // FirstID returns the first Event ID from the query.
 // Returns a *NotFoundError when no Event ID was found.
-func (eq *EventQuery) FirstID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (eq *EventQuery) FirstID(ctx context.Context) (id ulid.ID, err error) {
+	var ids []ulid.ID
 	if ids, err = eq.Limit(1).IDs(setContextOp(ctx, eq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
@@ -143,7 +169,7 @@ func (eq *EventQuery) FirstID(ctx context.Context) (id string, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (eq *EventQuery) FirstIDX(ctx context.Context) string {
+func (eq *EventQuery) FirstIDX(ctx context.Context) ulid.ID {
 	id, err := eq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -181,8 +207,8 @@ func (eq *EventQuery) OnlyX(ctx context.Context) *Event {
 // OnlyID is like Only, but returns the only Event ID in the query.
 // Returns a *NotSingularError when more than one Event ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (eq *EventQuery) OnlyID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (eq *EventQuery) OnlyID(ctx context.Context) (id ulid.ID, err error) {
+	var ids []ulid.ID
 	if ids, err = eq.Limit(2).IDs(setContextOp(ctx, eq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
@@ -198,7 +224,7 @@ func (eq *EventQuery) OnlyID(ctx context.Context) (id string, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (eq *EventQuery) OnlyIDX(ctx context.Context) string {
+func (eq *EventQuery) OnlyIDX(ctx context.Context) ulid.ID {
 	id, err := eq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -226,7 +252,7 @@ func (eq *EventQuery) AllX(ctx context.Context) []*Event {
 }
 
 // IDs executes the query and returns a list of Event IDs.
-func (eq *EventQuery) IDs(ctx context.Context) (ids []string, err error) {
+func (eq *EventQuery) IDs(ctx context.Context) (ids []ulid.ID, err error) {
 	if eq.ctx.Unique == nil && eq.path != nil {
 		eq.Unique(true)
 	}
@@ -238,7 +264,7 @@ func (eq *EventQuery) IDs(ctx context.Context) (ids []string, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (eq *EventQuery) IDsX(ctx context.Context) []string {
+func (eq *EventQuery) IDsX(ctx context.Context) []ulid.ID {
 	ids, err := eq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -293,17 +319,29 @@ func (eq *EventQuery) Clone() *EventQuery {
 		return nil
 	}
 	return &EventQuery{
-		config:        eq.config,
-		ctx:           eq.ctx.Clone(),
-		order:         append([]event.OrderOption{}, eq.order...),
-		inters:        append([]Interceptor{}, eq.inters...),
-		predicates:    append([]predicate.Event{}, eq.predicates...),
-		withEventType: eq.withEventType.Clone(),
-		withSport:     eq.withSport.Clone(),
+		config:          eq.config,
+		ctx:             eq.ctx.Clone(),
+		order:           append([]event.OrderOption{}, eq.order...),
+		inters:          append([]Interceptor{}, eq.inters...),
+		predicates:      append([]predicate.Event{}, eq.predicates...),
+		withUserStatsID: eq.withUserStatsID.Clone(),
+		withEventType:   eq.withEventType.Clone(),
+		withSport:       eq.withSport.Clone(),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
 	}
+}
+
+// WithUserStatsID tells the query-builder to eager-load the nodes that are connected to
+// the "user_stats_id" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EventQuery) WithUserStatsID(opts ...func(*UserStatsQuery)) *EventQuery {
+	query := (&UserStatsClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withUserStatsID = query
+	return eq
 }
 
 // WithEventType tells the query-builder to eager-load the nodes that are connected to
@@ -406,7 +444,8 @@ func (eq *EventQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Event,
 	var (
 		nodes       = []*Event{}
 		_spec       = eq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
+			eq.withUserStatsID != nil,
 			eq.withEventType != nil,
 			eq.withSport != nil,
 		}
@@ -429,6 +468,13 @@ func (eq *EventQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Event,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := eq.withUserStatsID; query != nil {
+		if err := eq.loadUserStatsID(ctx, query, nodes,
+			func(n *Event) { n.Edges.UserStatsID = []*UserStats{} },
+			func(n *Event, e *UserStats) { n.Edges.UserStatsID = append(n.Edges.UserStatsID, e) }); err != nil {
+			return nil, err
+		}
+	}
 	if query := eq.withEventType; query != nil {
 		if err := eq.loadEventType(ctx, query, nodes, nil,
 			func(n *Event, e *EventType) { n.Edges.EventType = e }); err != nil {
@@ -444,6 +490,37 @@ func (eq *EventQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Event,
 	return nodes, nil
 }
 
+func (eq *EventQuery) loadUserStatsID(ctx context.Context, query *UserStatsQuery, nodes []*Event, init func(*Event), assign func(*Event, *UserStats)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[ulid.ID]*Event)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.UserStats(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(event.UserStatsIDColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.event_id
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "event_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "event_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
 func (eq *EventQuery) loadEventType(ctx context.Context, query *EventTypeQuery, nodes []*Event, init func(*Event), assign func(*Event, *EventType)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*Event)

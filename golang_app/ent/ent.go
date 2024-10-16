@@ -16,6 +16,7 @@ import (
 	"github.com/asma12a/challenge-s6/ent/eventtype"
 	"github.com/asma12a/challenge-s6/ent/sport"
 	"github.com/asma12a/challenge-s6/ent/user"
+	"github.com/asma12a/challenge-s6/ent/userstats"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -80,6 +81,7 @@ func checkColumn(table, column string) error {
 			eventtype.Table: eventtype.ValidColumn,
 			sport.Table:     sport.ValidColumn,
 			user.Table:      user.ValidColumn,
+			userstats.Table: userstats.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

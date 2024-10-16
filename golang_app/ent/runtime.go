@@ -8,8 +8,10 @@ import (
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/eventtype"
 	"github.com/asma12a/challenge-s6/ent/schema"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/sport"
 	"github.com/asma12a/challenge-s6/ent/user"
+	"github.com/asma12a/challenge-s6/ent/userstats"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -57,9 +59,7 @@ func init() {
 	// eventDescID is the schema descriptor for id field.
 	eventDescID := eventFields[0].Descriptor()
 	// event.DefaultID holds the default value on creation for the id field.
-	event.DefaultID = eventDescID.Default.(func() string)
-	// event.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	event.IDValidator = eventDescID.Validators[0].(func(string) error)
+	event.DefaultID = eventDescID.Default.(func() ulid.ID)
 	eventtypeFields := schema.EventType{}.Fields()
 	_ = eventtypeFields
 	// eventtypeDescName is the schema descriptor for name field.
@@ -107,7 +107,19 @@ func init() {
 	// userDescID is the schema descriptor for id field.
 	userDescID := userFields[0].Descriptor()
 	// user.DefaultID holds the default value on creation for the id field.
-	user.DefaultID = userDescID.Default.(func() string)
-	// user.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	user.IDValidator = userDescID.Validators[0].(func(string) error)
+	user.DefaultID = userDescID.Default.(func() ulid.ID)
+	userstatsFields := schema.UserStats{}.Fields()
+	_ = userstatsFields
+	// userstatsDescUserID is the schema descriptor for user_id field.
+	userstatsDescUserID := userstatsFields[1].Descriptor()
+	// userstats.UserIDValidator is a validator for the "user_id" field. It is called by the builders before save.
+	userstats.UserIDValidator = userstatsDescUserID.Validators[0].(func(string) error)
+	// userstatsDescEventID is the schema descriptor for event_id field.
+	userstatsDescEventID := userstatsFields[2].Descriptor()
+	// userstats.EventIDValidator is a validator for the "event_id" field. It is called by the builders before save.
+	userstats.EventIDValidator = userstatsDescEventID.Validators[0].(func(string) error)
+	// userstatsDescID is the schema descriptor for id field.
+	userstatsDescID := userstatsFields[0].Descriptor()
+	// userstats.DefaultID holds the default value on creation for the id field.
+	userstats.DefaultID = userstatsDescID.Default.(func() ulid.ID)
 }

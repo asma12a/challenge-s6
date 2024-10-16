@@ -11,7 +11,9 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/asma12a/challenge-s6/ent/predicate"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/user"
+	"github.com/asma12a/challenge-s6/ent/userstats"
 )
 
 // UserUpdate is the builder for updating User entities.
@@ -83,9 +85,45 @@ func (uu *UserUpdate) SetNillableRole(s *string) *UserUpdate {
 	return uu
 }
 
+// AddUserStatIDs adds the "user_stats" edge to the UserStats entity by IDs.
+func (uu *UserUpdate) AddUserStatIDs(ids ...ulid.ID) *UserUpdate {
+	uu.mutation.AddUserStatIDs(ids...)
+	return uu
+}
+
+// AddUserStats adds the "user_stats" edges to the UserStats entity.
+func (uu *UserUpdate) AddUserStats(u ...*UserStats) *UserUpdate {
+	ids := make([]ulid.ID, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uu.AddUserStatIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
+}
+
+// ClearUserStats clears all "user_stats" edges to the UserStats entity.
+func (uu *UserUpdate) ClearUserStats() *UserUpdate {
+	uu.mutation.ClearUserStats()
+	return uu
+}
+
+// RemoveUserStatIDs removes the "user_stats" edge to UserStats entities by IDs.
+func (uu *UserUpdate) RemoveUserStatIDs(ids ...ulid.ID) *UserUpdate {
+	uu.mutation.RemoveUserStatIDs(ids...)
+	return uu
+}
+
+// RemoveUserStats removes "user_stats" edges to UserStats entities.
+func (uu *UserUpdate) RemoveUserStats(u ...*UserStats) *UserUpdate {
+	ids := make([]ulid.ID, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uu.RemoveUserStatIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -164,6 +202,51 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeString, value)
 	}
+	if uu.mutation.UserStatsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserStatsTable,
+			Columns: []string{user.UserStatsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedUserStatsIDs(); len(nodes) > 0 && !uu.mutation.UserStatsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserStatsTable,
+			Columns: []string{user.UserStatsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.UserStatsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserStatsTable,
+			Columns: []string{user.UserStatsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -240,9 +323,45 @@ func (uuo *UserUpdateOne) SetNillableRole(s *string) *UserUpdateOne {
 	return uuo
 }
 
+// AddUserStatIDs adds the "user_stats" edge to the UserStats entity by IDs.
+func (uuo *UserUpdateOne) AddUserStatIDs(ids ...ulid.ID) *UserUpdateOne {
+	uuo.mutation.AddUserStatIDs(ids...)
+	return uuo
+}
+
+// AddUserStats adds the "user_stats" edges to the UserStats entity.
+func (uuo *UserUpdateOne) AddUserStats(u ...*UserStats) *UserUpdateOne {
+	ids := make([]ulid.ID, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uuo.AddUserStatIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
+}
+
+// ClearUserStats clears all "user_stats" edges to the UserStats entity.
+func (uuo *UserUpdateOne) ClearUserStats() *UserUpdateOne {
+	uuo.mutation.ClearUserStats()
+	return uuo
+}
+
+// RemoveUserStatIDs removes the "user_stats" edge to UserStats entities by IDs.
+func (uuo *UserUpdateOne) RemoveUserStatIDs(ids ...ulid.ID) *UserUpdateOne {
+	uuo.mutation.RemoveUserStatIDs(ids...)
+	return uuo
+}
+
+// RemoveUserStats removes "user_stats" edges to UserStats entities.
+func (uuo *UserUpdateOne) RemoveUserStats(u ...*UserStats) *UserUpdateOne {
+	ids := make([]ulid.ID, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uuo.RemoveUserStatIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -350,6 +469,51 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeString, value)
+	}
+	if uuo.mutation.UserStatsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserStatsTable,
+			Columns: []string{user.UserStatsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedUserStatsIDs(); len(nodes) > 0 && !uuo.mutation.UserStatsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserStatsTable,
+			Columns: []string{user.UserStatsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.UserStatsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserStatsTable,
+			Columns: []string{user.UserStatsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userstats.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &User{config: uuo.config}
 	_spec.Assign = _node.assignValues
