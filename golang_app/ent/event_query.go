@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/asma12a/challenge-s6/ent/event"
+	"github.com/asma12a/challenge-s6/ent/eventtype"
 	"github.com/asma12a/challenge-s6/ent/predicate"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/userstats"
@@ -26,6 +27,8 @@ type EventQuery struct {
 	inters          []Interceptor
 	predicates      []predicate.Event
 	withUserStatsID *UserStatsQuery
+	withEventType   *EventTypeQuery
+	withFKs         bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -77,6 +80,28 @@ func (eq *EventQuery) QueryUserStatsID() *UserStatsQuery {
 			sqlgraph.From(event.Table, event.FieldID, selector),
 			sqlgraph.To(userstats.Table, userstats.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, event.UserStatsIDTable, event.UserStatsIDColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryEventType chains the current query on the "event_type" edge.
+func (eq *EventQuery) QueryEventType() *EventTypeQuery {
+	query := (&EventTypeClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, selector),
+			sqlgraph.To(eventtype.Table, eventtype.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, event.EventTypeTable, event.EventTypeColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -277,6 +302,7 @@ func (eq *EventQuery) Clone() *EventQuery {
 		inters:          append([]Interceptor{}, eq.inters...),
 		predicates:      append([]predicate.Event{}, eq.predicates...),
 		withUserStatsID: eq.withUserStatsID.Clone(),
+		withEventType:   eq.withEventType.Clone(),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
@@ -291,6 +317,17 @@ func (eq *EventQuery) WithUserStatsID(opts ...func(*UserStatsQuery)) *EventQuery
 		opt(query)
 	}
 	eq.withUserStatsID = query
+	return eq
+}
+
+// WithEventType tells the query-builder to eager-load the nodes that are connected to
+// the "event_type" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EventQuery) WithEventType(opts ...func(*EventTypeQuery)) *EventQuery {
+	query := (&EventTypeClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withEventType = query
 	return eq
 }
 
@@ -371,11 +408,19 @@ func (eq *EventQuery) prepareQuery(ctx context.Context) error {
 func (eq *EventQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Event, error) {
 	var (
 		nodes       = []*Event{}
+		withFKs     = eq.withFKs
 		_spec       = eq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			eq.withUserStatsID != nil,
+			eq.withEventType != nil,
 		}
 	)
+	if eq.withEventType != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, event.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Event).scanValues(nil, columns)
 	}
@@ -398,6 +443,12 @@ func (eq *EventQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Event,
 		if err := eq.loadUserStatsID(ctx, query, nodes,
 			func(n *Event) { n.Edges.UserStatsID = []*UserStats{} },
 			func(n *Event, e *UserStats) { n.Edges.UserStatsID = append(n.Edges.UserStatsID, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := eq.withEventType; query != nil {
+		if err := eq.loadEventType(ctx, query, nodes, nil,
+			func(n *Event, e *EventType) { n.Edges.EventType = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -432,6 +483,38 @@ func (eq *EventQuery) loadUserStatsID(ctx context.Context, query *UserStatsQuery
 			return fmt.Errorf(`unexpected referenced foreign-key "event_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
+	}
+	return nil
+}
+func (eq *EventQuery) loadEventType(ctx context.Context, query *EventTypeQuery, nodes []*Event, init func(*Event), assign func(*Event, *EventType)) error {
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*Event)
+	for i := range nodes {
+		if nodes[i].event_type_event == nil {
+			continue
+		}
+		fk := *nodes[i].event_type_event
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(eventtype.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "event_type_event" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }

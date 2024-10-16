@@ -18,12 +18,32 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "is_public", Type: field.TypeBool, Default: false},
 		{Name: "is_finished", Type: field.TypeBool, Default: false},
+		{Name: "event_type_event", Type: field.TypeString, Nullable: true},
 	}
 	// EventsTable holds the schema information for the "events" table.
 	EventsTable = &schema.Table{
 		Name:       "events",
 		Columns:    EventsColumns,
 		PrimaryKey: []*schema.Column{EventsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "events_event_types_event",
+				Columns:    []*schema.Column{EventsColumns[8]},
+				RefColumns: []*schema.Column{EventTypesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// EventTypesColumns holds the columns for the "event_types" table.
+	EventTypesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+	}
+	// EventTypesTable holds the schema information for the "event_types" table.
+	EventTypesTable = &schema.Table{
+		Name:       "event_types",
+		Columns:    EventTypesColumns,
+		PrimaryKey: []*schema.Column{EventTypesColumns[0]},
 	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
@@ -68,12 +88,14 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		EventsTable,
+		EventTypesTable,
 		UsersTable,
 		UserStatsTable,
 	}
 )
 
 func init() {
+	EventsTable.ForeignKeys[0].RefTable = EventTypesTable
 	UserStatsTable.ForeignKeys[0].RefTable = EventsTable
 	UserStatsTable.ForeignKeys[1].RefTable = UsersTable
 }

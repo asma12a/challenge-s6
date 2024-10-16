@@ -17,6 +17,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/asma12a/challenge-s6/ent/event"
+	"github.com/asma12a/challenge-s6/ent/eventtype"
 	"github.com/asma12a/challenge-s6/ent/user"
 	"github.com/asma12a/challenge-s6/ent/userstats"
 )
@@ -28,6 +29,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// Event is the client for interacting with the Event builders.
 	Event *EventClient
+	// EventType is the client for interacting with the EventType builders.
+	EventType *EventTypeClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 	// UserStats is the client for interacting with the UserStats builders.
@@ -44,6 +47,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Event = NewEventClient(c.config)
+	c.EventType = NewEventTypeClient(c.config)
 	c.User = NewUserClient(c.config)
 	c.UserStats = NewUserStatsClient(c.config)
 }
@@ -139,6 +143,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:       ctx,
 		config:    cfg,
 		Event:     NewEventClient(cfg),
+		EventType: NewEventTypeClient(cfg),
 		User:      NewUserClient(cfg),
 		UserStats: NewUserStatsClient(cfg),
 	}, nil
@@ -161,6 +166,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:       ctx,
 		config:    cfg,
 		Event:     NewEventClient(cfg),
+		EventType: NewEventTypeClient(cfg),
 		User:      NewUserClient(cfg),
 		UserStats: NewUserStatsClient(cfg),
 	}, nil
@@ -192,6 +198,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Event.Use(hooks...)
+	c.EventType.Use(hooks...)
 	c.User.Use(hooks...)
 	c.UserStats.Use(hooks...)
 }
@@ -200,6 +207,7 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Event.Intercept(interceptors...)
+	c.EventType.Intercept(interceptors...)
 	c.User.Intercept(interceptors...)
 	c.UserStats.Intercept(interceptors...)
 }
@@ -209,6 +217,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *EventMutation:
 		return c.Event.mutate(ctx, m)
+	case *EventTypeMutation:
+		return c.EventType.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
 	case *UserStatsMutation:
@@ -342,6 +352,22 @@ func (c *EventClient) QueryUserStatsID(e *Event) *UserStatsQuery {
 	return query
 }
 
+// QueryEventType queries the event_type edge of a Event.
+func (c *EventClient) QueryEventType(e *Event) *EventTypeQuery {
+	query := (&EventTypeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, id),
+			sqlgraph.To(eventtype.Table, eventtype.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, event.EventTypeTable, event.EventTypeColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *EventClient) Hooks() []Hook {
 	return c.hooks.Event
@@ -364,6 +390,155 @@ func (c *EventClient) mutate(ctx context.Context, m *EventMutation) (Value, erro
 		return (&EventDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Event mutation op: %q", m.Op())
+	}
+}
+
+// EventTypeClient is a client for the EventType schema.
+type EventTypeClient struct {
+	config
+}
+
+// NewEventTypeClient returns a client for the EventType from the given config.
+func NewEventTypeClient(c config) *EventTypeClient {
+	return &EventTypeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `eventtype.Hooks(f(g(h())))`.
+func (c *EventTypeClient) Use(hooks ...Hook) {
+	c.hooks.EventType = append(c.hooks.EventType, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `eventtype.Intercept(f(g(h())))`.
+func (c *EventTypeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.EventType = append(c.inters.EventType, interceptors...)
+}
+
+// Create returns a builder for creating a EventType entity.
+func (c *EventTypeClient) Create() *EventTypeCreate {
+	mutation := newEventTypeMutation(c.config, OpCreate)
+	return &EventTypeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of EventType entities.
+func (c *EventTypeClient) CreateBulk(builders ...*EventTypeCreate) *EventTypeCreateBulk {
+	return &EventTypeCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *EventTypeClient) MapCreateBulk(slice any, setFunc func(*EventTypeCreate, int)) *EventTypeCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &EventTypeCreateBulk{err: fmt.Errorf("calling to EventTypeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*EventTypeCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &EventTypeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for EventType.
+func (c *EventTypeClient) Update() *EventTypeUpdate {
+	mutation := newEventTypeMutation(c.config, OpUpdate)
+	return &EventTypeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *EventTypeClient) UpdateOne(et *EventType) *EventTypeUpdateOne {
+	mutation := newEventTypeMutation(c.config, OpUpdateOne, withEventType(et))
+	return &EventTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *EventTypeClient) UpdateOneID(id string) *EventTypeUpdateOne {
+	mutation := newEventTypeMutation(c.config, OpUpdateOne, withEventTypeID(id))
+	return &EventTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for EventType.
+func (c *EventTypeClient) Delete() *EventTypeDelete {
+	mutation := newEventTypeMutation(c.config, OpDelete)
+	return &EventTypeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *EventTypeClient) DeleteOne(et *EventType) *EventTypeDeleteOne {
+	return c.DeleteOneID(et.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *EventTypeClient) DeleteOneID(id string) *EventTypeDeleteOne {
+	builder := c.Delete().Where(eventtype.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &EventTypeDeleteOne{builder}
+}
+
+// Query returns a query builder for EventType.
+func (c *EventTypeClient) Query() *EventTypeQuery {
+	return &EventTypeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeEventType},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a EventType entity by its id.
+func (c *EventTypeClient) Get(ctx context.Context, id string) (*EventType, error) {
+	return c.Query().Where(eventtype.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *EventTypeClient) GetX(ctx context.Context, id string) *EventType {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryEvent queries the event edge of a EventType.
+func (c *EventTypeClient) QueryEvent(et *EventType) *EventQuery {
+	query := (&EventClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := et.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(eventtype.Table, eventtype.FieldID, id),
+			sqlgraph.To(event.Table, event.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, eventtype.EventTable, eventtype.EventColumn),
+		)
+		fromV = sqlgraph.Neighbors(et.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *EventTypeClient) Hooks() []Hook {
+	return c.hooks.EventType
+}
+
+// Interceptors returns the client interceptors.
+func (c *EventTypeClient) Interceptors() []Interceptor {
+	return c.inters.EventType
+}
+
+func (c *EventTypeClient) mutate(ctx context.Context, m *EventTypeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&EventTypeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&EventTypeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&EventTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&EventTypeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown EventType mutation op: %q", m.Op())
 	}
 }
 
@@ -652,9 +827,9 @@ func (c *UserStatsClient) mutate(ctx context.Context, m *UserStatsMutation) (Val
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Event, User, UserStats []ent.Hook
+		Event, EventType, User, UserStats []ent.Hook
 	}
 	inters struct {
-		Event, User, UserStats []ent.Interceptor
+		Event, EventType, User, UserStats []ent.Interceptor
 	}
 )

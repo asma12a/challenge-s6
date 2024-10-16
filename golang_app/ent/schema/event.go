@@ -34,9 +34,11 @@ func (Event) Fields() []ent.Field {
 	}
 }
 
-// Edges of the Event.
 func (Event) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("user_stats_id", UserStats.Type).StorageKey(edge.Column("event_id")),
+		edge.From("event_type", EventType.Type).
+			Ref("event").
+			Unique(),
 	}
 }

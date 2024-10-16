@@ -31,6 +31,8 @@ const (
 	FieldIsFinished = "is_finished"
 	// EdgeUserStatsID holds the string denoting the user_stats_id edge name in mutations.
 	EdgeUserStatsID = "user_stats_id"
+	// EdgeEventType holds the string denoting the event_type edge name in mutations.
+	EdgeEventType = "event_type"
 	// Table holds the table name of the event in the database.
 	Table = "events"
 	// UserStatsIDTable is the table that holds the user_stats_id relation/edge.
@@ -40,6 +42,13 @@ const (
 	UserStatsIDInverseTable = "user_stats"
 	// UserStatsIDColumn is the table column denoting the user_stats_id relation/edge.
 	UserStatsIDColumn = "event_id"
+	// EventTypeTable is the table that holds the event_type relation/edge.
+	EventTypeTable = "events"
+	// EventTypeInverseTable is the table name for the EventType entity.
+	// It exists in this package in order to avoid circular dependency with the "eventtype" package.
+	EventTypeInverseTable = "event_types"
+	// EventTypeColumn is the table column denoting the event_type relation/edge.
+	EventTypeColumn = "event_type_event"
 )
 
 // Columns holds all SQL columns for event fields.
@@ -54,10 +63,21 @@ var Columns = []string{
 	FieldIsFinished,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the "events"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"event_type_event",
+}
+
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -139,10 +159,24 @@ func ByUserStatsID(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newUserStatsIDStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByEventTypeField orders the results by event_type field.
+func ByEventTypeField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEventTypeStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newUserStatsIDStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(UserStatsIDInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, UserStatsIDTable, UserStatsIDColumn),
+	)
+}
+func newEventTypeStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(EventTypeInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, EventTypeTable, EventTypeColumn),
 	)
 }
