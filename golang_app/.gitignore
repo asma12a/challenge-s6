@@ -2,3 +2,8 @@
 tmp
 dragonflydata
 postgresdata
+
+# all files and folders inside ent without ent/schema in one line
+ent/*
+!ent/schema
+!ent/generate.go
