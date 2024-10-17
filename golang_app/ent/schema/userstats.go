@@ -21,8 +21,8 @@ func (UserStats) Fields() []ent.Field {
 					return ulid.MustNew("")
 				},
 			),
-		field.String("user_id").NotEmpty(),
-		field.String("event_id").NotEmpty(),
+		field.String("user_id").GoType(ulid.ID("")).NotEmpty(),
+		field.String("event_id").GoType(ulid.ID("")).NotEmpty(),
 	}
 
 }
