@@ -22,8 +22,8 @@ func (Message) Fields() []ent.Field {
 					return ulid.MustNew("")
 				},
 			),
-		field.String("event_id").NotEmpty(),
-		field.String("user_id").NotEmpty(),
+		field.String("event_id").GoType(ulid.ID("")).NotEmpty(),
+		field.String("user_id").GoType(ulid.ID("")).NotEmpty(),
 		field.String("content").NotEmpty(),
 		field.Time("created_at").Default(time.Now),
 	}
