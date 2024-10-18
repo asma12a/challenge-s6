@@ -2,7 +2,6 @@ package schema
 
 import (
 	"entgo.io/ent"
-	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
@@ -23,20 +22,12 @@ func (UserStats) Fields() []ent.Field {
 			),
 		field.String("user_id").GoType(ulid.ID("")).NotEmpty(),
 		field.String("event_id").GoType(ulid.ID("")).NotEmpty(),
+		field.String("stat_id").GoType(ulid.ID("")).NotEmpty(),
+		field.Int("stat_value").Positive().Default(0),
 	}
-
 }
 
 // Edges of the UserStats.
 func (UserStats) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.To("user_stats_foot", UserStatsFoot.Type).
-			StorageKey(edge.Column("stats_id")),
-		edge.To("user_stats_basket", UserStatsBasket.Type).
-			StorageKey(edge.Column("stats_id")),
-		edge.To("user_stats_running", UserStatsRunning.Type).
-			StorageKey(edge.Column("stats_id")),
-		edge.To("user_stats_tennis", UserStatsTennis.Type).
-			StorageKey(edge.Column("stats_id")),
-	}
+	return nil
 }

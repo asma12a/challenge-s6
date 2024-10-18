@@ -29,5 +29,7 @@ func (Sport) Fields() []ent.Field {
 func (Sport) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("events", Event.Type),
+		edge.To("sport_stat_labels", SportStatLabels.Type).
+			StorageKey(edge.Column("sport_id")),
 	}
 }
