@@ -6,6 +6,7 @@ import (
 
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
+	"github.com/asma12a/challenge-s6/presenter"
 	"github.com/asma12a/challenge-s6/service"
 	"github.com/gofiber/fiber/v2"
 )
@@ -112,7 +113,6 @@ func updateUser(ctx context.Context, service service.User) fiber.Handler {
 		user.Name = userInput.Name
 		user.Email = userInput.Email
 		user.Password = userInput.Password
-		user.Roles = userInput.Roles
 
 		updatedUser, err := service.Update(ctx, userInput)
 		if err != nil {
@@ -158,13 +158,23 @@ func listUsers(ctx context.Context, service service.User) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		users, err := service.List(ctx)
 		if err != nil {
-			log.Println(err)
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
 				"error":  err.Error(),
 			})
 		}
 
-		return c.JSON(users)
+		toJ := make([]presenter.User, len(users))
+
+		for i, user := range users {
+			toJ[i] = presenter.User{
+				ID:    user.ID,
+				Name:  user.Name,
+				Email: user.Email,
+				Roles: user.Role,
+			}
+		}
+
+		return c.JSON(toJ)
 	}
 }

@@ -8,10 +8,11 @@ type Team struct {
 	ent.Team
 }
 
-func NewTeam(name string) *Team {
+func NewTeam(name string, maxPlayers int) *Team {
 	return &Team{
 		Team: ent.Team{
-			Name: name,
+			Name:       name,
+			MaxPlayers: maxPlayers,
 		},
 	}
 }
