@@ -172,7 +172,7 @@ func listUsers(ctx context.Context, service service.User) fiber.Handler {
 				ID:    user.ID,
 				Name:  user.Name,
 				Email: user.Email,
-				Roles: user.Role,
+				Roles: user.Roles,
 			}
 		}
 
