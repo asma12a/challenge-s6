@@ -76,9 +76,7 @@ func signUp(ctx context.Context, service service.User, rdb *redis.Client) fiber.
 			Message string
 			Link    string
 		}{
-			Name:    createdUser.Name,
-			Message: "Votre inscription a été réussie !",
-			Link:    "http://localhost:3001/verify/" + string(token),
+			Link: "http://localhost:3001/verify/" + string(token),
 		}
 
 		var body string
