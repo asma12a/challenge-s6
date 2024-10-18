@@ -112,7 +112,7 @@ func updateUser(ctx context.Context, service service.User) fiber.Handler {
 		user.Name = userInput.Name
 		user.Email = userInput.Email
 		user.Password = userInput.Password
-		user.Role = userInput.Role
+		user.Roles = userInput.Roles
 
 		updatedUser, err := service.Update(ctx, userInput)
 		if err != nil {

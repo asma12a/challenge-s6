@@ -52,6 +52,7 @@ func main() {
 	handler.EventTypeHandler(api.Group("/event_types"), context.Background(), *service.NewEventTypeService(db_client))
 	handler.SportHandler(api.Group("/sports"), context.Background(), *service.NewSportService(db_client))
 	handler.UserHandler(api.Group("/users"), context.Background(), *service.NewUserService(db_client))
+	handler.EventTeamsHandler(api.Group("/event_teams"), context.Background(), *service.NewEventTeamsService(db_client), *service.NewEventService(db_client), *service.NewTeamService(db_client))
 
 	// Any other routes: Not Found
 	app.All("*", func(c *fiber.Ctx) error {
