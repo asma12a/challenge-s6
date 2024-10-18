@@ -39,5 +39,6 @@ func (Event) Edges() []ent.Edge {
 		edge.From("event_type", EventType.Type).Ref("events").Unique(),
 		edge.From("sport", Sport.Type).Ref("events").Unique(),
 		edge.To("user_stats_id", UserStats.Type).StorageKey(edge.Column("event_id")),
+		edge.To("event_teams_id", EventTeams.Type).StorageKey(edge.Column("event_id")),
 	}
 }
