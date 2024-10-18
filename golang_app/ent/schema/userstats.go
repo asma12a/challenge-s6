@@ -20,13 +20,14 @@ func (UserStats) Fields() []ent.Field {
 					return ulid.MustNew("")
 				},
 			),
-		field.String("user_id").NotEmpty(),
-		field.String("event_id").NotEmpty(),
+		field.String("user_id").GoType(ulid.ID("")).NotEmpty(),
+		field.String("event_id").GoType(ulid.ID("")).NotEmpty(),
+		field.String("stat_id").GoType(ulid.ID("")).NotEmpty(),
+		field.Int("stat_value").Positive().Default(0),
 	}
-
 }
 
 // Edges of the UserStats.
 func (UserStats) Edges() []ent.Edge {
-	return []ent.Edge{}
+	return nil
 }
