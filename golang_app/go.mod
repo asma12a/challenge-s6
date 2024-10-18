@@ -9,7 +9,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/oklog/ulid/v2 v2.1.0
 	github.com/redis/go-redis/v9 v9.7.0
-	golang.org/x/crypto v0.20.0
+	golang.org/x/crypto v0.25.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )
 
@@ -19,6 +19,12 @@ require (
 )
 
 require (
+	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
+	github.com/go-playground/locales v0.14.1 // indirect
+	github.com/go-playground/universal-translator v0.18.1 // indirect
+	github.com/go-playground/validator/v10 v10.22.1 // indirect
+	github.com/leodido/go-urn v1.4.0 // indirect
+	golang.org/x/net v0.27.0 // indirect
 	ariga.io/atlas v0.19.1-0.20240203083654-5948b60a8e43 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect

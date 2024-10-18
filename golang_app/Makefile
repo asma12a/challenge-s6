@@ -1,30 +1,27 @@
-clean:
-		rm -rf target; \
-		rm -f coverage.*
+# Start containers
+docker-up: 
+	docker compose up -d
 
-# Download verborse:
-deps: clean
-		go get -d -v ./...
+# New ent schema
+new: 
+	go run entgo.io/ent/cmd/ent new 
 
-# Dev with hot reload
-docker-dev: deps
-		docker-compose up
-
-# Migrate Ent scheme to database
-migration:
-	go run database/migrate/main.go
-
-# Start dev server if using docker container only for DB and adminer
-# Go and Air must be installed locally and Air configured
-# as per the docs https://github.com/cosmtrek/air
-start:
-	air
-
+# Generate ent code from schemas
 generate:
 	go generate ./ent
 
+# Migrate Ent scheme to database
+migrate migration:
+	go run database/migrate/main.go
 
-.PHONY: start migrate docker-dev
+# Seed database with data
+seed:
+	go run database/seed/main.go
 
-run:
-	docker compose up -d
+# Server start
+start:
+	air
+
+# Avoid file name conflicts
+.PHONY:
+
