@@ -65,5 +65,5 @@ func (repo *User) Delete(ctx context.Context, id ulid.ID) error {
 }
 
 func (repo *User) List(ctx context.Context) ([]*ent.User, error) {
-	return repo.db.User.Query().All(ctx)
+	return repo.db.User.Query().Select(user.FieldID, user.FieldName, user.FieldEmail, user.FieldRole).All(ctx)
 }
