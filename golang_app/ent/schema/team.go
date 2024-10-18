@@ -21,7 +21,8 @@ func (Team) Fields() []ent.Field {
 					return ulid.MustNew("")
 				},
 			),
-		field.String("name").NotEmpty(),
+		field.String("name").NotEmpty().Unique(),
+		field.Int("max_players").Default(0),
 	}
 }
 
@@ -30,5 +31,7 @@ func (Team) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("teams_id", EventTeams.Type).
 			StorageKey(edge.Column("team_id")),
+		edge.To("teamusers", TeamUser.Type).StorageKey(edge.Column("team_id")),
+
 	}
 }

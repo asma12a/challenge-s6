@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/asma12a/challenge-s6/ent"
-	"github.com/asma12a/challenge-s6/ent/team"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
+	"github.com/asma12a/challenge-s6/ent/team"
 	"github.com/asma12a/challenge-s6/entity"
 )
 
@@ -20,8 +20,10 @@ func NewTeamService(client *ent.Client) *Team {
 }
 
 func (repo *Team) Create(ctx context.Context, t *entity.Team) error {
+	
 	_, err := repo.db.Team.Create().
 		SetName(t.Name).
+		SetMaxPlayers(t.MaxPlayers).
 		Save(ctx)
 
 	if err != nil {
@@ -46,6 +48,7 @@ func (repo *Team) Update(ctx context.Context, t *entity.Team) (*entity.Team, err
 	team, err := repo.db.Team.
 		UpdateOneID(t.ID).
 		SetName(t.Name).
+		SetMaxPlayers(t.MaxPlayers).
 		Save(ctx)
 
 	if err != nil {
