@@ -48,7 +48,7 @@ func (repo *User) Update(ctx context.Context, user *entity.User) (*ent.User, err
 		SetName(user.Name).
 		SetEmail(user.Email).
 		SetPassword(user.Password).
-		SetRole(user.Role).Save(ctx)
+		SetRoles(user.Roles).Save(ctx)
 
 	if err != nil {
 		return nil, entity.ErrCannotBeUpdated
