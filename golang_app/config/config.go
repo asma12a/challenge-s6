@@ -16,6 +16,7 @@ type Environment struct {
 	DBName        string
 	APIPort       string
 	DragonFlyPort string
+	BrevoAPIKey   string
 }
 
 var Env *Environment
@@ -39,6 +40,7 @@ func LoadEnvironment() {
 	Env.DBPass = getEnv("DB_PASS", true)
 	Env.DBName = getEnv("DB_NAME", true)
 	Env.APIPort = getEnv("API_PORT", true)
+	Env.BrevoAPIKey = getEnv("BREVO_API_KEY", true)
 	Env.DragonFlyPort = getEnv("DRAGONFLY_PORT", true)
 }
 

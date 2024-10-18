@@ -48,7 +48,7 @@ func (repo *User) Update(ctx context.Context, user *entity.User) (*ent.User, err
 		SetName(user.Name).
 		SetEmail(user.Email).
 		SetPassword(user.Password).
-		SetRole(user.Role).Save(ctx)
+		SetRoles(user.Roles).Save(ctx)
 
 	if err != nil {
 		return nil, entity.ErrCannotBeUpdated
@@ -65,5 +65,5 @@ func (repo *User) Delete(ctx context.Context, id ulid.ID) error {
 }
 
 func (repo *User) List(ctx context.Context) ([]*ent.User, error) {
-	return repo.db.User.Query().All(ctx)
+	return repo.db.User.Query().Select(user.FieldID, user.FieldEmail, user.FieldRoles).All(ctx)
 }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/asma12a/challenge-s6/config"
 	"github.com/asma12a/challenge-s6/database"
+	"github.com/asma12a/challenge-s6/database/redis"
 	"github.com/asma12a/challenge-s6/handler"
 	"github.com/asma12a/challenge-s6/service"
 	"github.com/gofiber/fiber/v2"
@@ -24,7 +25,10 @@ func main() {
 	config.LoadEnvironmentFile()
 
 	db_client := database.GetClient()
+	rdb := redis.GetClient()
+
 	defer db_client.Close()
+	defer rdb.Close()
 
 	app := fiber.New()
 
@@ -52,6 +56,7 @@ func main() {
 	handler.EventTypeHandler(api.Group("/event_types"), context.Background(), *service.NewEventTypeService(db_client))
 	handler.SportHandler(api.Group("/sports"), context.Background(), *service.NewSportService(db_client))
 	handler.UserHandler(api.Group("/users"), context.Background(), *service.NewUserService(db_client))
+	handler.AuthHandler(api.Group("/auth"), context.Background(), *service.NewUserService(db_client), rdb)
 
 	// Any other routes: Not Found
 	app.All("*", func(c *fiber.Ctx) error {
