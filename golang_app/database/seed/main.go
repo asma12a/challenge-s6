@@ -20,8 +20,25 @@ func main() {
 
 	dropAllData(ctx, db_client)
 	seedUsers(ctx, db_client)
+	seedSports(ctx, db_client)
 
 	log.Println("Database seeding completed!")
+}
+
+func seedSports(ctx context.Context, db_client *ent.Client) {
+	// foot, basket, tennis, running
+	sports := []string{"football", "basketball", "tennis", "running"}
+
+	for _, sport := range sports {
+		_, err := db_client.Sport.Create().
+			SetName(sport).
+			Save(ctx)
+		if err != nil {
+			log.Fatalf("Failed creating sport: %v", err)
+		}
+	}
+
+	log.Println("Sports seeded!")
 }
 
 func seedUsers(ctx context.Context, db_client *ent.Client) {
