@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"html/template"
-	"log"
 	"time"
 
 	"github.com/asma12a/challenge-s6/config/mailer"
@@ -55,7 +54,6 @@ func signUp(ctx context.Context, service service.User, rdb *redis.Client) fiber.
 
 		err = rdb.Set(ctx, "token:"+string(createdUser.ID), string(token), 30*time.Minute).Err()
 		if err != nil {
-			log.Println("Erreur lors du stockage de la clé :", err)
 			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
 				"status": "error",
 				"error":  "Erreur lors du stockage du token",
@@ -64,7 +62,6 @@ func signUp(ctx context.Context, service service.User, rdb *redis.Client) fiber.
 
 		t, err := template.ParseFiles("template/signup_confirmation.html")
 		if err != nil {
-			log.Println("Erreur lors du chargement du template :", err)
 			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
 				"status": "error",
 				"error":  "Erreur lors du chargement du template",
@@ -83,7 +80,6 @@ func signUp(ctx context.Context, service service.User, rdb *redis.Client) fiber.
 		buf := new(bytes.Buffer)
 		err = t.Execute(buf, data)
 		if err != nil {
-			log.Println("Erreur lors de l'exécution du template :", err)
 			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
 				"status": "error",
 				"error":  "Erreur lors de l'exécution du template",
@@ -92,7 +88,6 @@ func signUp(ctx context.Context, service service.User, rdb *redis.Client) fiber.
 		body = buf.String()
 
 		if err := mailer.SendEmail(createdUser.Email, "Confirmation d'inscription", body); err != nil {
-			log.Println("Erreur lors de l'envoi de l'email :", err)
 			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
 				"status": "error",
 				"error":  "Erreur lors de l'envoi de l'email de confirmation",
