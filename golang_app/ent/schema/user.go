@@ -24,7 +24,8 @@ func (User) Fields() []ent.Field {
 		field.String("name").NotEmpty(),
 		field.String("email").NotEmpty(),
 		field.String("password").NotEmpty(),
-		field.JSON("role", []string{}).Default([]string{"user"})}
+		field.Strings("roles").Default([]string{"user"}),
+	}
 }
 
 // Edges of the User.
