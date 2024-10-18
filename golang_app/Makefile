@@ -14,6 +14,10 @@ docker-dev: deps
 migration:
 	go run database/migrate/main.go
 
+# Seed database with data
+seed:
+	go run database/seed/main.go
+
 # Start dev server if using docker container only for DB and adminer
 # Go and Air must be installed locally and Air configured
 # as per the docs https://github.com/cosmtrek/air
