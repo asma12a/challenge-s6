@@ -34,5 +34,6 @@ func (User) Edges() []ent.Edge {
 		edge.To("user_stats", UserStats.Type).
 			StorageKey(edge.Column("user_id")),
 		edge.To("teamusers", TeamUser.Type).StorageKey(edge.Column("user_id")),
+		edge.To("user_message_id", Message.Type).StorageKey(edge.Column("user_id")),
 	}
 }

@@ -11,8 +11,8 @@ import (
 )
 
 func EventTeamsHandler(app fiber.Router, ctx context.Context, serviceEventTeams service.EventTeamsService, serviceEvent service.Event, serviceTeam service.Team) {
-	app.Get("/", listEventTeams(ctx, serviceEventTeams)) // ok
-	app.Get("/:eventTeamsId", getEventTeams(ctx, serviceEventTeams)) // ok
+	app.Get("/", listEventTeams(ctx, serviceEventTeams))
+	app.Get("/:eventTeamsId", getEventTeams(ctx, serviceEventTeams))
 	app.Post("/", createEventTeams(ctx, serviceEventTeams, serviceEvent, serviceTeam))
 	app.Put("/:eventTeamsId", updateEventTeams(ctx, serviceEventTeams, serviceEvent, serviceTeam))
 	app.Delete("/:eventTeamsId", deleteEventTeams(ctx, serviceEventTeams))
