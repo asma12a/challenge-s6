@@ -4,7 +4,9 @@ import (
 	"context"
 
 	"github.com/asma12a/challenge-s6/ent"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
+	"github.com/asma12a/challenge-s6/presenter"
 	"github.com/asma12a/challenge-s6/service"
 	"github.com/gofiber/fiber/v2"
 )
@@ -48,7 +50,13 @@ func createSport(ctx context.Context, serviceSport service.Sport) fiber.Handler 
 
 func getSport(ctx context.Context, serviceSport service.Sport) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id := c.Params("sportId")
+		id, err := ulid.Parse(c.Params("sportId"))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
 
 		sport, err := serviceSport.FindOne(ctx, id)
 		if err != nil {
@@ -65,13 +73,25 @@ func getSport(ctx context.Context, serviceSport service.Sport) fiber.Handler {
 			})
 		}
 
-		return c.JSON(sport)
+		toJ := presenter.Sport{
+			ID:       sport.ID,
+			Name:     sport.Name,
+			ImageURL: sport.ImageURL,
+		}
+
+		return c.JSON(toJ)
 	}
 }
 
 func updateSport(ctx context.Context, serviceSport service.Sport) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id := c.Params("sportId")
+		id, err := ulid.Parse(c.Params("sportId"))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
 
 		existingSport, err := serviceSport.FindOne(ctx, id)
 		if err != nil {
@@ -113,9 +133,15 @@ func updateSport(ctx context.Context, serviceSport service.Sport) fiber.Handler 
 
 func deleteSport(ctx context.Context, serviceSport service.Sport) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id := c.Params("sportId")
+		id, err := ulid.Parse(c.Params("sportId"))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
 
-		err := serviceSport.Delete(ctx, id)
+		err = serviceSport.Delete(ctx, id)
 		if err != nil {
 			if ent.IsNotFound(err) {
 				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
@@ -143,6 +169,16 @@ func listSports(ctx context.Context, serviceSport service.Sport) fiber.Handler {
 				"error": err.Error(),
 			})
 		}
-		return c.JSON(sports)
+
+		toJ := make([]presenter.Sport, len(sports))
+
+		for i, sport := range sports {
+			toJ[i] = presenter.Sport{
+				ID:       sport.ID,
+				Name:     sport.Name,
+				ImageURL: sport.ImageURL,
+			}
+		}
+		return c.JSON(toJ)
 	}
 }

@@ -55,8 +55,6 @@ func (repo *Event) Update(ctx context.Context, event *entity.Event) (*entity.Eve
 		SetAddress(event.Address).
 		SetEventCode(event.EventCode).
 		SetDate(event.Date).
-		SetEventTypeID(event.Edges.EventType.ID).
-		SetSportID(event.Edges.Sport.ID).
 		Save(ctx)
 
 	if err != nil {
@@ -74,5 +72,6 @@ func (e *Event) Delete(ctx context.Context, id ulid.ID) error {
 }
 
 func (e *Event) List(ctx context.Context) ([]*ent.Event, error) {
-	return e.db.Event.Query().All(ctx)
+	return e.db.Event.Query().WithEventType().
+		WithSport().All(ctx)
 }

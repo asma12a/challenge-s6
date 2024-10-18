@@ -35,7 +35,6 @@ func createUser(ctx context.Context, service service.User) fiber.Handler {
 			userInput.Email,
 			userInput.Name,
 			userInput.Password,
-			userInput.Role,
 		)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
@@ -51,12 +50,9 @@ func createUser(ctx context.Context, service service.User) fiber.Handler {
 				"error":  err.Error(),
 			})
 		}
+		log.Println(createdUser)
 
-		return c.JSON(&fiber.Map{
-			"status": "success",
-			"data":   createdUser,
-			"error":  nil,
-		})
+		return c.SendStatus(fiber.StatusCreated)
 	}
 }
 

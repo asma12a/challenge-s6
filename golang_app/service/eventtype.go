@@ -5,6 +5,7 @@ import (
 
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/eventtype"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
 )
 
@@ -30,7 +31,7 @@ func (repo *EventType) Create(ctx context.Context, et *entity.EventType) error {
 	return nil
 }
 
-func (e *EventType) FindOne(ctx context.Context, id string) (*entity.EventType, error) {
+func (e *EventType) FindOne(ctx context.Context, id ulid.ID) (*entity.EventType, error) {
 	et, err := e.db.EventType.Query().Where(eventtype.IDEQ(id)).
 		Only(ctx)
 
@@ -54,7 +55,7 @@ func (repo *EventType) Update(ctx context.Context, et *entity.EventType) (*entit
 	return &entity.EventType{EventType: *eventType}, nil
 }
 
-func (et *EventType) Delete(ctx context.Context, id string) error {
+func (et *EventType) Delete(ctx context.Context, id ulid.ID) error {
 	err := et.db.EventType.DeleteOneID(id).Exec(ctx)
 	if err != nil {
 		return entity.ErrCannotBeDeleted

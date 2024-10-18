@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/asma12a/challenge-s6/ent"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/sport"
 	"github.com/asma12a/challenge-s6/entity"
 )
@@ -31,7 +32,7 @@ func (repo *Sport) Create(ctx context.Context, sport *entity.Sport) error {
 	return nil
 }
 
-func (sp *Sport) FindOne(ctx context.Context, id string) (*entity.Sport, error) {
+func (sp *Sport) FindOne(ctx context.Context, id ulid.ID) (*entity.Sport, error) {
 	sport, err := sp.db.Sport.Query().Where(sport.IDEQ(id)).
 		Only(ctx)
 
@@ -56,7 +57,7 @@ func (repo *Sport) Update(ctx context.Context, sp *entity.Sport) (*entity.Sport,
 	return &entity.Sport{Sport: *sport}, nil
 }
 
-func (sp *Sport) Delete(ctx context.Context, id string) error {
+func (sp *Sport) Delete(ctx context.Context, id ulid.ID) error {
 	err := sp.db.Sport.DeleteOneID(id).Exec(ctx)
 	if err != nil {
 		return entity.ErrCannotBeDeleted
