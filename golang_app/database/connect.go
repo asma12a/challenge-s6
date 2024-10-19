@@ -7,6 +7,7 @@ import (
 	"entgo.io/ent/dialect"
 	"github.com/asma12a/challenge-s6/config"
 	"github.com/asma12a/challenge-s6/ent"
+	_ "github.com/asma12a/challenge-s6/ent/runtime"
 	_ "github.com/lib/pq" // Required for "postgres" driver
 )
 
