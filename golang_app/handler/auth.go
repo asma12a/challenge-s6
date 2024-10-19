@@ -26,7 +26,7 @@ func signUp(ctx context.Context, service service.User, rdb *redis.Client) fiber.
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
-				"error":  err,
+				"error":  err.Error(),
 			})
 		}
 
@@ -38,7 +38,7 @@ func signUp(ctx context.Context, service service.User, rdb *redis.Client) fiber.
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
-				"error":  err,
+				"error":  err.Error(),
 			})
 		}
 

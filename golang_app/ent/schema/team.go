@@ -30,7 +30,6 @@ func (Team) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("event_teams", EventTeams.Type).
 			StorageKey(edge.Column("team_id")),
-		edge.To("team_users", TeamUser.Type).
-			StorageKey(edge.Column("team_id")),
+		edge.To("team_users", TeamUser.Type),
 	}
 }

@@ -36,8 +36,8 @@ func createMessage(ctx context.Context, serviceMessage service.MessageService, s
 		event, err := serviceEvent.FindOne(ctx, messageInput.EventID)
 		if err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": "Event not found",
+				"status": "error",
+				"error":  "Event not found",
 			})
 		}
 
@@ -45,8 +45,8 @@ func createMessage(ctx context.Context, serviceMessage service.MessageService, s
 		user, err := serviceUser.FindOne(ctx, messageInput.UserID)
 		if err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": "User not found",
+				"status": "error",
+				"error":  "User not found",
 			})
 		}
 
@@ -83,8 +83,8 @@ func getMessage(ctx context.Context, serviceMessage service.MessageService) fibe
 		message, err := serviceMessage.FindOne(ctx, id)
 		if err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": "Message not found",
+				"status": "error",
+				"error":  "Message not found",
 			})
 		}
 
@@ -115,8 +115,8 @@ func updateMessage(ctx context.Context, serviceMessage service.MessageService, s
 		existingMessage, err := serviceMessage.FindOne(ctx, id)
 		if err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": "Message not found",
+				"status": "error",
+				"error":  "Message not found",
 			})
 		}
 
@@ -134,8 +134,8 @@ func updateMessage(ctx context.Context, serviceMessage service.MessageService, s
 			event, err := serviceEvent.FindOne(ctx, messageInput.EventID)
 			if err != nil {
 				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-					"status":       "error",
-					"error_detail": "Event not found",
+					"status": "error",
+					"error":  "Event not found",
 				})
 			}
 			existingMessage.EventID = event.ID
@@ -146,8 +146,8 @@ func updateMessage(ctx context.Context, serviceMessage service.MessageService, s
 			user, err := serviceUser.FindOne(ctx, messageInput.UserID)
 			if err != nil {
 				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-					"status":       "error",
-					"error_detail": "User not found",
+					"status": "error",
+					"error":  "User not found",
 				})
 			}
 			existingMessage.UserID = user.ID
@@ -162,8 +162,8 @@ func updateMessage(ctx context.Context, serviceMessage service.MessageService, s
 		_, err = serviceMessage.Update(ctx, existingMessage)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": err.Error(),
+				"status": "error",
+				"error":  err.Error(),
 			})
 		}
 
@@ -185,8 +185,8 @@ func deleteMessage(ctx context.Context, serviceMessage service.MessageService) f
 		err = serviceMessage.Delete(ctx, id)
 		if err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": "Message not found",
+				"status": "error",
+				"error":  "Message not found",
 			})
 		}
 

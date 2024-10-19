@@ -20,25 +20,28 @@ func NewEventService(client *ent.Client) *Event {
 }
 
 func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
-	_, err := repo.db.Event.Create().
+
+	create := repo.db.Event.Create().
 		SetName(event.Name).
 		SetAddress(event.Address).
 		SetEventCode(event.EventCode).
 		SetDate(event.Date).
-		SetEventTypeID(event.EventTypeID).
-		SetSportID(event.SportID).
-		Save(ctx)
+		SetSportID(event.SportID)
 
+	if event.EventType != nil {
+		create.SetEventType(*event.EventType)
+	}
+
+	_, err := create.Save(ctx)
 	if err != nil {
-		return entity.ErrCannotBeCreated
+		return err
 	}
 
 	return nil
 }
 
 func (e *Event) FindOne(ctx context.Context, id ulid.ID) (*entity.Event, error) {
-	event, err := e.db.Event.Query().Where(event.IDEQ(id)).WithEventType().
-		Only(ctx)
+	event, err := e.db.Event.Query().Where(event.IDEQ(id)).Only(ctx)
 
 	if err != nil {
 		return nil, entity.ErrNotFound
@@ -72,6 +75,5 @@ func (e *Event) Delete(ctx context.Context, id ulid.ID) error {
 }
 
 func (e *Event) List(ctx context.Context) ([]*ent.Event, error) {
-	return e.db.Event.Query().WithEventType().
-		WithSport().All(ctx)
+	return e.db.Event.Query().WithSport().All(ctx)
 }

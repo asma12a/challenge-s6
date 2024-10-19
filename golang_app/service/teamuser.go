@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/asma12a/challenge-s6/ent"
-	"github.com/asma12a/challenge-s6/ent/teamuser"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
+	"github.com/asma12a/challenge-s6/ent/teamuser"
 	"github.com/asma12a/challenge-s6/entity"
 )
 
@@ -43,7 +43,7 @@ func (repo *TeamUser) FindOne(ctx context.Context, userID ulid.ID, teamID ulid.I
 }
 
 func (repo *TeamUser) Update(ctx context.Context, teamUser *entity.TeamUser) (*entity.TeamUser, error) {
-	
+
 	// Prepare the update query
 	e, err := repo.db.TeamUser.
 		UpdateOneID(teamUser.ID).

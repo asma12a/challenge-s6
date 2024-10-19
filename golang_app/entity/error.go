@@ -2,23 +2,39 @@ package entity
 
 import "errors"
 
-// ErrNotFound not found
-var ErrNotFound = errors.New("not found")
+// ErrNotFound
+var ErrNotFound = errors.New("Not found")
 
-// ErrEmailAlreadyRegistred email already in DB
-var ErrEmailAlreadyRegistred = errors.New("email already registred")
+// Dynamic Not Found
+func ErrEntityNotFound(entity string) error {
+	return errors.New(entity + " not found")
+}
 
-// ErrInvalidEntity invalid entity
-var ErrInvalidEntity = errors.New("invalid entity")
+// ErrEmailAlreadyRegistred
+var ErrEmailAlreadyRegistred = errors.New("Email already registred")
 
-// ErrCannotBeCreated cannot be created
-var ErrCannotBeCreated = errors.New("cannot be created")
+// ErrInvalidEntity
+var ErrInvalidEntity = errors.New("Invalid entity")
 
-// ErrCannotBeDeleted cannot be deleted
-var ErrCannotBeDeleted = errors.New("cannot be Deleted")
+// Dynamic Invalid relation
+func ErrInvalidRelation(relation string) error {
+	return errors.New("Invalid " + relation + ": relation not found")
+}
 
-// ErrCannotBeUpdated cannot be deleted
-var ErrCannotBeUpdated = errors.New("cannot be updated")
+// ErrInvalidInput
+var ErrInvalidInput = errors.New("Invalid input")
 
-// ErrCannotBeDeleted cannot be deleted
-var ErrPasswordGenaration = errors.New("pssword cannot be generated")
+// ErrCannotBeCreated
+var ErrCannotBeCreated = errors.New("Cannot be created")
+
+// ErrCannotBeDeleted
+var ErrCannotBeDeleted = errors.New("Cannot be Deleted")
+
+// ErrCannotBeUpdated
+var ErrCannotBeUpdated = errors.New("Cannot be updated")
+
+// ErrCannotBeDeleted
+var ErrPasswordGenaration = errors.New("Password cannot be generated")
+
+// ErrCannotParseJSON
+var ErrCannotParseJSON = errors.New("Cannot parse JSON")

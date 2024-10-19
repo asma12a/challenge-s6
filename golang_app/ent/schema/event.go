@@ -20,13 +20,13 @@ func (Event) Mixin() []ent.Mixin {
 // Fields of the Event.
 func (Event) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("name").NotEmpty(),
-		field.String("address").NotEmpty(),
-		field.Int16("event_code").Positive(),
-		field.String("date").NotEmpty(),
+		field.String("name").NotEmpty().StructTag(`validate:"required"`),
+		field.String("address").NotEmpty().StructTag(`validate:"required"`),
+		field.String("event_code").StructTag(`validate:"required"`),
+		field.String("date").NotEmpty().StructTag(`validate:"required"`),
 		field.Bool("is_public").Default(false),
 		field.Bool("is_finished").Default(false),
-		field.Enum("event_type").Values("match", "training").Default("match"),
+		field.Enum("event_type").Values("match", "training").Default("match").Nillable(), // Permet de ne pas demander le champ lors de la création, à condition de gérer partout le pointeur
 	}
 }
 

@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
@@ -28,5 +29,8 @@ func (TeamUser) Fields() []ent.Field {
 
 // Edges of the TeamUser.
 func (TeamUser) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("team", Team.Type).Ref("team_users").Unique().Required().Field("team_id"),
+		edge.From("user", User.Type).Ref("team_users").Unique().Required().Field("user_id"),
+	}
 }

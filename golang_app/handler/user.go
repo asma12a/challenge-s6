@@ -28,7 +28,7 @@ func createUser(ctx context.Context, service service.User) fiber.Handler {
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
-				"error":  err,
+				"error":  err.Error(),
 			})
 		}
 
@@ -40,7 +40,7 @@ func createUser(ctx context.Context, service service.User) fiber.Handler {
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
-				"error":  err,
+				"error":  err.Error(),
 			})
 		}
 
@@ -63,7 +63,7 @@ func getUser(ctx context.Context, service service.User) fiber.Handler {
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
-				"error":  err,
+				"error":  err.Error(),
 			})
 		}
 
@@ -71,7 +71,7 @@ func getUser(ctx context.Context, service service.User) fiber.Handler {
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
-				"error":  err,
+				"error":  err.Error(),
 			})
 		}
 
@@ -89,7 +89,7 @@ func updateUser(ctx context.Context, service service.User) fiber.Handler {
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
-				"error":  err,
+				"error":  err.Error(),
 			})
 		}
 
@@ -98,7 +98,7 @@ func updateUser(ctx context.Context, service service.User) fiber.Handler {
 		if err := c.BodyParser(&userInput); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
-				"error":  err,
+				"error":  err.Error(),
 			})
 		}
 
@@ -106,7 +106,7 @@ func updateUser(ctx context.Context, service service.User) fiber.Handler {
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
-				"error":  err,
+				"error":  err.Error(),
 			})
 		}
 
@@ -119,7 +119,7 @@ func updateUser(ctx context.Context, service service.User) fiber.Handler {
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
-				"error":  err,
+				"error":  err.Error(),
 			})
 		}
 
@@ -137,14 +137,14 @@ func deleteUser(ctx context.Context, service service.User) fiber.Handler {
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
-				"error":  err,
+				"error":  err.Error(),
 			})
 		}
 
 		if err := service.Delete(ctx, id); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
-				"error":  err,
+				"error":  err.Error(),
 			})
 		}
 
