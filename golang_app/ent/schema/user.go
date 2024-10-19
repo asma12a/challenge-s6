@@ -4,7 +4,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
 // User holds the schema definition for the User entity.
@@ -12,15 +11,15 @@ type User struct {
 	ent.Schema
 }
 
+func (User) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		BaseMixin{},
+	}
+}
+
 // Fields of the User.
 func (User) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").GoType(ulid.ID("")).
-			DefaultFunc(
-				func() ulid.ID {
-					return ulid.MustNew("")
-				},
-			),
 		field.String("name").NotEmpty(),
 		field.String("email").NotEmpty(),
 		field.String("password").NotEmpty(),
