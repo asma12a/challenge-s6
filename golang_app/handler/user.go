@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"log"
 
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
@@ -44,14 +43,13 @@ func createUser(ctx context.Context, service service.User) fiber.Handler {
 			})
 		}
 
-		createdUser, err := service.Create(ctx, newUser)
+		err = service.Create(ctx, newUser)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
 				"error":  err.Error(),
 			})
 		}
-		log.Println(createdUser)
 
 		return c.SendStatus(fiber.StatusCreated)
 	}
