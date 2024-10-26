@@ -20,8 +20,8 @@ func NewUserService(client *ent.Client) *User {
 	}
 }
 
-func (repo *User) Create(ctx context.Context, user *entity.User) error {
-	_, err := repo.db.User.Create().
+func (repo *User) Create(ctx context.Context, user *entity.User) (*entity.User, error) {
+	createdUser, err := repo.db.User.Create().
 		SetName(user.Name).
 		SetEmail(user.Email).
 		SetPassword(user.Password).
@@ -29,12 +29,12 @@ func (repo *User) Create(ctx context.Context, user *entity.User) error {
 
 	if err != nil {
 		if ent.IsConstraintError(err) {
-			return entity.ErrEmailAlreadyRegistred
+			return nil, entity.ErrEmailAlreadyRegistred
 		}
-		return entity.ErrCannotBeCreated
+		return nil, entity.ErrCannotBeCreated
 	}
 
-	return nil
+	return &entity.User{User: *createdUser}, nil
 }
 
 func (u *User) FindOne(ctx context.Context, id ulid.ID) (*entity.User, error) {

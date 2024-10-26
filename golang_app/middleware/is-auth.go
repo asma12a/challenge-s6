@@ -1,9 +1,12 @@
 package middleware
 
 import (
+	"context"
 	"os"
 	"strings"
 
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
+	"github.com/asma12a/challenge-s6/viewer"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -44,17 +47,19 @@ func IsAuthMiddleware(c *fiber.Ctx) error {
 	}
 
 	// Extraire les informations de l'utilisateur
-	name, ok := claims["name"].(string)
+	user_id, ok := claims["id"].(string)
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"error": "Invalid token claims",
 		})
 	}
 
-	// Ajouter les informations de l'utilisateur à la requête
-	c.Locals("user", fiber.Map{
-		"name": name,
-	})
+	// Mets à jour le contexte en utilisant le viewer
+
+	// TODO : CORRIGER POUR ACCEDER AU CONTEXTE DE L'UTILISATEUR
+	ctx := viewer.NewUserContext(context.Background(), &viewer.User{ID: ulid.ID(user_id)})
+	c.Locals("user", fiber.Map{"id": user_id})
+	c.SetUserContext(ctx)
 
 	return c.Next()
 }
