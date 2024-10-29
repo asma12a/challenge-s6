@@ -8,10 +8,8 @@ import (
 	"time"
 
 	"github.com/asma12a/challenge-s6/config/mailer"
-	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
-	"github.com/asma12a/challenge-s6/presenter"
 	"github.com/asma12a/challenge-s6/service"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -27,16 +25,28 @@ type MyCustomClaims struct {
 func AuthHandler(app fiber.Router, ctx context.Context, serviceUser service.User, rdb *redis.Client) {
 	app.Post("/signup", signUp(ctx, serviceUser, rdb))
 	app.Post("/login", login(ctx, serviceUser))
+}
 
+type SignUpRequestInput struct {
+	Email    string `json:"email" validate:"required,email"`
+	Name     string `json:"name" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }
 
 func signUp(ctx context.Context, serviceUser service.User, rdb *redis.Client) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var userInput *entity.User
+		var userInput SignUpRequestInput
 		err := c.BodyParser(&userInput)
 
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  entity.ErrCannotParseJSON.Error(),
+			})
+		}
+
+		if err := validate.Struct(userInput); err != nil {
+			return c.Status(fiber.StatusUnprocessableEntity).JSON(&fiber.Map{
 				"status": "error",
 				"error":  err.Error(),
 			})
@@ -48,7 +58,7 @@ func signUp(ctx context.Context, serviceUser service.User, rdb *redis.Client) fi
 			userInput.Password,
 		)
 		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
 				"status": "error",
 				"error":  err.Error(),
 			})
@@ -110,16 +120,29 @@ func signUp(ctx context.Context, serviceUser service.User, rdb *redis.Client) fi
 	}
 }
 
+type LoginRequestInput struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required"`
+}
+
 func login(ctx context.Context, serviceUser service.User) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// Parse le corps de la requête
-		var loginInput presenter.Login
+		var loginInput LoginRequestInput
+
 		err := c.BodyParser(&loginInput)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status":  "error",
-				"message": "Invalid input",
-				"error":   err.Error(),
+				"status": "error",
+				"error":  entity.ErrCannotParseJSON.Error(),
+			})
+		}
+
+		// Valide les champs du JSON
+		if err := validate.Struct(loginInput); err != nil {
+			return c.Status(fiber.StatusUnprocessableEntity).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
 			})
 		}
 
@@ -130,16 +153,9 @@ func login(ctx context.Context, serviceUser service.User) fiber.Handler {
 		// Rechercher l'utilisateur par email
 		user, err := serviceUser.FindByEmail(ctx, email)
 		if err != nil {
-			if ent.IsNotFound(err) {
-				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-					"status":       "error",
-					"error_detail": "User not found",
-				})
-			}
-			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": err,
-				"error":        err.Error(),
+			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+				"status": "error",
+				"error":  entity.ErrEntityNotFound("User").Error(),
 			})
 		}
 
@@ -147,17 +163,17 @@ func login(ctx context.Context, serviceUser service.User) fiber.Handler {
 		err = entity.ValidatePassword(user, password)
 		if err != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
-				"status":  "error",
-				"message": "Invalid password",
+				"status": "error",
+				"error":  entity.ErrInvalidPassword.Error(),
 			})
 		}
 
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-			"name": user.Name,
-			"iss":  "squadgo",
-			"iat":  time.Now().Unix(),
-			"exp":  time.Now().Add(30 * 24 * time.Hour).Unix(),
-			"nbf":  time.Now().Unix(),
+			"id":  user.ID,
+			"iss": "squadgo",
+			"iat": time.Now().Unix(),
+			"exp": time.Now().Add(30 * 24 * time.Hour).Unix(),
+			"nbf": time.Now().Unix(),
 		})
 
 		s, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))

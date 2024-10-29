@@ -15,6 +15,7 @@ type Event struct {
 	EventCode  string           `json:"event_code,omitempty"`
 	Date       string           `json:"date,omitempty"`
 	CreatedAt  time.Time        `json:"created_at,omitempty"`
+	CreatedBy  ulid.ID          `json:"created_by,omitempty"`
 	IsPublic   bool             `json:"is_public,omitempty"`
 	IsFinished bool             `json:"is_finished,omitempty"`
 	EventType  *event.EventType `json:"event_type,omitempty"` // Utiliser le type EventType personnalisé

@@ -21,8 +21,8 @@ func NewUserService(client *ent.Client) *User {
 	}
 }
 
-func (repo *User) Create(ctx context.Context, user *entity.User) (*ent.User, error) {
-	entUser, err := repo.db.User.Create().
+func (repo *User) Create(ctx context.Context, user *entity.User) (*entity.User, error) {
+	createdUser, err := repo.db.User.Create().
 		SetName(user.Name).
 		SetEmail(user.Email).
 		SetPassword(user.Password).
@@ -36,7 +36,7 @@ func (repo *User) Create(ctx context.Context, user *entity.User) (*ent.User, err
 		return nil, entity.ErrCannotBeCreated
 	}
 
-	return entUser, nil
+	return &entity.User{User: *createdUser}, nil
 }
 
 func (u *User) FindOne(ctx context.Context, id ulid.ID) (*entity.User, error) {

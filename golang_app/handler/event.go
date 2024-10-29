@@ -16,7 +16,7 @@ import (
 func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Event, serviceSport service.Sport) {
 	app.Get("/", middleware.IsAuthMiddleware, listEvents(ctx, serviceEvent))
 	app.Get("/:eventId", getEvent(ctx, serviceEvent))
-	app.Post("/", createEvent(ctx, serviceEvent, serviceSport))
+	app.Post("/", middleware.IsAuthMiddleware, createEvent(ctx, serviceEvent, serviceSport))
 	app.Put("/:eventId", updateEvent(ctx, serviceEvent, serviceSport))
 	app.Delete("/:eventId", deleteEvent(ctx, serviceEvent))
 }
@@ -27,8 +27,8 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 	return func(c *fiber.Ctx) error {
 		var eventInput entity.Event
 
+		// Parse le body de la requête
 		err := c.BodyParser(&eventInput)
-
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
@@ -36,6 +36,7 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 			})
 		}
 
+		// Valide les champs du JSON
 		if err := validate.Struct(eventInput); err != nil {
 			return c.Status(fiber.StatusUnprocessableEntity).JSON(&fiber.Map{
 				"status": "error",
@@ -43,6 +44,7 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 			})
 		}
 
+		// Vérifie si le sport existe à partir de l'ID fourni
 		sport, err := serviceSport.FindOne(ctx, eventInput.SportID)
 		if err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{

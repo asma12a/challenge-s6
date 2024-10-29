@@ -12,9 +12,8 @@ type User struct {
 func NewUser(email string, name string, password string) (*User, error) {
 	user := &User{
 		ent.User{
-			Email:    email,
-			Name:     name,
-			Password: password,
+			Email: email,
+			Name:  name,
 		},
 	}
 
