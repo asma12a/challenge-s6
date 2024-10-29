@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"log"
 	"strings"
 
 	"github.com/asma12a/challenge-s6/ent"
@@ -20,21 +21,22 @@ func NewUserService(client *ent.Client) *User {
 	}
 }
 
-func (repo *User) Create(ctx context.Context, user *entity.User) error {
-	_, err := repo.db.User.Create().
+func (repo *User) Create(ctx context.Context, user *entity.User) (*ent.User, error) {
+	entUser, err := repo.db.User.Create().
 		SetName(user.Name).
 		SetEmail(user.Email).
 		SetPassword(user.Password).
 		Save(ctx)
 
 	if err != nil {
+		log.Println(err)
 		if ent.IsConstraintError(err) {
-			return entity.ErrEmailAlreadyRegistred
+			return nil, entity.ErrEmailAlreadyRegistred
 		}
-		return entity.ErrCannotBeCreated
+		return nil, entity.ErrCannotBeCreated
 	}
 
-	return nil
+	return entUser, nil
 }
 
 func (u *User) FindOne(ctx context.Context, id ulid.ID) (*entity.User, error) {

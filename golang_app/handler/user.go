@@ -43,7 +43,7 @@ func createUser(ctx context.Context, service service.User) fiber.Handler {
 			})
 		}
 
-		err = service.Create(ctx, newUser)
+		_, err = service.Create(ctx, newUser)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
