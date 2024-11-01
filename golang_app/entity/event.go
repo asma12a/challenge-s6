@@ -2,24 +2,28 @@ package entity
 
 import (
 	"github.com/asma12a/challenge-s6/ent"
+	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
+
+
 type Event struct {
-	ent.Event
-	EventTypeID ulid.ID `json:"event_type_id"` // Ajoutez cette ligne
-	SportID     ulid.ID `json:"sport_id"`      // Assurez-vous que cela existe aussi
+	ent.Event 
+	SportID     ulid.ID `json:"sport_id"` 
+	Teams       []*ent.Team `json:"teams,omitempty"`  
 }
 
-func NewEvent(name string, address string, eventCode int16, date string, eventTypeId ulid.ID, sportId ulid.ID) *Event {
+func NewEvent(name string, address string, eventCode int16, date string, sportId ulid.ID, eventType event.EventType, teams []*ent.Team ) *Event {
 	return &Event{
 		Event: ent.Event{
 			Name:      name,
 			Address:   address,
 			EventCode: eventCode,
 			Date:      date,
+			EventType: eventType,
 		},
-		EventTypeID: eventTypeId,
 		SportID:     sportId,
+		Teams:       teams,
 	}
 }

@@ -11,17 +11,23 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Event, serviceEventType service.EventType, serviceSport service.Sport) {
+func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Event, serviceSport service.Sport) {
 	app.Get("/", listEvents(ctx, serviceEvent))
 	app.Get("/:eventId", getEvent(ctx, serviceEvent))
-	app.Post("/", createEvent(ctx, serviceEvent, serviceEventType, serviceSport))
-	app.Put("/:eventId", updateEvent(ctx, serviceEvent, serviceEventType, serviceSport))
+	app.Post("/", createEvent(ctx, serviceEvent, serviceSport))
+	app.Put("/:eventId", updateEvent(ctx, serviceEvent, serviceSport))
 	app.Delete("/:eventId", deleteEvent(ctx, serviceEvent))
 }
 
-func createEvent(ctx context.Context, serviceEvent service.Event, serviceEventType service.EventType, serviceSport service.Sport) fiber.Handler {
+func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport service.Sport) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var eventInput entity.Event
+		//var eventInput entity.Event
+
+		var eventInput struct {
+			entity.Event
+			Teams []*ent.Team `json:"teams"`
+		}
+
 
 		err := c.BodyParser(&eventInput)
 
@@ -30,21 +36,6 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceEventTy
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
 				"error":  err.Error(),
-			})
-		}
-		eventTypeId := eventInput.EventTypeID
-		eventType, err := serviceEventType.FindOne(ctx, eventTypeId)
-		if err != nil {
-			if ent.IsNotFound(err) {
-				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-					"status":       "error",
-					"error_detail": "EventType not found",
-				})
-			}
-
-			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": err.Error(),
 			})
 		}
 
@@ -68,8 +59,9 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceEventTy
 			eventInput.Address,
 			eventInput.EventCode,
 			eventInput.Date,
-			eventType.ID,
 			sport.ID,
+			eventInput.EventType,
+			eventInput.Teams,
 		)
 
 		err = serviceEvent.Create(ctx, newEvent)
@@ -121,10 +113,6 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 			CreatedAt:  event.CreatedAt,
 			IsPublic:   event.IsPublic,
 			IsFinished: event.IsFinished,
-			EventType: presenter.EventType{
-				ID:   event.Edges.EventType.ID,
-				Name: event.Edges.EventType.Name,
-			},
 			Sport: presenter.Sport{
 				ID:       event.Edges.Sport.ID,
 				Name:     event.Edges.Sport.Name,
@@ -136,7 +124,7 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 	}
 }
 
-func updateEvent(ctx context.Context, serviceEvent service.Event, serviceEventType service.EventType, serviceSport service.Sport) fiber.Handler {
+func updateEvent(ctx context.Context, serviceEvent service.Event, serviceSport service.Sport) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// Récupère l'ID de l'événement à mettre à jour depuis les paramètres de la route
 		id, err := ulid.Parse(c.Params("eventId"))
@@ -170,24 +158,6 @@ func updateEvent(ctx context.Context, serviceEvent service.Event, serviceEventTy
 			})
 		}
 
-		if eventInput.EventTypeID != "" {
-			eventTypeId := eventInput.EventTypeID
-			eventType, err := serviceEventType.FindOne(ctx, eventTypeId)
-			if err != nil {
-				if ent.IsNotFound(err) {
-					return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-						"status":       "error",
-						"error_detail": "EventType not found",
-					})
-				}
-				return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-					"status":       "error",
-					"error_detail": err.Error(),
-				})
-			}
-			existingEvent.EventTypeID = eventType.ID
-		}
-
 		if eventInput.SportID != "" {
 			sportId := eventInput.SportID
 			sport, err := serviceSport.FindOne(ctx, sportId)
@@ -210,6 +180,7 @@ func updateEvent(ctx context.Context, serviceEvent service.Event, serviceEventTy
 		existingEvent.Address = eventInput.Address
 		existingEvent.EventCode = eventInput.EventCode
 		existingEvent.Date = eventInput.Date
+		existingEvent.EventType = eventInput.EventType
 
 		_, err = serviceEvent.Update(ctx, existingEvent)
 		if err != nil {
@@ -275,10 +246,6 @@ func listEvents(ctx context.Context, service service.Event) fiber.Handler {
 				CreatedAt:  event.CreatedAt,
 				IsPublic:   event.IsPublic,
 				IsFinished: event.IsFinished,
-				EventType: presenter.EventType{
-					ID:   event.Edges.EventType.ID,
-					Name: event.Edges.EventType.Name,
-				},
 				Sport: presenter.Sport{
 					ID:       event.Edges.Sport.ID,
 					Name:     event.Edges.Sport.Name,
@@ -286,7 +253,6 @@ func listEvents(ctx context.Context, service service.Event) fiber.Handler {
 				},
 			}
 		}
-
 		return c.JSON(toJ)
 	}
 }

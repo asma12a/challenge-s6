@@ -16,6 +16,5 @@ type Event struct {
 	CreatedAt  time.Time `json:"created_at,omitempty"`
 	IsPublic   bool      `json:"is_public,omitempty"`
 	IsFinished bool      `json:"is_finished,omitempty"`
-	EventType  EventType `json:"event_type_id,omitempty"` // Utiliser le type EventType personnalisé
 	Sport      Sport     `json:"sport_id,omitempty"`      // Utiliser le type Sport personnalisé
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"log"
 
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/event"
@@ -20,16 +21,60 @@ func NewEventService(client *ent.Client) *Event {
 }
 
 func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
-	_, err := repo.db.Event.Create().
+
+	tx, err := repo.db.Tx(ctx)
+	if err != nil {
+		log.Println(err, "error creating transaction")
+		return entity.ErrCannotBeCreated
+	}
+
+	createdEvent, err := tx.Event.Create().
 		SetName(event.Name).
 		SetAddress(event.Address).
 		SetEventCode(event.EventCode).
 		SetDate(event.Date).
-		SetEventTypeID(event.EventTypeID).
 		SetSportID(event.SportID).
+		SetEventType(event.EventType).
 		Save(ctx)
 
 	if err != nil {
+		log.Println(err, "error creating event")
+		_ = tx.Rollback()
+		return entity.ErrCannotBeCreated
+	}
+
+	teamNames := make(map[string]bool)
+
+
+	for _, team := range event.Teams {
+		if _, ok := teamNames[team.Name]; ok {
+			log.Println("error creating team")
+			_ = tx.Rollback()
+			return entity.ErrCannotBeCreated
+		}
+		teamNames[team.Name] = true
+
+		createdTeam, err := tx.Team.Create().
+			SetName(team.Name).
+			SetMaxPlayers(team.MaxPlayers).
+			Save(ctx)
+		if err != nil {
+			log.Println(err, "error creating team")
+			_ = tx.Rollback() 
+			return entity.ErrCannotBeCreated
+		}
+		_, err = tx.EventTeams.Create().
+			SetEventID(createdEvent.ID).
+			SetTeamID(createdTeam.ID).
+			Save(ctx)
+		if err != nil {
+			log.Println(err, "error creating event team")
+			_ = tx.Rollback()
+			return entity.ErrCannotBeCreated
+		}
+	}
+	if err := tx.Commit(); err != nil {
+		log.Println("Erreur lors de la validation de la transaction :", err)
 		return entity.ErrCannotBeCreated
 	}
 
@@ -37,7 +82,7 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
 }
 
 func (e *Event) FindOne(ctx context.Context, id ulid.ID) (*entity.Event, error) {
-	event, err := e.db.Event.Query().Where(event.IDEQ(id)).WithEventType().
+	event, err := e.db.Event.Query().Where(event.IDEQ(id)).
 		Only(ctx)
 
 	if err != nil {
@@ -72,6 +117,6 @@ func (e *Event) Delete(ctx context.Context, id ulid.ID) error {
 }
 
 func (e *Event) List(ctx context.Context) ([]*ent.Event, error) {
-	return e.db.Event.Query().WithEventType().
+	return e.db.Event.Query().
 		WithSport().All(ctx)
 }

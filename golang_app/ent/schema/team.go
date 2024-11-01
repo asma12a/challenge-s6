@@ -21,7 +21,7 @@ func (Team) Fields() []ent.Field {
 					return ulid.MustNew("")
 				},
 			),
-		field.String("name").NotEmpty().Unique(),
+		field.String("name").NotEmpty(),
 		field.Int("max_players").Default(0),
 	}
 }
