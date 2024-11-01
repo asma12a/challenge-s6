@@ -3,18 +3,15 @@ package middleware
 import (
 	"context"
 	"os"
-	"slices"
 	"strings"
 
-	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
-	"github.com/asma12a/challenge-s6/service"
 	"github.com/asma12a/challenge-s6/viewer"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func IsAdminMiddleware(c *fiber.Ctx) error {
+func IsSelfAuthMiddleware(c *fiber.Ctx) error {
 	// Récupérer le token depuis l'en-tête Authorization
 	token := c.Get("Authorization")
 	if token == "" {
@@ -56,19 +53,16 @@ func IsAdminMiddleware(c *fiber.Ctx) error {
 		})
 	}
 
-	db_client := c.Locals("db").(*ent.Client)
-	userService := *service.NewUserService(db_client)
-
-	// Récupérer l'utilisateur depuis la base de données
-	u, err := userService.FindOne(context.Background(), ulid.ID(user_id))
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to retrieve user",
+	// Récupérer l'userId depuis les paramètres
+	paramUserID := c.Params("userId")
+	if paramUserID == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "No userId parameter provided",
 		})
 	}
 
-	// Vérifier le rôle de l'utilisateur
-	if !slices.Contains(u.Roles, "admin") {
+	// Vérifier si l'userId des paramètres est le même que celui du token
+	if paramUserID != user_id {
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
 			"error": "Access denied",
 		})

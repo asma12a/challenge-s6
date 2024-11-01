@@ -13,11 +13,13 @@ import (
 
 func UserHandler(app fiber.Router, ctx context.Context, service service.User) {
 	app.Get("/", middleware.IsAdminMiddleware, listUsers(ctx, service))
-	app.Get("/:userId", getUser(ctx, service))
-	app.Post("/", createUser(ctx, service))
-	app.Put("/:userId", updateUser(ctx, service))
-	app.Delete("/:userId", deleteUser(ctx, service))
-
+	app.Get("/:userId", middleware.OrMiddleware(
+		middleware.IsAdminMiddleware,
+		middleware.IsSelfAuthMiddleware,
+	), getUser(ctx, service))
+	app.Post("/", middleware.IsAdminMiddleware, createUser(ctx, service))
+	app.Put("/:userId", middleware.IsSelfAuthMiddleware, updateUser(ctx, service))
+	app.Delete("/:userId", middleware.IsAdminMiddleware, deleteUser(ctx, service))
 }
 
 func createUser(ctx context.Context, service service.User) fiber.Handler {
@@ -74,7 +76,7 @@ func getUser(ctx context.Context, service service.User) fiber.Handler {
 			})
 		}
 
-		return c.JSON(fiber.Map{
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"status":  "success",
 			"message": "User found",
 			"data":    user,
