@@ -11,15 +11,15 @@ type UserStats struct {
 	ent.Schema
 }
 
+func (UserStats) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		BaseMixin{},
+	}
+}
+
 // Fields of the UserStats.
 func (UserStats) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").GoType(ulid.ID("")).
-			DefaultFunc(
-				func() ulid.ID {
-					return ulid.MustNew("")
-				},
-			),
 		field.String("user_id").GoType(ulid.ID("")).NotEmpty(),
 		field.String("event_id").GoType(ulid.ID("")).NotEmpty(),
 		field.String("stat_id").GoType(ulid.ID("")).NotEmpty(),

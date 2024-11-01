@@ -7,6 +7,7 @@ import (
 	"github.com/asma12a/challenge-s6/config"
 	"github.com/asma12a/challenge-s6/database"
 	"github.com/asma12a/challenge-s6/ent"
+	"github.com/asma12a/challenge-s6/entity"
 	"github.com/brianvoe/gofakeit/v7"
 )
 
@@ -44,23 +45,29 @@ func seedSports(ctx context.Context, db_client *ent.Client) {
 func seedUsers(ctx context.Context, db_client *ent.Client) {
 
 	// create admin user
+	admin_user, admin_err := entity.NewUser("", "", "admin")
+	if admin_err != nil {
+		log.Fatalf("Failed creating admin user: %v", admin_err)
+	}
 	_, err := db_client.User.Create().
 		SetName("admin").
 		SetEmail("admin@admin.test").
-		SetPassword("admin").
+		SetPassword(admin_user.Password).
 		SetRoles([]string{"admin"}).
 		Save(ctx)
 	if err != nil {
 		log.Fatalf("Failed creating admin user: %v", err)
 	}
 
-	default_pwd := "password"
-
 	// default user
+	default_user, err := entity.NewUser("", "", "password")
+	if err != nil {
+		log.Fatalf("Failed creating default user: %v", err)
+	}
 	_, err = db_client.User.Create().
 		SetName("user").
 		SetEmail("user@user.test").
-		SetPassword(default_pwd).
+		SetPassword(default_user.Password).
 		Save(ctx)
 	if err != nil {
 		log.Fatalf("Failed creating default user: %v", err)
@@ -70,7 +77,7 @@ func seedUsers(ctx context.Context, db_client *ent.Client) {
 		_, err := db_client.User.Create().
 			SetName(gofakeit.Name()).
 			SetEmail(gofakeit.Email()).
-			SetPassword(default_pwd).
+			SetPassword(default_user.Password).
 			Save(ctx)
 		if err != nil {
 			log.Printf("Failed creating user: %v", err)
@@ -84,5 +91,6 @@ func seedUsers(ctx context.Context, db_client *ent.Client) {
 func dropAllData(ctx context.Context, db_client *ent.Client) {
 	// execute sql query to drop all data
 	db_client.User.Delete().ExecX(ctx)
+	db_client.Sport.Delete().ExecX(ctx)
 	log.Println("All data dropped!")
 }

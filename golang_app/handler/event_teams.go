@@ -36,13 +36,13 @@ func createEventTeams(ctx context.Context, serviceEventTeams service.EventTeamsS
 		if err != nil {
 			if err == entity.ErrNotFound {
 				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-					"status":       "error",
-					"error_detail": "Event not found",
+					"status": "error",
+					"error":  "Event not found",
 				})
 			}
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": err.Error(),
+				"status": "error",
+				"error":  err.Error(),
 			})
 		}
 
@@ -51,13 +51,13 @@ func createEventTeams(ctx context.Context, serviceEventTeams service.EventTeamsS
 		if err != nil {
 			if err == entity.ErrNotFound {
 				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-					"status":       "error",
-					"error_detail": "Team not found",
+					"status": "error",
+					"error":  "Team not found",
 				})
 			}
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": err.Error(),
+				"status": "error",
+				"error":  err.Error(),
 			})
 		}
 
@@ -88,8 +88,8 @@ func getEventTeams(ctx context.Context, serviceEventTeams service.EventTeamsServ
 		eventTeams, err := serviceEventTeams.FindOne(ctx, id)
 		if err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": "EventTeams not found",
+				"status": "error",
+				"error":  "EventTeams not found",
 			})
 		}
 
@@ -116,8 +116,8 @@ func updateEventTeams(ctx context.Context, serviceEventTeams service.EventTeamsS
 		existingEventTeams, err := serviceEventTeams.FindOne(ctx, id)
 		if err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": "EventTeams not found",
+				"status": "error",
+				"error":  "EventTeams not found",
 			})
 		}
 
@@ -134,8 +134,8 @@ func updateEventTeams(ctx context.Context, serviceEventTeams service.EventTeamsS
 		event, err := serviceEvent.FindOne(ctx, eventTeamsInput.EventID)
 		if err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": "Event not found",
+				"status": "error",
+				"error":  "Event not found",
 			})
 		}
 
@@ -143,8 +143,8 @@ func updateEventTeams(ctx context.Context, serviceEventTeams service.EventTeamsS
 		team, err := serviceTeam.FindOne(ctx, eventTeamsInput.TeamID)
 		if err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": "Team not found",
+				"status": "error",
+				"error":  "Team not found",
 			})
 		}
 
@@ -154,8 +154,8 @@ func updateEventTeams(ctx context.Context, serviceEventTeams service.EventTeamsS
 		_, err = serviceEventTeams.Update(ctx, existingEventTeams)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": err.Error(),
+				"status": "error",
+				"error":  err.Error(),
 			})
 		}
 
@@ -176,8 +176,8 @@ func deleteEventTeams(ctx context.Context, serviceEventTeams service.EventTeamsS
 		err = serviceEventTeams.Delete(ctx, id)
 		if err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": "EventTeams not found",
+				"status": "error",
+				"error":  "EventTeams not found",
 			})
 		}
 

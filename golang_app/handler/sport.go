@@ -39,8 +39,8 @@ func createSport(ctx context.Context, serviceSport service.Sport) fiber.Handler 
 		err = serviceSport.Create(ctx, newSport)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": err.Error(),
+				"status": "error",
+				"error":  err.Error(),
 			})
 		}
 
@@ -62,14 +62,13 @@ func getSport(ctx context.Context, serviceSport service.Sport) fiber.Handler {
 		if err != nil {
 			if ent.IsNotFound(err) {
 				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-					"status":       "error",
-					"error_detail": "Event not found",
+					"status": "error",
+					"error":  "Event not found",
 				})
 			}
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": err,
-				"error":        err.Error(),
+				"status": "error",
+				"error":  err.Error(),
 			})
 		}
 
@@ -97,13 +96,13 @@ func updateSport(ctx context.Context, serviceSport service.Sport) fiber.Handler 
 		if err != nil {
 			if ent.IsNotFound(err) {
 				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-					"status":       "error",
-					"error_detail": "Event not found",
+					"status": "error",
+					"error":  "Event not found",
 				})
 			}
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": err.Error(),
+				"status": "error",
+				"error":  err.Error(),
 			})
 		}
 
@@ -122,8 +121,8 @@ func updateSport(ctx context.Context, serviceSport service.Sport) fiber.Handler 
 		_, err = serviceSport.Update(ctx, existingSport)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": err.Error(),
+				"status": "error",
+				"error":  err.Error(),
 			})
 		}
 
@@ -145,14 +144,13 @@ func deleteSport(ctx context.Context, serviceSport service.Sport) fiber.Handler 
 		if err != nil {
 			if ent.IsNotFound(err) {
 				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-					"status":       "error",
-					"error_detail": "Event not found",
+					"status": "error",
+					"error":  "Event not found",
 				})
 			}
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": err,
-				"error":        err.Error(),
+				"status": "error",
+				"error":  err.Error(),
 			})
 		}
 

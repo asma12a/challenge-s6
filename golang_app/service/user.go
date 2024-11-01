@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"log"
+	"strings"
 
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
@@ -19,28 +21,49 @@ func NewUserService(client *ent.Client) *User {
 	}
 }
 
-func (repo *User) Create(ctx context.Context, user *entity.User) (*ent.User, error) {
-	entUser, err := repo.db.User.Create().
+func (repo *User) Create(ctx context.Context, user *entity.User) (*entity.User, error) {
+	createdUser, err := repo.db.User.Create().
 		SetName(user.Name).
 		SetEmail(user.Email).
 		SetPassword(user.Password).
 		Save(ctx)
 
 	if err != nil {
+		log.Println(err)
 		if ent.IsConstraintError(err) {
 			return nil, entity.ErrEmailAlreadyRegistred
 		}
 		return nil, entity.ErrCannotBeCreated
 	}
 
-	return entUser, nil
+	return &entity.User{User: *createdUser}, nil
 }
 
-func (e *User) FindOne(ctx context.Context, id ulid.ID) (*ent.User, error) {
-	return e.db.User.Query().Where(user.IDEQ(id)).Only(ctx)
+func (u *User) FindOne(ctx context.Context, id ulid.ID) (*entity.User, error) {
+	user, err := u.db.User.Query().Where(user.IDEQ(id)).
+		Only(ctx)
+
+	if err != nil {
+		return nil, entity.ErrNotFound
+	}
+	return &entity.User{User: *user}, nil
 }
 
-func (repo *User) Update(ctx context.Context, user *entity.User) (*ent.User, error) {
+func (u *User) FindByEmail(ctx context.Context, email string) (*entity.User, error) {
+	email = strings.ToLower(email) // Normaliser l'email
+	user, err := u.db.User.Query().Where(user.Email(email)).Only(ctx)
+
+	if ent.IsNotFound(err) {
+		return nil, entity.ErrNotFound
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return &entity.User{User: *user}, nil
+}
+
+func (repo *User) Update(ctx context.Context, user *entity.User) (*entity.User, error) {
 
 	// Prepare the update query
 	entUser, err := repo.db.User.
@@ -53,7 +76,7 @@ func (repo *User) Update(ctx context.Context, user *entity.User) (*ent.User, err
 	if err != nil {
 		return nil, entity.ErrCannotBeUpdated
 	}
-	return entUser, nil
+	return &entity.User{User: *entUser}, nil
 }
 
 func (repo *User) Delete(ctx context.Context, id ulid.ID) error {

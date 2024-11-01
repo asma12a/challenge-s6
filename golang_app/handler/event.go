@@ -6,18 +6,22 @@ import (
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
+	"github.com/asma12a/challenge-s6/middleware"
 	"github.com/asma12a/challenge-s6/presenter"
 	"github.com/asma12a/challenge-s6/service"
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
 func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Event, serviceSport service.Sport) {
-	app.Get("/", listEvents(ctx, serviceEvent))
+	app.Get("/", middleware.IsAuthMiddleware, listEvents(ctx, serviceEvent))
 	app.Get("/:eventId", getEvent(ctx, serviceEvent))
-	app.Post("/", createEvent(ctx, serviceEvent, serviceSport))
+	app.Post("/", middleware.IsAuthMiddleware, createEvent(ctx, serviceEvent, serviceSport))
 	app.Put("/:eventId", updateEvent(ctx, serviceEvent, serviceSport))
 	app.Delete("/:eventId", deleteEvent(ctx, serviceEvent))
 }
+
+var validate = validator.New()
 
 func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport service.Sport) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -28,29 +32,28 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 			Teams []*ent.Team `json:"teams"`
 		}
 
-
 		err := c.BodyParser(&eventInput)
-
 		if err != nil {
-
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  entity.ErrCannotParseJSON.Error(),
+			})
+		}
+
+		// Valide les champs du JSON
+		if err := validate.Struct(eventInput); err != nil {
+			return c.Status(fiber.StatusUnprocessableEntity).JSON(&fiber.Map{
 				"status": "error",
 				"error":  err.Error(),
 			})
 		}
 
-		sportId := eventInput.SportID
-		sport, err := serviceSport.FindOne(ctx, sportId)
+		// Vérifie si le sport existe à partir de l'ID fourni
+		sport, err := serviceSport.FindOne(ctx, eventInput.SportID)
 		if err != nil {
-			if ent.IsNotFound(err) {
-				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-					"status":       "error",
-					"error_detail": "Sport not found",
-				})
-			}
-			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": err.Error(),
+			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+				"status": "error",
+				"error":  entity.ErrEntityNotFound("Sport").Error(),
 			})
 		}
 
@@ -60,13 +63,12 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 			eventInput.EventCode,
 			eventInput.Date,
 			sport.ID,
-			eventInput.EventType,
+			*eventInput.EventType,
 			eventInput.Teams,
 		)
 
 		err = serviceEvent.Create(ctx, newEvent)
 		if err != nil {
-
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
 				"error":  err.Error(),
@@ -92,14 +94,13 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 		if err != nil {
 			if ent.IsNotFound(err) {
 				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-					"status":       "error",
-					"error_detail": "Event not found",
+					"status": "error",
+					"error":  "Event not found",
 				})
 			}
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": err,
-				"error":        err.Error(),
+				"status": "error",
+				"error":  err.Error(),
 			})
 		}
 
@@ -113,6 +114,7 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 			CreatedAt:  event.CreatedAt,
 			IsPublic:   event.IsPublic,
 			IsFinished: event.IsFinished,
+			EventType:  event.EventType,
 			Sport: presenter.Sport{
 				ID:       event.Edges.Sport.ID,
 				Name:     event.Edges.Sport.Name,
@@ -139,13 +141,13 @@ func updateEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 		if err != nil {
 			if ent.IsNotFound(err) {
 				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-					"status":       "error",
-					"error_detail": "Event not found",
+					"status": "error",
+					"error":  "Event not found",
 				})
 			}
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": err.Error(),
+				"status": "error",
+				"error":  err.Error(),
 			})
 		}
 
@@ -164,13 +166,13 @@ func updateEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 			if err != nil {
 				if ent.IsNotFound(err) {
 					return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-						"status":       "error",
-						"error_detail": "Sport not found",
+						"status": "error",
+						"error":  "Sport not found",
 					})
 				}
 				return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-					"status":       "error",
-					"error_detail": err.Error(),
+					"status": "error",
+					"error":  err.Error(),
 				})
 			}
 			existingEvent.SportID = sport.ID
@@ -185,8 +187,8 @@ func updateEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 		_, err = serviceEvent.Update(ctx, existingEvent)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": err.Error(),
+				"status": "error",
+				"error":  err.Error(),
 			})
 		}
 
@@ -209,14 +211,13 @@ func deleteEvent(ctx context.Context, service service.Event) fiber.Handler {
 		if err != nil {
 			if ent.IsNotFound(err) {
 				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-					"status":       "error",
-					"error_detail": "Event not found",
+					"status": "error",
+					"error":  "Event not found",
 				})
 			}
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": err,
-				"error":        err.Error(),
+				"status": "error",
+				"error":  err.Error(),
 			})
 		}
 
@@ -246,6 +247,7 @@ func listEvents(ctx context.Context, service service.Event) fiber.Handler {
 				CreatedAt:  event.CreatedAt,
 				IsPublic:   event.IsPublic,
 				IsFinished: event.IsFinished,
+				EventType:  event.EventType,
 				Sport: presenter.Sport{
 					ID:       event.Edges.Sport.ID,
 					Name:     event.Edges.Sport.Name,

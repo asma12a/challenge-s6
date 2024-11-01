@@ -1,12 +1,9 @@
 package schema
 
 import (
-	"time"
-
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
 // Event holds the schema definition for the Event entity.
@@ -14,23 +11,22 @@ type Event struct {
 	ent.Schema
 }
 
+func (Event) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		BaseMixin{},
+	}
+}
+
 // Fields of the Event.
 func (Event) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").GoType(ulid.ID("")).
-			DefaultFunc(
-				func() ulid.ID {
-					return ulid.MustNew("")
-				},
-			),
-		field.String("name").NotEmpty(),
-		field.String("address").NotEmpty(),
-		field.Int16("event_code").Positive(),
-		field.String("date").NotEmpty(),
-		field.Time("created_at").Default(time.Now),
+		field.String("name").NotEmpty().StructTag(`validate:"required"`),
+		field.String("address").NotEmpty().StructTag(`validate:"required"`),
+		field.String("event_code").StructTag(`validate:"required"`),
+		field.String("date").NotEmpty().StructTag(`validate:"required"`),
 		field.Bool("is_public").Default(false),
 		field.Bool("is_finished").Default(false),
-		field.Enum("event_type").Values("affrontement", "entrainement"),
+		field.Enum("event_type").Values("match", "training").Default("match").Nillable(), // Permet de ne pas demander le champ lors de la création, à condition de gérer partout le pointeur
 	}
 }
 
@@ -38,8 +34,8 @@ func (Event) Fields() []ent.Field {
 func (Event) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("sport", Sport.Type).Ref("events").Unique(),
-		edge.To("user_stats_id", UserStats.Type).StorageKey(edge.Column("event_id")),
-		edge.To("event_teams_id", EventTeams.Type).StorageKey(edge.Column("event_id")),
-		edge.To("messages_id", Message.Type).StorageKey(edge.Column("event_id")),
+		edge.To("user_stats", UserStats.Type).StorageKey(edge.Column("event_id")),
+		edge.To("event_teams", EventTeams.Type).StorageKey(edge.Column("event_id")),
+		edge.To("messages", Message.Type).StorageKey(edge.Column("event_id")),
 	}
 }

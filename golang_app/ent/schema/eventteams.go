@@ -11,15 +11,15 @@ type EventTeams struct {
 	ent.Schema
 }
 
+func (EventTeams) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		BaseMixin{},
+	}
+}
+
 // Fields of the Event.
 func (EventTeams) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").GoType(ulid.ID("")).
-			DefaultFunc(
-				func() ulid.ID {
-					return ulid.MustNew("")
-				},
-			),
 		field.String("event_id").GoType(ulid.ID("")).NotEmpty(),
 		field.String("team_id").GoType(ulid.ID("")).NotEmpty(),
 	}
@@ -27,5 +27,5 @@ func (EventTeams) Fields() []ent.Field {
 
 // Edges of the Event.
 func (EventTeams) Edges() []ent.Edge {
-	return []ent.Edge{}
+	return nil
 }

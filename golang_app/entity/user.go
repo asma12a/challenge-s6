@@ -14,11 +14,10 @@ func NewUser(email string, name string, password string) (*User, error) {
 		ent.User{
 			Email: email,
 			Name:  name,
-			Password: password,
 		},
 	}
 
-	pwd, err := user.GeneratePassword("password")
+	pwd, err := user.GeneratePassword(password)
 	if err != nil {
 		return nil, err
 	}
@@ -27,8 +26,8 @@ func NewUser(email string, name string, password string) (*User, error) {
 	return user, nil
 }
 
-// ValidatePassword validate user password
 func ValidatePassword(user *User, textPassword string) error {
+
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(textPassword))
 	if err != nil {
 		return err
@@ -38,7 +37,7 @@ func ValidatePassword(user *User, textPassword string) error {
 
 // generatePassword generate password
 func (u *User) GeneratePassword(raw string) (string, error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(raw), 10)
+	hash, err := bcrypt.GenerateFromPassword([]byte(raw), bcrypt.DefaultCost)
 	if err != nil {
 		return "", err
 	}

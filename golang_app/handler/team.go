@@ -17,7 +17,6 @@ func TeamHandler(app fiber.Router, ctx context.Context, serviceTeam service.Team
 	app.Delete("/:teamId", deleteTeam(ctx, serviceTeam))
 }
 
-
 func createTeam(ctx context.Context, serviceTeam service.Team) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var teamInput entity.Team
@@ -38,8 +37,8 @@ func createTeam(ctx context.Context, serviceTeam service.Team) fiber.Handler {
 		err = serviceTeam.Create(ctx, newTeam)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status":       "error",
-				"error_detail": err.Error(),
+				"status": "error",
+				"error":  err.Error(),
 			})
 		}
 
@@ -129,4 +128,3 @@ func deleteTeam(ctx context.Context, serviceTeam service.Team) fiber.Handler {
 		return c.SendStatus(fiber.StatusNoContent)
 	}
 }
-

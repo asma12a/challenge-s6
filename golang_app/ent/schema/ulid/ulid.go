@@ -54,7 +54,8 @@ func (i ID) MarshalGQL(w io.Writer) {
 // Scan implements the Scanner interface.
 func (i *ID) Scan(src interface{}) error {
 	if src == nil {
-		return fmt.Errorf("ulid: expected a value")
+		*i = ""
+		return nil
 	}
 
 	switch s := src.(type) {

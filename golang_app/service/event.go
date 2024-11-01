@@ -34,7 +34,7 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
 		SetEventCode(event.EventCode).
 		SetDate(event.Date).
 		SetSportID(event.SportID).
-		SetEventType(event.EventType).
+		SetEventType(*event.EventType).
 		Save(ctx)
 
 	if err != nil {
@@ -82,8 +82,7 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
 }
 
 func (e *Event) FindOne(ctx context.Context, id ulid.ID) (*entity.Event, error) {
-	event, err := e.db.Event.Query().Where(event.IDEQ(id)).
-		Only(ctx)
+	event, err := e.db.Event.Query().Where(event.IDEQ(id)).Only(ctx)
 
 	if err != nil {
 		return nil, entity.ErrNotFound
@@ -117,6 +116,5 @@ func (e *Event) Delete(ctx context.Context, id ulid.ID) error {
 }
 
 func (e *Event) List(ctx context.Context) ([]*ent.Event, error) {
-	return e.db.Event.Query().
-		WithSport().All(ctx)
+	return e.db.Event.Query().WithSport().All(ctx)
 }
