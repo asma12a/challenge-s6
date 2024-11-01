@@ -5,13 +5,14 @@ import (
 
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
+	"github.com/asma12a/challenge-s6/middleware"
 	"github.com/asma12a/challenge-s6/presenter"
 	"github.com/asma12a/challenge-s6/service"
 	"github.com/gofiber/fiber/v2"
 )
 
 func UserHandler(app fiber.Router, ctx context.Context, service service.User) {
-	app.Get("/", listUsers(ctx, service))
+	app.Get("/", middleware.IsAdminMiddleware, listUsers(ctx, service))
 	app.Get("/:userId", getUser(ctx, service))
 	app.Post("/", createUser(ctx, service))
 	app.Put("/:userId", updateUser(ctx, service))
