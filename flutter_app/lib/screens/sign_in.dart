@@ -13,29 +13,29 @@ class SignInScreen extends StatelessWidget {
         body: Center(
             child: isSmallScreen
                 ? const Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _Logo(),
-                      _FormContent(),
-                    ],
-                  )
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _Logo(),
+                _FormContent(),
+              ],
+            )
                 : Container(
-                    padding: const EdgeInsets.all(32.0),
-                    constraints: const BoxConstraints(maxWidth: 800),
-                    child: const Row(
-                      children: [
-                        Expanded(child: _Logo()),
-                        Expanded(
-                          child: Center(child: _FormContent()),
-                        ),
-                      ],
-                    ),
-                  )));
+              padding: const EdgeInsets.all(32.0),
+              constraints: const BoxConstraints(maxWidth: 800),
+              child: const Row(
+                children: [
+                  Expanded(child: _Logo()),
+                  Expanded(
+                    child: Center(child: _FormContent()),
+                  ),
+                ],
+              ),
+            )));
   }
 }
 
 class _Logo extends StatelessWidget {
-  const _Logo({super.key});
+  const _Logo();
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +56,7 @@ class _Logo extends StatelessWidget {
 }
 
 class _FormContent extends StatefulWidget {
-  const _FormContent({super.key});
+  const _FormContent();
 
   @override
   State<_FormContent> createState() => __FormContentState();
@@ -109,7 +109,7 @@ class __FormContentState extends State<_FormContent> {
                 }
 
                 bool emailValid = RegExp(
-                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                     .hasMatch(value);
                 if (!emailValid) {
                   return 'Please enter a valid email';
@@ -118,8 +118,8 @@ class __FormContentState extends State<_FormContent> {
                 return null;
               },
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
               decoration: const InputDecoration(
                 labelText: 'Email',
                 hintText: 'Entrez votre adresse email',
@@ -143,8 +143,8 @@ class __FormContentState extends State<_FormContent> {
                 return null;
               },
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
               obscureText: !_isPasswordVisible,
               decoration: InputDecoration(
                   labelText: 'Mot de passe',
@@ -203,7 +203,7 @@ class __FormContentState extends State<_FormContent> {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
-                      Theme.of(context).colorScheme.primaryContainer,
+                  Theme.of(context).colorScheme.primaryContainer,
                   foregroundColor: Theme.of(context).colorScheme.secondary,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4)),

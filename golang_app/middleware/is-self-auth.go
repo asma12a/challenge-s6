@@ -12,7 +12,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func IsAuthMiddleware(c *fiber.Ctx) error {
+func IsSelfAuthMiddleware(c *fiber.Ctx) error {
 	// Récupérer le token depuis l'en-tête Authorization
 	token := c.Get("Authorization")
 	if token == "" {
@@ -62,9 +62,22 @@ func IsAuthMiddleware(c *fiber.Ctx) error {
 		})
 	}
 
-	// Mets à jour le contexte en utilisant le viewer
+	// Récupérer l'userId depuis les paramètres
+	paramUserID := c.Params("userId")
+	if paramUserID == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "No userId parameter provided",
+		})
+	}
 
-	// TODO : CORRIGER POUR ACCEDER AU CONTEXTE DE L'UTILISATEUR
+	// Vérifier si l'userId des paramètres est le même que celui du token
+	if paramUserID != user_id {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"error": "Access denied",
+		})
+	}
+
+	// Mets à jour le contexte en utilisant le viewer
 	ctx := viewer.NewUserContext(context.Background(), &viewer.User{ID: ulid.ID(user_id)})
 	c.Locals("user", fiber.Map{"id": user_id})
 	c.SetUserContext(ctx)

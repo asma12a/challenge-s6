@@ -8,7 +8,7 @@ func ErrEntityNotFound(entity string) error {
 	return errors.New(entity + " not found")
 }
 
-var ErrEmailAlreadyRegistred = errors.New("Email already registred")
+var ErrEmailAlreadyRegistred = errors.New("L'adresse email est déjà utilisée.")
 
 var ErrInvalidEntity = errors.New("Invalid entity")
 
@@ -26,6 +26,6 @@ var ErrCannotBeUpdated = errors.New("Cannot be updated")
 
 var ErrPasswordGenaration = errors.New("Password cannot be generated")
 
-var ErrInvalidPassword = errors.New("Invalid password")
+var ErrInvalidPassword = errors.New("Identifiants incorrects. Veuillez vérifier vos informations et réessayer.")
 
 var ErrCannotParseJSON = errors.New("Cannot parse JSON")

@@ -3,16 +3,19 @@ package middleware
 import (
 	"context"
 	"os"
+	"slices"
 	"strings"
 	"time"
 
+	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
+	"github.com/asma12a/challenge-s6/service"
 	"github.com/asma12a/challenge-s6/viewer"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func IsAuthMiddleware(c *fiber.Ctx) error {
+func IsAdminMiddleware(c *fiber.Ctx) error {
 	// Récupérer le token depuis l'en-tête Authorization
 	token := c.Get("Authorization")
 	if token == "" {
@@ -62,9 +65,25 @@ func IsAuthMiddleware(c *fiber.Ctx) error {
 		})
 	}
 
-	// Mets à jour le contexte en utilisant le viewer
+	db_client := c.Locals("db").(*ent.Client)
+	userService := *service.NewUserService(db_client)
 
-	// TODO : CORRIGER POUR ACCEDER AU CONTEXTE DE L'UTILISATEUR
+	// Récupérer l'utilisateur depuis la base de données
+	u, err := userService.FindOne(context.Background(), ulid.ID(user_id))
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to retrieve user",
+		})
+	}
+
+	// Vérifier le rôle de l'utilisateur
+	if !slices.Contains(u.Roles, "admin") {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"error": "Access denied",
+		})
+	}
+
+	// Mets à jour le contexte en utilisant le viewer
 	ctx := viewer.NewUserContext(context.Background(), &viewer.User{ID: ulid.ID(user_id)})
 	c.Locals("user", fiber.Map{"id": user_id})
 	c.SetUserContext(ctx)

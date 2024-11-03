@@ -9,12 +9,12 @@ class AuthService {
   static Future<Map<String, dynamic>> signIn(body) async {
     try {
       final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/auth/login');
-    final response = await http.post(
-      uri,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(body)
+      final response = await http.post(
+          uri,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode(body)
       );
       final data = jsonDecode(utf8.decode(response.bodyBytes));
       print(data);
