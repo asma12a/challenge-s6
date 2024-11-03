@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/viewer"
@@ -46,10 +47,18 @@ func IsAuthMiddleware(c *fiber.Ctx) error {
 	}
 
 	// Extraire les informations de l'utilisateur
-	user_id, ok := claims["id"].(string)
-	if !ok {
+	user_id, ok_id := claims["id"].(string)
+	expiration, ok_exp := claims["exp"].(float64)
+	if !ok_id || !ok_exp {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"error": "Invalid token claims",
+		})
+	}
+
+	// Vérifier si le token a expiré
+	if int64(expiration) < time.Now().Unix() {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Token has expired",
 		})
 	}
 
