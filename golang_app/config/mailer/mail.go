@@ -10,7 +10,6 @@ import (
 func SendEmail(to string, subject string, body string) error {
 	d := gomail.NewDialer("smtp-relay.brevo.com", 587, "bastiendikiadi@gmail.com", config.Env.BrevoAPIKey)
 	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
-
 	m := gomail.NewMessage()
 	m.SetHeader("From", "squadgo@squadgo.com")
 	m.SetHeader("To", to)

@@ -33,3 +33,4 @@ func (Sport) Edges() []ent.Edge {
 			StorageKey(edge.Column("stat_id")),
 	}
 }
+	

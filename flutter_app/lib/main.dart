@@ -27,6 +27,6 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(theme: theme, home: const SignInScreen());
+    return MaterialApp(theme: theme, home: const SignInScreen(), debugShowCheckedModeBanner: false,);
   }
 }

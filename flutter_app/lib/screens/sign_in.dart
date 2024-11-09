@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/core/services/auth_service.dart';
+import 'package:flutter_app/screens/home.dart';
 import 'package:flutter_app/screens/sign_up.dart';
+import 'package:flutter_app/screens/tabs.dart';
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
@@ -13,24 +15,24 @@ class SignInScreen extends StatelessWidget {
         body: Center(
             child: isSmallScreen
                 ? const Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _Logo(),
-                _FormContent(),
-              ],
-            )
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _Logo(),
+                      _FormContent(),
+                    ],
+                  )
                 : Container(
-              padding: const EdgeInsets.all(32.0),
-              constraints: const BoxConstraints(maxWidth: 800),
-              child: const Row(
-                children: [
-                  Expanded(child: _Logo()),
-                  Expanded(
-                    child: Center(child: _FormContent()),
-                  ),
-                ],
-              ),
-            )));
+                    padding: const EdgeInsets.all(32.0),
+                    constraints: const BoxConstraints(maxWidth: 800),
+                    child: const Row(
+                      children: [
+                        Expanded(child: _Logo()),
+                        Expanded(
+                          child: Center(child: _FormContent()),
+                        ),
+                      ],
+                    ),
+                  )));
   }
 }
 
@@ -81,10 +83,17 @@ class __FormContentState extends State<_FormContent> {
           SnackBar(
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
             content: Text(
-              style: TextStyle(color: Theme.of(context).colorScheme.onErrorContainer),
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onErrorContainer),
               result['error'],
               textAlign: TextAlign.center,
             ),
+          ),
+        );
+      } else {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (ctx) => TabsScreen(),
           ),
         );
       }
@@ -109,7 +118,7 @@ class __FormContentState extends State<_FormContent> {
                 }
 
                 bool emailValid = RegExp(
-                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                     .hasMatch(value);
                 if (!emailValid) {
                   return 'Please enter a valid email';
@@ -118,8 +127,8 @@ class __FormContentState extends State<_FormContent> {
                 return null;
               },
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
               decoration: const InputDecoration(
                 labelText: 'Email',
                 hintText: 'Entrez votre adresse email',
@@ -143,8 +152,8 @@ class __FormContentState extends State<_FormContent> {
                 return null;
               },
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
               obscureText: !_isPasswordVisible,
               decoration: InputDecoration(
                   labelText: 'Mot de passe',
@@ -203,7 +212,7 @@ class __FormContentState extends State<_FormContent> {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
-                  Theme.of(context).colorScheme.primaryContainer,
+                      Theme.of(context).colorScheme.primaryContainer,
                   foregroundColor: Theme.of(context).colorScheme.secondary,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4)),
