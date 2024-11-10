@@ -20,7 +20,7 @@ func (Team) Mixin() []ent.Mixin {
 // Fields of the Team.
 func (Team) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("name").NotEmpty().Unique(),
+		field.String("name").NotEmpty(),
 		field.Int("max_players").Default(0),
 	}
 }

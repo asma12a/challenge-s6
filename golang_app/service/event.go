@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"log"
 
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/event"
@@ -21,19 +22,59 @@ func NewEventService(client *ent.Client) *Event {
 
 func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
 
-	create := repo.db.Event.Create().
+	tx, err := repo.db.Tx(ctx)
+	if err != nil {
+		log.Println(err, "error creating transaction")
+		return err
+	}
+
+	createdEvent, err := tx.Event.Create().
 		SetName(event.Name).
 		SetAddress(event.Address).
 		SetEventCode(event.EventCode).
 		SetDate(event.Date).
-		SetSportID(event.SportID)
+		SetSportID(event.SportID).
+		SetEventType(*event.EventType).
+		Save(ctx)
 
-	if event.EventType != nil {
-		create.SetEventType(*event.EventType)
+	if err != nil {
+		log.Println(err, "error creating event")
+		_ = tx.Rollback()
+		return err
 	}
 
-	_, err := create.Save(ctx)
-	if err != nil {
+	teamNames := make(map[string]bool)
+
+
+	for _, team := range event.Teams {
+		if _, ok := teamNames[team.Name]; ok {
+			log.Println("error creating team")
+			_ = tx.Rollback()
+			return entity.ErrCannotBeCreated
+		}
+		teamNames[team.Name] = true
+
+		createdTeam, err := tx.Team.Create().
+			SetName(team.Name).
+			SetMaxPlayers(team.MaxPlayers).
+			Save(ctx)
+		if err != nil {
+			log.Println(err, "error creating team")
+			_ = tx.Rollback() 
+			return err
+		}
+		_, err = tx.EventTeams.Create().
+			SetEventID(createdEvent.ID).
+			SetTeamID(createdTeam.ID).
+			Save(ctx)
+		if err != nil {
+			log.Println(err, "error creating event team")
+			_ = tx.Rollback()
+			return err
+		}
+	}
+	if err := tx.Commit(); err != nil {
+		log.Println("Erreur lors de la validation de la transaction :", err)
 		return err
 	}
 
