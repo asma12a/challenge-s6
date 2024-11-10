@@ -35,15 +35,15 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 		err := c.BodyParser(&eventInput)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status": "error",
-				"error":  entity.ErrCannotParseJSON.Error(),
+				"status": "error bodyparser",
+				"error":  err.Error(),
 			})
 		}
 
 		// Valide les champs du JSON
 		if err := validate.Struct(eventInput); err != nil {
 			return c.Status(fiber.StatusUnprocessableEntity).JSON(&fiber.Map{
-				"status": "error",
+				"status": "error validate",
 				"error":  err.Error(),
 			})
 		}
@@ -52,8 +52,8 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 		sport, err := serviceSport.FindOne(ctx, eventInput.SportID)
 		if err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-				"status": "error",
-				"error":  entity.ErrEntityNotFound("Sport").Error(),
+				"status": "error find sport",
+				"error":  err.Error(),
 			})
 		}
 
@@ -70,7 +70,7 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 		err = serviceEvent.Create(ctx, newEvent)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status": "error",
+				"status": "error create event",
 				"error":  err.Error(),
 			})
 		}

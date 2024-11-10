@@ -25,7 +25,7 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
 	tx, err := repo.db.Tx(ctx)
 	if err != nil {
 		log.Println(err, "error creating transaction")
-		return entity.ErrCannotBeCreated
+		return err
 	}
 
 	createdEvent, err := tx.Event.Create().
@@ -40,7 +40,7 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
 	if err != nil {
 		log.Println(err, "error creating event")
 		_ = tx.Rollback()
-		return entity.ErrCannotBeCreated
+		return err
 	}
 
 	teamNames := make(map[string]bool)
@@ -61,7 +61,7 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
 		if err != nil {
 			log.Println(err, "error creating team")
 			_ = tx.Rollback() 
-			return entity.ErrCannotBeCreated
+			return err
 		}
 		_, err = tx.EventTeams.Create().
 			SetEventID(createdEvent.ID).
@@ -70,12 +70,12 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
 		if err != nil {
 			log.Println(err, "error creating event team")
 			_ = tx.Rollback()
-			return entity.ErrCannotBeCreated
+			return err
 		}
 	}
 	if err := tx.Commit(); err != nil {
 		log.Println("Erreur lors de la validation de la transaction :", err)
-		return entity.ErrCannotBeCreated
+		return err
 	}
 
 	return nil

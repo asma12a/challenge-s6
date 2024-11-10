@@ -21,6 +21,7 @@ func NewEvent(name string, address string, eventCode string, date string, sportI
 			EventCode: eventCode,
 			Date:      date,
 			EventType: &eventType,
+			Address:  address,
 		},
 		SportID:     sportId,
 		Teams:       teams,
