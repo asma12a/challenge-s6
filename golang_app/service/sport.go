@@ -26,7 +26,7 @@ func (repo *Sport) Create(ctx context.Context, sport *entity.Sport) error {
 		Save(ctx)
 
 	if err != nil {
-		return entity.ErrCannotBeCreated
+		return err
 	}
 
 	return nil

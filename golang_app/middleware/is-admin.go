@@ -3,13 +3,10 @@ package middleware
 import (
 	"context"
 	"os"
-	"slices"
 	"strings"
 	"time"
 
-	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
-	"github.com/asma12a/challenge-s6/service"
 	"github.com/asma12a/challenge-s6/viewer"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -51,8 +48,9 @@ func IsAdminMiddleware(c *fiber.Ctx) error {
 
 	// Extraire les informations de l'utilisateur
 	user_id, ok_id := claims["id"].(string)
+	roles, ok_roles := claims["roles"].(string)
 	expiration, ok_exp := claims["exp"].(float64)
-	if !ok_id || !ok_exp {
+	if !ok_id || !ok_exp || !ok_roles {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"error": "Invalid token claims",
 		})
@@ -65,19 +63,8 @@ func IsAdminMiddleware(c *fiber.Ctx) error {
 		})
 	}
 
-	db_client := c.Locals("db").(*ent.Client)
-	userService := *service.NewUserService(db_client)
-
-	// Récupérer l'utilisateur depuis la base de données
-	u, err := userService.FindOne(context.Background(), ulid.ID(user_id))
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to retrieve user",
-		})
-	}
-
 	// Vérifier le rôle de l'utilisateur
-	if !slices.Contains(u.Roles, "admin") {
+	if !strings.Contains(roles, "admin") {
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
 			"error": "Access denied",
 		})
