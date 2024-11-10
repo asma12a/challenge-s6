@@ -44,7 +44,7 @@ func (u *User) FindOne(ctx context.Context, id ulid.ID) (*entity.User, error) {
 		Only(ctx)
 
 	if err != nil {
-		return nil, entity.ErrNotFound
+		return nil, entity.ErrEntityNotFound("User")
 	}
 	return &entity.User{User: *user}, nil
 }

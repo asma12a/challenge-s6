@@ -13,12 +13,9 @@ import (
 
 func UserHandler(app fiber.Router, ctx context.Context, service service.User) {
 	app.Get("/", middleware.IsAdminMiddleware, listUsers(ctx, service))
-	app.Get("/:userId", middleware.OrMiddleware(
-		middleware.IsAdminMiddleware,
-		middleware.IsSelfAuthMiddleware,
-	), getUser(ctx, service))
+	app.Get("/:userId", middleware.IsAdminOrSelfAuthMiddleware, getUser(ctx, service))
 	app.Post("/", middleware.IsAdminMiddleware, createUser(ctx, service))
-	app.Put("/:userId", middleware.IsSelfAuthMiddleware, updateUser(ctx, service))
+	app.Put("/:userId", middleware.IsAdminOrSelfAuthMiddleware, updateUser(ctx, service))
 	app.Delete("/:userId", middleware.IsAdminMiddleware, deleteUser(ctx, service))
 }
 
