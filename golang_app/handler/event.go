@@ -15,6 +15,7 @@ import (
 
 func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Event, serviceSport service.Sport) {
 	app.Get("/", middleware.IsAuthMiddleware, listEvents(ctx, serviceEvent))
+	app.Get("/search", searchEvent(ctx, serviceEvent))
 	app.Get("/:eventId", getEvent(ctx, serviceEvent))
 	app.Post("/", middleware.IsAuthMiddleware, createEvent(ctx, serviceEvent, serviceSport))
 	app.Put("/:eventId", updateEvent(ctx, serviceEvent, serviceSport))
@@ -234,6 +235,60 @@ func listEvents(ctx context.Context, service service.Event) fiber.Handler {
 				"error": err.Error(),
 			})
 		}
+
+		toJ := make([]presenter.Event, len(events))
+
+		for i, event := range events {
+			toJ[i] = presenter.Event{
+				ID:         event.ID,
+				Name:       event.Name,
+				Address:    event.Address,
+				EventCode:  event.EventCode,
+				Date:       event.Date,
+				CreatedAt:  event.CreatedAt,
+				IsPublic:   event.IsPublic,
+				IsFinished: event.IsFinished,
+				EventType:  event.EventType,
+				Sport: presenter.Sport{
+					ID:       event.Edges.Sport.ID,
+					Name:     event.Edges.Sport.Name,
+					ImageURL: event.Edges.Sport.ImageURL, // Optional
+				},
+			}
+		}
+		return c.JSON(toJ)
+	}
+}
+
+func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
+
+	return func(c *fiber.Ctx) error {
+
+		name := c.Query("name")
+		address := c.Query("address")
+		eventType := c.Query("type")
+		sportIDStr := c.Query("sport")
+
+		var sportID *ulid.ID
+        if sportIDStr != "" {
+            parsedID, err := ulid.Parse(sportIDStr)
+            if err != nil {
+                return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+                    "status": "error",
+                    "error":  "Invalid sportID format",
+                })
+            }
+            sportID = &parsedID
+        }
+
+
+		events, err := service.Search(ctx, name, address, eventType, sportID)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
 
 		toJ := make([]presenter.Event, len(events))
 

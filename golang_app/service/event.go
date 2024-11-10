@@ -7,6 +7,7 @@ import (
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
+	"github.com/asma12a/challenge-s6/ent/sport"
 	"github.com/asma12a/challenge-s6/entity"
 )
 
@@ -117,4 +118,23 @@ func (e *Event) Delete(ctx context.Context, id ulid.ID) error {
 
 func (e *Event) List(ctx context.Context) ([]*ent.Event, error) {
 	return e.db.Event.Query().WithSport().All(ctx)
+}
+
+func (e *Event) Search(ctx context.Context, name, address, eventType string, sportID *ulid.ID) ([]*ent.Event, error) {
+	query := e.db.Event.Query()
+	if name != "" {
+		query.Where(event.NameContainsFold(name))
+	}
+	if address != "" {
+		query.Where(event.AddressContainsFold(address))
+	}
+	if eventType != "" {
+		query.Where(event.EventTypeEQ(event.EventType(eventType)))
+	}
+
+	if sportID != nil {
+        query = query.Where(event.HasSportWith(sport.IDEQ(*sportID)))
+    }
+	return query.WithSport().All(ctx)
+
 }
