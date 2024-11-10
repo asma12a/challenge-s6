@@ -5,6 +5,7 @@ import (
 	"context"
 	"html/template"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/asma12a/challenge-s6/config/mailer"
@@ -169,11 +170,12 @@ func login(ctx context.Context, serviceUser service.User) fiber.Handler {
 		}
 
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-			"id":  user.ID,
-			"iss": "squadgo",
-			"iat": time.Now().Unix(),
-			"exp": time.Now().Add(30 * 24 * time.Hour).Unix(),
-			"nbf": time.Now().Unix(),
+			"id":    user.ID,
+			"roles": strings.Join(user.Roles, ","),
+			"iss":   "squadgo",
+			"iat":   time.Now().Unix(),
+			"exp":   time.Now().Add(30 * 24 * time.Hour).Unix(),
+			"nbf":   time.Now().Unix(),
 		})
 
 		s, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
