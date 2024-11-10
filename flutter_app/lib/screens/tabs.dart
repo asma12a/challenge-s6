@@ -46,6 +46,7 @@ class _TabsScreenState extends State<TabsScreen> {
       drawer: MainDrawer(onSelectScreen: _setScreen),
       body: Padding(padding: EdgeInsets.only(top: 20), child: activePage),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         onTap: _selectPage,
         currentIndex: _selectPageIndex,
         items: const [
@@ -58,9 +59,14 @@ class _TabsScreenState extends State<TabsScreen> {
             label: 'Rechercher',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.event_available),
-            label: 'Mes événements',
+            icon: Icon(Icons.qr_code),
+            label: 'Rejoindre',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.event_available),
+            label: 'Mes évents',
+          ),
+
         ],
       ),
     );
