@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"slices"
 
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
@@ -9,6 +10,7 @@ import (
 	"github.com/asma12a/challenge-s6/presenter"
 	"github.com/asma12a/challenge-s6/service"
 	"github.com/gofiber/fiber/v2"
+	passwordValidator "github.com/wagslane/go-password-validator"
 )
 
 func UserHandler(app fiber.Router, ctx context.Context, service service.User) {
@@ -73,11 +75,13 @@ func getUser(ctx context.Context, service service.User) fiber.Handler {
 			})
 		}
 
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{
-			"status":  "success",
-			"message": "User found",
-			"data":    user,
-		})
+		data := presenter.User{
+			ID:    user.ID,
+			Name:  user.Name,
+			Email: user.Email,
+		}
+
+		return c.Status(fiber.StatusOK).JSON(data)
 	}
 }
 
@@ -87,7 +91,7 @@ func updateUser(ctx context.Context, service service.User) fiber.Handler {
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
-				"error":  err.Error(),
+				"error":  entity.ErrInvalidID.Error(),
 			})
 		}
 
@@ -95,6 +99,13 @@ func updateUser(ctx context.Context, service service.User) fiber.Handler {
 
 		if err := c.BodyParser(&userInput); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+
+		if err := validate.Struct(userInput); err != nil {
+			return c.Status(fiber.StatusUnprocessableEntity).JSON(&fiber.Map{
 				"status": "error",
 				"error":  err.Error(),
 			})
@@ -110,10 +121,30 @@ func updateUser(ctx context.Context, service service.User) fiber.Handler {
 
 		user.Name = userInput.Name
 		user.Email = userInput.Email
-		user.Password = userInput.Password
-		user.Roles = userInput.Roles
 
-		updatedUser, err := service.Update(ctx, userInput)
+		if userInput.Password != "" {
+			if err := passwordValidator.Validate(userInput.Password, 60); err != nil {
+				return c.Status(fiber.StatusUnprocessableEntity).JSON(&fiber.Map{
+					"status": "error",
+					"error":  entity.ErrPasswordNotStrong.Error(),
+				})
+			}
+
+			hashedPassword, err := user.GeneratePassword(userInput.Password)
+			if err != nil {
+				return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+					"status": "error",
+					"error":  err.Error(),
+				})
+			}
+			user.Password = hashedPassword
+		}
+
+		if slices.Contains(user.Roles, "admin") && userInput.Roles != nil {
+			user.Roles = userInput.Roles
+		}
+
+		updatedUser, err := service.Update(ctx, user)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",

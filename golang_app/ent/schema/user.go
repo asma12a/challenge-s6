@@ -20,8 +20,8 @@ func (User) Mixin() []ent.Mixin {
 // Fields of the User.
 func (User) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("name").NotEmpty(),
-		field.String("email").NotEmpty().Unique(),
+		field.String("name").NotEmpty().StructTag(`validate:"required"`),
+		field.String("email").NotEmpty().Unique().StructTag(`validate:"required,email"`),
 		field.String("password").NotEmpty(),
 		field.Strings("roles").Default([]string{"user"}),
 	}

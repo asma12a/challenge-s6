@@ -18,6 +18,8 @@ func ErrInvalidRelation(relation string) error {
 
 var ErrInvalidInput = errors.New("Invalid input")
 
+var ErrInvalidID = errors.New("Invalid ID")
+
 var ErrCannotBeCreated = errors.New("Cannot be created")
 
 var ErrCannotBeDeleted = errors.New("Cannot be deleted")
@@ -25,6 +27,8 @@ var ErrCannotBeDeleted = errors.New("Cannot be deleted")
 var ErrCannotBeUpdated = errors.New("Cannot be updated")
 
 var ErrPasswordGenaration = errors.New("Password cannot be generated")
+
+var ErrPasswordNotStrong = errors.New("Le mot de passe n'est pas assez fort. Veuillez choisir un mot de passe plus fort.")
 
 var ErrInvalidPassword = errors.New("Identifiants incorrects. Veuillez vérifier vos informations et réessayer.")
 

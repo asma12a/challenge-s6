@@ -15,6 +15,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/redis/go-redis/v9"
+	passwordValidator "github.com/wagslane/go-password-validator"
 )
 
 // Définition de MyCustomClaims pour les claims personnalisés du JWT
@@ -50,6 +51,13 @@ func signUp(ctx context.Context, serviceUser service.User, rdb *redis.Client) fi
 			return c.Status(fiber.StatusUnprocessableEntity).JSON(&fiber.Map{
 				"status": "error",
 				"error":  err.Error(),
+			})
+		}
+
+		if err := passwordValidator.Validate(userInput.Password, 60); err != nil {
+			return c.Status(fiber.StatusUnprocessableEntity).JSON(&fiber.Map{
+				"status": "error",
+				"error":  entity.ErrPasswordNotStrong.Error(),
 			})
 		}
 

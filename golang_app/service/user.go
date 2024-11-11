@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"log"
 	"strings"
 
 	"github.com/asma12a/challenge-s6/ent"
@@ -29,7 +28,6 @@ func (repo *User) Create(ctx context.Context, user *entity.User) (*entity.User, 
 		Save(ctx)
 
 	if err != nil {
-		log.Println(err)
 		if ent.IsConstraintError(err) {
 			return nil, entity.ErrEmailAlreadyRegistred
 		}
@@ -74,7 +72,7 @@ func (repo *User) Update(ctx context.Context, user *entity.User) (*entity.User, 
 		SetRoles(user.Roles).Save(ctx)
 
 	if err != nil {
-		return nil, entity.ErrCannotBeUpdated
+		return nil, err
 	}
 	return &entity.User{User: *entUser}, nil
 }

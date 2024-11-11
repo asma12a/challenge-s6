@@ -13,6 +13,7 @@ require (
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )
 
+
 require (
 	ariga.io/atlas v0.19.1-0.20240203083654-5948b60a8e43 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
@@ -40,6 +41,7 @@ require (
 	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
 	github.com/philhofer/fwd v1.1.2 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
+	github.com/wagslane/go-password-validator v0.3.0 // indirect
 	github.com/samber/lo v1.47.0 // indirect
 	github.com/stretchr/testify v1.9.0 // indirect
 	github.com/tinylib/msgp v1.1.8 // indirect
