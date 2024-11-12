@@ -2,10 +2,10 @@ package middleware
 
 import (
 	"context"
-	"os"
 	"strings"
 	"time"
 
+	"github.com/asma12a/challenge-s6/config"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/viewer"
 	"github.com/gofiber/fiber/v2"
@@ -37,7 +37,7 @@ func IsAdminMiddleware(c *fiber.Ctx) error {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fiber.NewError(fiber.StatusUnauthorized, "Invalid signing method")
 		}
-		return []byte(os.Getenv("JWT_SECRET")), nil
+		return []byte(config.Env.JWTSecret), nil
 	})
 
 	if err != nil {

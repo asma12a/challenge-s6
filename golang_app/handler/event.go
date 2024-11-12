@@ -2,12 +2,10 @@ package handler
 
 import (
 	"context"
-	"log"
 
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
-	"github.com/asma12a/challenge-s6/middleware"
 	"github.com/asma12a/challenge-s6/presenter"
 	"github.com/asma12a/challenge-s6/service"
 	"github.com/go-playground/validator/v10"
@@ -15,10 +13,10 @@ import (
 )
 
 func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Event, serviceSport service.Sport) {
-	app.Get("/", middleware.IsAuthMiddleware, listEvents(ctx, serviceEvent))
-	app.Get("/search", middleware.IsAuthMiddleware, searchEvent(ctx, serviceEvent))
+	// app.Get("/", listEvents(ctx, serviceEvent))
+	app.Get("/search", searchEvent(ctx, serviceEvent))
 	app.Get("/:eventId", getEvent(ctx, serviceEvent))
-	app.Post("/", middleware.IsAuthMiddleware, createEvent(ctx, serviceEvent, serviceSport))
+	app.Post("/", createEvent(ctx, serviceEvent, serviceSport))
 	app.Put("/:eventId", updateEvent(ctx, serviceEvent, serviceSport))
 	app.Delete("/:eventId", deleteEvent(ctx, serviceEvent))
 }
@@ -271,18 +269,16 @@ func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
 		sportIDStr := c.Query("sport")
 
 		var sportID *ulid.ID
-        if sportIDStr != "" {
-            parsedID, err := ulid.Parse(sportIDStr)
-            if err != nil {
-                return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-                    "status": "error",
-                    "error":  "Invalid sportID format",
-                })
-            }
-            sportID = &parsedID
-        }
-		log.Println("sportID", sportID)
-
+		if sportIDStr != "" {
+			parsedID, err := ulid.Parse(sportIDStr)
+			if err != nil {
+				return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+					"status": "error",
+					"error":  "Invalid sportID format",
+				})
+			}
+			sportID = &parsedID
+		}
 
 		events, err := service.Search(ctx, name, address, eventType, sportID)
 		if err != nil {
@@ -290,7 +286,6 @@ func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
 				"error": err.Error(),
 			})
 		}
-
 
 		toJ := make([]presenter.Event, len(events))
 
@@ -312,7 +307,7 @@ func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
 					Name:     condition.Name,
 					ImageURL: condition.ImageURL,
 				}
-				
+
 			}
 		}
 		return c.JSON(toJ)

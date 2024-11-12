@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"context"
 	"html/template"
-	"os"
 	"strings"
 	"time"
 
+	"github.com/asma12a/challenge-s6/config"
 	"github.com/asma12a/challenge-s6/config/mailer"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
@@ -186,7 +186,7 @@ func login(ctx context.Context, serviceUser service.User) fiber.Handler {
 			"nbf":   time.Now().Unix(),
 		})
 
-		s, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+		s, err := token.SignedString([]byte(config.Env.JWTSecret))
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
 				"status": "error",

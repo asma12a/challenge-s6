@@ -9,6 +9,7 @@ import (
 	"github.com/asma12a/challenge-s6/database"
 	"github.com/asma12a/challenge-s6/database/redis"
 	"github.com/asma12a/challenge-s6/handler"
+	"github.com/asma12a/challenge-s6/middleware"
 	"github.com/asma12a/challenge-s6/service"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
@@ -52,13 +53,13 @@ func main() {
 	// Routes
 	api := app.Group("/api")
 
-	handler.EventHandler(api.Group("/events"), context.Background(), *service.NewEventService(db_client), *service.NewSportService(db_client))
-	handler.SportHandler(api.Group("/sports"), context.Background(), *service.NewSportService(db_client))
-	handler.UserHandler(api.Group("/users"), context.Background(), *service.NewUserService(db_client))
+	handler.EventHandler(api.Group("/events", middleware.IsAuthMiddleware), context.Background(), *service.NewEventService(db_client), *service.NewSportService(db_client))
+	handler.SportHandler(api.Group("/sports", middleware.IsAuthMiddleware), context.Background(), *service.NewSportService(db_client))
+	handler.UserHandler(api.Group("/users", middleware.IsAuthMiddleware), context.Background(), *service.NewUserService(db_client))
 	handler.AuthHandler(api.Group("/auth"), context.Background(), *service.NewUserService(db_client), rdb)
-	handler.EventTeamsHandler(api.Group("/event_teams"), context.Background(), *service.NewEventTeamsService(db_client), *service.NewEventService(db_client), *service.NewTeamService(db_client))
-	handler.MessageHandler(api.Group("/message"), context.Background(), *service.NewMessageService(db_client), *service.NewEventService(db_client), *service.NewUserService(db_client))
-	handler.TeamHandler(api.Group("/teams"), context.Background(), *service.NewTeamService(db_client))
+	handler.EventTeamsHandler(api.Group("/event_teams", middleware.IsAuthMiddleware), context.Background(), *service.NewEventTeamsService(db_client), *service.NewEventService(db_client), *service.NewTeamService(db_client))
+	handler.MessageHandler(api.Group("/message", middleware.IsAuthMiddleware), context.Background(), *service.NewMessageService(db_client), *service.NewEventService(db_client), *service.NewUserService(db_client))
+	handler.TeamHandler(api.Group("/teams", middleware.IsAuthMiddleware), context.Background(), *service.NewTeamService(db_client))
 
 	// Any other routes: Not Found
 	app.All("*", func(c *fiber.Ctx) error {

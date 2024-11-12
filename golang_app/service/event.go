@@ -46,7 +46,6 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
 
 	teamNames := make(map[string]bool)
 
-
 	for _, team := range event.Teams {
 		if _, ok := teamNames[team.Name]; ok {
 			log.Println("error creating team")
@@ -61,7 +60,7 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
 			Save(ctx)
 		if err != nil {
 			log.Println(err, "error creating team")
-			_ = tx.Rollback() 
+			_ = tx.Rollback()
 			return err
 		}
 		_, err = tx.EventTeams.Create().
@@ -134,9 +133,9 @@ func (e *Event) Search(ctx context.Context, name, address, eventType string, spo
 	}
 
 	if sportID != nil {
-        query = query.Where(event.HasSportWith(sport.IDEQ(*sportID)))
-    }
-	
+		query = query.Where(event.HasSportWith(sport.IDEQ(*sportID)))
+	}
+
 	return query.WithSport().All(ctx)
 
 }
