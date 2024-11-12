@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"log"
 
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
@@ -15,7 +16,7 @@ import (
 
 func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Event, serviceSport service.Sport) {
 	app.Get("/", middleware.IsAuthMiddleware, listEvents(ctx, serviceEvent))
-	app.Get("/search", searchEvent(ctx, serviceEvent))
+	app.Get("/search", middleware.IsAuthMiddleware, searchEvent(ctx, serviceEvent))
 	app.Get("/:eventId", getEvent(ctx, serviceEvent))
 	app.Post("/", middleware.IsAuthMiddleware, createEvent(ctx, serviceEvent, serviceSport))
 	app.Put("/:eventId", updateEvent(ctx, serviceEvent, serviceSport))
@@ -280,6 +281,7 @@ func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
             }
             sportID = &parsedID
         }
+		log.Println("sportID", sportID)
 
 
 		events, err := service.Search(ctx, name, address, eventType, sportID)
@@ -303,11 +305,14 @@ func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
 				IsPublic:   event.IsPublic,
 				IsFinished: event.IsFinished,
 				EventType:  event.EventType,
-				Sport: presenter.Sport{
-					ID:       event.Edges.Sport.ID,
-					Name:     event.Edges.Sport.Name,
-					ImageURL: event.Edges.Sport.ImageURL, // Optional
-				},
+			}
+			if condition := event.Edges.Sport; condition != nil {
+				toJ[i].Sport = presenter.Sport{
+					ID:       condition.ID,
+					Name:     condition.Name,
+					ImageURL: condition.ImageURL,
+				}
+				
 			}
 		}
 		return c.JSON(toJ)

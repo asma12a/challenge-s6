@@ -121,6 +121,7 @@ func (e *Event) List(ctx context.Context) ([]*ent.Event, error) {
 }
 
 func (e *Event) Search(ctx context.Context, name, address, eventType string, sportID *ulid.ID) ([]*ent.Event, error) {
+	log.Println(address, "searching")
 	query := e.db.Event.Query()
 	if name != "" {
 		query.Where(event.NameContainsFold(name))
@@ -135,6 +136,7 @@ func (e *Event) Search(ctx context.Context, name, address, eventType string, spo
 	if sportID != nil {
         query = query.Where(event.HasSportWith(sport.IDEQ(*sportID)))
     }
+	
 	return query.WithSport().All(ctx)
 
 }
