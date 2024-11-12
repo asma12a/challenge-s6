@@ -53,8 +53,8 @@ func main() {
 	// Routes
 	api := app.Group("/api")
 
-	handler.EventHandler(api.Group("/events", middleware.IsAuthMiddleware), context.Background(), *service.NewEventService(db_client), *service.NewSportService(db_client))
-	handler.SportHandler(api.Group("/sports", middleware.IsAuthMiddleware), context.Background(), *service.NewSportService(db_client))
+	handler.EventHandler(api.Group("/events"), context.Background(), *service.NewEventService(db_client), *service.NewSportService(db_client))
+	handler.SportHandler(api.Group("/sports"), context.Background(), *service.NewSportService(db_client))
 	handler.UserHandler(api.Group("/users", middleware.IsAuthMiddleware), context.Background(), *service.NewUserService(db_client))
 	handler.AuthHandler(api.Group("/auth"), context.Background(), *service.NewUserService(db_client), rdb)
 	handler.EventTeamsHandler(api.Group("/event_teams", middleware.IsAuthMiddleware), context.Background(), *service.NewEventTeamsService(db_client), *service.NewEventService(db_client), *service.NewTeamService(db_client))
