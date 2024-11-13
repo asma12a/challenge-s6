@@ -5,15 +5,16 @@ import (
 
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
+	"github.com/asma12a/challenge-s6/middleware"
 	"github.com/asma12a/challenge-s6/presenter"
 	"github.com/asma12a/challenge-s6/service"
 	"github.com/gofiber/fiber/v2"
 )
 
 func EventTeamsHandler(app fiber.Router, ctx context.Context, serviceEventTeams service.EventTeamsService, serviceEvent service.Event, serviceTeam service.Team) {
-	app.Get("/", listEventTeams(ctx, serviceEventTeams))
-	app.Get("/:eventTeamsId", getEventTeams(ctx, serviceEventTeams))
-	app.Post("/", createEventTeams(ctx, serviceEventTeams, serviceEvent, serviceTeam))
+	app.Get("/", middleware.IsAdminMiddleware, listEventTeams(ctx, serviceEventTeams))
+	app.Get("/:eventTeamsId", middleware.IsAdminMiddleware, getEventTeams(ctx, serviceEventTeams))
+	app.Post("/", createEventTeams(ctx, serviceEventTeams, serviceEvent, serviceTeam)) // middleware admin or id of user
 	app.Put("/:eventTeamsId", updateEventTeams(ctx, serviceEventTeams, serviceEvent, serviceTeam))
 	app.Delete("/:eventTeamsId", deleteEventTeams(ctx, serviceEventTeams))
 }
@@ -63,7 +64,7 @@ func createEventTeams(ctx context.Context, serviceEventTeams service.EventTeamsS
 
 		// Crée l'enregistrement EventTeams
 		newEventTeams := entity.NewEventTeams(event.ID, team.ID)
-		err = serviceEventTeams.Create(ctx, newEventTeams)
+		err = serviceEventTeams.Create(c.UserContext(), newEventTeams)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
@@ -151,7 +152,7 @@ func updateEventTeams(ctx context.Context, serviceEventTeams service.EventTeamsS
 		existingEventTeams.EventID = event.ID
 		existingEventTeams.TeamID = team.ID
 
-		_, err = serviceEventTeams.Update(ctx, existingEventTeams)
+		_, err = serviceEventTeams.Update(c.UserContext(), existingEventTeams)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",

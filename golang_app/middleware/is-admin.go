@@ -70,9 +70,8 @@ func IsAdminMiddleware(c *fiber.Ctx) error {
 		})
 	}
 
-	// Mets à jour le contexte en utilisant le viewer
+	// Mets à jour le contexte user en utilisant le viewer
 	ctx := viewer.NewUserContext(context.Background(), &viewer.User{ID: ulid.ID(user_id)})
-	c.Locals("user", fiber.Map{"id": user_id})
 	c.SetUserContext(ctx)
 
 	return c.Next()

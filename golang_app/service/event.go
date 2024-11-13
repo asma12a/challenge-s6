@@ -29,15 +29,18 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
 		return err
 	}
 
-	createdEvent, err := tx.Event.Create().
+	newEvent := tx.Event.Create().
 		SetName(event.Name).
 		SetAddress(event.Address).
 		SetEventCode(event.EventCode).
 		SetDate(event.Date).
-		SetSportID(event.SportID).
-		SetEventType(*event.EventType).
-		Save(ctx)
+		SetSportID(event.SportID)
 
+	if event.EventType != nil {
+		newEvent.SetEventType(*event.EventType)
+	}
+
+	createdEvent, err := newEvent.Save(ctx)
 	if err != nil {
 		log.Println(err, "error creating event")
 		_ = tx.Rollback()
@@ -120,7 +123,6 @@ func (e *Event) List(ctx context.Context) ([]*ent.Event, error) {
 }
 
 func (e *Event) Search(ctx context.Context, name, address, eventType string, sportID *ulid.ID) ([]*ent.Event, error) {
-	log.Println(address, "searching")
 	query := e.db.Event.Query()
 	if name != "" {
 		query.Where(event.NameContainsFold(name))

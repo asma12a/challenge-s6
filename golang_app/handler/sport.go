@@ -6,6 +6,7 @@ import (
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
+	"github.com/asma12a/challenge-s6/middleware"
 	"github.com/asma12a/challenge-s6/presenter"
 	"github.com/asma12a/challenge-s6/service"
 	"github.com/gofiber/fiber/v2"
@@ -13,10 +14,10 @@ import (
 
 func SportHandler(app fiber.Router, ctx context.Context, serviceSport service.Sport) {
 	app.Get("/", listSports(ctx, serviceSport))
-	app.Get("/:sportId", getSport(ctx, serviceSport))
-	app.Post("/", createSport(ctx, serviceSport))
-	app.Put("/:sportId", updateSport(ctx, serviceSport))
-	app.Delete("/:sportId", deleteSport(ctx, serviceSport))
+	app.Get("/:sportId", middleware.IsAdminMiddleware, getSport(ctx, serviceSport))
+	app.Post("/", middleware.IsAdminMiddleware, createSport(ctx, serviceSport))
+	app.Put("/:sportId", middleware.IsAdminMiddleware, updateSport(ctx, serviceSport))
+	app.Delete("/:sportId", middleware.IsAdminMiddleware, deleteSport(ctx, serviceSport))
 }
 
 func createSport(ctx context.Context, serviceSport service.Sport) fiber.Handler {
@@ -36,7 +37,7 @@ func createSport(ctx context.Context, serviceSport service.Sport) fiber.Handler 
 			sportInput.ImageURL,
 		)
 
-		err = serviceSport.Create(ctx, newSport)
+		err = serviceSport.Create(c.UserContext(), newSport)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
@@ -118,7 +119,7 @@ func updateSport(ctx context.Context, serviceSport service.Sport) fiber.Handler 
 		existingSport.Name = sportInput.Name
 		existingSport.ImageURL = sportInput.ImageURL
 
-		_, err = serviceSport.Update(ctx, existingSport)
+		_, err = serviceSport.Update(c.UserContext(), existingSport)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",

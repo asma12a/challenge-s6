@@ -49,6 +49,12 @@ func main() {
 	app.Use(logger.New())
 	app.Use(recover.New())
 	app.Use(requestid.New())
+	app.Use(func(c *fiber.Ctx) error {
+		// add db client to context
+		ctx := context.WithValue(c.Context(), "db", db_client)
+		c.SetUserContext(ctx)
+		return c.Next()
+	})
 
 	// Routes
 	api := app.Group("/api")
