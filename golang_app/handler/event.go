@@ -27,9 +27,16 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 	return func(c *fiber.Ctx) error {
 
 		var eventInput struct {
-			entity.Event
-			Teams []*ent.Team `json:"teams"`
+			entity.Event // Inclut tous les champs de l'entité Event
+			Teams        []struct {
+				entity.Team
+				Players    []struct {
+					Email string `json:"email"`
+					Role  string `json:"role,omitempty"`
+				} `json:"players"`
+			} `json:"teams"`
 		}
+
 
 		err := c.BodyParser(&eventInput)
 		if err != nil {
@@ -62,10 +69,9 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 			eventInput.Date,
 			sport.ID,
 			eventInput.EventType,
-			eventInput.Teams,
 		)
 
-		err = serviceEvent.Create(ctx, newEvent)
+		err = serviceEvent.Create(ctx, newEvent, eventInput.Teams)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error create event",
