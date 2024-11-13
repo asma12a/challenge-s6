@@ -5,18 +5,23 @@ import 'package:flutter_app/core/exceptions/app_exception.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 class AuthService {
-  static Future<Map<String, dynamic>> signIn(body) async {
+  final _storage = const FlutterSecureStorage();
+
+  Future<Map<String, dynamic>> signIn(body) async {
     try {
       final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/auth/login');
-      final response = await http.post(
-          uri,
+      final response = await http.post(uri,
           headers: {
             'Content-Type': 'application/json',
           },
-          body: jsonEncode(body)
-      );
+          body: jsonEncode(body));
       final data = jsonDecode(utf8.decode(response.bodyBytes));
+      await _storage.write(
+          key: dotenv.env['JWT_STORAGE_KEY']!, value: data['token']);
+
       return data;
     } catch (error) {
       log('An error occurred while ', error: error);
@@ -43,4 +48,5 @@ class AuthService {
       log('An error occurred during sign-up', error: error);
       throw AppException(message: 'Failed to sign up, please try again.');
     }
-  }}
+  }
+}

@@ -75,8 +75,8 @@ class __FormContentState extends State<_FormContent> {
   void _signIn() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      final result = await AuthService.signIn(
-          {"email": _enteredEmail, "password": _enteredPassword});
+      final result = await AuthService()
+          .signIn({"email": _enteredEmail, "password": _enteredPassword});
       if (result['status'] == 'error') {
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
