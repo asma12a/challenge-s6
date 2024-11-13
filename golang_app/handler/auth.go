@@ -73,7 +73,7 @@ func signUp(ctx context.Context, serviceUser service.User, rdb *redis.Client) fi
 			})
 		}
 
-		createdUser, err := serviceUser.Create(ctx, newUser)
+		createdUser, err := serviceUser.Create(c.UserContext(), newUser)
 		if err != nil {
 			return c.Status(fiber.StatusConflict).JSON(&fiber.Map{
 				"status": "error",

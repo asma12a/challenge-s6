@@ -6,6 +6,7 @@ import (
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
+	"github.com/asma12a/challenge-s6/middleware"
 	"github.com/asma12a/challenge-s6/presenter"
 	"github.com/asma12a/challenge-s6/service"
 	"github.com/go-playground/validator/v10"
@@ -13,12 +14,14 @@ import (
 )
 
 func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Event, serviceSport service.Sport) {
-	// app.Get("/", listEvents(ctx, serviceEvent))
+	app.Get("/", middleware.IsAdminMiddleware, listEvents(ctx, serviceEvent))
 	app.Get("/search", searchEvent(ctx, serviceEvent))
 	app.Get("/:eventId", getEvent(ctx, serviceEvent))
 	app.Post("/", createEvent(ctx, serviceEvent, serviceSport))
 	app.Put("/:eventId", updateEvent(ctx, serviceEvent, serviceSport))
 	app.Delete("/:eventId", deleteEvent(ctx, serviceEvent))
+
+	// Handle event teams routes
 }
 
 var validate = validator.New()
@@ -65,7 +68,7 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 			eventInput.Teams,
 		)
 
-		err = serviceEvent.Create(ctx, newEvent)
+		err = serviceEvent.Create(c.UserContext(), newEvent)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error create event",
@@ -182,7 +185,7 @@ func updateEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 		existingEvent.Date = eventInput.Date
 		existingEvent.EventType = eventInput.EventType
 
-		_, err = serviceEvent.Update(ctx, existingEvent)
+		_, err = serviceEvent.Update(c.UserContext(), existingEvent)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",

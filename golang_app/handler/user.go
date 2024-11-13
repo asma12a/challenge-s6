@@ -45,7 +45,7 @@ func createUser(ctx context.Context, service service.User) fiber.Handler {
 			})
 		}
 
-		_, err = service.Create(ctx, newUser)
+		_, err = service.Create(c.UserContext(), newUser)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
@@ -144,7 +144,7 @@ func updateUser(ctx context.Context, service service.User) fiber.Handler {
 			user.Roles = userInput.Roles
 		}
 
-		updatedUser, err := service.Update(ctx, user)
+		updatedUser, err := service.Update(c.UserContext(), user)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",

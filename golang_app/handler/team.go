@@ -34,7 +34,7 @@ func createTeam(ctx context.Context, serviceTeam service.Team) fiber.Handler {
 			teamInput.MaxPlayers,
 		)
 
-		err = serviceTeam.Create(ctx, newTeam)
+		err = serviceTeam.Create(c.UserContext(), newTeam)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
@@ -91,7 +91,7 @@ func updateTeam(ctx context.Context, serviceTeam service.Team) fiber.Handler {
 		}
 
 		teamInput.ID = id
-		team, err := serviceTeam.Update(ctx, &teamInput)
+		team, err := serviceTeam.Update(c.UserContext(), &teamInput)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",

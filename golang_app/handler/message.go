@@ -57,7 +57,7 @@ func createMessage(ctx context.Context, serviceMessage service.MessageService, s
 			time.Now(), // Timestamp pour la création du message
 		)
 
-		err = serviceMessage.Create(ctx, newMessage)
+		err = serviceMessage.Create(c.UserContext(), newMessage)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
@@ -159,7 +159,7 @@ func updateMessage(ctx context.Context, serviceMessage service.MessageService, s
 		}
 
 		// Mettre à jour le message dans la base de données
-		_, err = serviceMessage.Update(ctx, existingMessage)
+		_, err = serviceMessage.Update(c.UserContext(), existingMessage)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
