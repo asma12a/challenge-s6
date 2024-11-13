@@ -25,7 +25,6 @@ var validate = validator.New()
 
 func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport service.Sport) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		//var eventInput entity.Event
 
 		var eventInput struct {
 			entity.Event
@@ -60,7 +59,6 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 		newEvent := entity.NewEvent(
 			eventInput.Name,
 			eventInput.Address,
-			eventInput.EventCode,
 			eventInput.Date,
 			sport.ID,
 			*eventInput.EventType,
@@ -310,6 +308,7 @@ func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
 
 			}
 		}
+
 		return c.JSON(toJ)
 	}
 }
