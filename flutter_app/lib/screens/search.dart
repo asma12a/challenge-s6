@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/core/services/event_service.dart';
+import 'package:flutter_app/models/event.dart';
 import 'package:flutter_app/widgets/event_search.dart';
+import 'package:intl/intl.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -151,29 +153,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                 ),
               ),
-              SizedBox(
-                width: 10,
-              ),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(5.0),
-                  decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.secondary,
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8.0)),
-                  child: DropdownButton<String>(
-                    iconDisabledColor: Colors.black,
-                    hint: Text(
-                      "Statut",
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSecondary),
-                    ),
-                    underline: Container(),
-                    items: [],
-                    onChanged: (String? value) {},
-                  ),
-                ),
-              ),
+
             ],
           ),
           SizedBox(
@@ -185,10 +165,21 @@ class _SearchScreenState extends State<SearchScreen> {
                 : "${_searchResults.length} résultat trouvé.",
             style: TextStyle(color: Colors.white),
           ),
+          SizedBox(
+            height: 50,
+          ),
           Expanded(
             child: ListView.builder(
               itemCount: _searchResults.length,
-              itemBuilder: (ctx, index) => EventSearch(),
+              itemBuilder: (ctx, index) => EventSearch(
+                  event: Event(
+                      id: _searchResults[index]["id"],
+                      name: _searchResults[index]["name"],
+                      date: DateFormat.yMMMd().format(
+                        DateTime.parse(_searchResults[index]["date"]),
+                      ),
+                      address: _searchResults[index]["address"],
+                  sport: _searchResults[index]["sport"]["name"])),
             ),
           ),
         ],

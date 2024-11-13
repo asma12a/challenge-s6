@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/asma12a/challenge-s6/config"
 	"github.com/asma12a/challenge-s6/database"
@@ -22,13 +23,14 @@ func main() {
 	dropAllData(ctx, db_client)
 	seedUsers(ctx, db_client)
 	seedSports(ctx, db_client)
+	seedEvents(ctx, db_client)
 
 	log.Println("Database seeding completed!")
 }
 
 func seedSports(ctx context.Context, db_client *ent.Client) {
 	// foot, basket, tennis, running
-	sports := []string{"football", "basketball", "tennis", "running"}
+	sports := []string{"Football", "Basketball", "Tennis", "Running"}
 
 	for _, sport := range sports {
 		_, err := db_client.Sport.Create().
@@ -40,6 +42,26 @@ func seedSports(ctx context.Context, db_client *ent.Client) {
 	}
 
 	log.Println("Sports seeded!")
+}
+
+func seedEvents(ctx context.Context, db_client *ent.Client) {
+	// foot, basket, tennis, running
+	sports := db_client.Sport.Query().AllX(ctx)
+
+	for _, sport := range sports {
+		_, err := db_client.Event.Create().
+			SetName(gofakeit.Name()).
+			SetAddress(gofakeit.Address().Address).
+			SetSport(sport).
+			SetEventCode("1234").
+			SetDate(time.Now().Format(time.DateOnly)).
+			Save(ctx)
+		if err != nil {
+			log.Fatalf("Failed creating event: %v", err)
+		}
+	}
+
+	log.Println("Events seeded!")
 }
 
 func seedUsers(ctx context.Context, db_client *ent.Client) {
@@ -92,5 +114,6 @@ func dropAllData(ctx context.Context, db_client *ent.Client) {
 	// execute sql query to drop all data
 	db_client.User.Delete().ExecX(ctx)
 	db_client.Sport.Delete().ExecX(ctx)
+	db_client.Event.Delete().ExecX(ctx)
 	log.Println("All data dropped!")
 }
