@@ -4,11 +4,11 @@ import 'package:carousel_slider/carousel_slider.dart';
 class Carousel extends StatefulWidget {
   const Carousel({
     super.key,
-    required this.imgList,
+    required this.items,
     required this.text,
   });
 
-  final List<String> imgList;
+  final List<Widget> items;
   final String text;
 
   @override
@@ -30,19 +30,21 @@ class CarouselState extends State<Carousel> {
           children: [
             // Positionne le texte au-dessus de l'image active
             Padding(
-              padding: EdgeInsets.only(left: (constraints.maxWidth - imageWidth) / 2),
+              padding: EdgeInsets.only(
+                  left: (constraints.maxWidth - imageWidth) / 2),
               child: Text(
                 widget.text,
-                style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                  color: Colors.white
-                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleLarge!
+                    .copyWith(color: Colors.white),
               ),
             ),
             const SizedBox(height: 10),
             CarouselSlider(
               options: CarouselOptions(
                 height: MediaQuery.of(context).size.width,
-                autoPlay: true,
+                autoPlay: false,
                 enlargeCenterPage: true,
                 onPageChanged: (index, reason) {
                   setState(() {
@@ -50,13 +52,7 @@ class CarouselState extends State<Carousel> {
                   });
                 },
               ),
-              items: widget.imgList.map((item) {
-                return Image.network(
-                  item,
-                  fit: BoxFit.cover,
-                  width: imageWidth,
-                );
-              }).toList(),
+              items: widget.items,
             ),
           ],
         );

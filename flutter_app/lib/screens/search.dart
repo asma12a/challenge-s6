@@ -153,11 +153,10 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                 ),
               ),
-
             ],
           ),
           SizedBox(
-            height: 50,
+            height: 10,
           ),
           Text(
             _searchResults.length > 1
@@ -166,7 +165,7 @@ class _SearchScreenState extends State<SearchScreen> {
             style: TextStyle(color: Colors.white),
           ),
           SizedBox(
-            height: 50,
+            height: 5,
           ),
           Expanded(
             child: ListView.builder(
@@ -179,7 +178,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         DateTime.parse(_searchResults[index]["date"]),
                       ),
                       address: _searchResults[index]["address"],
-                  sport: _searchResults[index]["sport"]["name"])),
+                      sport: _searchResults[index]["sport"]["name"])),
             ),
           ),
         ],
