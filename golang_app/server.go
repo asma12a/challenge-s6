@@ -11,6 +11,7 @@ import (
 	"github.com/asma12a/challenge-s6/handler"
 	"github.com/asma12a/challenge-s6/middleware"
 	"github.com/asma12a/challenge-s6/service"
+	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -56,7 +57,39 @@ func main() {
 		return c.Next()
 	})
 
-	// Routes
+	// Middleware pour vérifier si la requête est une demande de WebSocket
+	app.Use(func(c *fiber.Ctx) error {
+		if websocket.IsWebSocketUpgrade(c) {
+			return c.Next() // Si c'est une mise à niveau WebSocket, on continue
+		}
+		return fiber.ErrUpgradeRequired
+	})
+
+	// Route WebSocket
+	app.Get("/ws/:id", websocket.New(func(c *websocket.Conn) {
+		// Extraire les paramètres et afficher les informations
+		log.Println("WebSocket connected!")
+		log.Println("ID:", c.Params("id"))                   // Paramètre :id
+		log.Println("Version:", c.Query("v"))                // Paramètre de query :v
+		log.Println("Session cookie:", c.Cookies("session")) // Cookie :session
+
+		// Lire et écrire des messages sur la connexion WebSocket
+		for {
+			mt, msg, err := c.ReadMessage()
+			if err != nil {
+				log.Println("Failed to read message:", err)
+				break
+			}
+			log.Printf("Received: %s", msg)
+
+			if err := c.WriteMessage(mt, msg); err != nil {
+				log.Println("Failed to write message:", err)
+				break
+			}
+		}
+	}))
+
+	// Routes API
 	api := app.Group("/api")
 
 	handler.EventHandler(api.Group("/events", middleware.IsAuthMiddleware), context.Background(), *service.NewEventService(db_client), *service.NewSportService(db_client))
@@ -74,5 +107,6 @@ func main() {
 		})
 	})
 
+	// Démarre le serveur
 	log.Fatal(app.Listen(fmt.Sprintf(":%s", config.Env.APIPort)))
 }
