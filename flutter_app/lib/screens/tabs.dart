@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/screens/home.dart';
+import 'package:flutter_app/screens/new_event.dart';
 import 'package:flutter_app/screens/search.dart';
 import 'package:flutter_app/widgets/main_drawer.dart';
 
@@ -25,7 +26,7 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget activePage = HomeScreen();
+    Widget activePage = NewEvent();
 
     if (_selectPageIndex == 1) {
       activePage = SearchScreen();

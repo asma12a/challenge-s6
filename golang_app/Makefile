@@ -11,7 +11,7 @@ generate:
 	go generate ./ent
 
 # Migrate Ent scheme to database
-migrate migration:
+migrate:
 	go run database/migrate/main.go
 
 # Seed database with data

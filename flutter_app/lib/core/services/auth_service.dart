@@ -17,7 +17,6 @@ class AuthService {
           body: jsonEncode(body)
       );
       final data = jsonDecode(utf8.decode(response.bodyBytes));
-      print(data);
       return data;
     } catch (error) {
       log('An error occurred while ', error: error);
