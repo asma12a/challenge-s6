@@ -58,12 +58,12 @@ func main() {
 	})
 
 	// Middleware pour vérifier si la requête est une demande de WebSocket
-	app.Use(func(c *fiber.Ctx) error {
-		if websocket.IsWebSocketUpgrade(c) {
-			return c.Next() // Si c'est une mise à niveau WebSocket, on continue
-		}
-		return fiber.ErrUpgradeRequired
-	})
+	// app.Use(func(c *fiber.Ctx) error {
+	// if websocket.IsWebSocketUpgrade(c) {
+	// return c.Next() // Si c'est une mise à niveau WebSocket, on continue
+	// }
+	// return fiber.ErrUpgradeRequired
+	// })
 
 	// Route WebSocket
 	app.Get("/ws/:id", websocket.New(func(c *websocket.Conn) {
