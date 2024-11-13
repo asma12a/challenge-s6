@@ -3,10 +3,12 @@ package service
 import (
 	"context"
 	"log"
+	"github.com/asma12a/challenge-s6/ent/user"
 
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
+	"github.com/asma12a/challenge-s6/ent/teamuser"
 	"github.com/asma12a/challenge-s6/ent/sport"
 	"github.com/asma12a/challenge-s6/entity"
 )
@@ -21,7 +23,13 @@ func NewEventService(client *ent.Client) *Event {
 	}
 }
 
-func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
+func (repo *Event) Create(ctx context.Context, event *entity.Event, teamsInput []struct {
+	entity.Team
+	Players    []struct {
+		Email string `json:"email"`
+		Role  string `json:"role,omitempty"`
+	} `json:"players"`
+}) error {
 
 	tx, err := repo.db.Tx(ctx)
 	if err != nil {
@@ -49,7 +57,7 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
 
 	teamNames := make(map[string]bool)
 
-	for _, team := range event.Teams {
+	for _, team := range teamsInput {
 		if _, ok := teamNames[team.Name]; ok {
 			log.Println("error creating team")
 			_ = tx.Rollback()
@@ -74,6 +82,50 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
 			log.Println(err, "error creating event team")
 			_ = tx.Rollback()
 			return err
+		}
+
+		for _, player := range team.Players {
+			playerEmail := player.Email
+			user, err := tx.User.Query().Where(user.EmailEQ(playerEmail)).Only(ctx)
+			if err != nil {
+				if ent.IsNotFound(err) {
+					teamUserCreate := tx.TeamUser.Create().
+						SetTeamID(createdTeam.ID).
+						SetEmail(player.Email).
+						SetStatus("pending")
+
+					// Définir le rôle uniquement s'il est présent dans le payload
+					if player.Role != "" {
+						teamUserCreate = teamUserCreate.SetRole(teamuser.Role(player.Role))
+					}
+					_, err = teamUserCreate.Save(ctx)
+											
+					if err != nil {
+						log.Println("error adding player to team with null userId:", err)
+						_ = tx.Rollback()
+						return err
+					}
+				}else{
+					log.Println("error finding user with email:", err)
+					_ = tx.Rollback()
+					return err
+				}
+			}else{
+				teamUserCreate := tx.TeamUser.Create().
+					SetTeamID(createdTeam.ID).
+					SetUserID(user.ID).
+					SetStatus("valid")
+					if player.Role != "" {
+						teamUserCreate = teamUserCreate.SetRole(teamuser.Role(player.Role))
+					}
+				_, err = teamUserCreate.Save(ctx)
+				if err != nil {
+					log.Println("error adding player to team with userId:", err)
+					_ = tx.Rollback()
+					return err
+				}
+			}
+
 		}
 	}
 	if err := tx.Commit(); err != nil {
@@ -122,13 +174,15 @@ func (e *Event) List(ctx context.Context) ([]*ent.Event, error) {
 	return e.db.Event.Query().WithSport().All(ctx)
 }
 
-func (e *Event) Search(ctx context.Context, name, address, eventType string, sportID *ulid.ID) ([]*ent.Event, error) {
+func (e *Event) Search(ctx context.Context, search, eventType string, sportID *ulid.ID) ([]*ent.Event, error) {
 	query := e.db.Event.Query()
-	if name != "" {
-		query.Where(event.NameContainsFold(name))
-	}
-	if address != "" {
-		query.Where(event.AddressContainsFold(address))
+	if search != "" {
+		query.Where(
+			event.Or(
+				event.NameContainsFold(search),
+				event.AddressContainsFold(search),
+			),
+		)
 	}
 	if eventType != "" {
 		query.Where(event.EventTypeEQ(event.EventType(eventType)))
@@ -139,5 +193,4 @@ func (e *Event) Search(ctx context.Context, name, address, eventType string, spo
 	}
 
 	return query.WithSport().All(ctx)
-
 }

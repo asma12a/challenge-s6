@@ -30,9 +30,16 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 	return func(c *fiber.Ctx) error {
 
 		var eventInput struct {
-			entity.Event
-			Teams []*ent.Team `json:"teams"`
+			entity.Event // Inclut tous les champs de l'entité Event
+			Teams        []struct {
+				entity.Team
+				Players    []struct {
+					Email string `json:"email"`
+					Role  string `json:"role,omitempty"`
+				} `json:"players"`
+			} `json:"teams"`
 		}
+
 
 		err := c.BodyParser(&eventInput)
 		if err != nil {
@@ -65,10 +72,9 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 			eventInput.Date,
 			sport.ID,
 			eventInput.EventType,
-			eventInput.Teams,
 		)
 
-		err = serviceEvent.Create(c.UserContext(), newEvent)
+		err = serviceEvent.Create(c.UserContext(), newEvent, eventInput.Teams)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error create event",
@@ -264,8 +270,7 @@ func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
 
-		name := c.Query("name")
-		address := c.Query("address")
+		search := c.Query("search")
 		eventType := c.Query("type")
 		sportIDStr := c.Query("sport")
 
@@ -281,7 +286,7 @@ func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
 			sportID = &parsedID
 		}
 
-		events, err := service.Search(ctx, name, address, eventType, sportID)
+		events, err := service.Search(ctx, search, eventType, sportID)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"error": err.Error(),

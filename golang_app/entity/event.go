@@ -9,10 +9,9 @@ import (
 type Event struct {
 	ent.Event
 	SportID ulid.ID     `json:"sport_id"`
-	Teams   []*ent.Team `json:"teams,omitempty"`
 }
 
-func NewEvent(name string, address string, date string, sportId ulid.ID, eventType *event.EventType, teams []*ent.Team) *Event {
+func NewEvent(name string, address string, date string, sportId ulid.ID, eventType *event.EventType) *Event {
 	event := &Event{
 		Event: ent.Event{
 			Name:      name,
@@ -22,7 +21,6 @@ func NewEvent(name string, address string, date string, sportId ulid.ID, eventTy
 			Address:   address,
 		},
 		SportID: sportId,
-		Teams:   teams,
 	}
 
 	return event
