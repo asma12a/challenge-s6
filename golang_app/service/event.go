@@ -174,13 +174,15 @@ func (e *Event) List(ctx context.Context) ([]*ent.Event, error) {
 	return e.db.Event.Query().WithSport().All(ctx)
 }
 
-func (e *Event) Search(ctx context.Context, name, address, eventType string, sportID *ulid.ID) ([]*ent.Event, error) {
+func (e *Event) Search(ctx context.Context, search, eventType string, sportID *ulid.ID) ([]*ent.Event, error) {
 	query := e.db.Event.Query()
-	if name != "" {
-		query.Where(event.NameContainsFold(name))
-	}
-	if address != "" {
-		query.Where(event.AddressContainsFold(address))
+	if search != "" {
+		query.Where(
+			event.Or(
+				event.NameContainsFold(search),
+				event.AddressContainsFold(search),
+			),
+		)
 	}
 	if eventType != "" {
 		query.Where(event.EventTypeEQ(event.EventType(eventType)))
@@ -191,5 +193,4 @@ func (e *Event) Search(ctx context.Context, name, address, eventType string, spo
 	}
 
 	return query.WithSport().All(ctx)
-
 }

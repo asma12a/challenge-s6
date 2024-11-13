@@ -267,8 +267,7 @@ func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
 
-		name := c.Query("name")
-		address := c.Query("address")
+		search := c.Query("search")
 		eventType := c.Query("type")
 		sportIDStr := c.Query("sport")
 
@@ -284,7 +283,7 @@ func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
 			sportID = &parsedID
 		}
 
-		events, err := service.Search(ctx, name, address, eventType, sportID)
+		events, err := service.Search(ctx, search, eventType, sportID)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"error": err.Error(),
