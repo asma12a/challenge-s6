@@ -111,6 +111,7 @@ class __FormContentState extends State<_FormContent> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextFormField(
+              keyboardType: TextInputType.emailAddress,
               validator: (value) {
                 // add email validation
                 if (value == null || value.isEmpty) {

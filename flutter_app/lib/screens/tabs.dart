@@ -26,7 +26,7 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget activePage = NewEvent();
+    Widget activePage = HomeScreen();
 
     if (_selectPageIndex == 1) {
       activePage = SearchScreen();
@@ -67,7 +67,6 @@ class _TabsScreenState extends State<TabsScreen> {
             icon: Icon(Icons.event_available),
             label: 'Mes évents',
           ),
-
         ],
       ),
     );
