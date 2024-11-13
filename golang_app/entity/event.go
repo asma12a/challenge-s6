@@ -12,13 +12,13 @@ type Event struct {
 	Teams   []*ent.Team `json:"teams,omitempty"`
 }
 
-func NewEvent(name string, address string, date string, sportId ulid.ID, eventType event.EventType, teams []*ent.Team) *Event {
+func NewEvent(name string, address string, date string, sportId ulid.ID, eventType *event.EventType, teams []*ent.Team) *Event {
 	event := &Event{
 		Event: ent.Event{
 			Name:      name,
 			EventCode: GenerateEventCode(),
 			Date:      date,
-			EventType: &eventType,
+			EventType: eventType,
 			Address:   address,
 		},
 		SportID: sportId,

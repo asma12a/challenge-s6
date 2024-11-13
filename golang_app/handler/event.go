@@ -61,7 +61,7 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 			eventInput.Address,
 			eventInput.Date,
 			sport.ID,
-			*eventInput.EventType,
+			eventInput.EventType,
 			eventInput.Teams,
 		)
 
