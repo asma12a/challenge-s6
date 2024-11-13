@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/widgets/carousel.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -62,32 +61,46 @@ class ChatScreenState extends State<ChatScreen>
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Chat"),
+          title: const Text("Chat de l'événement"),
         ),
         body: Column(
           children: [
             Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(8.0),
-                itemCount: messages.length,
-                itemBuilder: (context, index) {
-                  return Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 15),
-                      margin: const EdgeInsets.symmetric(vertical: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.blueAccent.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(10),
+              child: Container(
+                color: Colors.grey[
+                    200], // Couleur de fond claire pour la zone de messages
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(8.0),
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    return Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 15),
+                        margin: const EdgeInsets.symmetric(vertical: 5),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.2),
+                              blurRadius: 5,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          messages[index],
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.black, // Texte en noir
+                          ),
+                        ),
                       ),
-                      child: Text(
-                        messages[index],
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
             Padding(
@@ -97,15 +110,26 @@ class ChatScreenState extends State<ChatScreen>
                   Expanded(
                     child: TextField(
                       controller: _messageController,
-                      decoration: const InputDecoration(
+                      style: const TextStyle(
+                          color: Colors.black), // Texte visible en noir
+                      decoration: InputDecoration(
                         hintText: 'Écrire un message...',
-                        border: OutlineInputBorder(),
+                        hintStyle: const TextStyle(color: Colors.grey),
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 15),
                       ),
                     ),
                   ),
+                  const SizedBox(width: 8),
                   IconButton(
                     icon: const Icon(Icons.send),
-                    color: Colors.blue,
+                    color: Colors.white,
                     onPressed: _sendMessage,
                   ),
                 ],
