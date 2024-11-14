@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/core/services/event_service.dart';
 import 'package:flutter_app/models/event.dart';
-import 'package:flutter_app/widgets/event_search.dart';
+import 'package:flutter_app/widgets/event_card.dart';
 import 'package:intl/intl.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -170,7 +170,7 @@ class _SearchScreenState extends State<SearchScreen> {
           Expanded(
             child: ListView.builder(
               itemCount: _searchResults.length,
-              itemBuilder: (ctx, index) => EventSearch(
+              itemBuilder: (ctx, index) => EventCard(
                   event: Event(
                       id: _searchResults[index]["id"],
                       name: _searchResults[index]["name"],

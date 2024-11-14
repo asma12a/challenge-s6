@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/models/event.dart';
 import 'package:flutter_app/widgets/carousel.dart';
+import 'package:flutter_app/widgets/event_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -56,10 +58,24 @@ class HomeScreenState extends State<HomeScreen>
             Carousel(
               text: "Mes événements",
               items: [
-                // "https://images.unsplash.com/photo-1729592088218-02a52acb3547?q=80&w=2876&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                // "https://images.unsplash.com/photo-1729592088218-02a52acb3547?q=80&w=2876&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                // "https://images.unsplash.com/photo-1729592088218-02a52acb3547?q=80&w=2876&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                // "https://images.unsplash.com/photo-1729592088218-02a52acb3547?q=80&w=2876&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                EventCard(
+                  event: Event(
+                    id: "id",
+                    name: "Event 1",
+                    address: "Rue de la rue",
+                    date: "2022-01-01",
+                    sport: "football",
+                  ),
+                ),
+                EventCard(
+                  event: Event(
+                    id: "id2",
+                    name: "Event 2",
+                    address: "Rue de la rue",
+                    date: "2022-01-01",
+                    sport: "football",
+                  ),
+                ),
               ],
             ),
             SizedBox(
@@ -67,12 +83,7 @@ class HomeScreenState extends State<HomeScreen>
             ),
             Carousel(
               text: "Évenements recommandés",
-              items: [
-                // "https://images.unsplash.com/photo-1729592088218-02a52acb3547?q=80&w=2876&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                // "https://images.unsplash.com/photo-1729592088218-02a52acb3547?q=80&w=2876&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                // "https://images.unsplash.com/photo-1729592088218-02a52acb3547?q=80&w=2876&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                // "https://images.unsplash.com/photo-1729592088218-02a52acb3547?q=80&w=2876&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              ],
+              items: [],
             ),
           ],
         ),

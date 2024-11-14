@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/models/event.dart';
 
-class EventSearch extends StatelessWidget {
-  const EventSearch({super.key, required this.event});
+class EventCard extends StatelessWidget {
+  const EventCard({super.key, required this.event});
 
   final Event event;
 
@@ -19,7 +19,11 @@ class EventSearch extends StatelessWidget {
               title: Text(event.name),
               subtitle: Row(
                 children: [
-                  Expanded(child: Text(event.address, overflow: TextOverflow.ellipsis,)),
+                  Expanded(
+                      child: Text(
+                    event.address,
+                    overflow: TextOverflow.ellipsis,
+                  )),
                   SizedBox(width: 8),
                   Icon(
                     Icons.place,
@@ -30,11 +34,11 @@ class EventSearch extends StatelessWidget {
             ),
             Stack(
               children: [
-                Image.network(
-                    height: 300,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    "https://images.unsplash.com/photo-1729592088218-02a52acb3547?q=80&w=2876&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"),
+                // Image.network(
+                //     height: 300,
+                //     fit: BoxFit.cover,
+                //     width: double.infinity,
+                //     "https://images.unsplash.com/photo-1729592088218-02a52acb3547?q=80&w=2876&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"),
                 Positioned(
                   bottom: 0,
                   left: 0,

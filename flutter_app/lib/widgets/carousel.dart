@@ -40,8 +40,10 @@ class CarouselState extends State<Carousel> {
             const SizedBox(height: 10),
             CarouselSlider(
               options: CarouselOptions(
+                enableInfiniteScroll: false,
+                enlargeFactor: 0,
+                aspectRatio: 1,
                 height: MediaQuery.of(context).size.width,
-                autoPlay: false,
                 enlargeCenterPage: true,
                 onPageChanged: (index, reason) {
                   setState(() {
