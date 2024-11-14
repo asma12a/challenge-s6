@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -12,6 +13,7 @@ class ChatScreenState extends State<ChatScreen>
   late AnimationController _animationController;
   final TextEditingController _messageController = TextEditingController();
   List<String> messages = []; // Liste pour stocker les messages
+  late WebSocketChannel _channel; // Channel WebSocket
 
   @override
   void initState() {
@@ -23,12 +25,25 @@ class ChatScreenState extends State<ChatScreen>
       upperBound: 1,
     );
     _animationController.forward();
+
+    // Connecter le client au serveur WebSocket
+    _channel = WebSocketChannel.connect(
+      Uri.parse('ws://localhost:8080/ws'), // URL de votre serveur WebSocket
+    );
+
+    // Ecouter les messages entrants du serveur WebSocket
+    _channel.stream.listen((message) {
+      setState(() {
+        messages.add(message); // Ajoute le message à la liste
+      });
+    });
   }
 
   @override
   void dispose() {
     _animationController.dispose();
     _messageController.dispose();
+    _channel.sink.close(); // Ferme la connexion WebSocket lors de la fermeture
     super.dispose();
   }
 
@@ -36,8 +51,9 @@ class ChatScreenState extends State<ChatScreen>
   void _sendMessage() {
     final message = _messageController.text.trim();
     if (message.isNotEmpty) {
+      _channel.sink.add(message); // Envoi du message au serveur WebSocket
       setState(() {
-        messages.add(message); // Ajoute le message à la liste
+        messages.add(message); // Ajoute le message localement
       });
       _messageController.clear(); // Efface le champ de texte après l’envoi
     }
@@ -129,7 +145,7 @@ class ChatScreenState extends State<ChatScreen>
                   const SizedBox(width: 8),
                   IconButton(
                     icon: const Icon(Icons.send),
-                    color: Colors.white,
+                    color: Colors.blue,
                     onPressed: _sendMessage,
                   ),
                 ],

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sync"
 
 	"github.com/asma12a/challenge-s6/config"
 	"github.com/asma12a/challenge-s6/database"
@@ -22,6 +23,49 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 )
+
+type client struct {
+	isClosing bool
+	mu        sync.Mutex
+}
+
+var clients = make(map[*websocket.Conn]*client)
+var register = make(chan *websocket.Conn)
+var broadcast = make(chan string)
+var unregister = make(chan *websocket.Conn)
+
+func runHub() {
+	for {
+		select {
+		case connection := <-register:
+			clients[connection] = &client{}
+			log.Println("New client connected")
+
+		case message := <-broadcast:
+			// Broadcast the message to all connected clients
+			log.Println("Broadcasting message:", message)
+			for connection, c := range clients {
+				go func(connection *websocket.Conn, c *client) {
+					c.mu.Lock()
+					defer c.mu.Unlock()
+					if c.isClosing {
+						return
+					}
+					if err := connection.WriteMessage(websocket.TextMessage, []byte(message)); err != nil {
+						c.isClosing = true
+						log.Println("Write error:", err)
+						connection.Close()
+						unregister <- connection
+					}
+				}(connection, c)
+			}
+
+		case connection := <-unregister:
+			delete(clients, connection)
+			log.Println("Client disconnected")
+		}
+	}
+}
 
 func main() {
 	config.LoadEnvironmentFile()
@@ -57,37 +101,36 @@ func main() {
 		return c.Next()
 	})
 
-	// Middleware pour vérifier si la requête est une demande de WebSocket
-	// app.Use(func(c *fiber.Ctx) error {
-	// if websocket.IsWebSocketUpgrade(c) {
-	// return c.Next() // Si c'est une mise à niveau WebSocket, on continue
-	// }
-	// return fiber.ErrUpgradeRequired
-	// })
-
-	// Route WebSocket
-	app.Get("/ws/:id", websocket.New(func(c *websocket.Conn) {
-		// Extraire les paramètres et afficher les informations
-		log.Println("WebSocket connected!")
-		log.Println("ID:", c.Params("id"))                   // Paramètre :id
-		log.Println("Version:", c.Query("v"))                // Paramètre de query :v
-		log.Println("Session cookie:", c.Cookies("session")) // Cookie :session
-
-		// Lire et écrire des messages sur la connexion WebSocket
-		for {
-			mt, msg, err := c.ReadMessage()
-			if err != nil {
-				log.Println("Failed to read message:", err)
-				break
+	// WebSocket route to handle incoming connections
+	app.Get("/ws", websocket.New(func(c *websocket.Conn) {
+		defer func() {
+			// Envoyer un message de fermeture
+			if err := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, "")); err != nil {
+				log.Println("Error closing WebSocket:", err)
 			}
-			log.Printf("Received: %s", msg)
+			unregister <- c
+			c.Close()
+		}()
 
-			if err := c.WriteMessage(mt, msg); err != nil {
-				log.Println("Failed to write message:", err)
-				break
+		register <- c
+		for {
+			messageType, message, err := c.ReadMessage()
+			if err != nil {
+				log.Println("Read error:", err)
+				return
+			}
+
+			if messageType == websocket.TextMessage {
+				// Broadcast received message to all clients
+				broadcast <- string(message)
+			} else {
+				log.Println("Non-text message received")
 			}
 		}
 	}))
+
+	// Start the WebSocket hub
+	go runHub()
 
 	// Routes API
 	api := app.Group("/api")
