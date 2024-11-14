@@ -1,3 +1,5 @@
+import 'package:flutter_app/models/sport.dart';
+
 class Event {
   const Event(
       {required this.id,
@@ -10,5 +12,5 @@ class Event {
   final String name;
   final String address;
   final String date;
-  final String sport;
+  final Sport sport;
 }

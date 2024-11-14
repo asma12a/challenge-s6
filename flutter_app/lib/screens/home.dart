@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/models/event.dart';
+import 'package:flutter_app/models/sport.dart';
 import 'package:flutter_app/widgets/carousel.dart';
 import 'package:flutter_app/widgets/event_card.dart';
 
@@ -55,6 +56,9 @@ class HomeScreenState extends State<HomeScreen>
       child: SingleChildScrollView(
         child: Column(
           children: [
+            const SizedBox(
+              height: 10,
+            ),
             Carousel(
               text: "Mes événements",
               items: [
@@ -64,8 +68,13 @@ class HomeScreenState extends State<HomeScreen>
                     name: "Event 1",
                     address: "Rue de la rue",
                     date: "2022-01-01",
-                    sport: "football",
+                    sport: Sport(
+                      id: "id",
+                      name: SportName.football,
+                      type: SportType.team,
+                    ),
                   ),
+                  hasJoinedEvent: true,
                 ),
                 EventCard(
                   event: Event(
@@ -73,13 +82,40 @@ class HomeScreenState extends State<HomeScreen>
                     name: "Event 2",
                     address: "Rue de la rue",
                     date: "2022-01-01",
-                    sport: "football",
+                    sport: Sport(
+                      id: "id2",
+                      name: SportName.basketball,
+                      type: SportType.team,
+                    ),
+                  ),
+                ),
+                EventCard(
+                  event: Event(
+                    id: "id3",
+                    name: "Event 2",
+                    address: "Rue de la rue",
+                    date: "2022-01-01",
+                    sport: Sport(
+                      id: "id3",
+                      name: SportName.tennis,
+                      type: SportType.individual,
+                    ),
+                  ),
+                ),
+                EventCard(
+                  event: Event(
+                    id: "id4",
+                    name: "Event 2",
+                    address: "Rue de la rue",
+                    date: "2022-01-01",
+                    sport: Sport(
+                      id: "id4",
+                      name: SportName.running,
+                      type: SportType.individual,
+                    ),
                   ),
                 ),
               ],
-            ),
-            SizedBox(
-              height: 100,
             ),
             Carousel(
               text: "Évenements recommandés",

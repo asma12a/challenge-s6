@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/core/services/auth_service.dart';
-import 'package:flutter_app/screens/home.dart';
 import 'package:flutter_app/screens/sign_up.dart';
 import 'package:flutter_app/screens/tabs.dart';
 import 'package:flutter_app/widgets/logo.dart';

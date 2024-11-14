@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/core/services/event_service.dart';
 import 'package:flutter_app/models/event.dart';
+import 'package:flutter_app/models/sport.dart';
 import 'package:flutter_app/widgets/event_card.dart';
 import 'package:intl/intl.dart';
 
@@ -171,14 +172,38 @@ class _SearchScreenState extends State<SearchScreen> {
             child: ListView.builder(
               itemCount: _searchResults.length,
               itemBuilder: (ctx, index) => EventCard(
-                  event: Event(
-                      id: _searchResults[index]["id"],
-                      name: _searchResults[index]["name"],
-                      date: DateFormat.yMMMd().format(
-                        DateTime.parse(_searchResults[index]["date"]),
+                event: Event(
+                  id: _searchResults[index]["id"],
+                  name: _searchResults[index]["name"],
+                  date: DateFormat.yMMMd().format(
+                    DateTime.parse(_searchResults[index]["date"]),
+                  ),
+                  address: _searchResults[index]["address"],
+                  sport: Sport(
+                      id: _searchResults[index]["sport"]["id"],
+                      name: SportName.values.firstWhere(
+                        (sn) => sn.name.contains(
+                          _searchResults[index]["sport"]["name"]
+                              .toString()
+                              .toLowerCase(),
+                        ),
+                        orElse: () => SportName.football,
                       ),
-                      address: _searchResults[index]["address"],
-                      sport: _searchResults[index]["sport"]["name"])),
+                      type: SportType.values.firstWhere(
+                        (st) => st.name.contains(
+                          _searchResults[index]["sport"]["type"]
+                              .toString()
+                              .toLowerCase(),
+                        ),
+                        orElse: () => SportType.team,
+                      ),
+                      color: Color(int.tryParse(
+                            _searchResults[index]["sport"]["color"],
+                          ) ??
+                          0xFF000000),
+                      imageUrl: _searchResults[index]["sport"]["imageUrl"]),
+                ),
+              ),
             ),
           ),
         ],

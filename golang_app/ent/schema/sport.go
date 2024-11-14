@@ -18,7 +18,8 @@ func (Sport) Mixin() []ent.Mixin {
 
 func (Sport) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("name").NotEmpty(),
+		field.String("name").NotEmpty().StructTag(`validate:"required"`),
+		field.String("color").Optional(),
 		field.String("image_url").Optional(),
 		field.Int("max_teams").Optional(),
 		field.Enum("type").Values("individual", "team").Default("team").Optional(),
@@ -33,4 +34,3 @@ func (Sport) Edges() []ent.Edge {
 			StorageKey(edge.Column("stat_id")),
 	}
 }
-	

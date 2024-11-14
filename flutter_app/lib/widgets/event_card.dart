@@ -1,93 +1,123 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/models/event.dart';
+import 'package:flutter_app/models/sport.dart';
 
 class EventCard extends StatelessWidget {
-  const EventCard({super.key, required this.event});
-
   final Event event;
+  final bool hasJoinedEvent;
+
+  const EventCard(
+      {super.key, required this.event, this.hasJoinedEvent = false});
+
+  // make the on card click
+  void onCardClick() {
+    debugPrint('Card tapped.');
+  }
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Card(
-        surfaceTintColor: Theme.of(context).colorScheme.tertiary,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            ListTile(
-              leading: const Icon(Icons.sports),
-              title: Text(event.name),
-              subtitle: Row(
+        clipBehavior: Clip.hardEdge,
+        child: InkWell(
+          splashColor: Theme.of(context).colorScheme.secondary.withAlpha(30),
+          onTap: onCardClick,
+          child: SizedBox(
+            width: 300,
+            height: 200,
+            child: Stack(children: [
+              Column(
                 children: [
                   Expanded(
-                      child: Text(
-                    event.address,
-                    overflow: TextOverflow.ellipsis,
-                  )),
-                  SizedBox(width: 8),
-                  Icon(
-                    Icons.place,
-                    size: 16,
+                    flex: 3,
+                    child: event.sport.imageUrl != null
+                        ? Image.network(
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            event.sport.imageUrl as String,
+                          )
+                        : Icon(
+                            Icons.hide_image,
+                            size: 80,
+                            color: event.sport.color ??
+                                Theme.of(context)
+                                    .colorScheme
+                                    .secondary
+                                    .withAlpha(30),
+                          ),
                   ),
-                ],
-              ),
-            ),
-            Stack(
-              children: [
-                // Image.network(
-                //     height: 300,
-                //     fit: BoxFit.cover,
-                //     width: double.infinity,
-                //     "https://images.unsplash.com/photo-1729592088218-02a52acb3547?q=80&w=2876&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    color: Colors.black54,
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 6, horizontal: 24),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                  Expanded(
+                    flex: 4,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Icon(Icons.date_range),
-                        SizedBox(
-                          width: 8,
+                        ListTile(
+                          leading: const Icon(Icons.sports),
+                          title: Text(event.name),
+                          subtitle: Row(
+                            children: [
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.place,
+                                      size: 16,
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      event.address,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        Text(
-                          event.date,
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        SizedBox(
-                          width: 30,
-                        ),
-                        Icon(Icons.groups),
-                        SizedBox(
-                          width: 8,
-                        ),
-                        Text(
-                          event.sport,
-                          style: TextStyle(color: Colors.white),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            left: 16,
+                            right: 16,
+                            bottom: 16,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.date_range),
+                                  SizedBox(width: 8),
+                                  Text(event.date),
+                                ],
+                              ),
+                              Flexible(
+                                child: TextButton(
+                                  onPressed: onCardClick,
+                                  child: Text(
+                                    hasJoinedEvent ? "VOIR" : 'REJOINDRE',
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
+                ],
+              ),
+              Positioned(
+                right: 10,
+                top: 10,
+                child: Icon(
+                  sportIcon[event.sport.name],
+                  size: 32,
+                  color: event.sport.color ??
+                      Theme.of(context).colorScheme.secondary.withAlpha(30),
                 ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                TextButton(
-                  child: const Text('REJOINDRE'),
-                  onPressed: () {
-                    /* ... */
-                  },
-                ),
-                const SizedBox(width: 8),
-              ],
-            ),
-          ],
+              ),
+            ]),
+          ),
         ),
       ),
     );
