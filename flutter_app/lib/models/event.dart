@@ -10,7 +10,7 @@ class Event {
     this.type = EventType.match,
   });
 
-  final String id;
+  final String? id;
   final String name;
   final String address;
   final String date;

@@ -118,7 +118,8 @@ func seedUsers(ctx context.Context, db_client *ent.Client) {
 func dropAllData(ctx context.Context, db_client *ent.Client) {
 	// execute sql query to drop all data
 	db_client.User.Delete().ExecX(ctx)
-	db_client.Sport.Delete().ExecX(ctx)
 	db_client.Event.Delete().ExecX(ctx)
+	db_client.Sport.Delete().ExecX(ctx)
+
 	log.Println("All data dropped!")
 }

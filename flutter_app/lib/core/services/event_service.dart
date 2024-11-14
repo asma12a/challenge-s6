@@ -61,4 +61,24 @@ class EventService {
           message: 'Failed to retrieve sports, please try again.');
     }
   }
+
+  static Future<void> createEvent(Event event) async {
+    final storage = const FlutterSecureStorage();
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    try {
+      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/events');
+      await http.post(uri,
+          headers: {
+            'Content-Type': 'application/json',
+            "Authorization": "Bearer $token",
+          },
+          body: jsonEncode(event.toJson()));
+
+      print(event.toJson());
+    } catch (error) {
+      log('An error occurred while ', error: error);
+      throw AppException(
+          message: 'Failed to create event, please try again.');
+    }
+  }
 }

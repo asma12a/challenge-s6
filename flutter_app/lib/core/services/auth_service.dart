@@ -4,7 +4,6 @@ import 'dart:developer';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthService {
@@ -18,6 +17,7 @@ class AuthService {
             'Content-Type': 'application/json',
           },
           body: jsonEncode(body));
+
       final data = jsonDecode(utf8.decode(response.bodyBytes));
       await _storage.write(
           key: dotenv.env['JWT_STORAGE_KEY']!, value: data['token']);

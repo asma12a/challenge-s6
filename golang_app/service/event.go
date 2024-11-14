@@ -3,13 +3,14 @@ package service
 import (
 	"context"
 	"log"
+
 	"github.com/asma12a/challenge-s6/ent/user"
 
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
-	"github.com/asma12a/challenge-s6/ent/teamuser"
 	"github.com/asma12a/challenge-s6/ent/sport"
+	"github.com/asma12a/challenge-s6/ent/teamuser"
 	"github.com/asma12a/challenge-s6/entity"
 )
 
@@ -25,7 +26,7 @@ func NewEventService(client *ent.Client) *Event {
 
 func (repo *Event) Create(ctx context.Context, event *entity.Event, teamsInput []struct {
 	entity.Team
-	Players    []struct {
+	Players []struct {
 		Email string `json:"email"`
 		Role  string `json:"role,omitempty"`
 	} `json:"players"`
@@ -99,25 +100,25 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event, teamsInput [
 						teamUserCreate = teamUserCreate.SetRole(teamuser.Role(player.Role))
 					}
 					_, err = teamUserCreate.Save(ctx)
-											
+
 					if err != nil {
 						log.Println("error adding player to team with null userId:", err)
 						_ = tx.Rollback()
 						return err
 					}
-				}else{
+				} else {
 					log.Println("error finding user with email:", err)
 					_ = tx.Rollback()
 					return err
 				}
-			}else{
+			} else {
 				teamUserCreate := tx.TeamUser.Create().
 					SetTeamID(createdTeam.ID).
 					SetUserID(user.ID).
 					SetStatus("valid")
-					if player.Role != "" {
-						teamUserCreate = teamUserCreate.SetRole(teamuser.Role(player.Role))
-					}
+				if player.Role != "" {
+					teamUserCreate = teamUserCreate.SetRole(teamuser.Role(player.Role))
+				}
 				_, err = teamUserCreate.Save(ctx)
 				if err != nil {
 					log.Println("error adding player to team with userId:", err)
