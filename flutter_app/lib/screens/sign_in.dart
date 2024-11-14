@@ -3,6 +3,7 @@ import 'package:flutter_app/core/services/auth_service.dart';
 import 'package:flutter_app/screens/home.dart';
 import 'package:flutter_app/screens/sign_up.dart';
 import 'package:flutter_app/screens/tabs.dart';
+import 'package:flutter_app/widgets/logo.dart';
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
@@ -46,9 +47,7 @@ class _Logo extends StatelessWidget {
     return const Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Image(
-          image: AssetImage('assets/images/my_logo.png'),
-        ),
+        Logo(),
         SizedBox(
           height: 50,
         )

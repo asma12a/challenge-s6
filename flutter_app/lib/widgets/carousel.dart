@@ -34,10 +34,7 @@ class CarouselState extends State<Carousel> {
                   left: (constraints.maxWidth - imageWidth) / 2),
               child: Text(
                 widget.text,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleLarge!
-                    .copyWith(color: Colors.white),
+                style: Theme.of(context).textTheme.titleLarge!,
               ),
             ),
             const SizedBox(height: 10),
