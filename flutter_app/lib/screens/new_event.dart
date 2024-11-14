@@ -1,4 +1,13 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:flutter_app/core/services/event_service.dart';
+import 'package:flutter_app/models/event.dart';
+import 'package:flutter_app/screens/tabs.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:http/http.dart' as http;
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class NewEvent extends StatefulWidget {
   const NewEvent({super.key});
@@ -9,6 +18,182 @@ class NewEvent extends StatefulWidget {
 
 class _NewEventState extends State<NewEvent> {
   final _formKey = GlobalKey<FormState>();
+  var _enteredName = '';
+  var _selectedFile = '';
+  String? _selectedDate;
+  final TextEditingController _addressController = TextEditingController();
+  List<String> _suggestedAddresses = [];
+  var _selectedType = '';
+  var _selectedSport = '';
+  List<Map<String, dynamic>> _sports = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _initSports();
+  }
+
+  Future<void> _initSports() async {
+    try {
+      final fetchedSports = await EventService.getSports();
+      setState(() {
+        _sports = fetchedSports;
+      });
+    } catch (error) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            textAlign: TextAlign.center,
+            error.toString(),
+            style: TextStyle(color: Theme.of(context).colorScheme.onError),
+          ),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
+  }
+
+  Future<List<String>> _getAddressSuggestions(String query) async {
+    if (query.isEmpty) {
+      return [];
+    }
+    final String apiUrl =
+        'https://api-adresse.data.gouv.fr/search/?q=$query&limit=5';
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+
+      setState(() {
+        _suggestedAddresses = data['features']
+            .where((feature) => feature['properties']['label'] != null)
+            .map<String>((feature) => feature['properties']['label'] as String)
+            .toList();
+      });
+      return _suggestedAddresses;
+    } else {
+      throw Exception('Impossible de récupérer les suggestions');
+    }
+  }
+
+  String? _validateAddress(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Le champ adresse ne peut pas être vide.';
+    } else if (!_suggestedAddresses.contains(value)) {
+      return 'Veuillez sélectionner une adresse correcte.';
+    }
+    return null;
+  }
+
+  void _presentDatePicker() async {
+    final now = DateTime.now();
+    final firstDate = DateTime(now.year, now.month, now.day);
+    final lastDate = DateTime(now.year + 4);
+
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: firstDate,
+      lastDate: lastDate,
+    );
+
+    if (pickedDate != null) {
+      final formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+      setState(() {
+        _selectedDate = formattedDate; // _selectedDate devient une chaîne
+      });
+    }
+  }
+
+  void _pickFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      PlatformFile file = result.files.first;
+      setState(() {
+        _selectedFile = file.name;
+      });
+      print(file.name);
+    } else {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Theme.of(context).colorScheme.errorContainer,
+          content: Text(
+            "Erreur lors de la sélection du document",
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onErrorContainer),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+  }
+
+  void _saveEvent() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      if (_selectedDate == null || _selectedDate!.isEmpty) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              textAlign: TextAlign.center,
+              "Veuillez renseigner une date.",
+              style: TextStyle(color: Theme.of(context).colorScheme.onError),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+        return;
+      }
+      try {
+        final newEvent = Event(
+          name: _enteredName,
+          address: _addressController.text,
+          date: _selectedDate!,
+          sport: _selectedSport,
+          eventType: _selectedType,
+        );
+        await EventService.createEvent(newEvent);
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              textAlign: TextAlign.center,
+              "L'événement a bien été enregistré.",
+              style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+          ),
+        );
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (ctx) => TabsScreen(),
+          ),
+        );
+      } catch (error) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              textAlign: TextAlign.center,
+              "Serveur indisponible. Veuillez réessayer plus tard.",
+              style: TextStyle(color: Theme.of(context).colorScheme.onError),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
+
+    @override
+    void dispose() {
+      // TODO: implement dispose
+      _addressController.dispose();
+      super.dispose();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,67 +201,120 @@ class _NewEventState extends State<NewEvent> {
       appBar: AppBar(
         title: Text("Créer un événement"),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.all(20),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  TextFormField(
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface),
-                    maxLength: 50,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      icon: Icon(Icons.title),
-                      label: Text('Nom de l\'événement'),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: EdgeInsets.all(20),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    TextFormField(
+                      validator: (value) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            value.trim().length <= 1 ||
+                            value.trim().length > 50) {
+                          return 'Doit contenir entre 1 et 50 caractères.';
+                        }
+                        return null;
+                      },
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface),
+                      maxLength: 50,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        icon: Icon(Icons.title),
+                        label: Text('Nom de l\'événement'),
+                      ),
+                      onSaved: (value) {
+                        _enteredName = value!;
+                      },
                     ),
-                  ),
-                  SizedBox(height: 20),
-                  TextFormField(
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface),
-                    maxLength: 100,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      icon: Icon(Icons.place),
-                      label: Text('Adresse de l\'événement'),
+                    SizedBox(height: 20),
+                    TypeAheadField<String>(
+                      controller: _addressController,
+                      // Utilisation du controller
+                      builder: (context, controller, focusNode) {
+                        return TextFormField(
+                          controller: controller,
+                          focusNode: focusNode,
+                          autofocus: true,
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface),
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            icon: Icon(Icons.place),
+                            labelText: 'Adresse de l\'événement',
+                          ),
+                          validator: _validateAddress,
+                          onSaved: (value) {
+                            _addressController.text = value!;
+                          },
+                        );
+                      },
+                      suggestionsCallback: (search) =>
+                          _getAddressSuggestions(search),
+                      itemBuilder: (context, suggestion) {
+                        return ListTile(
+                          title: Text(suggestion),
+                        );
+                      },
+                      onSelected: (suggestion) {
+                        _addressController.text =
+                            suggestion; // Mise à jour du champ de texte
+                      },
                     ),
-                  ),
-                  SizedBox(height: 20),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 2),
-                    child: Row(
-                      children: [
-                        Icon(Icons.calendar_month),
-                        SizedBox(
-                          width: 15,
-                        ),
-                        ElevatedButton(
-                            onPressed: () {},
-                            child: Text("Sélectionner une date"))
-                      ],
+                    SizedBox(height: 40),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 2),
+                      child: Row(
+                        children: [
+                          Icon(Icons.calendar_month),
+                          SizedBox(width: 15),
+                          ElevatedButton(
+                            onPressed: _presentDatePicker,
+                            child: Text("Sélectionner une date"),
+                          ),
+                          SizedBox(width: 20),
+                          Text(
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface),
+                            _selectedDate == null ? '' : _selectedDate!,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 30),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 2),
-                    child: Row(
-                      children: [
-                        Icon(Icons.sports_sharp),
-                        SizedBox(
-                          width: 15,
-                        ),
-                        SizedBox(
-                          width: 200,
-                          child: DropdownButtonFormField(
+                    SizedBox(height: 30),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 2),
+                      child: Row(
+                        children: [
+                          Icon(Icons.sports_sharp),
+                          SizedBox(width: 15),
+                          SizedBox(
+                            width: 200,
+                            child: DropdownButtonFormField(
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Veuillez sélectionner un type.';
+                                }
+                                return null;
+                              },
+                              hint: Text(
+                                "Type",
+                                style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface),
+                              ),
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(),
                               ),
                               items: [
                                 DropdownMenuItem(
+                                  value: null,
                                   child: Text(
                                     "Type",
                                     style: TextStyle(
@@ -85,49 +323,126 @@ class _NewEventState extends State<NewEvent> {
                                             .onSurface),
                                   ),
                                 ),
-                              ],
-                              onChanged: (value) {}),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 30),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 2),
-                    child: Row(
-                      children: [
-                        Icon(Icons.sports_soccer),
-                        SizedBox(
-                          width: 15,
-                        ),
-                        SizedBox(
-                          width: 200,
-                          child: DropdownButtonFormField(
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                              ),
-                              items: [
                                 DropdownMenuItem(
+                                  value: "match",
                                   child: Text(
-                                    "Sport",
+                                    "Match",
                                     style: TextStyle(
                                         color: Theme.of(context)
                                             .colorScheme
                                             .onSurface),
                                   ),
                                 ),
+                                DropdownMenuItem(
+                                  value: "training",
+                                  child: Text(
+                                    "Training",
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface),
+                                  ),
+                                )
                               ],
-                              onChanged: (value) {}),
-                        ),
-                      ],
+                              onChanged: (value) {
+                                _selectedType = value!;
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 30,),
-                ],
+                    SizedBox(height: 30),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 2),
+                      child: Row(
+                        children: [
+                          Icon(Icons.sports_soccer),
+                          SizedBox(width: 15),
+                          SizedBox(
+                            width: 200,
+                            child: DropdownButtonFormField(
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Veuillez sélectionner un sport.';
+                                }
+                                return null;
+                              },
+                              hint: Text(
+                                "Sport",
+                                style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface),
+                              ),
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                              ),
+                              items: [
+                                DropdownMenuItem<String>(
+                                  value: null,
+                                  child: Text(
+                                    "Sport",
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(context).colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ),
+                                ..._sports.map((sport) {
+                                  return DropdownMenuItem<String>(
+                                    value: sport['id'],
+                                    child: Text(
+                                      sport['name'],
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ],
+                              onChanged: (value) {
+                                _selectedSport = value!;
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 30),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 2),
+                      child: Row(
+                        children: [
+                          Icon(Icons.image),
+                          SizedBox(width: 15),
+                          ElevatedButton(
+                            onPressed: _pickFile,
+                            child: Text("Choisir une image"),
+                          ),
+                          SizedBox(width: 15),
+                          Expanded(
+                              child: Text(
+                            _selectedFile ?? '',
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface),
+                          )),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 60,
+                    ),
+                    ElevatedButton(
+                        onPressed: _saveEvent, child: Text("Enregistrer"))
+                  ],
+                ),
               ),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }

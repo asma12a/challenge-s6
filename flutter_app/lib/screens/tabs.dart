@@ -39,7 +39,11 @@ class _TabsScreenState extends State<TabsScreen> {
             IconButton(
               icon: const Icon(Icons.add),
               onPressed: () {
-                // Action pour l'icône "add"
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (ctx) => NewEvent(),
+                  ),
+                );
               },
             ),
         ],

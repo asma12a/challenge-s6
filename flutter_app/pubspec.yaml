@@ -1,8 +1,8 @@
 name: flutter_app
-description: 'Frontend of SquadGo'
+description: "Frontend of SquadGo"
 
 # Prevent accidental publishing to pub.dev.
-publish_to: 'none'
+publish_to: "none"
 
 version: 1.0.0+1
 
@@ -11,6 +11,7 @@ environment:
 
 dependencies:
   carousel_slider: ^5.0.0
+  file_picker: ^8.1.4
   flutter:
     sdk: flutter
   flutter_dotenv: ^5.2.1
@@ -19,6 +20,7 @@ dependencies:
   flutter_native_splash: ^2.4.2
   flutter_riverpod: ^2.6.1
   flutter_secure_storage: ^9.2.2
+  flutter_typeahead: ^5.2.0
   google_fonts: ^6.2.1
   http: ^1.2.2
   intl: ^0.19.0
@@ -45,6 +47,3 @@ flutter_native_splash:
   image: assets/images/splash.png
   android_12:
     image: assets/images/splash.png
-
-
-

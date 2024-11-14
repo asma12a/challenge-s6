@@ -31,12 +31,19 @@ class _SearchScreenState extends State<SearchScreen> {
       final fetchedSports = await EventService.getSports();
       setState(() {
         _sports = fetchedSports;
-        _isLoading = false;
       });
     } catch (error) {
-      setState(() {
-        _isLoading = false;
-      });
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            textAlign: TextAlign.center,
+            error.toString(),
+            style: TextStyle(color: Theme.of(context).colorScheme.onError),
+          ),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
     }
   }
 
@@ -71,10 +78,8 @@ class _SearchScreenState extends State<SearchScreen> {
               if (_debounce?.isActive ?? false) _debounce?.cancel();
               // Créer un nouveau Timer de 2 secondes
               _debounce = Timer(const Duration(seconds: 2), () {
-                setState(() {
-                  params["address"] = value!;
+                  params["search"] = value!;
                   _getSearchResult();
-                });
               });
             },
           ),
@@ -110,10 +115,8 @@ class _SearchScreenState extends State<SearchScreen> {
                       );
                     }).toList(),
                     onChanged: (String? value) {
-                      setState(() {
                         params["sport"] = value!;
                         _getSearchResult();
-                      });
                     },
                   ),
                 ),
@@ -153,7 +156,6 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                 ),
               ),
-
             ],
           ),
           SizedBox(
@@ -179,7 +181,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         DateTime.parse(_searchResults[index]["date"]),
                       ),
                       address: _searchResults[index]["address"],
-                  sport: _searchResults[index]["sport"]["name"])),
+                      sport: _searchResults[index]["sport"]["name"])),
             ),
           ),
         ],

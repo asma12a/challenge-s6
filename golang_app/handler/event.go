@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"log"
 
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
@@ -33,13 +34,12 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 			entity.Event // Inclut tous les champs de l'entité Event
 			Teams        []struct {
 				entity.Team
-				Players    []struct {
+				Players []struct {
 					Email string `json:"email"`
 					Role  string `json:"role,omitempty"`
 				} `json:"players"`
 			} `json:"teams"`
 		}
-
 
 		err := c.BodyParser(&eventInput)
 		if err != nil {
@@ -56,6 +56,8 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 				"error":  err.Error(),
 			})
 		}
+
+		log.Println(eventInput.SportID, "HEEEEE")
 
 		// Vérifie si le sport existe à partir de l'ID fourni
 		sport, err := serviceSport.FindOne(ctx, eventInput.SportID)
