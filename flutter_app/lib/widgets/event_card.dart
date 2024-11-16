@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/models/event.dart';
 import 'package:flutter_app/models/sport.dart';
+import 'package:intl/intl.dart';
 
 class EventCard extends StatelessWidget {
   final Event event;
@@ -39,11 +40,11 @@ class EventCard extends StatelessWidget {
                         : Icon(
                             Icons.hide_image,
                             size: 80,
-                            color: event.sport.color ??
+                            color: event.sport.color?.withAlpha(30) ??
                                 Theme.of(context)
                                     .colorScheme
                                     .secondary
-                                    .withAlpha(30),
+                                    .withAlpha(50),
                           ),
                   ),
                   Expanded(
@@ -74,31 +75,46 @@ class EventCard extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            left: 16,
-                            right: 16,
-                            bottom: 16,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(Icons.date_range),
-                                  SizedBox(width: 8),
-                                  Text(event.date),
-                                ],
-                              ),
-                              Flexible(
-                                child: TextButton(
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              left: 16,
+                              right: 16,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: event.sport.color?.withAlpha(30) ??
+                                        Theme.of(context)
+                                            .colorScheme
+                                            .secondary
+                                            .withAlpha(30),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  padding: EdgeInsets.all(3),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.date_range,
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        DateFormat('dd/MM/yyyy')
+                                            .format(DateTime.parse(event.date)),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                TextButton(
                                   onPressed: onCardClick,
                                   child: Text(
                                     hasJoinedEvent ? "VOIR" : 'REJOINDRE',
                                   ),
-                                ),
-                              )
-                            ],
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -112,8 +128,8 @@ class EventCard extends StatelessWidget {
                 child: Icon(
                   sportIcon[event.sport.name],
                   size: 32,
-                  color: event.sport.color ??
-                      Theme.of(context).colorScheme.secondary.withAlpha(30),
+                  color: event.sport.color?.withAlpha(50) ??
+                      Theme.of(context).colorScheme.secondary.withAlpha(50),
                 ),
               ),
             ]),
