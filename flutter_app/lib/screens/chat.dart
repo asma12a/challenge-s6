@@ -18,25 +18,21 @@ class ChatScreenState extends State<ChatScreen>
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-      lowerBound: 0,
-      upperBound: 1,
-    );
-    _animationController.forward();
 
-    // Connecter le client au serveur WebSocket
-    _channel = WebSocketChannel.connect(
-      Uri.parse('ws://localhost:8080/ws'), // URL de votre serveur WebSocket
-    );
+    // Test de connexion
+    _channel = WebSocketChannel.connect(Uri.parse('ws://10.0.2.2:3001/ws'));
 
-    // Ecouter les messages entrants du serveur WebSocket
-    _channel.stream.listen((message) {
-      setState(() {
-        messages.add(message); // Ajoute le message à la liste
-      });
-    });
+    _channel.stream.listen(
+      (message) {
+        print("Message reçu du serveur : $message");
+      },
+      onError: (error) {
+        print("Erreur lors de la connexion : $error");
+      },
+      onDone: () {
+        print("Connexion terminée");
+      },
+    );
   }
 
   @override

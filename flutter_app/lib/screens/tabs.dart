@@ -3,6 +3,7 @@ import 'package:squad_go/screens/home.dart';
 import 'package:squad_go/screens/search.dart';
 import 'package:squad_go/widgets/main_drawer.dart';
 
+
 class TabsScreen extends StatefulWidget {
   const TabsScreen({super.key});
 
