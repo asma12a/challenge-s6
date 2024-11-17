@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/screens/sign_in.dart';
+import 'package:flutter_app/widgets/logo.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({super.key, required this.onSelectScreen});
@@ -36,10 +37,7 @@ class MainDrawer extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Image(
-                  image: AssetImage('assets/images/my_logo.png'),
-                  width: 120,
-                ),
+                Logo(width: 120),
                 const SizedBox(width: 18),
               ],
             ),
