@@ -29,12 +29,17 @@ func main() {
 }
 
 func seedSports(ctx context.Context, db_client *ent.Client) {
-	// foot, basket, tennis, running
-	sports := []string{"Football", "Basketball", "Tennis", "Running"}
+	sports := []ent.Sport{
+		{Name: "Football", Color: "0000FF"},
+		{Name: "Basketball", Color: "FFA500"},
+		{Name: "Tennis", Color: "008000"},
+		{Name: "Running", Color: "FF0000"},
+	}
 
 	for _, sport := range sports {
 		_, err := db_client.Sport.Create().
-			SetName(sport).
+			SetName(sport.Name).
+			SetColor(sport.Color).
 			Save(ctx)
 		if err != nil {
 			log.Fatalf("Failed creating sport: %v", err)

@@ -175,8 +175,9 @@ class _SearchScreenState extends State<SearchScreen> {
                 event: Event(
                   id: _searchResults[index]["id"],
                   name: _searchResults[index]["name"],
-                  date: DateFormat.yMMMd().format(
-                    DateTime.parse(_searchResults[index]["date"]),
+                  date: DateFormat('yyyy-MM-dd').format(
+                    DateTime.tryParse(_searchResults[index]["date"]) ??
+                        DateTime.now(),
                   ),
                   address: _searchResults[index]["address"],
                   sport: Sport(
@@ -197,10 +198,13 @@ class _SearchScreenState extends State<SearchScreen> {
                         ),
                         orElse: () => SportType.team,
                       ),
-                      color: Color(int.tryParse(
-                            _searchResults[index]["sport"]["color"],
-                          ) ??
-                          0xFF000000),
+                      color: _searchResults[index]["sport"]["color"] != null
+                          ? Color(int.parse(
+                              _searchResults[index]["sport"]["color"]
+                                  .toString(),
+                              radix: 16,
+                            ))
+                          : Colors.black,
                       imageUrl: _searchResults[index]["sport"]["imageUrl"]),
                 ),
               ),

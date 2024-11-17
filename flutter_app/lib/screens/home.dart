@@ -15,9 +15,10 @@ class HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
 
+  // TODO: get events from the API (my events and recommended events)
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     _animationController = AnimationController(
@@ -33,7 +34,6 @@ class HomeScreenState extends State<HomeScreen>
   @override
   void dispose() {
     _animationController.dispose();
-    // TODO: implement dispose
     super.dispose();
   }
 
@@ -72,6 +72,7 @@ class HomeScreenState extends State<HomeScreen>
                       id: "id",
                       name: SportName.football,
                       type: SportType.team,
+                      color: Colors.blue,
                     ),
                   ),
                   hasJoinedEvent: true,
@@ -82,6 +83,7 @@ class HomeScreenState extends State<HomeScreen>
                     name: "Event 2",
                     address: "Rue de la rue",
                     date: "2022-01-01",
+                    type: EventType.training,
                     sport: Sport(
                       id: "id2",
                       name: SportName.basketball,

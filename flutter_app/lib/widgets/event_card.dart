@@ -19,6 +19,7 @@ class EventCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Card(
+        shadowColor: event.sport.color,
         clipBehavior: Clip.hardEdge,
         child: InkWell(
           splashColor: Theme.of(context).colorScheme.secondary.withAlpha(30),
@@ -40,7 +41,7 @@ class EventCard extends StatelessWidget {
                         : Icon(
                             Icons.hide_image,
                             size: 80,
-                            color: event.sport.color?.withAlpha(30) ??
+                            color: event.sport.color?.withAlpha(50) ??
                                 Theme.of(context)
                                     .colorScheme
                                     .secondary
@@ -53,7 +54,11 @@ class EventCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         ListTile(
-                          leading: const Icon(Icons.sports),
+                          leading: Icon(
+                            sportIcon[event.sport.name],
+                            size: 32,
+                            color: event.sport.color,
+                          ),
                           title: Text(event.name),
                           subtitle: Row(
                             children: [
@@ -65,9 +70,11 @@ class EventCard extends StatelessWidget {
                                       size: 16,
                                     ),
                                     SizedBox(width: 8),
-                                    Text(
-                                      event.address,
-                                      overflow: TextOverflow.ellipsis,
+                                    Expanded(
+                                      child: Text(
+                                        event.address,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -86,24 +93,19 @@ class EventCard extends StatelessWidget {
                               children: [
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: event.sport.color?.withAlpha(30) ??
-                                        Theme.of(context)
-                                            .colorScheme
-                                            .secondary
-                                            .withAlpha(30),
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary
+                                        .withAlpha(30),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   padding: EdgeInsets.all(3),
                                   child: Row(
                                     children: [
-                                      Icon(
-                                        Icons.date_range,
-                                      ),
+                                      Icon(Icons.date_range),
                                       SizedBox(width: 8),
-                                      Text(
-                                        DateFormat('dd/MM/yyyy')
-                                            .format(DateTime.parse(event.date)),
-                                      ),
+                                      Text(DateFormat('dd/MM/yyyy')
+                                          .format(DateTime.parse(event.date))),
                                     ],
                                   ),
                                 ),
@@ -126,10 +128,10 @@ class EventCard extends StatelessWidget {
                 right: 10,
                 top: 10,
                 child: Icon(
-                  sportIcon[event.sport.name],
+                  event.type == EventType.match
+                      ? Icons.sports
+                      : Icons.fitness_center,
                   size: 32,
-                  color: event.sport.color?.withAlpha(50) ??
-                      Theme.of(context).colorScheme.secondary.withAlpha(50),
                 ),
               ),
             ]),
