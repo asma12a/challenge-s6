@@ -1,27 +1,21 @@
+import 'package:flutter_app/models/sport.dart';
+
 class Event {
   const Event({
-    this.id,
-    this.eventType,
+    required this.id,
     required this.name,
     required this.address,
     required this.date,
     required this.sport,
+    this.type = EventType.match,
   });
 
   final String? id;
   final String name;
   final String address;
   final String date;
-  final String sport;
-  final String? eventType;
-
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'address': address,
-      'date': date,
-      'sport_id': sport,
-      'event_type': eventType,
-    };
-  }
+  final Sport sport;
+  final EventType type;
 }
+
+enum EventType { match, training }

@@ -43,7 +43,7 @@ flutter:
     - .env
 
 flutter_native_splash:
-  color: "#231502"
+  color: '#085F71'
   image: assets/images/splash.png
   android_12:
     image: assets/images/splash.png

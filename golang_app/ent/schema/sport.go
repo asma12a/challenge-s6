@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"regexp"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
@@ -18,7 +20,9 @@ func (Sport) Mixin() []ent.Mixin {
 
 func (Sport) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("name").NotEmpty(),
+		field.String("name").NotEmpty().StructTag(`validate:"required"`),
+		// color is format RRGGBB as hex string
+		field.String("color").Optional().Match(regexp.MustCompile("^[0-9A-Fa-f]{6}$")),
 		field.String("image_url").Optional(),
 		field.Int("max_teams").Optional(),
 		field.Enum("type").Values("individual", "team").Default("team").Optional(),
@@ -33,4 +37,3 @@ func (Sport) Edges() []ent.Edge {
 			StorageKey(edge.Column("stat_id")),
 	}
 }
-	

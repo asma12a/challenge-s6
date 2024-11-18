@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/screens/home.dart';
-import 'package:flutter_app/screens/new_event.dart';
 import 'package:flutter_app/screens/search.dart';
 import 'package:flutter_app/widgets/main_drawer.dart';
 
@@ -49,7 +48,7 @@ class _TabsScreenState extends State<TabsScreen> {
         ],
       ),
       drawer: MainDrawer(onSelectScreen: _setScreen),
-      body: Padding(padding: EdgeInsets.only(top: 20), child: activePage),
+      body: activePage,
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         onTap: _selectPage,
