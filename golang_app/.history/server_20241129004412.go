@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sync"
+	"time"
 
 	"github.com/asma12a/challenge-s6/config"
 	"github.com/asma12a/challenge-s6/database"
 	"github.com/asma12a/challenge-s6/database/redis"
 	"github.com/asma12a/challenge-s6/handler"
-	"github.com/asma12a/challenge-s6/internal/ws"
 	"github.com/asma12a/challenge-s6/middleware"
 	"github.com/asma12a/challenge-s6/service"
 	"github.com/gofiber/contrib/websocket"
@@ -23,6 +24,64 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 )
+
+type client struct {
+	isClosing bool
+	mu        sync.Mutex
+}
+
+type room struct {
+	clients map[*websocket.Conn]bool // Clients connectés dans la salle
+}
+
+var rooms = make(map[string]*room) // Map des salles (clé : event_id)
+
+var (
+	clients    = make(map[*websocket.Conn]*client)
+	clientsMu  sync.Mutex
+	register   = make(chan *websocket.Conn)
+	broadcast  = make(chan string)
+	unregister = make(chan *websocket.Conn)
+)
+
+func runHub() {
+	for {
+		select {
+		case connection := <-register:
+			clientsMu.Lock()
+			clients[connection] = &client{}
+			clientsMu.Unlock()
+			log.Printf("New client connected: %p", connection)
+
+		case message := <-broadcast:
+			// Broadcast the message to all connected clients
+			clientsMu.Lock()
+			log.Printf("Broadcasting message to %d clients: %s", len(clients), message)
+			for connection, c := range clients {
+				go func(connection *websocket.Conn, c *client) {
+					c.mu.Lock()
+					defer c.mu.Unlock()
+					if c.isClosing {
+						return
+					}
+					if err := connection.WriteMessage(websocket.TextMessage, []byte(message)); err != nil {
+						c.isClosing = true
+						log.Printf("Write error for client %p: %v", connection, err)
+						connection.Close()
+						unregister <- connection
+					}
+				}(connection, c)
+			}
+			clientsMu.Unlock()
+
+		case connection := <-unregister:
+			clientsMu.Lock()
+			delete(clients, connection)
+			clientsMu.Unlock()
+			log.Printf("Client disconnected: %p. Total clients: %d", connection, len(clients))
+		}
+	}
+}
 
 func main() {
 	config.LoadEnvironmentFile()
@@ -58,15 +117,49 @@ func main() {
 		return c.Next()
 	})
 
-	// WebSocket Hub
-	hub := ws.NewHub()
-	go hub.Run()
+	// WebSocket route to handle incoming connections
+	app.Get("/ws", websocket.New(func(c *websocket.Conn) {
+		defer func() {
+			unregister <- c
+			c.Close()
+		}()
 
-	// WebSocket route
-	app.Get("/ws", websocket.New(ws.WebSocketHandler(hub)))
+		register <- c
+		c.SetReadLimit(512)
+		c.SetPongHandler(func(string) error {
+			c.SetReadDeadline(time.Now().Add(60 * time.Second))
+			return nil
+		})
+		c.SetReadDeadline(time.Now().Add(60 * time.Second)) // Set initial read deadline.
 
-	// API routes
+		ticker := time.NewTicker(50 * time.Second)
+		defer ticker.Stop()
+
+		go func() {
+			for range ticker.C {
+				if err := c.WriteControl(websocket.PingMessage, nil, time.Now().Add(10*time.Second)); err != nil {
+					log.Println("Ping error:", err)
+					return
+				}
+			}
+		}()
+
+		for {
+			_, message, err := c.ReadMessage()
+			if err != nil {
+				log.Println("Read error:", err)
+				return
+			}
+			broadcast <- string(message)
+		}
+	}))
+
+	// Start the WebSocket hub
+	go runHub()
+
+	// Routes API
 	api := app.Group("/api")
+
 	handler.EventHandler(api.Group("/events", middleware.IsAuthMiddleware), context.Background(), *service.NewEventService(dbClient), *service.NewSportService(dbClient))
 	handler.SportHandler(api.Group("/sports", middleware.IsAuthMiddleware), context.Background(), *service.NewSportService(dbClient))
 	handler.UserHandler(api.Group("/users", middleware.IsAuthMiddleware), context.Background(), *service.NewUserService(dbClient))
@@ -82,5 +175,6 @@ func main() {
 		})
 	})
 
+	// Start the server
 	log.Fatal(app.Listen(fmt.Sprintf(":%s", config.Env.APIPort)))
 }

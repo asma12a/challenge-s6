@@ -8,8 +8,7 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => ChatScreenState();
 }
 
-class ChatScreenState extends State<ChatScreen>
-    with SingleTickerProviderStateMixin {
+class ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   final TextEditingController _messageController = TextEditingController();
   List<String> messages = []; // Liste pour stocker les messages
@@ -19,12 +18,25 @@ class ChatScreenState extends State<ChatScreen>
   void initState() {
     super.initState();
 
-    // Test de connexion
+    // Initialisation de l'AnimationController
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(
+          milliseconds: 500), // Ajustez la durée de l'animation si nécessaire
+    );
+
+    // Démarrer l'animation au lancement
+    _animationController.forward();
+
+    // Connexion au WebSocket
     _channel = WebSocketChannel.connect(Uri.parse('ws://10.0.2.2:3001/ws'));
 
     _channel.stream.listen(
       (message) {
         print("Message reçu du serveur : $message");
+        setState(() {
+          messages.add(message); // Ajoute le message reçu dans la liste
+        });
       },
       onError: (error) {
         print("Erreur lors de la connexion : $error");

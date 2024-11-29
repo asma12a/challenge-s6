@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sync"
 
 	"github.com/asma12a/challenge-s6/config"
 	"github.com/asma12a/challenge-s6/database"
 	"github.com/asma12a/challenge-s6/database/redis"
 	"github.com/asma12a/challenge-s6/handler"
-	"github.com/asma12a/challenge-s6/internal/ws"
 	"github.com/asma12a/challenge-s6/middleware"
 	"github.com/asma12a/challenge-s6/service"
 	"github.com/gofiber/contrib/websocket"
@@ -23,6 +23,64 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 )
+
+type client struct {
+	isClosing bool
+	mu        sync.Mutex
+}
+
+type room struct {
+	clients map[*websocket.Conn]bool // Clients connectés dans la salle
+}
+
+var rooms = make(map[string]*room) // Map des salles (clé : event_id)
+
+var (
+	clients    = make(map[*websocket.Conn]*client)
+	clientsMu  sync.Mutex
+	register   = make(chan *websocket.Conn)
+	broadcast  = make(chan string)
+	unregister = make(chan *websocket.Conn)
+)
+
+func runHub() {
+	for {
+		select {
+		case connection := <-register:
+			clientsMu.Lock()
+			clients[connection] = &client{}
+			clientsMu.Unlock()
+			log.Printf("New client connected: %p", connection)
+
+		case message := <-broadcast:
+			// Broadcast the message to all connected clients
+			clientsMu.Lock()
+			log.Printf("Broadcasting message to %d clients: %s", len(clients), message)
+			for connection, c := range clients {
+				go func(connection *websocket.Conn, c *client) {
+					c.mu.Lock()
+					defer c.mu.Unlock()
+					if c.isClosing {
+						return
+					}
+					if err := connection.WriteMessage(websocket.TextMessage, []byte(message)); err != nil {
+						c.isClosing = true
+						log.Printf("Write error for client %p: %v", connection, err)
+						connection.Close()
+						unregister <- connection
+					}
+				}(connection, c)
+			}
+			clientsMu.Unlock()
+
+		case connection := <-unregister:
+			clientsMu.Lock()
+			delete(clients, connection)
+			clientsMu.Unlock()
+			log.Printf("Client disconnected: %p. Total clients: %d", connection, len(clients))
+		}
+	}
+}
 
 func main() {
 	config.LoadEnvironmentFile()
@@ -58,15 +116,54 @@ func main() {
 		return c.Next()
 	})
 
-	// WebSocket Hub
-	hub := ws.NewHub()
-	go hub.Run()
+	// WebSocket route to handle incoming connections
+	app.Get("/ws", websocket.New(func(c *websocket.Conn) {
+		eventID := c.Query("event_id")
+		if eventID == "" {
+			log.Println("Missing event_id")
+			c.Close()
+			return
+		}
 
-	// WebSocket route
-	app.Get("/ws", websocket.New(ws.WebSocketHandler(hub)))
+		// Ajouter l'utilisateur à la salle
+		if _, exists := rooms[eventID]; !exists {
+			rooms[eventID] = &room{
+				clients: make(map[*websocket.Conn]bool),
+			}
+		}
+		rooms[eventID].clients[c] = true
+		log.Printf("New client connected to event %s: %p\n", eventID, c)
 
-	// API routes
+		defer func() {
+			// Déconnexion de l'utilisateur
+			delete(rooms[eventID].clients, c)
+			if len(rooms[eventID].clients) == 0 {
+				delete(rooms, eventID) // Supprime la salle si elle est vide
+			}
+			log.Printf("Client disconnected from event %s: %p\n", eventID, c)
+			c.Close()
+		}()
+
+		for {
+			messageType, message, err := c.ReadMessage()
+			if err != nil {
+				log.Printf("Read error for client %p in event %s: %v\n", c, eventID, err)
+				break
+			}
+
+			if messageType == websocket.TextMessage {
+				// Diffuser le message aux autres clients de la salle
+				broadcastToRoom(eventID, message)
+			}
+		}
+	}))
+
+	// Start the WebSocket hub
+	go runHub()
+
+	// Routes API
 	api := app.Group("/api")
+
 	handler.EventHandler(api.Group("/events", middleware.IsAuthMiddleware), context.Background(), *service.NewEventService(dbClient), *service.NewSportService(dbClient))
 	handler.SportHandler(api.Group("/sports", middleware.IsAuthMiddleware), context.Background(), *service.NewSportService(dbClient))
 	handler.UserHandler(api.Group("/users", middleware.IsAuthMiddleware), context.Background(), *service.NewUserService(dbClient))
@@ -82,5 +179,6 @@ func main() {
 		})
 	})
 
+	// Start the server
 	log.Fatal(app.Listen(fmt.Sprintf(":%s", config.Env.APIPort)))
 }
