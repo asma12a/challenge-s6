@@ -1,69 +1,56 @@
 import 'package:flutter/material.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
+import '../core/services/chat_service.dart';
 
-class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+class ChatPage extends StatefulWidget {
+  const ChatPage({super.key});
 
   @override
-  State<ChatScreen> createState() => ChatScreenState();
+  State<ChatPage> createState() => _ChatPageState();
 }
 
-class ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateMixin {
+class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin {
+  final _controller = TextEditingController();
+  final _chatService = ChatService();
+  final List<String> _messages = [];
   late AnimationController _animationController;
-  final TextEditingController _messageController = TextEditingController();
-  List<String> messages = []; // Liste pour stocker les messages
-  late WebSocketChannel _channel; // Channel WebSocket
 
   @override
   void initState() {
     super.initState();
 
-    // Initialisation de l'AnimationController
+    // Initialiser l'AnimationController pour les animations d'entrées
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(
-          milliseconds: 500), // Ajustez la durée de l'animation si nécessaire
+      duration: const Duration(milliseconds: 500),
     );
 
-    // Démarrer l'animation au lancement
-    _animationController.forward();
+    _animationController.forward(); // Démarrer l'animation
 
-    // Connexion au WebSocket
-    _channel = WebSocketChannel.connect(Uri.parse('ws://10.0.2.2:3001/ws'));
+    // Définir la fonction de callback pour traiter les messages reçus
+    _chatService.onMessageReceived = (message) {
+      setState(() {
+        _messages.add('Autre: $message'); // Ajouter le message reçu à la liste
+      });
+    };
 
-    _channel.stream.listen(
-      (message) {
-        print("Message reçu du serveur : $message");
-        setState(() {
-          messages.add(message); // Ajoute le message reçu dans la liste
-        });
-      },
-      onError: (error) {
-        print("Erreur lors de la connexion : $error");
-      },
-      onDone: () {
-        print("Connexion terminée");
-      },
-    );
+    _chatService.connect('ws://localhost:3001/ws'); // Remplacez avec l'URL de votre WebSocket
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
-    _messageController.dispose();
-    _channel.sink.close(); // Ferme la connexion WebSocket lors de la fermeture
     super.dispose();
+    _chatService.closeConnection();
+    _animationController.dispose(); // Libérer les ressources de l'animation
   }
 
-  // Fonction pour envoyer un message
   void _sendMessage() {
-    final message = _messageController.text.trim();
+    final message = _controller.text;
     if (message.isNotEmpty) {
-      _channel.sink.add(message); // Envoi du message au serveur WebSocket
+      _chatService.sendMessage(message); // Envoyer le message au serveur
       setState(() {
-        messages.add(message); // Ajoute le message localement
+        _messages.add('Moi: $message'); // Ajouter le message envoyé à la liste
       });
-      _messageController.clear(); // Efface le champ de texte après l’envoi
+      _controller.clear(); // Effacer le champ de texte après l'envoi
     }
   }
 
@@ -85,26 +72,29 @@ class ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateMi
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Chat de l'événement"),
+          title: const Text('Chat'),
         ),
         body: Column(
           children: [
             Expanded(
               child: Container(
-                color: Colors.grey[
-                    200], // Couleur de fond claire pour la zone de messages
+                color: Colors.grey[200], // Couleur de fond claire pour la zone de messages
                 child: ListView.builder(
                   padding: const EdgeInsets.all(8.0),
-                  itemCount: messages.length,
+                  itemCount: _messages.length,
                   itemBuilder: (context, index) {
                     return Align(
-                      alignment: Alignment.centerLeft,
+                      alignment: _messages[index].startsWith('Moi:')
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft, // Aligner à gauche ou droite
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 15),
                         margin: const EdgeInsets.symmetric(vertical: 5),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: _messages[index].startsWith('Moi:')
+                              ? Colors.blue[100] // Couleur pour les messages envoyés
+                              : Colors.white, // Couleur pour les messages reçus
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
@@ -115,10 +105,10 @@ class ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateMi
                           ],
                         ),
                         child: Text(
-                          messages[index],
+                          _messages[index],
                           style: const TextStyle(
                             fontSize: 16,
-                            color: Colors.black, // Texte en noir
+                            color: Colors.black,
                           ),
                         ),
                       ),
@@ -133,11 +123,10 @@ class ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateMi
                 children: [
                   Expanded(
                     child: TextField(
-                      controller: _messageController,
-                      style: const TextStyle(
-                          color: Colors.black), // Texte visible en noir
+                      controller: _controller,
+                      style: const TextStyle(color: Colors.black), // Texte visible en noir
                       decoration: InputDecoration(
-                        hintText: 'Écrire un message...',
+                        hintText: 'Entrez un message...',
                         hintStyle: const TextStyle(color: Colors.grey),
                         filled: true,
                         fillColor: Colors.white,
@@ -154,7 +143,7 @@ class ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateMi
                   IconButton(
                     icon: const Icon(Icons.send),
                     color: Colors.blue,
-                    onPressed: _sendMessage,
+                    onPressed: _sendMessage, // Envoi du message
                   ),
                 ],
               ),

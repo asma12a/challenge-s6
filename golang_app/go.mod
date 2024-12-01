@@ -12,10 +12,13 @@ require (
 	github.com/redis/go-redis/v9 v9.7.0
 	golang.org/x/crypto v0.29.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
+	gorm.io/gorm v1.25.12
 )
 
 require (
 	github.com/fasthttp/websocket v1.5.10 // indirect
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/savsgio/gotils v0.0.0-20240704082632-aef3928b8a38 // indirect
 )
 
