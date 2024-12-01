@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/screens/sign_in.dart';
-import 'package:flutter_app/widgets/logo.dart';
+import 'package:squad_go/screens/sign_in.dart';
+import 'package:squad_go/widgets/logo.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({super.key, required this.onSelectScreen});

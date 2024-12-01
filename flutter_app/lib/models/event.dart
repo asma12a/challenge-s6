@@ -1,4 +1,4 @@
-import 'package:flutter_app/models/sport.dart';
+import 'package:squad_go/models/sport.dart';
 
 class Event {
   const Event({

@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/core/services/event_service.dart';
-import 'package:flutter_app/models/event.dart';
-import 'package:flutter_app/models/sport.dart';
-import 'package:flutter_app/widgets/event_card.dart';
+import 'package:squad_go/core/services/event_service.dart';
+import 'package:squad_go/models/event.dart';
+import 'package:squad_go/models/sport.dart';
+import 'package:squad_go/widgets/event_card.dart';
 import 'package:intl/intl.dart';
 
 class SearchScreen extends StatefulWidget {

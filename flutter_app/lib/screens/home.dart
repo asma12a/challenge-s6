@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/models/event.dart';
-import 'package:flutter_app/models/sport.dart';
-import 'package:flutter_app/widgets/carousel.dart';
-import 'package:flutter_app/widgets/event_card.dart';
+import 'package:squad_go/models/event.dart';
+import 'package:squad_go/models/sport.dart';
+import 'package:squad_go/widgets/carousel.dart';
+import 'package:squad_go/widgets/event_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
