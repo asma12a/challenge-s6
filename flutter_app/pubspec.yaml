@@ -1,5 +1,5 @@
-name: flutter_app
-description: "Frontend of SquadGo"
+name: squad_go
+description: "SquadGo"
 
 # Prevent accidental publishing to pub.dev.
 publish_to: "none"
@@ -15,6 +15,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_dotenv: ^5.2.1
+  flutter_launcher_icons: ^0.14.1
   flutter_localizations:
     sdk: flutter
   flutter_native_splash: ^2.4.2
@@ -43,7 +44,7 @@ flutter:
     - .env
 
 flutter_native_splash:
-  color: '#085F71'
+  color: "#FFFFFF"
   image: assets/images/splash.png
   android_12:
     image: assets/images/splash.png

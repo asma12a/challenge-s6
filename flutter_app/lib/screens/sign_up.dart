@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/core/services/auth_service.dart';
-import 'package:flutter_app/screens/sign_in.dart';
+import 'package:squad_go/core/services/auth_service.dart';
+import 'package:squad_go/screens/sign_in.dart';
 
 class SignUpScreen extends StatelessWidget {
   const SignUpScreen({super.key});
@@ -13,24 +13,24 @@ class SignUpScreen extends StatelessWidget {
         body: Center(
             child: isSmallScreen
                 ? const Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _Title(),
-                _FormContent(),
-              ],
-            )
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _Title(),
+                      _FormContent(),
+                    ],
+                  )
                 : Container(
-              padding: const EdgeInsets.all(32.0),
-              constraints: const BoxConstraints(maxWidth: 800),
-              child: const Row(
-                children: [
-                  Expanded(child: _Title()),
-                  Expanded(
-                    child: Center(child: _FormContent()),
-                  ),
-                ],
-              ),
-            )));
+                    padding: const EdgeInsets.all(32.0),
+                    constraints: const BoxConstraints(maxWidth: 800),
+                    child: const Row(
+                      children: [
+                        Expanded(child: _Title()),
+                        Expanded(
+                          child: Center(child: _FormContent()),
+                        ),
+                      ],
+                    ),
+                  )));
   }
 }
 
@@ -42,22 +42,22 @@ class _Title extends StatelessWidget {
     final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
 
     return Container(
-      constraints: const BoxConstraints(maxWidth: 300), // Largeur maximale pour alignement avec le formulaire
+      constraints: const BoxConstraints(
+          maxWidth: 300), // Largeur maximale pour alignement avec le formulaire
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-              'Rejoignez votre communauté dès aujourd’hui !',
+          Text('Rejoignez votre communauté dès aujourd’hui !',
               style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                color: Colors.white,
-                fontSize: 30,
-              )
-          ),
+                    color: Colors.white,
+                    fontSize: 30,
+                  )),
           const SizedBox(height: 50),
         ],
       ),
-    );  }
+    );
+  }
 }
 
 class _FormContent extends StatefulWidget {
@@ -134,8 +134,8 @@ class __FormContentState extends State<_FormContent> {
                 return null;
               },
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
               decoration: const InputDecoration(
                 labelText: 'Pseudo',
                 hintText: 'John Doe',
@@ -155,7 +155,7 @@ class __FormContentState extends State<_FormContent> {
                 }
 
                 bool emailValid = RegExp(
-                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                     .hasMatch(value);
                 if (!emailValid) {
                   return 'Please enter a valid email';
@@ -164,8 +164,8 @@ class __FormContentState extends State<_FormContent> {
                 return null;
               },
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
               decoration: const InputDecoration(
                 labelText: 'Email',
                 hintText: 'Entrez votre adresse email',
@@ -189,8 +189,8 @@ class __FormContentState extends State<_FormContent> {
                 return null;
               },
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
               obscureText: !_isPasswordVisible,
               decoration: InputDecoration(
                   labelText: 'Mot de passe',

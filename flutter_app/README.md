@@ -1,4 +1,4 @@
-# flutter_app
+# squad_go
 
 A new Flutter project.
 
