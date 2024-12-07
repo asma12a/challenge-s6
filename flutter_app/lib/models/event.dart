@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:squad_go/models/sport.dart';
 
 class Event {
@@ -19,3 +20,13 @@ class Event {
 }
 
 enum EventType { match, training }
+
+final Map<EventType, Color> eventTypeColor = {
+  EventType.match: Colors.red,
+  EventType.training: Colors.blue,
+};
+
+final Map<EventType, IconData> eventTypeIcon = {
+  EventType.match: Icons.sports,
+  EventType.training: Icons.fitness_center,
+};

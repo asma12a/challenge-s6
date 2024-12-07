@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:squad_go/models/event.dart';
 import 'package:squad_go/models/sport.dart';
 import 'package:intl/intl.dart';
+import 'package:squad_go/screens/event.dart';
+import 'package:squad_go/widgets/custom_label.dart';
 
 class EventCard extends StatelessWidget {
   final Event event;
@@ -10,9 +12,18 @@ class EventCard extends StatelessWidget {
   const EventCard(
       {super.key, required this.event, this.hasJoinedEvent = false});
 
-  // make the on card click
-  void onCardClick() {
-    debugPrint('Card tapped.');
+  void onCardClick(BuildContext context) {
+    if (hasJoinedEvent) {
+      // Navigate to the event details screen (by adding to stack)
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (ctx) => EventScreen(event: event),
+        ),
+      );
+    } else {
+      // Show the join event dialog/modal
+      debugPrint('Join event.');
+    }
   }
 
   @override
@@ -23,7 +34,9 @@ class EventCard extends StatelessWidget {
         clipBehavior: Clip.hardEdge,
         child: InkWell(
           splashColor: Theme.of(context).colorScheme.secondary.withAlpha(30),
-          onTap: onCardClick,
+          onTap: () {
+            onCardClick(context);
+          },
           child: SizedBox(
             width: 300,
             height: 200,
@@ -59,7 +72,11 @@ class EventCard extends StatelessWidget {
                             size: 32,
                             color: event.sport.color,
                           ),
-                          title: Text(event.name),
+                          title: Text(
+                            event.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                           subtitle: Row(
                             children: [
                               Expanded(
@@ -91,26 +108,19 @@ class EventCard extends StatelessWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .secondary
-                                        .withAlpha(30),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  padding: EdgeInsets.all(3),
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.date_range),
-                                      SizedBox(width: 8),
-                                      Text(DateFormat('dd/MM/yyyy')
-                                          .format(DateTime.parse(event.date))),
-                                    ],
-                                  ),
+                                CustomLabel(
+                                  label: DateFormat('dd/MM/yyyy')
+                                      .format(DateTime.parse(event.date)),
+                                  icon: Icons.date_range,
+                                  backgroundColor: Theme.of(context)
+                                      .colorScheme
+                                      .secondary
+                                      .withAlpha(30),
                                 ),
                                 TextButton(
-                                  onPressed: onCardClick,
+                                  onPressed: () {
+                                    onCardClick(context);
+                                  },
                                   child: Text(
                                     hasJoinedEvent ? "VOIR" : 'REJOINDRE',
                                   ),

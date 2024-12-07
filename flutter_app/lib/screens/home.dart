@@ -65,8 +65,10 @@ class HomeScreenState extends State<HomeScreen>
                 EventCard(
                   event: Event(
                     id: "id",
-                    name: "Event 1",
-                    address: "Rue de la rue",
+                    name:
+                        "Event 1 - Football Event 1 - Football Event 1 - Football Event 1 - Football Event 1 - Football Event 1 - Football Event 1 - Football ",
+                    address:
+                        "16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue ",
                     date: "2022-01-01",
                     sport: Sport(
                       id: "id",
@@ -90,6 +92,7 @@ class HomeScreenState extends State<HomeScreen>
                       type: SportType.team,
                     ),
                   ),
+                  hasJoinedEvent: true,
                 ),
                 EventCard(
                   event: Event(
