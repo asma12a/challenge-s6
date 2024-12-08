@@ -56,7 +56,10 @@ class EventScreen extends StatelessWidget {
                       margin: const EdgeInsets.only(
                           bottom: 16, left: 16, right: 16),
                       decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.05),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withOpacity(0.05),
                         borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(16),
                           bottomRight: Radius.circular(16),
@@ -128,9 +131,76 @@ class EventScreen extends StatelessWidget {
                   Flexible(
                     flex: 4,
                     child: Container(
-                      color: Colors.green.shade50,
+                      margin: const EdgeInsets.only(
+                        bottom: 16,
+                        left: 16,
+                        right: 16,
+                      ),
+                      child: DefaultTabController(
+                        length: 2,
+                        child: Column(
+                          children: [
+                            Container(
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: TabBar(
+                                // isScrollable: true,
+                                indicatorSize: TabBarIndicatorSize.tab,
+                                dividerColor: Colors.transparent,
+                                indicator: BoxDecoration(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primary
+                                      .withOpacity(0.5),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                labelColor: Colors.white,
+                                labelStyle: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                tabs: [
+                                  Tab(
+                                    child: Text(
+                                      'Équipes',
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  Tab(
+                                    child: Text(
+                                      'Chat',
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: TabBarView(
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 16),
+                                    color: Colors.amber,
+                                    child: Center(child: Text('Vue équipes')),
+                                  ),
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 16),
+                                    color: Colors.blue,
+                                    child: Center(child: Text('Chat')),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
