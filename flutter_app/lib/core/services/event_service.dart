@@ -72,9 +72,8 @@ class EventService {
             'Content-Type': 'application/json',
             "Authorization": "Bearer $token",
           },
-          body: jsonEncode(event.toJson()));
+          body: jsonEncode(event));
 
-      print(event.toJson());
     } catch (error) {
       log('An error occurred while ', error: error);
       throw AppException(
