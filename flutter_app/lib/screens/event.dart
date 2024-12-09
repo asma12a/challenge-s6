@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:squad_go/models/event.dart';
 import 'package:squad_go/models/sport.dart';
+import 'package:squad_go/models/team.dart';
 import 'package:squad_go/widgets/custom_label.dart';
+import 'package:squad_go/widgets/teams.dart';
 
 class EventScreen extends StatelessWidget {
   final Event event;
@@ -150,7 +152,6 @@ class EventScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: TabBar(
-                                // isScrollable: true,
                                 indicatorSize: TabBarIndicatorSize.tab,
                                 dividerColor: Colors.transparent,
                                 indicator: BoxDecoration(
@@ -185,8 +186,35 @@ class EventScreen extends StatelessWidget {
                                 children: [
                                   Container(
                                     margin: const EdgeInsets.only(top: 16),
-                                    color: Colors.amber,
-                                    child: Center(child: Text('Vue équipes')),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary
+                                          .withOpacity(0.05),
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    padding: const EdgeInsets.all(16),
+                                    child: TeamsHandle(
+                                      eventId: event.id,
+                                      maxTeams: event.sport.maxTeams,
+                                      teams: [
+                                        Team(
+                                            id: "dsqdsq",
+                                            name: "Equipe A",
+                                            maxPlayers: 11,
+                                            players: [
+                                              Player(
+                                                  id: "dsqdsq",
+                                                  name: "Joueur 1",
+                                                  email: "user@test.com")
+                                            ]),
+                                        Team(
+                                          id: "dsqdsq",
+                                          name: "Equipe B",
+                                          maxPlayers: 11,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                   Container(
                                     margin: const EdgeInsets.only(top: 16),

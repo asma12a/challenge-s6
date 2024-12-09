@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:squad_go/models/sport.dart';
+import 'package:squad_go/models/team.dart';
 
 class Event {
   const Event({
@@ -8,6 +9,7 @@ class Event {
     required this.address,
     required this.date,
     required this.sport,
+    this.teams,
     this.type = EventType.match,
   });
 
@@ -17,6 +19,7 @@ class Event {
   final String date;
   final Sport sport;
   final EventType type;
+  final List<Team>? teams;
 }
 
 enum EventType { match, training }

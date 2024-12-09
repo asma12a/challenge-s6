@@ -41,6 +41,26 @@ class EventService {
     }
   }
 
+  static Future<Map<String, dynamic>> getEventById(String id) async {
+    final storage = const FlutterSecureStorage();
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+
+    final Uri url = Uri.http(dotenv.env['API_BASE_URL']!, 'api/events/$id');
+
+    try {
+      final response = await http.get(url, headers: {
+        'Content-Type': 'application/json',
+        'Authorization': "Bearer $token",
+      });
+
+      final Map<String, dynamic> event = json.decode(response.body);
+      return event;
+    } catch (error) {
+      throw AppException(
+          message: 'Failed to retrieve event, please try again.');
+    }
+  }
+
   static Future<List<Map<String, dynamic>>> getSports() async {
     final storage = const FlutterSecureStorage();
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
