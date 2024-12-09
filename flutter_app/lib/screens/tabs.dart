@@ -4,6 +4,7 @@ import 'package:squad_go/screens/search.dart';
 import 'package:squad_go/widgets/main_drawer.dart';
 import 'package:squad_go/screens/new_event.dart';
 
+import 'package:squad_go/screens/chat.dart';
 
 class TabsScreen extends StatefulWidget {
   const TabsScreen({super.key});
@@ -27,6 +28,7 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
+   // Widget activePage = ChatPage(eventID: "01JEP2VWKHA6RVTVBDAY0552D9");
     Widget activePage = HomeScreen();
 
     if (_selectPageIndex == 1) {
