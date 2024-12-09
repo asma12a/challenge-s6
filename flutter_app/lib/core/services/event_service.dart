@@ -62,7 +62,7 @@ class EventService {
     }
   }
 
-  static Future<void> createEvent(Event event) async {
+  static Future<void> createEvent(Map<String, String> event) async {
     final storage = const FlutterSecureStorage();
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
     try {

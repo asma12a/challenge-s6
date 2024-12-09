@@ -12,27 +12,29 @@ class SignInScreen extends StatelessWidget {
     final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
 
     return Scaffold(
-        body: Center(
-            child: isSmallScreen
-                ? const Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _Logo(),
-                      _FormContent(),
-                    ],
-                  )
-                : Container(
-                    padding: const EdgeInsets.all(32.0),
-                    constraints: const BoxConstraints(maxWidth: 800),
-                    child: const Row(
+        body: SingleChildScrollView(
+          child: Center(
+              child: isSmallScreen
+                  ? const Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Expanded(child: _Logo()),
-                        Expanded(
-                          child: Center(child: _FormContent()),
-                        ),
+                        _Logo(),
+                        _FormContent(),
                       ],
-                    ),
-                  )));
+                    )
+                  : Container(
+                      padding: const EdgeInsets.all(32.0),
+                      constraints: const BoxConstraints(maxWidth: 800),
+                      child: const Row(
+                        children: [
+                          Expanded(child: _Logo()),
+                          Expanded(
+                            child: Center(child: _FormContent()),
+                          ),
+                        ],
+                      ),
+                    )),
+        ));
   }
 }
 

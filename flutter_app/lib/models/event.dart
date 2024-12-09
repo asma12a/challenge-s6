@@ -2,7 +2,7 @@ import 'package:squad_go/models/sport.dart';
 
 class Event {
   const Event({
-    required this.id,
+    this.id,
     required this.name,
     required this.address,
     required this.date,

@@ -148,13 +148,13 @@ class _NewEventState extends State<NewEvent> {
         return;
       }
       try {
-        final newEvent = Event(
-          name: _enteredName,
-          address: _addressController.text,
-          date: _selectedDate!,
-          sport: _selectedSport,
-          eventType: _selectedType,
-        );
+        final newEvent = {
+          "name": _enteredName,
+          "address": _addressController.text,
+          "date": _selectedDate!,
+          "sport_id": _selectedSport,
+          "event_type": _selectedType,
+        };
         await EventService.createEvent(newEvent);
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
