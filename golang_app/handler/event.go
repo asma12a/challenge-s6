@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"log"
 
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
@@ -60,8 +59,6 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 				"error":  err.Error(),
 			})
 		}
-
-		log.Println(eventInput.SportID, "HEEEEE")
 
 		// Vérifie si le sport existe à partir de l'ID fourni
 		sport, err := serviceSport.FindOne(ctx, eventInput.SportID)
@@ -363,8 +360,6 @@ func addTeam(ctx context.Context, serviceEvent service.Event) fiber.Handler {
 		eventIDStr := c.Params("eventId")
 		eventID, err := ulid.Parse(eventIDStr)
 
-
-		var teamsInput []entity.Team
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
@@ -372,9 +367,13 @@ func addTeam(ctx context.Context, serviceEvent service.Event) fiber.Handler {
 			})
 		}
 
-		log.Println("team input", teamsInput)
-
-		
+		var teamsInput [] struct{
+			entity.Team
+			Players []struct {
+				Email string `json:"email"`
+				Role  string `json:"role,omitempty"`
+			} `json:"players"`
+		}
 
 		err = c.BodyParser(&teamsInput)
 		if err != nil {
@@ -392,7 +391,7 @@ func addTeam(ctx context.Context, serviceEvent service.Event) fiber.Handler {
 			})
 		}
 
-	
+
 
 		err = serviceEvent.AddTeam(ctx, event.ID, teamsInput)
 		if err != nil {

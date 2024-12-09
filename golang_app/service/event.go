@@ -87,45 +87,10 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event, teamsInput [
 		}
 
 		for _, player := range team.Players {
-			playerEmail := player.Email
-			user, err := tx.User.Query().Where(user.EmailEQ(playerEmail)).Only(ctx)
+			err = repo.AddPlayerToTeam(ctx, tx, createdTeam.ID, player)
 			if err != nil {
-				if ent.IsNotFound(err) {
-					teamUserCreate := tx.TeamUser.Create().
-						SetTeamID(createdTeam.ID).
-						SetEmail(player.Email).
-						SetStatus("pending")
-
-					// Définir le rôle uniquement s'il est présent dans le payload
-					if player.Role != "" {
-						teamUserCreate = teamUserCreate.SetRole(teamuser.Role(player.Role))
-					}
-					_, err = teamUserCreate.Save(ctx)
-
-					if err != nil {
-						log.Println("error adding player to team with null userId:", err)
-						_ = tx.Rollback()
-						return err
-					}
-				} else {
-					log.Println("error finding user with email:", err)
-					_ = tx.Rollback()
-					return err
-				}
-			} else {
-				teamUserCreate := tx.TeamUser.Create().
-					SetTeamID(createdTeam.ID).
-					SetUserID(user.ID).
-					SetStatus("valid")
-				if player.Role != "" {
-					teamUserCreate = teamUserCreate.SetRole(teamuser.Role(player.Role))
-				}
-				_, err = teamUserCreate.Save(ctx)
-				if err != nil {
-					log.Println("error adding player to team with userId:", err)
-					_ = tx.Rollback()
-					return err
-				}
+				_ = tx.Rollback()
+				return err
 			}
 
 		}
@@ -215,26 +180,38 @@ func (e *Event) Search(ctx context.Context, search, eventType string, sportID *u
 	return query.WithSport().All(ctx)
 }
 
-func (e *Event) AddTeam(ctx context.Context, eventID ulid.ID, teams []entity.Team) error {
+func (e *Event) AddTeam(ctx context.Context, eventID ulid.ID, teams [] struct{
+	entity.Team
+	Players []struct {
+		Email string `json:"email"`
+		Role  string `json:"role,omitempty"`
+	} `json:"players"`
+}) error {
 	tx, err := e.db.Tx(ctx)
 	if err != nil {
 		return err
 	}
 
 	teamNames := make(map[string]bool)
-	existingTeams, err := tx.EventTeams.Query().Where(eventteams.EventIDEQ(eventID)).All(ctx)
+	existingTeams, err := tx.EventTeams.Query().Where(eventteams.EventIDEQ(eventID)).WithTeam().All(ctx)
 	if err != nil {
 		_ = tx.Rollback()
 	}
 
 	existingTeamsNames := make(map[string]bool)
+
+
 	for _, existingTeam := range existingTeams {
+
 		team, err := tx.Team.Get(ctx, existingTeam.Edges.Team.ID)
+
 		if err != nil {
+
 			_ = tx.Rollback()
 		}
 		existingTeamsNames[team.Name] = true
 	}
+
 
 	for _, team := range teams {
 		if _, exists := existingTeamsNames[team.Name]; exists {
@@ -261,6 +238,14 @@ func (e *Event) AddTeam(ctx context.Context, eventID ulid.ID, teams []entity.Tea
 			_ = tx.Rollback()
 			return err
 		}
+
+		for _, player := range team.Players {
+			err = e.AddPlayerToTeam(ctx, tx, createdTeam.ID, player)
+			if err != nil {
+				_ = tx.Rollback
+				return err
+			}
+		}
 	}
 
 	if err := tx.Commit(); err != nil {
@@ -269,3 +254,56 @@ func (e *Event) AddTeam(ctx context.Context, eventID ulid.ID, teams []entity.Tea
 	return nil
 
 }
+
+
+func (repo *Event) AddPlayerToTeam(ctx context.Context, tx *ent.Tx, teamID ulid.ID, player struct {
+	Email string `json:"email"`
+	Role  string `json:"role,omitempty"`
+}) error {
+	playerEmail := player.Email
+
+	// Vérifier si le joueur existe dans la base
+	user, err := tx.User.Query().Where(user.EmailEQ(playerEmail)).Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			// Création d'un utilisateur d'équipe avec un email uniquement
+			teamUserCreate := tx.TeamUser.Create().
+				SetTeamID(teamID).
+				SetEmail(player.Email).
+				SetStatus("pending")
+
+			if player.Role != "" {
+				teamUserCreate = teamUserCreate.SetRole(teamuser.Role(player.Role))
+			}
+
+			_, err = teamUserCreate.Save(ctx)
+			if err != nil {
+				log.Println("error adding player to team with null userId:", err)
+				return err
+			}
+		} else {
+			log.Println("error finding user with email:", err)
+			return err
+		}
+	} else {
+		// Ajout de l'utilisateur existant à l'équipe
+		teamUserCreate := tx.TeamUser.Create().
+			SetTeamID(teamID).
+			SetUserID(user.ID).
+			SetStatus("valid")
+
+		// Ajouter le rôle si défini
+		if player.Role != "" {
+			teamUserCreate = teamUserCreate.SetRole(teamuser.Role(player.Role))
+		}
+
+		_, err = teamUserCreate.Save(ctx)
+		if err != nil {
+			log.Println("error adding player to team with userId:", err)
+			return err
+		}
+	}
+
+	return nil
+}
+
