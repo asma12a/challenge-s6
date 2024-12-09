@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter_app/core/services/event_service.dart';
-import 'package:flutter_app/models/event.dart';
-import 'package:flutter_app/screens/tabs.dart';
+import 'package:squad_go/core/services/event_service.dart';
+import 'package:squad_go/models/event.dart';
+import 'package:squad_go/screens/tabs.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
