@@ -63,7 +63,6 @@ func main() {
 	handler.SportHandler(api.Group("/sports", middleware.IsAuthMiddleware), context.Background(), *service.NewSportService(db_client))
 	handler.UserHandler(api.Group("/users", middleware.IsAuthMiddleware), context.Background(), *service.NewUserService(db_client))
 	handler.AuthHandler(api.Group("/auth"), context.Background(), *service.NewUserService(db_client), rdb)
-	handler.EventTeamsHandler(api.Group("/event_teams", middleware.IsAuthMiddleware), context.Background(), *service.NewEventTeamsService(db_client), *service.NewEventService(db_client), *service.NewTeamService(db_client))
 	handler.MessageHandler(api.Group("/message", middleware.IsAuthMiddleware), context.Background(), *service.NewMessageService(db_client), *service.NewEventService(db_client), *service.NewUserService(db_client))
 	handler.TeamHandler(api.Group("/teams", middleware.IsAuthMiddleware), context.Background(), *service.NewTeamService(db_client))
 
