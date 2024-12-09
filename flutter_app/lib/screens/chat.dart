@@ -20,7 +20,7 @@ class _ChatPageState extends State<ChatPage>
   final _chatService = ChatService();
   final List<String> _messages = [];
   late AnimationController _animationController;
-  late String _currentUserId;
+  late String _currentUserId = '';
 
   @override
   void initState() {
@@ -48,8 +48,40 @@ class _ChatPageState extends State<ChatPage>
     _loadMessages(widget.eventID);
   }
 
+  // Fonction pour récupérer l'user_id à partir du token
   Future<void> _loadCurrentUser() async {
-    _currentUserId = await FlutterSecureStorage().read(key: 'user_id') ?? '';
+    final storage = const FlutterSecureStorage();
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+
+    if (token != null) {
+      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/users/:userId');
+
+      try {
+        final response = await http.get(uri, headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        });
+
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          setState(() {
+            _currentUserId = data['id'] ?? '';
+          });
+        } else if (response.statusCode == 403) {
+          print('Accès refusé : ${response.body}');
+          setState(() {
+            _currentUserId = '';
+          });
+        } else {
+          print('Erreur inconnue (${response.statusCode}): ${response.body}');
+        }
+      } catch (e) {
+        print(
+            'Erreur lors de la récupération des informations utilisateur : $e');
+      }
+    } else {
+      print('Token manquant');
+    }
   }
 
   @override
@@ -61,6 +93,11 @@ class _ChatPageState extends State<ChatPage>
 
   // Fonction pour récupérer les messages de l'événement via l'API
   Future<void> _loadMessages(String eventID) async {
+    if (_currentUserId.isEmpty) {
+      print(
+          'L\'ID utilisateur n\'est pas initialisé. Impossible de charger les messages.');
+      return; // Empêcher toute tentative d'appel si l'utilisateur n'est pas valide
+    }
     final uri =
         Uri.http(dotenv.env['API_BASE_URL']!, 'api/message/event/$eventID');
     final response = await http.get(uri, headers: {

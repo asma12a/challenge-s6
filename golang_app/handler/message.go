@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
@@ -17,6 +18,7 @@ func MessageHandler(app fiber.Router, ctx context.Context, serviceMessage servic
 	app.Post("/", createMessage(ctx, serviceMessage, serviceEvent, serviceUser))
 	app.Put("/:messageId", updateMessage(ctx, serviceMessage, serviceEvent, serviceUser))
 	app.Delete("/:messageId", deleteMessage(ctx, serviceMessage))
+	app.Get("/event/:eventID", listMessagesByEvent(ctx, serviceMessage))
 }
 
 // createMessage permet de créer un nouveau message
@@ -43,6 +45,7 @@ func createMessage(ctx context.Context, serviceMessage service.MessageService, s
 
 		// Vérification de l'existence de l'utilisateur (User)
 		user, err := serviceUser.FindOne(ctx, messageInput.UserID)
+
 		if err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 				"status": "error",
@@ -50,12 +53,23 @@ func createMessage(ctx context.Context, serviceMessage service.MessageService, s
 			})
 		}
 
+		// Validation du champ Name
+		if user.Name == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "User name is missing",
+			})
+		}
+
 		newMessage := entity.NewMessage(
 			event.ID,
 			user.ID,
+			user.Name,
 			messageInput.Content,
 			time.Now(), // Timestamp pour la création du message
 		)
+
+		fmt.Println(newMessage)
 
 		err = serviceMessage.Create(c.UserContext(), newMessage)
 		if err != nil {
@@ -93,6 +107,7 @@ func getMessage(ctx context.Context, serviceMessage service.MessageService) fibe
 			ID:        message.ID,
 			EventID:   message.EventID,
 			UserID:    message.UserID,
+			UserName:  message.UserName,
 			Content:   message.Content,
 			CreatedAt: message.CreatedAt,
 		}
@@ -211,11 +226,51 @@ func listMessages(ctx context.Context, serviceMessage service.MessageService) fi
 				ID:        message.ID,
 				EventID:   message.EventID,
 				UserID:    message.UserID,
+				UserName:  message.UserName,
 				Content:   message.Content,
 				CreatedAt: message.CreatedAt,
 			}
 		}
 
+		return c.JSON(toJ)
+	}
+}
+
+// listMessagesByEvent permet de lister les messages associés à un événement
+func listMessagesByEvent(ctx context.Context, serviceMessage service.MessageService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		// Récupérer l'ID de l'événement depuis les paramètres d'URL
+		eventID, err := ulid.Parse(c.Params("eventID"))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "Invalid Event ID",
+			})
+		}
+
+		// Récupérer les messages pour cet événement
+		messages, err := serviceMessage.ListByEvent(c.UserContext(), eventID)
+		if err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "No messages found for this event",
+			})
+		}
+
+		// Mapper les messages vers un format adapté pour la réponse
+		toJ := make([]presenter.Message, len(messages))
+		for i, message := range messages {
+			toJ[i] = presenter.Message{
+				ID:        message.ID,
+				EventID:   message.EventID,
+				UserID:    message.UserID,
+				UserName:  message.UserName,
+				Content:   message.Content,
+				CreatedAt: message.CreatedAt,
+			}
+		}
+
+		// Retourner les messages au format JSON
 		return c.JSON(toJ)
 	}
 }

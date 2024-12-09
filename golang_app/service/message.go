@@ -23,9 +23,11 @@ func NewMessageService(client *ent.Client) *MessageService {
 
 // Create permet de créer une nouvelle entrée dans Message
 func (repo *MessageService) Create(ctx context.Context, message *entity.Message) error {
+
 	_, err := repo.db.Message.Create().
 		SetEventID(message.EventID).
 		SetUserID(message.UserID).
+		SetUserName(message.UserName).
 		SetContent(message.Content).
 		SetCreatedAt(time.Now()).
 		Save(ctx)
@@ -74,4 +76,22 @@ func (repo *MessageService) Delete(ctx context.Context, id ulid.ID) error {
 // List permet de récupérer toutes les entrées Message
 func (repo *MessageService) List(ctx context.Context) ([]*ent.Message, error) {
 	return repo.db.Message.Query().All(ctx)
+}
+
+// ListByEvent permet de récupérer tous les messages associés à un événement
+func (repo *MessageService) ListByEvent(ctx context.Context, eventID ulid.ID) ([]*entity.Message, error) {
+	// Récupère tous les messages associés à un événement spécifique
+	messages, err := repo.db.Message.Query().
+		Where(message.EventIDEQ(eventID)).
+		All(ctx)
+	if err != nil {
+		return nil, entity.ErrNotFound
+	}
+
+	// Convertit les entités récupérées en entité Message
+	var result []*entity.Message
+	for _, msg := range messages {
+		result = append(result, &entity.Message{Message: *msg})
+	}
+	return result, nil
 }

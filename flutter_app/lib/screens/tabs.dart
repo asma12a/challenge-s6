@@ -4,7 +4,7 @@ import 'package:squad_go/screens/search.dart';
 import 'package:squad_go/widgets/main_drawer.dart';
 import 'package:squad_go/screens/new_event.dart';
 
-import 'package:squad_go/screens/chat.dart';
+// import 'package:squad_go/screens/chat.dart';
 
 class TabsScreen extends StatefulWidget {
   const TabsScreen({super.key});
