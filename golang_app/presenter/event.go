@@ -19,5 +19,6 @@ type Event struct {
 	IsPublic   bool             `json:"is_public,omitempty"`
 	IsFinished bool             `json:"is_finished,omitempty"`
 	EventType  *event.EventType `json:"event_type,omitempty"` // Utiliser le type EventType personnalisé
-	Sport      Sport            `json:"sport,omitempty"`      // Utiliser le type Sport personnalisé
+	Sport      Sport            `json:"sport,omitempty"`   
+	Teams 	[]Team           `json:"teams,omitempty"`
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/sport"
 	"github.com/asma12a/challenge-s6/ent/teamuser"
+	"github.com/asma12a/challenge-s6/ent/eventteams"
 	"github.com/asma12a/challenge-s6/entity"
 )
 
@@ -137,14 +138,32 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event, teamsInput [
 	return nil
 }
 
-func (e *Event) FindOne(ctx context.Context, id ulid.ID) (*entity.Event, error) {
-	event, err := e.db.Event.Query().Where(event.IDEQ(id)).Only(ctx)
+func (e *Event) FindOneWithDetails(ctx context.Context, id ulid.ID) (*entity.Event, error) {
+	event, err := e.db.Event.Query().Where(event.IDEQ(id)).
+	WithEventTeams(func(etq *ent.EventTeamsQuery) {
+		etq.WithTeam(func(tq *ent.TeamQuery) {
+			tq.WithTeamUsers(func(tuq *ent.TeamUserQuery) {
+				tuq.WithUser()
+			})
+	})}).
+		WithSport().
+		Only(ctx)
 
 	if err != nil {
 		return nil, entity.ErrNotFound
 	}
 	return &entity.Event{Event: *event}, nil
 }
+
+func (e *Event) FindOne(ctx context.Context, id ulid.ID) (*entity.Event, error) {
+	event, err := e.db.Event.Query().Where(event.IDEQ(id)).WithSport().Only(ctx)
+	if err != nil {
+		return nil, entity.ErrNotFound
+	}
+	return &entity.Event{Event: *event}, nil
+}
+
+
 
 func (repo *Event) Update(ctx context.Context, event *entity.Event) (*entity.Event, error) {
 
@@ -194,4 +213,59 @@ func (e *Event) Search(ctx context.Context, search, eventType string, sportID *u
 	}
 
 	return query.WithSport().All(ctx)
+}
+
+func (e *Event) AddTeam(ctx context.Context, eventID ulid.ID, teams []entity.Team) error {
+	tx, err := e.db.Tx(ctx)
+	if err != nil {
+		return err
+	}
+
+	teamNames := make(map[string]bool)
+	existingTeams, err := tx.EventTeams.Query().Where(eventteams.EventIDEQ(eventID)).All(ctx)
+	if err != nil {
+		_ = tx.Rollback()
+	}
+
+	existingTeamsNames := make(map[string]bool)
+	for _, existingTeam := range existingTeams {
+		team, err := tx.Team.Get(ctx, existingTeam.Edges.Team.ID)
+		if err != nil {
+			_ = tx.Rollback()
+		}
+		existingTeamsNames[team.Name] = true
+	}
+
+	for _, team := range teams {
+		if _, exists := existingTeamsNames[team.Name]; exists {
+			_ = tx.Rollback()
+		}
+		if _, exists := teamNames[team.Name]; exists {
+			_ = tx.Rollback()
+		}
+		teamNames[team.Name] = true
+
+		createdTeam, err := tx.Team.Create().
+				SetName(team.Name).
+				SetMaxPlayers(team.MaxPlayers).
+				Save(ctx)
+		if err != nil {
+			_ = tx.Rollback()
+			return err
+		}
+		_, err = tx.EventTeams.Create().
+			SetEventID(eventID).
+			SetTeamID(createdTeam.ID).
+			Save(ctx)
+		if err != nil {
+			_ = tx.Rollback()
+			return err
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+	return nil
+
 }

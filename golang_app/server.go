@@ -74,7 +74,6 @@ func main() {
 	handler.SportHandler(api.Group("/sports"), context.Background(), *service.NewSportService(dbClient))
 	handler.UserHandler(api.Group("/users"), context.Background(), *service.NewUserService(dbClient))
 	handler.AuthHandler(api.Group("/auth"), context.Background(), *service.NewUserService(dbClient), rdb)
-	handler.EventTeamsHandler(api.Group("/event_teams"), context.Background(), *service.NewEventTeamsService(dbClient), *service.NewEventService(dbClient), *service.NewTeamService(dbClient))
 	handler.MessageHandler(api.Group("/message"), context.Background(), *service.NewMessageService(dbClient), *service.NewEventService(dbClient), *service.NewUserService(dbClient))
 	handler.TeamHandler(api.Group("/teams"), context.Background(), *service.NewTeamService(dbClient))
 
