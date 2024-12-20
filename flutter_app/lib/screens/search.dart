@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:squad_go/core/services/event_service.dart';
-import 'package:squad_go/models/event.dart';
-import 'package:squad_go/models/sport.dart';
+import 'package:squad_go/core/models/event.dart';
+import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/widgets/event_card.dart';
 import 'package:intl/intl.dart';
 
@@ -79,8 +79,8 @@ class _SearchScreenState extends State<SearchScreen> {
               if (_debounce?.isActive ?? false) _debounce?.cancel();
               // Créer un nouveau Timer de 2 secondes
               _debounce = Timer(const Duration(seconds: 2), () {
-                  params["search"] = value!;
-                  _getSearchResult();
+                params["search"] = value!;
+                _getSearchResult();
               });
             },
           ),
@@ -116,8 +116,8 @@ class _SearchScreenState extends State<SearchScreen> {
                       );
                     }).toList(),
                     onChanged: (String? value) {
-                        params["sport"] = value!;
-                        _getSearchResult();
+                      params["sport"] = value!;
+                      _getSearchResult();
                     },
                   ),
                 ),

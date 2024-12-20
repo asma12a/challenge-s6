@@ -11,7 +11,10 @@ import (
 	"github.com/asma12a/challenge-s6/config/mailer"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
+	"github.com/asma12a/challenge-s6/middleware"
+	"github.com/asma12a/challenge-s6/presenter"
 	"github.com/asma12a/challenge-s6/service"
+	"github.com/asma12a/challenge-s6/viewer"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/redis/go-redis/v9"
@@ -27,6 +30,7 @@ type MyCustomClaims struct {
 func AuthHandler(app fiber.Router, ctx context.Context, serviceUser service.User, rdb *redis.Client) {
 	app.Post("/signup", signUp(ctx, serviceUser, rdb))
 	app.Post("/login", login(ctx, serviceUser))
+	app.Get("/me", middleware.IsAuthMiddleware, me(ctx, serviceUser))
 }
 
 type SignUpRequestInput struct {
@@ -195,7 +199,37 @@ func login(ctx context.Context, serviceUser service.User) fiber.Handler {
 		}
 		return c.Status(fiber.StatusOK).JSON(&fiber.Map{
 			"status": "success",
-			"token":  s,
+			"user": presenter.User{
+				ID:    user.ID,
+				Name:  user.Name,
+				Email: user.Email,
+				Roles: user.Roles,
+			},
+			"token": s,
 		})
+	}
+}
+
+func me(ctx context.Context, serviceUser service.User) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		currentUser, err := viewer.UserFromContext(c.UserContext())
+
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+
+		user, err := serviceUser.FindOne(ctx, currentUser.ID)
+
+		data := presenter.User{
+			ID:    user.ID,
+			Name:  user.Name,
+			Email: user.Email,
+			Roles: user.Roles,
+		}
+
+		return c.Status(fiber.StatusOK).JSON(data)
 	}
 }
