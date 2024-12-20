@@ -9,8 +9,9 @@ import (
 	"github.com/asma12a/challenge-s6/database"
 	"github.com/asma12a/challenge-s6/database/redis"
 	"github.com/asma12a/challenge-s6/handler"
-	"github.com/asma12a/challenge-s6/middleware"
+	"github.com/asma12a/challenge-s6/internal/ws"
 	"github.com/asma12a/challenge-s6/service"
+	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -23,21 +24,25 @@ import (
 )
 
 func main() {
+	// Charger les variables d'environnement
 	config.LoadEnvironmentFile()
 
-	db_client := database.GetClient()
+	// Initialiser les clients de la base de données et Redis
+	dbClient := database.GetClient()
 	rdb := redis.GetClient()
 
-	defer db_client.Close()
+	// Assurez-vous de fermer les connexions lorsque le programme se termine
+	defer dbClient.Close()
 	defer rdb.Close()
 
+	// Créer une nouvelle instance de l'application Fiber
 	app := fiber.New()
 
-	// Middlewares
-	app.Use(cors.New())
-	app.Use(compress.New())
-	app.Use(etag.New())
-	app.Use(favicon.New())
+	// Middleware
+	app.Use(cors.New())     // Activer CORS
+	app.Use(compress.New()) // Compression des réponses
+	app.Use(etag.New())     // Gestion des ETag
+	app.Use(favicon.New())  // Gestion du favicon
 	app.Use(limiter.New(limiter.Config{
 		Max: 100,
 		LimitReached: func(c *fiber.Ctx) error {
@@ -45,34 +50,41 @@ func main() {
 				"error": "Too many requests",
 			})
 		},
-	}))
-	app.Use(logger.New())
-	app.Use(recover.New())
-	app.Use(requestid.New())
+	})) // Limiter le nombre de requêtes
+	app.Use(logger.New())    // Logger des requêtes
+	app.Use(recover.New())   // Récupérer après des erreurs
+	app.Use(requestid.New()) // Générer un identifiant unique pour chaque requête
 	app.Use(func(c *fiber.Ctx) error {
-		// add db client to context
-		ctx := context.WithValue(c.Context(), "db", db_client)
+		// Ajouter le client DB au contexte de la requête
+		ctx := context.WithValue(c.Context(), "db", dbClient)
 		c.SetUserContext(ctx)
 		return c.Next()
 	})
 
-	// Routes
+	// Créer un Hub WebSocket
+	hub := ws.NewHub()
+	go hub.Run() // Lancer le Hub dans une goroutine
+
+	// Route WebSocket
+	app.Get("/ws", websocket.New(ws.WebSocketHandler(hub)))
+
+	// Routes API (sans authentification middleware)
 	api := app.Group("/api")
+	handler.EventHandler(api.Group("/events"), context.Background(), *service.NewEventService(dbClient), *service.NewSportService(dbClient))
+	handler.SportHandler(api.Group("/sports"), context.Background(), *service.NewSportService(dbClient))
+	handler.UserHandler(api.Group("/users"), context.Background(), *service.NewUserService(dbClient))
+	handler.AuthHandler(api.Group("/auth"), context.Background(), *service.NewUserService(dbClient), rdb)
+	handler.EventTeamsHandler(api.Group("/event_teams"), context.Background(), *service.NewEventTeamsService(dbClient), *service.NewEventService(dbClient), *service.NewTeamService(dbClient))
+	handler.MessageHandler(api.Group("/message"), context.Background(), *service.NewMessageService(dbClient), *service.NewEventService(dbClient), *service.NewUserService(dbClient))
+	handler.TeamHandler(api.Group("/teams"), context.Background(), *service.NewTeamService(dbClient))
 
-	handler.EventHandler(api.Group("/events", middleware.IsAuthMiddleware), context.Background(), *service.NewEventService(db_client), *service.NewSportService(db_client))
-	handler.SportHandler(api.Group("/sports", middleware.IsAuthMiddleware), context.Background(), *service.NewSportService(db_client))
-	handler.UserHandler(api.Group("/users", middleware.IsAuthMiddleware), context.Background(), *service.NewUserService(db_client))
-	handler.AuthHandler(api.Group("/auth"), context.Background(), *service.NewUserService(db_client), rdb)
-	handler.EventTeamsHandler(api.Group("/event_teams", middleware.IsAuthMiddleware), context.Background(), *service.NewEventTeamsService(db_client), *service.NewEventService(db_client), *service.NewTeamService(db_client))
-	handler.MessageHandler(api.Group("/message", middleware.IsAuthMiddleware), context.Background(), *service.NewMessageService(db_client), *service.NewEventService(db_client), *service.NewUserService(db_client))
-	handler.TeamHandler(api.Group("/teams", middleware.IsAuthMiddleware), context.Background(), *service.NewTeamService(db_client))
-
-	// Any other routes: Not Found
+	// Route de gestion des erreurs (Not Found)
 	app.All("*", func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 			"error": "Not Found",
 		})
 	})
 
+	// Démarrer le serveur Fiber
 	log.Fatal(app.Listen(fmt.Sprintf(":%s", config.Env.APIPort)))
 }

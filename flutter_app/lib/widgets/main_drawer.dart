@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/screens/sign_in.dart';
 import 'package:squad_go/widgets/logo.dart';
 
@@ -6,9 +8,11 @@ class MainDrawer extends StatelessWidget {
   const MainDrawer({super.key, required this.onSelectScreen});
 
   final void Function(String identifier) onSelectScreen;
+  final storage = const FlutterSecureStorage();
 
-  void _logOut(BuildContext context) {
-    Navigator.of(context).pushReplacement(
+  void _logOut(BuildContext context) async {
+    await storage.delete(key: dotenv.env['JWT_STORAGE_KEY']!);
+    await Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (ctx) => SignInScreen(),
       ),

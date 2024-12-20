@@ -43,12 +43,14 @@ class _Logo extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
 
-    return const Column(
+    return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Logo(),
+        Logo(
+          width: isSmallScreen ? 200 : 300,
+        ),
         SizedBox(
-          height: 50,
+          height: 25,
         )
       ],
     );

@@ -11,6 +11,10 @@
 
 ### Golang
 
+
+1-  Créer un fichier .env au meme niveau que le .env.example et dupliquer son contenu dedans.
+
+2 - Lancer le docker-compose en mode détache et s'assurer que les 3 containers sont up
 ```
 docker compose up -d
 ```

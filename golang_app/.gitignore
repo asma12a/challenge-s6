@@ -8,3 +8,5 @@ ent/*
 !ent/schema
 !ent/generate.go
 .DS_Store
+
+.history
