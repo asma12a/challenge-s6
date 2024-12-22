@@ -53,7 +53,7 @@ class _SearchScreenState extends State<SearchScreen> {
       final fetchedEvents = await EventService.getSearchResults(params);
       setState(() {
         _searchResults = fetchedEvents;
-        print(_searchResults);
+        debugPrint("Résultats de recherche : $_searchResults");
         _isLoading = false;
       });
     } catch (error) {
@@ -163,10 +163,9 @@ class _SearchScreenState extends State<SearchScreen> {
             height: 10,
           ),
           Text(
-            _searchResults.length > 1
-                ? "${_searchResults.length} résultats trouvés."
-                : "${_searchResults.length} résultat trouvé.",
-            style: TextStyle(color: Colors.white),
+            _searchResults.isNotEmpty
+                ? "${_searchResults.length} événements trouvés."
+                : "Aucun événement trouvé.",
           ),
           SizedBox(
             height: 5,

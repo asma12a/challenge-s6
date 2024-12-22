@@ -4,11 +4,11 @@ import (
 	"context"
 	"log"
 
+	"github.com/asma12a/challenge-s6/ent/team"
 	"github.com/asma12a/challenge-s6/ent/user"
 
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/event"
-	"github.com/asma12a/challenge-s6/ent/eventteams"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/sport"
 	"github.com/asma12a/challenge-s6/ent/teamuser"
@@ -89,18 +89,10 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event, teamsInput [
 		createdTeam, err := tx.Team.Create().
 			SetName(team.Name).
 			SetMaxPlayers(team.MaxPlayers).
+			SetEventID(createdEvent.ID). // Assuming Team has an EventID field
 			Save(ctx)
 		if err != nil {
 			log.Println(err, "error creating team")
-			_ = tx.Rollback()
-			return err
-		}
-		_, err = tx.EventTeams.Create().
-			SetEventID(createdEvent.ID).
-			SetTeamID(createdTeam.ID).
-			Save(ctx)
-		if err != nil {
-			log.Println(err, "error creating event team")
 			_ = tx.Rollback()
 			return err
 		}
@@ -159,11 +151,9 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event, teamsInput [
 
 func (e *Event) FindOneWithDetails(ctx context.Context, id ulid.ID) (*entity.Event, error) {
 	event, err := e.db.Event.Query().Where(event.IDEQ(id)).
-		WithEventTeams(func(etq *ent.EventTeamsQuery) {
-			etq.WithTeam(func(tq *ent.TeamQuery) {
-				tq.WithTeamUsers(func(tuq *ent.TeamUserQuery) {
-					tuq.WithUser()
-				})
+		WithTeams(func(tq *ent.TeamQuery) {
+			tq.WithTeamUsers(func(tuq *ent.TeamUserQuery) {
+				tuq.WithUser()
 			})
 		}).
 		WithSport().
@@ -252,7 +242,7 @@ func (e *Event) List(ctx context.Context) ([]*ent.Event, error) {
 }
 
 // @Summary Search Events
-// @Description Search for events based on criteria such as name, address, type, and sport ID
+// @Description Search for public events based on criteria such as name, address, type, and sport ID
 // @Tags events
 // @Accept  json
 // @Produce  json
@@ -263,7 +253,7 @@ func (e *Event) List(ctx context.Context) ([]*ent.Event, error) {
 // @Failure 400 {object} map[string]interface{} "Bad Request"  // Remplacer fiber.Map par map[string]interface{}
 // @Router /events/search [get]
 func (e *Event) Search(ctx context.Context, search, eventType string, sportID *ulid.ID) ([]*ent.Event, error) {
-	query := e.db.Event.Query()
+	query := e.db.Event.Query().Where(event.IsPublicEQ(true))
 	if search != "" {
 		query.Where(
 			event.Or(
@@ -290,18 +280,14 @@ func (e *Event) AddTeam(ctx context.Context, eventID ulid.ID, teams []entity.Tea
 	}
 
 	teamNames := make(map[string]bool)
-	existingTeams, err := tx.EventTeams.Query().Where(eventteams.EventIDEQ(eventID)).All(ctx)
+	existingTeams, err := tx.Team.Query().Where(team.EventIDEQ(eventID)).All(ctx)
 	if err != nil {
 		_ = tx.Rollback()
 	}
 
 	existingTeamsNames := make(map[string]bool)
 	for _, existingTeam := range existingTeams {
-		team, err := tx.Team.Get(ctx, existingTeam.Edges.Team.ID)
-		if err != nil {
-			_ = tx.Rollback()
-		}
-		existingTeamsNames[team.Name] = true
+		existingTeamsNames[existingTeam.Name] = true
 	}
 
 	for _, team := range teams {
@@ -313,17 +299,10 @@ func (e *Event) AddTeam(ctx context.Context, eventID ulid.ID, teams []entity.Tea
 		}
 		teamNames[team.Name] = true
 
-		createdTeam, err := tx.Team.Create().
+		_, err := tx.Team.Create().
 			SetName(team.Name).
 			SetMaxPlayers(team.MaxPlayers).
-			Save(ctx)
-		if err != nil {
-			_ = tx.Rollback()
-			return err
-		}
-		_, err = tx.EventTeams.Create().
-			SetEventID(eventID).
-			SetTeamID(createdTeam.ID).
+			SetEventID(eventID). // Assuming Team has an EventID field
 			Save(ctx)
 		if err != nil {
 			_ = tx.Rollback()
@@ -335,5 +314,25 @@ func (e *Event) AddTeam(ctx context.Context, eventID ulid.ID, teams []entity.Tea
 		return err
 	}
 	return nil
+}
 
+// ListUserEvents: Get all events for a user by getting all teams that the user is part of and then getting all events for those teams
+func (e *Event) ListUserEvents(ctx context.Context, userID ulid.ID) ([]*ent.Event, error) {
+	// teamuser has a user edge and a team edge
+	teams, err := e.db.TeamUser.Query().Where(teamuser.HasUserWith(user.IDEQ(userID))).WithTeam().All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var teamIDs []ulid.ID
+	for _, team := range teams {
+		teamIDs = append(teamIDs, team.Edges.Team.ID)
+	}
+
+	events, err := e.db.Event.Query().Where(event.HasTeamsWith(team.IDIn(teamIDs...))).WithSport().All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return events, nil
 }

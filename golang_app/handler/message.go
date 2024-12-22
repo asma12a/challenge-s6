@@ -104,9 +104,14 @@ func getMessage(ctx context.Context, serviceMessage service.MessageService) fibe
 
 		// Mapper les données de message vers presenter.Message
 		toJ := presenter.Message{
-			ID:        message.ID,
-			EventID:   message.EventID,
-			UserID:    message.UserID,
+			ID:      message.ID,
+			EventID: message.EventID,
+			User: presenter.User{
+				ID:    message.Edges.User.ID,
+				Name:  message.Edges.User.Name,
+				Email: message.Edges.User.Email,
+				Roles: message.Edges.User.Roles,
+			},
 			UserName:  message.UserName,
 			Content:   message.Content,
 			CreatedAt: message.CreatedAt,
@@ -223,9 +228,14 @@ func listMessages(ctx context.Context, serviceMessage service.MessageService) fi
 
 		for i, message := range messages {
 			toJ[i] = presenter.Message{
-				ID:        message.ID,
-				EventID:   message.EventID,
-				UserID:    message.UserID,
+				ID:      message.ID,
+				EventID: message.Edges.Event.ID,
+				User: presenter.User{
+					ID:    message.Edges.User.ID,
+					Name:  message.Edges.User.Name,
+					Email: message.Edges.User.Email,
+					Roles: message.Edges.User.Roles,
+				},
 				UserName:  message.UserName,
 				Content:   message.Content,
 				CreatedAt: message.CreatedAt,
@@ -261,9 +271,14 @@ func listMessagesByEvent(ctx context.Context, serviceMessage service.MessageServ
 		toJ := make([]presenter.Message, len(messages))
 		for i, message := range messages {
 			toJ[i] = presenter.Message{
-				ID:        message.ID,
-				EventID:   message.EventID,
-				UserID:    message.UserID,
+				ID:      message.ID,
+				EventID: message.EventID,
+				User: presenter.User{
+					ID:    message.Edges.User.ID,
+					Name:  message.Edges.User.Name,
+					Email: message.Edges.User.Email,
+					Roles: message.Edges.User.Roles,
+				},
 				UserName:  message.UserName,
 				Content:   message.Content,
 				CreatedAt: message.CreatedAt,

@@ -24,10 +24,10 @@ func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Ev
 	app.Put("/:eventId", updateEvent(ctx, serviceEvent, serviceSport))
 	app.Delete("/:eventId", deleteEvent(ctx, serviceEvent))
 
-	// Handle event teams routes
+	// Get current user events
+	// app.Get("/me", listUserEvents(ctx, serviceEvent))
+
 }
-
-
 
 var validate = validator.New()
 
@@ -138,17 +138,15 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 			}
 		}
 
-		
-		for _, eventTeam := range event.Edges.EventTeams {
-			if eventTeam.Edges.Team != nil {
-				team := eventTeam.Edges.Team
+		for _, eventTeam := range event.Edges.Teams {
+			if eventTeam != nil {
 				teamToj := presenter.Team{
-					ID:   team.ID,
-					Name: team.Name,
-					MaxPlayers: team.MaxPlayers,
+					ID:         eventTeam.ID,
+					Name:       eventTeam.Name,
+					MaxPlayers: eventTeam.MaxPlayers,
 				}
 
-				for _, teamUser := range team.Edges.TeamUsers {
+				for _, teamUser := range eventTeam.Edges.TeamUsers {
 					user := teamUser.Edges.User
 					if user != nil {
 						teamToj.Players = append(teamToj.Players, presenter.User{
@@ -161,8 +159,6 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 				toJ.Teams = append(toJ.Teams, teamToj)
 			}
 		}
-
-
 
 		return c.JSON(toJ)
 	}
@@ -363,7 +359,6 @@ func addTeam(ctx context.Context, serviceEvent service.Event) fiber.Handler {
 		eventIDStr := c.Params("eventId")
 		eventID, err := ulid.Parse(eventIDStr)
 
-
 		var teamsInput []entity.Team
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
@@ -373,8 +368,6 @@ func addTeam(ctx context.Context, serviceEvent service.Event) fiber.Handler {
 		}
 
 		log.Println("team input", teamsInput)
-
-		
 
 		err = c.BodyParser(&teamsInput)
 		if err != nil {
@@ -392,8 +385,6 @@ func addTeam(ctx context.Context, serviceEvent service.Event) fiber.Handler {
 			})
 		}
 
-	
-
 		err = serviceEvent.AddTeam(ctx, event.ID, teamsInput)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
@@ -404,5 +395,18 @@ func addTeam(ctx context.Context, serviceEvent service.Event) fiber.Handler {
 
 		return c.SendStatus(fiber.StatusOK)
 	}
-	
+
 }
+
+// func listUserEvents(ctx context.Context, serviceEvent service.Event) fiber.Handler {
+// 	return func(c *fiber.Ctx) error {
+// 		currentUser, err := viewer.UserFromContext(c.UserContext())
+// 		if err != nil {
+// 			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+// 				"status": "error",
+// 				"error":  err.Error(),
+// 			})
+// 		}
+
+// 	}
+// }

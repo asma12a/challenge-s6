@@ -113,7 +113,7 @@ class _NewEventState extends State<NewEvent> {
       setState(() {
         _selectedFile = file.name;
       });
-      print(file.name);
+      debugPrint(file.name);
     } else {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(

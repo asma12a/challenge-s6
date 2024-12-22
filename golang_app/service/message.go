@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/asma12a/challenge-s6/ent"
+	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/message"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
@@ -133,7 +134,7 @@ func (repo *MessageService) List(ctx context.Context) ([]*ent.Message, error) {
 func (repo *MessageService) ListByEvent(ctx context.Context, eventID ulid.ID) ([]*entity.Message, error) {
 	// Récupère tous les messages associés à un événement spécifique
 	messages, err := repo.db.Message.Query().
-		Where(message.EventIDEQ(eventID)).
+		Where(message.HasEventWith(event.IDEQ(eventID))).
 		All(ctx)
 	if err != nil {
 		return nil, entity.ErrNotFound

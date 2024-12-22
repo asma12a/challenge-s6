@@ -2,8 +2,9 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/asma12a/challenge-s6/ent/schema/ulid"
+	"entgo.io/ent/schema/index"
 )
 
 // UserStats holds the schema definition for the UserStats entity.
@@ -20,14 +21,22 @@ func (UserStats) Mixin() []ent.Mixin {
 // Fields of the UserStats.
 func (UserStats) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("user_id").GoType(ulid.ID("")).NotEmpty(),
-		field.String("event_id").GoType(ulid.ID("")).NotEmpty(),
-		field.String("stat_id").GoType(ulid.ID("")).NotEmpty(),
 		field.Int("stat_value").Positive().Default(0),
 	}
 }
 
 // Edges of the UserStats.
 func (UserStats) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("user", User.Type).Ref("user_stats").Unique().Required(),
+		edge.From("event", Event.Type).Ref("user_stats").Unique().Required(),
+		edge.From("stat", SportStatLabels.Type).Ref("user_stats").Unique().Required(),
+	}
+}
+
+// Indexes of the UserStats.
+func (UserStats) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Edges("user", "event", "stat").Unique(),
+	}
 }

@@ -8,7 +8,7 @@ import (
 
 type Event struct {
 	ent.Event
-	SportID ulid.ID     `json:"sport_id"`
+	SportID ulid.ID `json:"sport_id"`
 }
 
 func NewEvent(name string, address string, date string, sportId ulid.ID, eventType *event.EventType) *Event {

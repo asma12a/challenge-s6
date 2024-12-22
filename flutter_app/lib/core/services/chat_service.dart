@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChatService {
@@ -13,15 +14,15 @@ class ChatService {
       isConnected = true;
 
       _channel.stream.listen((data) {
-        print('Message reçu : $data');
+        debugPrint('Message reçu : $data');
 
         if (onMessageReceived != null) {
           onMessageReceived!(data);
         }
       });
-      print('Connexion WebSocket réussie');
+      debugPrint('Connexion WebSocket réussie');
     } catch (e) {
-      print('Erreur de connexion : $e');
+      debugPrint('Erreur de connexion : $e');
     }
   }
 
@@ -29,7 +30,7 @@ class ChatService {
     if (isConnected) {
       _channel.sink.add(message); // Envoi du message au serveur WebSocket
     } else {
-      print('Erreur : Pas de connexion WebSocket');
+      debugPrint('Erreur : Pas de connexion WebSocket');
     }
   }
 
@@ -37,6 +38,6 @@ class ChatService {
   void closeConnection() {
     _channel.sink.close();
     isConnected = false;
-    print('Connexion WebSocket fermée');
+    debugPrint('Connexion WebSocket fermée');
   }
 }

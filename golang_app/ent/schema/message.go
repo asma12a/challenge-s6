@@ -2,8 +2,9 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/asma12a/challenge-s6/ent/schema/ulid"
+	"entgo.io/ent/schema/index"
 )
 
 // Message holds the schema definition for the Message entity.
@@ -20,8 +21,6 @@ func (Message) Mixin() []ent.Mixin {
 // Fields of the Message.
 func (Message) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("event_id").GoType(ulid.ID("")).NotEmpty(),
-		field.String("user_id").GoType(ulid.ID("")).NotEmpty(),
 		field.String("content").NotEmpty(),
 		field.String("user_name").NotEmpty(),
 	}
@@ -29,5 +28,15 @@ func (Message) Fields() []ent.Field {
 
 // Edges of the Message.
 func (Message) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("user", User.Type).Ref("user_message_id").Unique().Required(),
+		edge.From("event", Event.Type).Ref("messages").Unique().Required(),
+	}
+}
+
+// Indexes of the Message.
+func (Message) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Edges("user", "event").Unique(),
+	}
 }

@@ -68,19 +68,20 @@ class _ChatPageState extends State<ChatPage>
             _currentUserId = data['id'] ?? '';
           });
         } else if (response.statusCode == 403) {
-          print('Accès refusé : ${response.body}');
+          debugPrint('Accès refusé : ${response.body}');
           setState(() {
             _currentUserId = '';
           });
         } else {
-          print('Erreur inconnue (${response.statusCode}): ${response.body}');
+          debugPrint(
+              'Erreur inconnue (${response.statusCode}): ${response.body}');
         }
       } catch (e) {
-        print(
+        debugPrint(
             'Erreur lors de la récupération des informations utilisateur : $e');
       }
     } else {
-      print('Token manquant');
+      debugPrint('Token manquant');
     }
   }
 
@@ -94,7 +95,7 @@ class _ChatPageState extends State<ChatPage>
   // Fonction pour récupérer les messages de l'événement via l'API
   Future<void> _loadMessages(String eventID) async {
     if (_currentUserId.isEmpty) {
-      print(
+      debugPrint(
           'L\'ID utilisateur n\'est pas initialisé. Impossible de charger les messages.');
       return; // Empêcher toute tentative d'appel si l'utilisateur n'est pas valide
     }
@@ -148,9 +149,9 @@ class _ChatPageState extends State<ChatPage>
           body: jsonEncode(messageData));
 
       if (response.statusCode == 201) {
-        print('Message envoyé et enregistré');
+        debugPrint('Message envoyé et enregistré');
       } else {
-        print(
+        debugPrint(
             'Erreur lors de l\'enregistrement du message : ${response.statusCode}');
       }
 
