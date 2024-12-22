@@ -62,64 +62,23 @@ class HomeScreenState extends State<HomeScreen>
             Carousel(
               text: "Mes événements",
               items: [
-                EventCard(
-                  event: Event(
-                    id: "id",
-                    name:
-                        "Event 1 - Football Event 1 - Football Event 1 - Football Event 1 - Football Event 1 - Football Event 1 - Football Event 1 - Football ",
-                    address:
-                        "16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue ",
-                    date: "2022-01-01",
-                    sport: Sport(
-                      id: "id",
-                      name: SportName.football,
-                      type: SportType.team,
-                      color: Colors.blue,
-                    ),
-                  ),
-                  hasJoinedEvent: true,
-                ),
-                EventCard(
-                  event: Event(
-                    id: "id2",
-                    name: "Event 2",
-                    address: "Rue de la rue",
-                    date: "2022-01-01",
-                    type: EventType.training,
-                    sport: Sport(
-                      id: "id2",
-                      name: SportName.basketball,
-                      type: SportType.team,
-                    ),
-                  ),
-                  hasJoinedEvent: true,
-                ),
-                EventCard(
-                  event: Event(
-                    id: "id3",
-                    name: "Event 2",
-                    address: "Rue de la rue",
-                    date: "2022-01-01",
-                    sport: Sport(
-                      id: "id3",
-                      name: SportName.tennis,
-                      type: SportType.individual,
-                    ),
-                  ),
-                ),
-                EventCard(
-                  event: Event(
-                    id: "id4",
-                    name: "Event 2",
-                    address: "Rue de la rue",
-                    date: "2022-01-01",
-                    sport: Sport(
-                      id: "id4",
-                      name: SportName.running,
-                      type: SportType.individual,
-                    ),
-                  ),
-                ),
+                // EventCard(
+                //   event: Event(
+                //     id: "id",
+                //     name:
+                //         "Event 1 - Football Event 1 - Football Event 1 - Football Event 1 - Football Event 1 - Football Event 1 - Football Event 1 - Football ",
+                //     address:
+                //         "16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue ",
+                //     date: "2022-01-01",
+                //     sport: Sport(
+                //       id: "id",
+                //       name: SportName.football,
+                //       type: SportType.team,
+                //       color: Colors.blue,
+                //     ),
+                //   ),
+                //   hasJoinedEvent: true,
+                // ),
               ],
             ),
             Carousel(

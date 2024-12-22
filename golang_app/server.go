@@ -25,6 +25,7 @@ import (
 	_ "github.com/asma12a/challenge-s6/docs"
 	"github.com/asma12a/challenge-s6/handler"
 	"github.com/asma12a/challenge-s6/internal/ws"
+	"github.com/asma12a/challenge-s6/middleware"
 	"github.com/asma12a/challenge-s6/service"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
@@ -86,12 +87,12 @@ func main() {
 
 	// Routes API (sans authentification middleware)
 	api := app.Group("/api")
-	handler.EventHandler(api.Group("/events"), context.Background(), *service.NewEventService(dbClient), *service.NewSportService(dbClient))
-	handler.SportHandler(api.Group("/sports"), context.Background(), *service.NewSportService(dbClient))
-	handler.UserHandler(api.Group("/users"), context.Background(), *service.NewUserService(dbClient))
+	handler.EventHandler(api.Group("/events", middleware.IsAuthMiddleware), context.Background(), *service.NewEventService(dbClient), *service.NewSportService(dbClient))
+	handler.SportHandler(api.Group("/sports", middleware.IsAuthMiddleware), context.Background(), *service.NewSportService(dbClient))
+	handler.UserHandler(api.Group("/users", middleware.IsAuthMiddleware), context.Background(), *service.NewUserService(dbClient))
 	handler.AuthHandler(api.Group("/auth"), context.Background(), *service.NewUserService(dbClient), rdb)
-	handler.MessageHandler(api.Group("/message"), context.Background(), *service.NewMessageService(dbClient), *service.NewEventService(dbClient), *service.NewUserService(dbClient))
-	handler.TeamHandler(api.Group("/teams"), context.Background(), *service.NewTeamService(dbClient))
+	handler.MessageHandler(api.Group("/message", middleware.IsAuthMiddleware), context.Background(), *service.NewMessageService(dbClient), *service.NewEventService(dbClient), *service.NewUserService(dbClient))
+	handler.TeamHandler(api.Group("/teams", middleware.IsAuthMiddleware), context.Background(), *service.NewTeamService(dbClient))
 
 	// Route de gestion des erreurs (Not Found)
 	app.All("*", func(c *fiber.Ctx) error {
