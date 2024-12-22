@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"log"
+	"strconv"
 
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
@@ -18,12 +19,11 @@ import (
 func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Event, serviceSport service.Sport) {
 	// User scoped routes
 	app.Get("/user", listUserEvents(ctx, serviceEvent))
-	// get recommended events route: /recommended (based on user's location and interests)
-	// app.Get("/recommended", listUserRecommendedEvents(ctx, serviceEvent))
 	// user join event route: /:eventId/join
 
 	// Global routes
 	app.Get("/search", searchEvent(ctx, serviceEvent))
+	app.Get("/recommended", listRecommendedEvents(ctx, serviceEvent))
 	app.Get("/:eventId", getEvent(ctx, serviceEvent))
 	app.Post("/", createEvent(ctx, serviceEvent, serviceSport))
 	app.Post("/:eventId/team", addTeam(ctx, serviceEvent))
@@ -82,6 +82,8 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 		newEvent := entity.NewEvent(
 			eventInput.Name,
 			eventInput.Address,
+			eventInput.Latitude,
+			eventInput.Longitude,
 			eventInput.Date,
 			sport.ID,
 			eventInput.EventType,
@@ -448,5 +450,55 @@ func listUserEvents(ctx context.Context, serviceEvent service.Event) fiber.Handl
 		return c.JSON(toJ)
 	}
 }
+func listRecommendedEvents(ctx context.Context, serviceEvent service.Event) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		defaultLatitude := 46.603354
+		defaultLongitude := 1.888334
+		latitudeStr := c.Query("latitude", strconv.FormatFloat(defaultLatitude, 'f', -1, 64))
+		longitudeStr := c.Query("longitude", strconv.FormatFloat(defaultLongitude, 'f', -1, 64))
 
-// func listUserRecommendedEvents(ctx context.Context, serviceEvent service.Event) fiber.Handler {}
+		latitude, err := strconv.ParseFloat(latitudeStr, 64)
+		if err != nil {
+			latitude = defaultLatitude
+		}
+
+		longitude, err := strconv.ParseFloat(longitudeStr, 64)
+		if err != nil {
+			longitude = defaultLongitude
+		}
+
+		events, err := serviceEvent.ListRecommendedEvents(ctx, latitude, longitude)
+
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
+		toJ := make([]presenter.Event, len(events))
+
+		for i, event := range events {
+			toJ[i] = presenter.Event{
+				ID:         event.ID,
+				Name:       event.Name,
+				Address:    event.Address,
+				Latitude:   event.Latitude,
+				Longitude:  event.Longitude,
+				EventCode:  event.EventCode,
+				Date:       event.Date,
+				CreatedAt:  event.CreatedAt,
+				IsPublic:   event.IsPublic,
+				IsFinished: event.IsFinished,
+				EventType:  event.EventType,
+			}
+			if condition := event.Edges.Sport; condition != nil {
+				toJ[i].Sport = presenter.Sport{
+					ID:       condition.ID,
+					Name:     condition.Name,
+					ImageURL: condition.ImageURL,
+				}
+			}
+		}
+		return c.JSON(toJ)
+	}
+}

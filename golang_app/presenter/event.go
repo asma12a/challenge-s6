@@ -12,6 +12,8 @@ type Event struct {
 	ID         ulid.ID          `json:"id,omitempty"`
 	Name       string           `json:"name,omitempty"`
 	Address    string           `json:"address,omitempty"`
+	Latitude   float64          `json:"latitude,omitempty"`
+	Longitude  float64          `json:"longitude,omitempty"`
 	EventCode  string           `json:"event_code,omitempty"`
 	Date       string           `json:"date,omitempty"`
 	CreatedAt  time.Time        `json:"created_at,omitempty"`

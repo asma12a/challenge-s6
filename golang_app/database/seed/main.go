@@ -57,6 +57,8 @@ func seedEvents(ctx context.Context, db_client *ent.Client) {
 		_, err := db_client.Event.Create().
 			SetName(gofakeit.Name()).
 			SetAddress(gofakeit.Address().Address).
+			SetLatitude(gofakeit.Latitude()).
+			SetLongitude(gofakeit.Longitude()).
 			SetSport(sport).
 			SetEventCode("1234").
 			SetDate(time.Now().Format(time.DateOnly)).

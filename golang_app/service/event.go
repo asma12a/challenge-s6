@@ -336,3 +336,18 @@ func (e *Event) ListUserEvents(ctx context.Context, userID ulid.ID) ([]*ent.Even
 
 	return events, nil
 }
+
+func (e *Event) ListRecommendedEvents(ctx context.Context, lat, long float64) ([]*ent.Event, error) {
+	events, err := e.db.Event.Query().Where(event.IsPublicEQ(true)).WithSport().All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	events = entity.SortEventsByDistance(events, lat, long)
+
+	if len(events) > 5 {
+		events = events[:5]
+	}
+
+	return events, nil
+}
