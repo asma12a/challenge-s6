@@ -33,17 +33,8 @@ var validate = validator.New()
 func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport service.Sport) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
-		var eventInput struct {
-			entity.Event // Inclut tous les champs de l'entité Event
-			Teams        []struct {
-				entity.Team
-				Players []struct {
-					Email string `json:"email"`
-					Role  string `json:"role,omitempty"`
-				} `json:"players"`
-			} `json:"teams"`
-		}
-
+		var eventInput  entity.Event // Inclut tous les champs de l'entité Event
+		
 		err := c.BodyParser(&eventInput)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
@@ -77,7 +68,7 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 			eventInput.EventType,
 		)
 
-		err = serviceEvent.Create(c.UserContext(), newEvent, eventInput.Teams)
+		err = serviceEvent.Create(c.UserContext(), newEvent)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error create event",
@@ -135,10 +126,9 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 			}
 		}
 
-		
-		for _, eventTeam := range event.Edges.EventTeams {
-			if eventTeam.Edges.Team != nil {
-				team := eventTeam.Edges.Team
+		for _, eventTeam := range event.Edges.EventTeam {
+			if eventTeam != nil {
+				team := eventTeam
 				teamToj := presenter.Team{
 					ID:   team.ID,
 					Name: team.Name,
@@ -158,9 +148,6 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 				toJ.Teams = append(toJ.Teams, teamToj)
 			}
 		}
-
-
-
 		return c.JSON(toJ)
 	}
 }

@@ -4,11 +4,11 @@ import (
 	"context"
 	"log"
 
+	"github.com/asma12a/challenge-s6/ent/team"
 	"github.com/asma12a/challenge-s6/ent/user"
 
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/event"
-	"github.com/asma12a/challenge-s6/ent/eventteams"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/sport"
 	"github.com/asma12a/challenge-s6/ent/teamuser"
@@ -44,13 +44,7 @@ func NewEventService(client *ent.Client) *Event {
 // @Failure 500 {object} map[string]interface{} "Internal Server Error"
 // @Router /events [post]
 
-func (repo *Event) Create(ctx context.Context, event *entity.Event, teamsInput []struct {
-	entity.Team
-	Players []struct {
-		Email string `json:"email"`
-		Role  string `json:"role,omitempty"`
-	} `json:"players"`
-}) error {
+func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
 
 	tx, err := repo.db.Tx(ctx)
 	if err != nil {
@@ -69,51 +63,14 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event, teamsInput [
 		newEvent.SetEventType(*event.EventType)
 	}
 
-	createdEvent, err := newEvent.Save(ctx)
+	_, err = newEvent.Save(ctx)
 	if err != nil {
 		log.Println(err, "error creating event")
 		_ = tx.Rollback()
 		return err
 	}
 
-	teamNames := make(map[string]bool)
-
-	for _, team := range teamsInput {
-		if _, ok := teamNames[team.Name]; ok {
-			log.Println("error creating team")
-			_ = tx.Rollback()
-			return entity.ErrCannotBeCreated
-		}
-		teamNames[team.Name] = true
-
-		createdTeam, err := tx.Team.Create().
-			SetName(team.Name).
-			SetMaxPlayers(team.MaxPlayers).
-			Save(ctx)
-		if err != nil {
-			log.Println(err, "error creating team")
-			_ = tx.Rollback()
-			return err
-		}
-		_, err = tx.EventTeams.Create().
-			SetEventID(createdEvent.ID).
-			SetTeamID(createdTeam.ID).
-			Save(ctx)
-		if err != nil {
-			log.Println(err, "error creating event team")
-			_ = tx.Rollback()
-			return err
-		}
-
-		for _, player := range team.Players {
-			err = repo.AddPlayerToTeam(ctx, tx, createdTeam.ID, player)
-			if err != nil {
-				_ = tx.Rollback()
-				return err
-			}
-
-		}
-	}
+	
 	if err := tx.Commit(); err != nil {
 		log.Println("Erreur lors de la validation de la transaction :", err)
 		return err
@@ -124,11 +81,9 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event, teamsInput [
 
 func (e *Event) FindOneWithDetails(ctx context.Context, id ulid.ID) (*entity.Event, error) {
 	event, err := e.db.Event.Query().Where(event.IDEQ(id)).
-		WithEventTeams(func(etq *ent.EventTeamsQuery) {
-			etq.WithTeam(func(tq *ent.TeamQuery) {
-				tq.WithTeamUsers(func(tuq *ent.TeamUserQuery) {
-					tuq.WithUser()
-				})
+		WithEventTeam(func(etq *ent.TeamQuery) {
+			etq.WithTeamUsers(func(tuq *ent.TeamUserQuery) {
+				tuq.WithUser()
 			})
 		}).
 		WithSport().
@@ -261,7 +216,7 @@ func (e *Event) AddTeam(ctx context.Context, eventID ulid.ID, teams [] struct{
 	}
 
 	teamNames := make(map[string]bool)
-	existingTeams, err := tx.EventTeams.Query().Where(eventteams.EventIDEQ(eventID)).WithTeam().All(ctx)
+	existingTeams, err := tx.Team.Query(). Where(team.HasEventWith(event.IDEQ(eventID))).All(ctx)
 	if err != nil {
 		_ = tx.Rollback()
 	}
@@ -271,7 +226,8 @@ func (e *Event) AddTeam(ctx context.Context, eventID ulid.ID, teams [] struct{
 
 	for _, existingTeam := range existingTeams {
 
-		team, err := tx.Team.Get(ctx, existingTeam.Edges.Team.ID)
+		//team, err := tx.Team.Get(ctx, existingTeam.Edges.Team.ID)
+		team, err := tx.Team.Get(ctx, existingTeam.ID)
 
 		if err != nil {
 
@@ -293,14 +249,7 @@ func (e *Event) AddTeam(ctx context.Context, eventID ulid.ID, teams [] struct{
 		createdTeam, err := tx.Team.Create().
 			SetName(team.Name).
 			SetMaxPlayers(team.MaxPlayers).
-			Save(ctx)
-		if err != nil {
-			_ = tx.Rollback()
-			return err
-		}
-		_, err = tx.EventTeams.Create().
 			SetEventID(eventID).
-			SetTeamID(createdTeam.ID).
 			Save(ctx)
 		if err != nil {
 			_ = tx.Rollback()

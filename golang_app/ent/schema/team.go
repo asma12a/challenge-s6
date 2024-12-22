@@ -22,13 +22,16 @@ func (Team) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").NotEmpty(),
 		field.Int("max_players").Default(0),
+	
 	}
 }
 
 // Edges of the Team.
 func (Team) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("event_teams", EventTeams.Type),
+		//edge.To("event_teams", EventTeams.Type),
+		//edge.To("event_team", Event.Type),
+		edge.From("event", Event.Type).Ref("event_team").Unique().Required(),
 		edge.To("team_users", TeamUser.Type).StorageKey(edge.Column("team_id")),
 	}
 }
