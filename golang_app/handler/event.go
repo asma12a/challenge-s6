@@ -10,12 +10,19 @@ import (
 	"github.com/asma12a/challenge-s6/middleware"
 	"github.com/asma12a/challenge-s6/presenter"
 	"github.com/asma12a/challenge-s6/service"
+	"github.com/asma12a/challenge-s6/viewer"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
 func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Event, serviceSport service.Sport) {
-	app.Get("/", middleware.IsAdminMiddleware, listEvents(ctx, serviceEvent))
+	// User scoped routes
+	app.Get("/user", listUserEvents(ctx, serviceEvent))
+	// get recommended events route: /recommended (based on user's location and interests)
+	// app.Get("/recommended", listUserRecommendedEvents(ctx, serviceEvent))
+	// user join event route: /:eventId/join
+
+	// Global routes
 	app.Get("/search", searchEvent(ctx, serviceEvent))
 	app.Get("/:eventId", getEvent(ctx, serviceEvent))
 	app.Post("/", createEvent(ctx, serviceEvent, serviceSport))
@@ -24,8 +31,8 @@ func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Ev
 	app.Put("/:eventId", updateEvent(ctx, serviceEvent, serviceSport))
 	app.Delete("/:eventId", deleteEvent(ctx, serviceEvent))
 
-	// Get current user events
-	// app.Get("/me", listUserEvents(ctx, serviceEvent))
+	// Admin routes
+	app.Get("/", middleware.IsAdminMiddleware, listEvents(ctx, serviceEvent))
 
 }
 
@@ -398,15 +405,48 @@ func addTeam(ctx context.Context, serviceEvent service.Event) fiber.Handler {
 
 }
 
-// func listUserEvents(ctx context.Context, serviceEvent service.Event) fiber.Handler {
-// 	return func(c *fiber.Ctx) error {
-// 		currentUser, err := viewer.UserFromContext(c.UserContext())
-// 		if err != nil {
-// 			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
-// 				"status": "error",
-// 				"error":  err.Error(),
-// 			})
-// 		}
+func listUserEvents(ctx context.Context, serviceEvent service.Event) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		currentUser, err := viewer.UserFromContext(c.UserContext())
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
 
-// 	}
-// }
+		events, err := serviceEvent.ListUserEvents(ctx, currentUser.ID)
+
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
+		toJ := make([]presenter.Event, len(events))
+
+		for i, event := range events {
+			toJ[i] = presenter.Event{
+				ID:         event.ID,
+				Name:       event.Name,
+				Address:    event.Address,
+				EventCode:  event.EventCode,
+				Date:       event.Date,
+				CreatedAt:  event.CreatedAt,
+				IsPublic:   event.IsPublic,
+				IsFinished: event.IsFinished,
+				EventType:  event.EventType,
+			}
+			if condition := event.Edges.Sport; condition != nil {
+				toJ[i].Sport = presenter.Sport{
+					ID:       condition.ID,
+					Name:     condition.Name,
+					ImageURL: condition.ImageURL,
+				}
+			}
+		}
+		return c.JSON(toJ)
+	}
+}
+
+// func listUserRecommendedEvents(ctx context.Context, serviceEvent service.Event) fiber.Handler {}
