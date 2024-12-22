@@ -1,3 +1,17 @@
+//	@title			Challenge S6 API
+//	@version		1.0
+//	@description	API pour gérer des groupes de personnes autour d'une thématique
+//	@termsOfService	http://swagger.io/terms/
+
+//	@contact.name	Support Technique
+//	@contact.url	http://www.example.com/support
+//	@contact.email	support@example.com
+
+//	@license.name	MIT
+//	@license.url	https://opensource.org/licenses/MIT
+
+// @host		localhost:3001
+// @BasePath	/api
 package main
 
 import (
@@ -8,6 +22,7 @@ import (
 	"github.com/asma12a/challenge-s6/config"
 	"github.com/asma12a/challenge-s6/database"
 	"github.com/asma12a/challenge-s6/database/redis"
+	_ "github.com/asma12a/challenge-s6/docs"
 	"github.com/asma12a/challenge-s6/handler"
 	"github.com/asma12a/challenge-s6/internal/ws"
 	"github.com/asma12a/challenge-s6/service"
@@ -21,28 +36,25 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
+	fiberSwagger "github.com/swaggo/fiber-swagger"
 )
 
 func main() {
-	// Charger les variables d'environnement
 	config.LoadEnvironmentFile()
 
-	// Initialiser les clients de la base de données et Redis
 	dbClient := database.GetClient()
 	rdb := redis.GetClient()
 
-	// Assurez-vous de fermer les connexions lorsque le programme se termine
 	defer dbClient.Close()
 	defer rdb.Close()
 
-	// Créer une nouvelle instance de l'application Fiber
 	app := fiber.New()
 
 	// Middleware
-	app.Use(cors.New())     // Activer CORS
-	app.Use(compress.New()) // Compression des réponses
-	app.Use(etag.New())     // Gestion des ETag
-	app.Use(favicon.New())  // Gestion du favicon
+	app.Use(cors.New())
+	app.Use(compress.New())
+	app.Use(etag.New())
+	app.Use(favicon.New())
 	app.Use(limiter.New(limiter.Config{
 		Max: 100,
 		LimitReached: func(c *fiber.Ctx) error {
@@ -50,9 +62,10 @@ func main() {
 				"error": "Too many requests",
 			})
 		},
-	})) // Limiter le nombre de requêtes
-	app.Use(logger.New())    // Logger des requêtes
-	app.Use(recover.New())   // Récupérer après des erreurs
+	}))
+
+	app.Use(logger.New())
+	app.Use(recover.New())
 	app.Use(requestid.New()) // Générer un identifiant unique pour chaque requête
 	app.Use(func(c *fiber.Ctx) error {
 		// Ajouter le client DB au contexte de la requête
@@ -60,6 +73,9 @@ func main() {
 		c.SetUserContext(ctx)
 		return c.Next()
 	})
+
+	// Route pour afficher Swagger UI
+	app.Get("/swagger/*", fiberSwagger.WrapHandler)
 
 	// Créer un Hub WebSocket
 	hub := ws.NewHub()
@@ -74,7 +90,6 @@ func main() {
 	handler.SportHandler(api.Group("/sports"), context.Background(), *service.NewSportService(dbClient))
 	handler.UserHandler(api.Group("/users"), context.Background(), *service.NewUserService(dbClient))
 	handler.AuthHandler(api.Group("/auth"), context.Background(), *service.NewUserService(dbClient), rdb)
-	handler.EventTeamsHandler(api.Group("/event_teams"), context.Background(), *service.NewEventTeamsService(dbClient), *service.NewEventService(dbClient), *service.NewTeamService(dbClient))
 	handler.MessageHandler(api.Group("/message"), context.Background(), *service.NewMessageService(dbClient), *service.NewEventService(dbClient), *service.NewUserService(dbClient))
 	handler.TeamHandler(api.Group("/teams"), context.Background(), *service.NewTeamService(dbClient))
 
@@ -85,6 +100,6 @@ func main() {
 		})
 	})
 
-	// Démarrer le serveur Fiber
+	// Serveur Fiber
 	log.Fatal(app.Listen(fmt.Sprintf(":%s", config.Env.APIPort)))
 }

@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
@@ -19,13 +20,18 @@ func (EventTeams) Mixin() []ent.Mixin {
 
 // Fields of the Event.
 func (EventTeams) Fields() []ent.Field {
+	
 	return []ent.Field{
 		field.String("event_id").GoType(ulid.ID("")).NotEmpty(),
 		field.String("team_id").GoType(ulid.ID("")).NotEmpty(),
 	}
+	
 }
 
 // Edges of the Event.
 func (EventTeams) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("event", Event.Type).Ref("event_teams").Field("event_id").Unique().Required(),
+		edge.From("team", Team.Type).Ref("event_teams").Field("team_id").Unique().Required(),
+	}
 }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:squad_go/core/services/auth_service.dart';
+import 'package:squad_go/core/providers/auth_state_provider.dart';
 import 'package:squad_go/screens/sign_up.dart';
 import 'package:squad_go/screens/tabs.dart';
 import 'package:squad_go/widgets/logo.dart';
+import 'package:provider/provider.dart';
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
@@ -12,27 +13,29 @@ class SignInScreen extends StatelessWidget {
     final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
 
     return Scaffold(
-        body: Center(
-            child: isSmallScreen
-                ? const Column(
-                    mainAxisSize: MainAxisSize.min,
+        body: SingleChildScrollView(
+      child: Center(
+          child: isSmallScreen
+              ? const Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _Logo(),
+                    _FormContent(),
+                  ],
+                )
+              : Container(
+                  padding: const EdgeInsets.all(32.0),
+                  constraints: const BoxConstraints(maxWidth: 800),
+                  child: const Row(
                     children: [
-                      _Logo(),
-                      _FormContent(),
+                      Expanded(child: _Logo()),
+                      Expanded(
+                        child: Center(child: _FormContent()),
+                      ),
                     ],
-                  )
-                : Container(
-                    padding: const EdgeInsets.all(32.0),
-                    constraints: const BoxConstraints(maxWidth: 800),
-                    child: const Row(
-                      children: [
-                        Expanded(child: _Logo()),
-                        Expanded(
-                          child: Center(child: _FormContent()),
-                        ),
-                      ],
-                    ),
-                  )));
+                  ),
+                )),
+    ));
   }
 }
 
@@ -72,12 +75,15 @@ class __FormContentState extends State<_FormContent> {
   var _enteredEmail = '';
   var _enteredPassword = '';
 
-  void _signIn() async {
+  void _signIn(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      final result = await AuthService()
-          .signIn({"email": _enteredEmail, "password": _enteredPassword});
-      if (result['status'] == 'error') {
+
+      final loginData = await context
+          .read<AuthState>()
+          .login(_enteredEmail, _enteredPassword);
+
+      if (loginData['status'] == 'error') {
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -85,7 +91,7 @@ class __FormContentState extends State<_FormContent> {
             content: Text(
               style: TextStyle(
                   color: Theme.of(context).colorScheme.onErrorContainer),
-              result['error'],
+              loginData['error'],
               textAlign: TextAlign.center,
             ),
           ),
@@ -203,7 +209,7 @@ class __FormContentState extends State<_FormContent> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4)),
                 ),
-                onPressed: _signIn,
+                onPressed: () async => _signIn(context),
                 child: const Padding(
                   padding: EdgeInsets.all(10.0),
                   child: Text(

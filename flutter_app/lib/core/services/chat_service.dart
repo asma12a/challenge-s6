@@ -5,7 +5,6 @@ class ChatService {
   late WebSocketChannel _channel;
   bool isConnected = false;
 
-  // Fonction de callback pour informer la page des messages reçus
   Function(String)? onMessageReceived;
 
   // Connexion WebSocket
@@ -14,13 +13,11 @@ class ChatService {
       _channel = WebSocketChannel.connect(Uri.parse(url));
       isConnected = true;
 
-      // Écouter les messages reçus du serveur
       _channel.stream.listen((data) {
         print('Message reçu : $data');
-        
-        // Appeler la fonction onMessageReceived si elle est définie
+
         if (onMessageReceived != null) {
-          onMessageReceived!(data); // Informer la page
+          onMessageReceived!(data);
         }
       });
       print('Connexion WebSocket réussie');
@@ -29,7 +26,6 @@ class ChatService {
     }
   }
 
-  // Envoyer un message
   void sendMessage(String message) {
     if (isConnected) {
       _channel.sink.add(message); // Envoi du message au serveur WebSocket

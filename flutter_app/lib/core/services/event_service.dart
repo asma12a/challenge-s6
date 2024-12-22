@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:squad_go/core/exceptions/app_exception.dart';
+import 'package:squad_go/core/models/event.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class EventService {
@@ -79,6 +79,23 @@ class EventService {
       log('An error occurred while ', error: error);
       throw AppException(
           message: 'Failed to retrieve sports, please try again.');
+    }
+  }
+
+  static Future<void> createEvent(Map<String, String> event) async {
+    final storage = const FlutterSecureStorage();
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    try {
+      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/events');
+      await http.post(uri,
+          headers: {
+            'Content-Type': 'application/json',
+            "Authorization": "Bearer $token",
+          },
+          body: jsonEncode(event));
+    } catch (error) {
+      log('An error occurred while ', error: error);
+      throw AppException(message: 'Failed to create event, please try again.');
     }
   }
 }

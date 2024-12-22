@@ -56,3 +56,19 @@ func (h *Hub) Run() {
 func (h *Hub) Broadcast(message []byte) {
 	h.broadcast <- message
 }
+
+func (h *Hub) BroadcastToOthers(sender *websocket.Conn, message []byte) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	for client := range h.clients {
+		if client != sender {
+			err := client.WriteMessage(websocket.TextMessage, message)
+			if err != nil {
+				log.Println("Error sending message:", err)
+				client.Close()
+				delete(h.clients, client)
+			}
+		}
+	}
+}

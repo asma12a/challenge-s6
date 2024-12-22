@@ -1,0 +1,1638 @@
+basePath: /api
+definitions:
+  ent.Event:
+    properties:
+      address:
+        description: Address holds the value of the "address" field.
+        type: string
+      created_at:
+        description: CreatedAt holds the value of the "created_at" field.
+        type: string
+      created_by:
+        description: CreatedBy holds the value of the "created_by" field.
+        type: string
+      date:
+        description: Date holds the value of the "date" field.
+        type: string
+      edges:
+        allOf:
+        - $ref: '#/definitions/ent.EventEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the EventQuery when eager-loading is set.
+      event_code:
+        description: EventCode holds the value of the "event_code" field.
+        type: string
+      event_type:
+        allOf:
+        - $ref: '#/definitions/event.EventType'
+        description: EventType holds the value of the "event_type" field.
+      id:
+        description: ID of the ent.
+        type: string
+      is_finished:
+        description: IsFinished holds the value of the "is_finished" field.
+        type: boolean
+      is_public:
+        description: IsPublic holds the value of the "is_public" field.
+        type: boolean
+      name:
+        description: Name holds the value of the "name" field.
+        type: string
+      updated_at:
+        description: UpdatedAt holds the value of the "updated_at" field.
+        type: string
+      updated_by:
+        description: UpdatedBy holds the value of the "updated_by" field.
+        type: string
+    required:
+    - address
+    - date
+    - name
+    type: object
+  ent.EventEdges:
+    properties:
+      event_teams:
+        description: EventTeams holds the value of the event_teams edge.
+        items:
+          $ref: '#/definitions/ent.EventTeams'
+        type: array
+      messages:
+        description: Messages holds the value of the messages edge.
+        items:
+          $ref: '#/definitions/ent.Message'
+        type: array
+      sport:
+        allOf:
+        - $ref: '#/definitions/ent.Sport'
+        description: Sport holds the value of the sport edge.
+      user_stats:
+        description: UserStats holds the value of the user_stats edge.
+        items:
+          $ref: '#/definitions/ent.UserStats'
+        type: array
+    type: object
+  ent.EventTeams:
+    properties:
+      created_at:
+        description: CreatedAt holds the value of the "created_at" field.
+        type: string
+      created_by:
+        description: CreatedBy holds the value of the "created_by" field.
+        type: string
+      edges:
+        allOf:
+        - $ref: '#/definitions/ent.EventTeamsEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the EventTeamsQuery when eager-loading is set.
+      event_id:
+        description: EventID holds the value of the "event_id" field.
+        type: string
+      id:
+        description: ID of the ent.
+        type: string
+      team_id:
+        description: TeamID holds the value of the "team_id" field.
+        type: string
+      updated_at:
+        description: UpdatedAt holds the value of the "updated_at" field.
+        type: string
+      updated_by:
+        description: UpdatedBy holds the value of the "updated_by" field.
+        type: string
+    type: object
+  ent.EventTeamsEdges:
+    properties:
+      event:
+        allOf:
+        - $ref: '#/definitions/ent.Event'
+        description: Event holds the value of the event edge.
+      team:
+        allOf:
+        - $ref: '#/definitions/ent.Team'
+        description: Team holds the value of the team edge.
+    type: object
+  ent.Message:
+    properties:
+      content:
+        description: Content holds the value of the "content" field.
+        type: string
+      created_at:
+        description: CreatedAt holds the value of the "created_at" field.
+        type: string
+      created_by:
+        description: CreatedBy holds the value of the "created_by" field.
+        type: string
+      event_id:
+        description: EventID holds the value of the "event_id" field.
+        type: string
+      id:
+        description: ID of the ent.
+        type: string
+      updated_at:
+        description: UpdatedAt holds the value of the "updated_at" field.
+        type: string
+      updated_by:
+        description: UpdatedBy holds the value of the "updated_by" field.
+        type: string
+      user_id:
+        description: UserID holds the value of the "user_id" field.
+        type: string
+      user_name:
+        description: UserName holds the value of the "user_name" field.
+        type: string
+    type: object
+  ent.Sport:
+    properties:
+      color:
+        description: Color holds the value of the "color" field.
+        type: string
+      created_at:
+        description: CreatedAt holds the value of the "created_at" field.
+        type: string
+      created_by:
+        description: CreatedBy holds the value of the "created_by" field.
+        type: string
+      edges:
+        allOf:
+        - $ref: '#/definitions/ent.SportEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the SportQuery when eager-loading is set.
+      id:
+        description: ID of the ent.
+        type: string
+      image_url:
+        description: ImageURL holds the value of the "image_url" field.
+        type: string
+      max_teams:
+        description: MaxTeams holds the value of the "max_teams" field.
+        type: integer
+      name:
+        description: Name holds the value of the "name" field.
+        type: string
+      type:
+        allOf:
+        - $ref: '#/definitions/sport.Type'
+        description: Type holds the value of the "type" field.
+      updated_at:
+        description: UpdatedAt holds the value of the "updated_at" field.
+        type: string
+      updated_by:
+        description: UpdatedBy holds the value of the "updated_by" field.
+        type: string
+    required:
+    - name
+    type: object
+  ent.SportEdges:
+    properties:
+      events:
+        description: Events holds the value of the events edge.
+        items:
+          $ref: '#/definitions/ent.Event'
+        type: array
+      sport_stat_labels:
+        description: SportStatLabels holds the value of the sport_stat_labels edge.
+        items:
+          $ref: '#/definitions/ent.SportStatLabels'
+        type: array
+    type: object
+  ent.SportStatLabels:
+    properties:
+      created_at:
+        description: CreatedAt holds the value of the "created_at" field.
+        type: string
+      created_by:
+        description: CreatedBy holds the value of the "created_by" field.
+        type: string
+      edges:
+        allOf:
+        - $ref: '#/definitions/ent.SportStatLabelsEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the SportStatLabelsQuery when eager-loading is set.
+      id:
+        description: ID of the ent.
+        type: string
+      is_main:
+        description: IsMain holds the value of the "is_main" field.
+        type: boolean
+      label:
+        description: Label holds the value of the "label" field.
+        type: string
+      sport_id:
+        description: SportID holds the value of the "sport_id" field.
+        type: string
+      unit:
+        description: Unit holds the value of the "unit" field.
+        type: string
+      updated_at:
+        description: UpdatedAt holds the value of the "updated_at" field.
+        type: string
+      updated_by:
+        description: UpdatedBy holds the value of the "updated_by" field.
+        type: string
+    type: object
+  ent.SportStatLabelsEdges:
+    properties:
+      user_stats:
+        description: UserStats holds the value of the user_stats edge.
+        items:
+          $ref: '#/definitions/ent.UserStats'
+        type: array
+    type: object
+  ent.Team:
+    properties:
+      created_at:
+        description: CreatedAt holds the value of the "created_at" field.
+        type: string
+      created_by:
+        description: CreatedBy holds the value of the "created_by" field.
+        type: string
+      edges:
+        allOf:
+        - $ref: '#/definitions/ent.TeamEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the TeamQuery when eager-loading is set.
+      id:
+        description: ID of the ent.
+        type: string
+      max_players:
+        description: MaxPlayers holds the value of the "max_players" field.
+        type: integer
+      name:
+        description: Name holds the value of the "name" field.
+        type: string
+      updated_at:
+        description: UpdatedAt holds the value of the "updated_at" field.
+        type: string
+      updated_by:
+        description: UpdatedBy holds the value of the "updated_by" field.
+        type: string
+    type: object
+  ent.TeamEdges:
+    properties:
+      event_teams:
+        description: EventTeams holds the value of the event_teams edge.
+        items:
+          $ref: '#/definitions/ent.EventTeams'
+        type: array
+      team_users:
+        description: TeamUsers holds the value of the team_users edge.
+        items:
+          $ref: '#/definitions/ent.TeamUser'
+        type: array
+    type: object
+  ent.TeamUser:
+    properties:
+      created_at:
+        description: CreatedAt holds the value of the "created_at" field.
+        type: string
+      created_by:
+        description: CreatedBy holds the value of the "created_by" field.
+        type: string
+      edges:
+        allOf:
+        - $ref: '#/definitions/ent.TeamUserEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the TeamUserQuery when eager-loading is set.
+      email:
+        description: Email holds the value of the "email" field.
+        type: string
+      id:
+        description: ID of the ent.
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/teamuser.Role'
+        description: Role holds the value of the "role" field.
+      status:
+        description: Status holds the value of the "status" field.
+        type: string
+      updated_at:
+        description: UpdatedAt holds the value of the "updated_at" field.
+        type: string
+      updated_by:
+        description: UpdatedBy holds the value of the "updated_by" field.
+        type: string
+    type: object
+  ent.TeamUserEdges:
+    properties:
+      team:
+        allOf:
+        - $ref: '#/definitions/ent.Team'
+        description: Team holds the value of the team edge.
+      user:
+        allOf:
+        - $ref: '#/definitions/ent.User'
+        description: User holds the value of the user edge.
+    type: object
+  ent.User:
+    properties:
+      created_at:
+        description: CreatedAt holds the value of the "created_at" field.
+        type: string
+      created_by:
+        description: CreatedBy holds the value of the "created_by" field.
+        type: string
+      edges:
+        allOf:
+        - $ref: '#/definitions/ent.UserEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the UserQuery when eager-loading is set.
+      email:
+        description: Email holds the value of the "email" field.
+        type: string
+      id:
+        description: ID of the ent.
+        type: string
+      name:
+        description: Name holds the value of the "name" field.
+        type: string
+      password:
+        description: Password holds the value of the "password" field.
+        type: string
+      roles:
+        description: Roles holds the value of the "roles" field.
+        items:
+          type: string
+        type: array
+      updated_at:
+        description: UpdatedAt holds the value of the "updated_at" field.
+        type: string
+      updated_by:
+        description: UpdatedBy holds the value of the "updated_by" field.
+        type: string
+    required:
+    - email
+    - name
+    type: object
+  ent.UserEdges:
+    properties:
+      team_users:
+        description: TeamUsers holds the value of the team_users edge.
+        items:
+          $ref: '#/definitions/ent.TeamUser'
+        type: array
+      user_message_id:
+        description: UserMessageID holds the value of the user_message_id edge.
+        items:
+          $ref: '#/definitions/ent.Message'
+        type: array
+      user_stats:
+        description: UserStats holds the value of the user_stats edge.
+        items:
+          $ref: '#/definitions/ent.UserStats'
+        type: array
+    type: object
+  ent.UserStats:
+    properties:
+      created_at:
+        description: CreatedAt holds the value of the "created_at" field.
+        type: string
+      created_by:
+        description: CreatedBy holds the value of the "created_by" field.
+        type: string
+      event_id:
+        description: EventID holds the value of the "event_id" field.
+        type: string
+      id:
+        description: ID of the ent.
+        type: string
+      stat_id:
+        description: StatID holds the value of the "stat_id" field.
+        type: string
+      stat_value:
+        description: StatValue holds the value of the "stat_value" field.
+        type: integer
+      updated_at:
+        description: UpdatedAt holds the value of the "updated_at" field.
+        type: string
+      updated_by:
+        description: UpdatedBy holds the value of the "updated_by" field.
+        type: string
+      user_id:
+        description: UserID holds the value of the "user_id" field.
+        type: string
+    type: object
+  entity.Event:
+    properties:
+      address:
+        description: Address holds the value of the "address" field.
+        type: string
+      created_at:
+        description: CreatedAt holds the value of the "created_at" field.
+        type: string
+      created_by:
+        description: CreatedBy holds the value of the "created_by" field.
+        type: string
+      date:
+        description: Date holds the value of the "date" field.
+        type: string
+      edges:
+        allOf:
+        - $ref: '#/definitions/ent.EventEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the EventQuery when eager-loading is set.
+      event_code:
+        description: EventCode holds the value of the "event_code" field.
+        type: string
+      event_type:
+        allOf:
+        - $ref: '#/definitions/event.EventType'
+        description: EventType holds the value of the "event_type" field.
+      id:
+        description: ID of the ent.
+        type: string
+      is_finished:
+        description: IsFinished holds the value of the "is_finished" field.
+        type: boolean
+      is_public:
+        description: IsPublic holds the value of the "is_public" field.
+        type: boolean
+      name:
+        description: Name holds the value of the "name" field.
+        type: string
+      sport_id:
+        type: string
+      updated_at:
+        description: UpdatedAt holds the value of the "updated_at" field.
+        type: string
+      updated_by:
+        description: UpdatedBy holds the value of the "updated_by" field.
+        type: string
+    required:
+    - address
+    - date
+    - name
+    type: object
+  entity.Message:
+    properties:
+      content:
+        description: Content holds the value of the "content" field.
+        type: string
+      created_at:
+        description: CreatedAt holds the value of the "created_at" field.
+        type: string
+      created_by:
+        description: CreatedBy holds the value of the "created_by" field.
+        type: string
+      event_id:
+        description: EventID holds the value of the "event_id" field.
+        type: string
+      id:
+        description: ID of the ent.
+        type: string
+      updated_at:
+        description: UpdatedAt holds the value of the "updated_at" field.
+        type: string
+      updated_by:
+        description: UpdatedBy holds the value of the "updated_by" field.
+        type: string
+      user_id:
+        description: UserID holds the value of the "user_id" field.
+        type: string
+      user_name:
+        description: UserName holds the value of the "user_name" field.
+        type: string
+    type: object
+  entity.Sport:
+    properties:
+      color:
+        description: Color holds the value of the "color" field.
+        type: string
+      created_at:
+        description: CreatedAt holds the value of the "created_at" field.
+        type: string
+      created_by:
+        description: CreatedBy holds the value of the "created_by" field.
+        type: string
+      edges:
+        allOf:
+        - $ref: '#/definitions/ent.SportEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the SportQuery when eager-loading is set.
+      id:
+        description: ID of the ent.
+        type: string
+      image_url:
+        description: ImageURL holds the value of the "image_url" field.
+        type: string
+      max_teams:
+        description: MaxTeams holds the value of the "max_teams" field.
+        type: integer
+      name:
+        description: Name holds the value of the "name" field.
+        type: string
+      type:
+        allOf:
+        - $ref: '#/definitions/sport.Type'
+        description: Type holds the value of the "type" field.
+      updated_at:
+        description: UpdatedAt holds the value of the "updated_at" field.
+        type: string
+      updated_by:
+        description: UpdatedBy holds the value of the "updated_by" field.
+        type: string
+    required:
+    - name
+    type: object
+  entity.Team:
+    properties:
+      created_at:
+        description: CreatedAt holds the value of the "created_at" field.
+        type: string
+      created_by:
+        description: CreatedBy holds the value of the "created_by" field.
+        type: string
+      edges:
+        allOf:
+        - $ref: '#/definitions/ent.TeamEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the TeamQuery when eager-loading is set.
+      id:
+        description: ID of the ent.
+        type: string
+      max_players:
+        description: MaxPlayers holds the value of the "max_players" field.
+        type: integer
+      name:
+        description: Name holds the value of the "name" field.
+        type: string
+      updated_at:
+        description: UpdatedAt holds the value of the "updated_at" field.
+        type: string
+      updated_by:
+        description: UpdatedBy holds the value of the "updated_by" field.
+        type: string
+    type: object
+  entity.TeamUser:
+    properties:
+      created_at:
+        description: CreatedAt holds the value of the "created_at" field.
+        type: string
+      created_by:
+        description: CreatedBy holds the value of the "created_by" field.
+        type: string
+      edges:
+        allOf:
+        - $ref: '#/definitions/ent.TeamUserEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the TeamUserQuery when eager-loading is set.
+      email:
+        description: Email holds the value of the "email" field.
+        type: string
+      id:
+        description: ID of the ent.
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/teamuser.Role'
+        description: Role holds the value of the "role" field.
+      status:
+        description: Status holds the value of the "status" field.
+        type: string
+      team_id:
+        type: string
+      updated_at:
+        description: UpdatedAt holds the value of the "updated_at" field.
+        type: string
+      updated_by:
+        description: UpdatedBy holds the value of the "updated_by" field.
+        type: string
+      user_id:
+        type: string
+    type: object
+  entity.User:
+    properties:
+      created_at:
+        description: CreatedAt holds the value of the "created_at" field.
+        type: string
+      created_by:
+        description: CreatedBy holds the value of the "created_by" field.
+        type: string
+      edges:
+        allOf:
+        - $ref: '#/definitions/ent.UserEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the UserQuery when eager-loading is set.
+      email:
+        description: Email holds the value of the "email" field.
+        type: string
+      id:
+        description: ID of the ent.
+        type: string
+      name:
+        description: Name holds the value of the "name" field.
+        type: string
+      password:
+        description: Password holds the value of the "password" field.
+        type: string
+      roles:
+        description: Roles holds the value of the "roles" field.
+        items:
+          type: string
+        type: array
+      updated_at:
+        description: UpdatedAt holds the value of the "updated_at" field.
+        type: string
+      updated_by:
+        description: UpdatedBy holds the value of the "updated_by" field.
+        type: string
+    required:
+    - email
+    - name
+    type: object
+  entity.UserStats:
+    properties:
+      created_at:
+        description: CreatedAt holds the value of the "created_at" field.
+        type: string
+      created_by:
+        description: CreatedBy holds the value of the "created_by" field.
+        type: string
+      event_id:
+        description: EventID holds the value of the "event_id" field.
+        type: string
+      id:
+        description: ID of the ent.
+        type: string
+      stat_id:
+        description: StatID holds the value of the "stat_id" field.
+        type: string
+      stat_value:
+        description: StatValue holds the value of the "stat_value" field.
+        type: integer
+      updated_at:
+        description: UpdatedAt holds the value of the "updated_at" field.
+        type: string
+      updated_by:
+        description: UpdatedBy holds the value of the "updated_by" field.
+        type: string
+      user_id:
+        description: UserID holds the value of the "user_id" field.
+        type: string
+    type: object
+  event.EventType:
+    enum:
+    - match
+    - match
+    - training
+    type: string
+    x-enum-varnames:
+    - DefaultEventType
+    - EventTypeMatch
+    - EventTypeTraining
+  sport.Type:
+    enum:
+    - team
+    - individual
+    - team
+    type: string
+    x-enum-varnames:
+    - DefaultType
+    - TypeIndividual
+    - TypeTeam
+  teamuser.Role:
+    enum:
+    - player
+    - player
+    - coach
+    type: string
+    x-enum-varnames:
+    - DefaultRole
+    - RolePlayer
+    - RoleCoach
+host: localhost:3001
+info:
+  contact:
+    email: support@example.com
+    name: Support Technique
+    url: http://www.example.com/support
+  description: API pour gérer des groupes de personnes autour d'une thématique
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Challenge S6 API
+  version: "1.0"
+paths:
+  /events/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an event by ID
+      parameters:
+      - description: Event ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Event deleted"  // Remplacer fiber.Map par map[string]interface{}
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Event Not Found"  // Remplacer fiber.Map par map[string]interface{}
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete an Event
+      tags:
+      - events
+    get:
+      consumes:
+      - application/json
+      description: Get an event by its ID with details of teams and players
+      parameters:
+      - description: Event ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Event details
+          schema:
+            $ref: '#/definitions/entity.Event'
+        "400":
+          description: Bad Request"  // Remplacer fiber.Map par map[string]interface{}
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Event Not Found"  // Remplacer fiber.Map par map[string]interface{}
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get an Event by ID
+      tags:
+      - events
+    put:
+      consumes:
+      - application/json
+      description: Update an existing event by ID
+      parameters:
+      - description: Event ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated event data
+        in: body
+        name: event
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Event'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated event
+          schema:
+            $ref: '#/definitions/entity.Event'
+        "400":
+          description: Bad Request"  // Remplacer fiber.Map par map[string]interface{}
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Event Not Found"  // Remplacer fiber.Map par map[string]interface{}
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update an Event
+      tags:
+      - events
+  /events/search:
+    get:
+      consumes:
+      - application/json
+      description: Search for events based on criteria such as name, address, type,
+        and sport ID
+      parameters:
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      - description: Event type
+        in: query
+        name: eventType
+        type: string
+      - description: Sport ID
+        in: query
+        name: sportID
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of events matching search
+          schema:
+            items:
+              $ref: '#/definitions/entity.Event'
+            type: array
+        "400":
+          description: Bad Request"  // Remplacer fiber.Map par map[string]interface{}
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Search Events
+      tags:
+      - events
+  /messages:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all messages
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of messages
+          schema:
+            items:
+              $ref: '#/definitions/entity.Message'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all messages
+      tags:
+      - messages
+    post:
+      consumes:
+      - application/json
+      description: Create a new message for a specific event
+      parameters:
+      - description: Message to be created
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Message'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Message created
+          schema:
+            $ref: '#/definitions/entity.Message'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a new message
+      tags:
+      - messages
+  /messages/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a message by ID
+      parameters:
+      - description: Message ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Message deleted
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Message Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete a message
+      tags:
+      - messages
+    get:
+      consumes:
+      - application/json
+      description: Get a specific message by its ID
+      parameters:
+      - description: Message ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Message details
+          schema:
+            $ref: '#/definitions/entity.Message'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Message Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a message by ID
+      tags:
+      - messages
+    put:
+      consumes:
+      - application/json
+      description: Update an existing message by ID
+      parameters:
+      - description: Message ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated message data
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Message'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated message
+          schema:
+            $ref: '#/definitions/entity.Message'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Message Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a message
+      tags:
+      - messages
+  /messages/event/{eventID}:
+    get:
+      consumes:
+      - application/json
+      description: Get all messages associated with a specific event
+      parameters:
+      - description: Event ID
+        in: path
+        name: eventID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of messages
+          schema:
+            items:
+              $ref: '#/definitions/entity.Message'
+            type: array
+        "404":
+          description: Event Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all messages for an event
+      tags:
+      - messages
+  /sports:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all sports
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of sports
+          schema:
+            items:
+              $ref: '#/definitions/entity.Sport'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: List all sports
+      tags:
+      - sports
+    post:
+      consumes:
+      - application/json
+      description: Create a new sport with name and image URL
+      parameters:
+      - description: Sport to be created
+        in: body
+        name: sport
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Sport'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Sport created
+          schema:
+            $ref: '#/definitions/entity.Sport'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a new sport
+      tags:
+      - sports
+  /sports/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a sport by ID
+      parameters:
+      - description: Sport ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sport deleted
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Sport Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete a sport
+      tags:
+      - sports
+    get:
+      consumes:
+      - application/json
+      description: Get a specific sport by its ID
+      parameters:
+      - description: Sport ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sport details
+          schema:
+            $ref: '#/definitions/entity.Sport'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Sport Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a sport by ID
+      tags:
+      - sports
+    put:
+      consumes:
+      - application/json
+      description: Update a sport's details by ID
+      parameters:
+      - description: Sport ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated sport data
+        in: body
+        name: sport
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Sport'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated sport
+          schema:
+            $ref: '#/definitions/entity.Sport'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Sport Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a sport
+      tags:
+      - sports
+  /team_users:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all team-user relations
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of TeamUser relations
+          schema:
+            items:
+              $ref: '#/definitions/entity.TeamUser'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: List all TeamUser relations
+      tags:
+      - team_users
+    post:
+      consumes:
+      - application/json
+      description: Create a new team-user relation with userID and teamID
+      parameters:
+      - description: Team-User relation to be created
+        in: body
+        name: teamUser
+        required: true
+        schema:
+          $ref: '#/definitions/entity.TeamUser'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: TeamUser created
+          schema:
+            $ref: '#/definitions/entity.TeamUser'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a new TeamUser
+      tags:
+      - team_users
+  /team_users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a team-user relation by ID
+      parameters:
+      - description: TeamUser ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: TeamUser deleted
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: TeamUser Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete a TeamUser relation
+      tags:
+      - team_users
+    put:
+      consumes:
+      - application/json
+      description: Update a specific team-user relation by userID and teamID
+      parameters:
+      - description: TeamUser ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated Team-User relation
+        in: body
+        name: teamUser
+        required: true
+        schema:
+          $ref: '#/definitions/entity.TeamUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated TeamUser
+          schema:
+            $ref: '#/definitions/entity.TeamUser'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: TeamUser Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a TeamUser relation
+      tags:
+      - team_users
+  /team_users/{userID}/{teamID}:
+    get:
+      consumes:
+      - application/json
+      description: Get a specific team-user relation by userID and teamID
+      parameters:
+      - description: User ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: Team ID
+        in: path
+        name: teamID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: TeamUser details
+          schema:
+            $ref: '#/definitions/entity.TeamUser'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: TeamUser Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a TeamUser by userID and teamID
+      tags:
+      - team_users
+  /teams:
+    post:
+      consumes:
+      - application/json
+      description: Create a new team with name and max players
+      parameters:
+      - description: Team to be created
+        in: body
+        name: team
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Team'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Team created
+          schema:
+            $ref: '#/definitions/entity.Team'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a new team
+      tags:
+      - teams
+  /teams/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a team by ID
+      parameters:
+      - description: Team ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Team deleted
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Team Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete a team
+      tags:
+      - teams
+    get:
+      consumes:
+      - application/json
+      description: Get a specific team by its ID
+      parameters:
+      - description: Team ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Team details
+          schema:
+            $ref: '#/definitions/entity.Team'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Team Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a team by ID
+      tags:
+      - teams
+    put:
+      consumes:
+      - application/json
+      description: Update a team's details by ID
+      parameters:
+      - description: Team ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated team data
+        in: body
+        name: team
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Team'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated team
+          schema:
+            $ref: '#/definitions/entity.Team'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Team Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a team
+      tags:
+      - teams
+  /user_stats:
+    post:
+      consumes:
+      - application/json
+      description: Create a new UserStats entry with userID and eventID
+      parameters:
+      - description: UserStats to be created
+        in: body
+        name: userStats
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UserStats'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: UserStats created
+          schema:
+            $ref: '#/definitions/entity.UserStats'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a new UserStats
+      tags:
+      - user_stats
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of users
+          schema:
+            items:
+              $ref: '#/definitions/entity.User'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: List all users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Create a new user with name, email, and password
+      parameters:
+      - description: User to be created
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/entity.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User created
+          schema:
+            $ref: '#/definitions/entity.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Email already registered
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a new user
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User deleted
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: User Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete a user
+      tags:
+      - users
+    get:
+      consumes:
+      - application/json
+      description: Get a specific user by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User details
+          schema:
+            $ref: '#/definitions/entity.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: User Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a user by ID
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Update a user's details by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated user data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/entity.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated user
+          schema:
+            $ref: '#/definitions/entity.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: User Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a user
+      tags:
+      - users
+swagger: "2.0"

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:squad_go/models/event.dart';
-import 'package:squad_go/models/sport.dart';
+import 'package:squad_go/core/models/event.dart';
+import 'package:squad_go/core/models/sport.dart';
 import 'package:intl/intl.dart';
 import 'package:squad_go/screens/event.dart';
 import 'package:squad_go/widgets/custom_label.dart';

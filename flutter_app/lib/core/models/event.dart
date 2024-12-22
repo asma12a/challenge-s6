@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:squad_go/models/sport.dart';
-import 'package:squad_go/models/team.dart';
+import 'package:squad_go/core/models/sport.dart';
+import 'package:squad_go/core/models/team.dart';
 
 class Event {
   const Event({
-    required this.id,
+    this.id,
     required this.name,
     required this.address,
     required this.date,
@@ -13,7 +13,7 @@ class Event {
     this.type = EventType.match,
   });
 
-  final String id;
+  final String? id;
   final String name;
   final String address;
   final String date;

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"log"
 
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
@@ -18,11 +19,15 @@ func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Ev
 	app.Get("/search", searchEvent(ctx, serviceEvent))
 	app.Get("/:eventId", getEvent(ctx, serviceEvent))
 	app.Post("/", createEvent(ctx, serviceEvent, serviceSport))
+	app.Post("/:eventId/team", addTeam(ctx, serviceEvent))
+	//app.Post("/:eventId/team/:teamId/player", addPlayer(ctx, serviceEvent))
 	app.Put("/:eventId", updateEvent(ctx, serviceEvent, serviceSport))
 	app.Delete("/:eventId", deleteEvent(ctx, serviceEvent))
 
 	// Handle event teams routes
 }
+
+
 
 var validate = validator.New()
 
@@ -33,13 +38,12 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 			entity.Event // Inclut tous les champs de l'entité Event
 			Teams        []struct {
 				entity.Team
-				Players    []struct {
+				Players []struct {
 					Email string `json:"email"`
 					Role  string `json:"role,omitempty"`
 				} `json:"players"`
 			} `json:"teams"`
 		}
-
 
 		err := c.BodyParser(&eventInput)
 		if err != nil {
@@ -56,6 +60,8 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 				"error":  err.Error(),
 			})
 		}
+
+		log.Println(eventInput.SportID, "HEEEEE")
 
 		// Vérifie si le sport existe à partir de l'ID fourni
 		sport, err := serviceSport.FindOne(ctx, eventInput.SportID)
@@ -97,7 +103,7 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 			})
 		}
 
-		event, err := service.FindOne(ctx, id)
+		event, err := service.FindOneWithDetails(ctx, id)
 		if err != nil {
 			if ent.IsNotFound(err) {
 				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
@@ -122,12 +128,41 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 			IsPublic:   event.IsPublic,
 			IsFinished: event.IsFinished,
 			EventType:  event.EventType,
-			Sport: presenter.Sport{
-				ID:       event.Edges.Sport.ID,
-				Name:     event.Edges.Sport.Name,
-				ImageURL: event.Edges.Sport.ImageURL,
-			},
 		}
+
+		if condition := event.Edges.Sport; condition != nil {
+			toJ.Sport = presenter.Sport{
+				ID:       condition.ID,
+				Name:     condition.Name,
+				ImageURL: condition.ImageURL,
+			}
+		}
+
+		
+		for _, eventTeam := range event.Edges.EventTeams {
+			if eventTeam.Edges.Team != nil {
+				team := eventTeam.Edges.Team
+				teamToj := presenter.Team{
+					ID:   team.ID,
+					Name: team.Name,
+					MaxPlayers: team.MaxPlayers,
+				}
+
+				for _, teamUser := range team.Edges.TeamUsers {
+					user := teamUser.Edges.User
+					if user != nil {
+						teamToj.Players = append(teamToj.Players, presenter.User{
+							ID:    user.ID,
+							Name:  user.Name,
+							Email: user.Email,
+						})
+					}
+				}
+				toJ.Teams = append(toJ.Teams, teamToj)
+			}
+		}
+
+
 
 		return c.JSON(toJ)
 	}
@@ -255,11 +290,13 @@ func listEvents(ctx context.Context, service service.Event) fiber.Handler {
 				IsPublic:   event.IsPublic,
 				IsFinished: event.IsFinished,
 				EventType:  event.EventType,
-				Sport: presenter.Sport{
-					ID:       event.Edges.Sport.ID,
-					Name:     event.Edges.Sport.Name,
-					ImageURL: event.Edges.Sport.ImageURL, // Optional
-				},
+			}
+			if condition := event.Edges.Sport; condition != nil {
+				toJ[i].Sport = presenter.Sport{
+					ID:       condition.ID,
+					Name:     condition.Name,
+					ImageURL: condition.ImageURL,
+				}
 			}
 		}
 		return c.JSON(toJ)
@@ -319,4 +356,53 @@ func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
 
 		return c.JSON(toJ)
 	}
+}
+
+func addTeam(ctx context.Context, serviceEvent service.Event) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		eventIDStr := c.Params("eventId")
+		eventID, err := ulid.Parse(eventIDStr)
+
+
+		var teamsInput []entity.Team
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "Invalid event ID format",
+			})
+		}
+
+		log.Println("team input", teamsInput)
+
+		
+
+		err = c.BodyParser(&teamsInput)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error bodyparser",
+				"error":  err.Error(),
+			})
+		}
+
+		event, err := serviceEvent.FindOne(ctx, eventID)
+		if err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+				"status": "error find event",
+				"error":  err.Error(),
+			})
+		}
+
+	
+
+		err = serviceEvent.AddTeam(ctx, event.ID, teamsInput)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error add team",
+				"error":  err.Error(),
+			})
+		}
+
+		return c.SendStatus(fiber.StatusOK)
+	}
+	
 }
