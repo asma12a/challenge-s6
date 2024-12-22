@@ -227,7 +227,7 @@ class _ChatPageState extends State<ChatPage>
                             child: Text(
                               isSelf
                                   ? message.replaceFirst('Moi: ', '')
-                                  : message.replaceFirst('${userName}: ',
+                                  : message.replaceFirst('$userName: ',
                                       ''), // Afficher le message sans le nom
                               style: const TextStyle(
                                   fontSize: 16, color: Colors.black),

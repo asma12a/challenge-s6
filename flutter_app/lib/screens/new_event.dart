@@ -403,7 +403,7 @@ class _NewEventState extends State<NewEvent> {
                                       ),
                                     ),
                                   );
-                                }).toList(),
+                                }),
                               ],
                               onChanged: (value) {
                                 _selectedSport = value!;

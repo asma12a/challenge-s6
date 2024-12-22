@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:squad_go/models/team.dart';
+import 'package:squad_go/core/models/team.dart';
 
 class TeamsHandle extends StatefulWidget {
   final String eventId;

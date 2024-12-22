@@ -23,9 +23,6 @@ class App extends StatelessWidget {
       builder: (context, child) => MaterialApp(
         theme: theme,
         home: provider.Consumer<AuthState>(builder: (context, authState, _) {
-          debugPrint('isAuthenticated? : ${authState.isAuthenticated}');
-          debugPrint('isAdmin? : ${authState.isAdmin}');
-
           return authState.isAuthenticated
               ? const TabsScreen()
               : FutureBuilder(
