@@ -5,6 +5,7 @@ import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:squad_go/core/models/user_app.dart';
 
 class AuthService {
   final _storage = const FlutterSecureStorage();
@@ -48,5 +49,31 @@ class AuthService {
       log('An error occurred during sign-up', error: error);
       throw AppException(message: 'Failed to sign up, please try again.');
     }
+  }
+
+  Future<UserApp?> getUserInfo() async {
+    try {
+      final token = await _storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+      if (token == null) return null;
+
+      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/auth/me');
+      final response = await http.get(uri, headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      });
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
+        return UserApp.fromJson({...data, 'apiToken': token});
+      }
+    } catch (error) {
+      log(
+        'An error occurred while fetching user info, error: $error',
+      );
+      throw AppException(
+        message: 'Failed to fetch user info, please try again.',
+      );
+    }
+    return null;
   }
 }

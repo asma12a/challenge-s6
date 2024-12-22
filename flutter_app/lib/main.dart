@@ -1,10 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:provider/provider.dart' as provider;
+import 'package:squad_go/core/providers/auth_state_provider.dart';
 import 'package:squad_go/screens/sign_in.dart';
 import 'package:squad_go/screens/tabs.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+void main() async {
+  await dotenv.load(fileName: "assets/../.env");
+  runApp(const App());
+}
+
+class App extends StatelessWidget {
+  const App({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return provider.MultiProvider(
+      providers: [
+        provider.ChangeNotifierProvider(create: (_) => AuthState()),
+      ],
+      builder: (context, child) => MaterialApp(
+        theme: theme,
+        home: provider.Consumer<AuthState>(builder: (context, authState, _) {
+          debugPrint('isAuthenticated? : ${authState.isAuthenticated}');
+          debugPrint('isAdmin? : ${authState.isAdmin}');
+
+          return authState.isAuthenticated
+              ? const TabsScreen()
+              : FutureBuilder(
+                  future: authState.tryLogin(),
+                  builder: (context, snapshot) =>
+                      snapshot.connectionState == ConnectionState.waiting
+                          ? const Scaffold(
+                              body: Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            )
+                          : const SignInScreen(),
+                );
+        }),
+        debugShowCheckedModeBanner: false,
+      ),
+    );
+  }
+}
 
 final theme = ThemeData(
   useMaterial3: true,
@@ -13,33 +53,3 @@ final theme = ThemeData(
   ),
   textTheme: GoogleFonts.latoTextTheme(),
 );
-
-Future main() async {
-  final storage = const FlutterSecureStorage();
-  await dotenv.load(fileName: "assets/../.env");
-  final token = dotenv.env['JWT_STORAGE KEY'] != null
-      ? await storage.read(key: dotenv.env['JWT_STORAGE KEY']!)
-      : null;
-
-  runApp(
-    ProviderScope(
-      child: App(
-        token: token,
-      ),
-    ),
-  );
-}
-
-class App extends StatelessWidget {
-  final String? token;
-  const App({super.key, this.token});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: theme,
-      home: token != null ? const TabsScreen() : const SignInScreen(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}

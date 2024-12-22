@@ -23,6 +23,7 @@ func (Message) Fields() []ent.Field {
 		field.String("event_id").GoType(ulid.ID("")).NotEmpty(),
 		field.String("user_id").GoType(ulid.ID("")).NotEmpty(),
 		field.String("content").NotEmpty(),
+		field.String("user_name").NotEmpty(),
 	}
 }
 

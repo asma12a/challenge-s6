@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:squad_go/core/exceptions/app_exception.dart';
-import 'package:squad_go/models/event.dart';
+import 'package:squad_go/core/models/event.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -73,11 +73,9 @@ class EventService {
             "Authorization": "Bearer $token",
           },
           body: jsonEncode(event));
-
     } catch (error) {
       log('An error occurred while ', error: error);
-      throw AppException(
-          message: 'Failed to create event, please try again.');
+      throw AppException(message: 'Failed to create event, please try again.');
     }
   }
 }

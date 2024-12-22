@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:squad_go/core/services/event_service.dart';
-import 'package:squad_go/models/event.dart';
+import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/screens/tabs.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:http/http.dart' as http;
@@ -306,8 +306,9 @@ class _NewEventState extends State<NewEvent> {
                               hint: Text(
                                 "Type",
                                 style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface),
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface),
                               ),
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(),
@@ -371,8 +372,9 @@ class _NewEventState extends State<NewEvent> {
                               hint: Text(
                                 "Sport",
                                 style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface),
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface),
                               ),
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(),
@@ -383,8 +385,9 @@ class _NewEventState extends State<NewEvent> {
                                   child: Text(
                                     "Sport",
                                     style: TextStyle(
-                                      color:
-                                          Theme.of(context).colorScheme.onSurface,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
                                     ),
                                   ),
                                 ),
