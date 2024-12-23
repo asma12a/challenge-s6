@@ -14,6 +14,7 @@ import (
 func TeamHandler(app fiber.Router, ctx context.Context, serviceTeam service.Team) {
 	// User interaction with teams
 	app.Post("/:teamId/join", joinTeam(ctx, serviceTeam))
+	app.Post("/:teamId/switch", switchTeam(ctx, serviceTeam))
 
 	// "/:eventId/teams" scoped
 	app.Get("/", listEventTeams(ctx, serviceTeam))
@@ -210,6 +211,47 @@ func joinTeam(ctx context.Context, serviceTeam service.Team) fiber.Handler {
 		}
 
 		err = serviceTeam.JoinTeam(ctx, eventID, teamID, currentUser.ID)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+
+		return c.SendStatus(fiber.StatusOK)
+	}
+}
+
+func switchTeam(ctx context.Context, serviceTeam service.Team) fiber.Handler {
+	// user switch team in a event, must check if user isn't already in a team of the event
+	return func(c *fiber.Ctx) error {
+		currentUser, err := viewer.UserFromContext(c.UserContext())
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+		eventIDStr := c.Params("eventId")
+		teamIDStr := c.Params("teamId")
+
+		eventID, err := ulid.Parse(eventIDStr)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "Invalid event ID format",
+			})
+		}
+
+		teamID, err := ulid.Parse(teamIDStr)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "Invalid team ID format",
+			})
+		}
+
+		err = serviceTeam.SwitchTeam(ctx, eventID, teamID, currentUser.ID)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",

@@ -181,10 +181,65 @@ func (e *Team) JoinTeam(ctx context.Context, eventID, teamID, userID ulid.ID) er
 		).
 		Only(ctx)
 	if err == nil && existingTeamUser != nil {
-		return entity.ErrUserAlreadyInTeam
+		return entity.ErrUserAlreadyInATeam
 	}
 
 	// Add the user to the team
+	_, err = e.db.TeamUser.Create().
+		SetTeamID(teamID).
+		SetUserID(userID).
+		SetEmail(userFound.Email).
+		SetStatus("valid").
+		Save(ctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (e *Team) SwitchTeam(ctx context.Context, eventID, teamID, userID ulid.ID) error {
+	// Check if the team exists and get the current number of players
+	teamFound, err := e.db.Team.Query().
+		Where(team.IDEQ(teamID)).
+		WithTeamUsers().
+		Only(ctx)
+	if err != nil {
+		return entity.ErrNotFound
+	}
+
+	// Check if the team has a max players limit and if it's full
+	if teamFound.MaxPlayers > 0 && len(teamFound.Edges.TeamUsers) >= teamFound.MaxPlayers {
+		return entity.ErrTeamFull
+	}
+
+	// Check if the user exists
+	userFound, uErr := e.db.User.Get(ctx, userID)
+	if uErr != nil {
+		return entity.ErrNotFound
+	}
+
+	// Check if the user is already in another team for the same event
+	existingTeamUser, err := e.db.TeamUser.Query().
+		Where(
+			teamuser.HasTeamWith(team.HasEventWith(event.IDEQ(eventID))),
+			teamuser.HasUserWith(user.IDEQ(userID)),
+		).
+		WithTeam().
+		Only(ctx)
+	if err == nil && existingTeamUser != nil {
+		// Check if the user is already in the requested team
+		if existingTeamUser.Edges.Team.ID == teamID {
+			return entity.ErrUserAlreadyInThisTeam
+		}
+		// Remove the user from the current team
+		err = e.db.TeamUser.DeleteOne(existingTeamUser).Exec(ctx)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Add the user to the new team
 	_, err = e.db.TeamUser.Create().
 		SetTeamID(teamID).
 		SetUserID(userID).

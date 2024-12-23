@@ -36,4 +36,6 @@ var ErrCannotParseJSON = errors.New("Cannot parse JSON")
 
 var ErrTeamFull = errors.New("Team is full")
 
-var ErrUserAlreadyInTeam = errors.New("User is already in a team")
+var ErrUserAlreadyInATeam = errors.New("User is already in a team")
+
+var ErrUserAlreadyInThisTeam = errors.New("User is already in this team")
