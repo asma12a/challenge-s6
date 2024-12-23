@@ -46,7 +46,7 @@ func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Ev
 	app.Get("/:eventId", getEvent(ctx, serviceEvent))
 	app.Post("/", createEvent(ctx, serviceEvent, serviceSport))
 	app.Put("/:eventId", updateEvent(ctx, serviceEvent, serviceSport))
-	app.Delete("/:eventId", deleteEvent(ctx, serviceEvent))
+	app.Delete("/:eventId", middleware.IsEventOrganizer(ctx, serviceEvent), deleteEvent(ctx, serviceEvent))
 
 	// Admin routes
 	app.Get("/", middleware.IsAdminMiddleware, listEvents(ctx, serviceEvent))
@@ -151,6 +151,7 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 			EventCode:  event.EventCode,
 			Date:       event.Date,
 			CreatedAt:  event.CreatedAt,
+			CreatedBy:  event.CreatedBy,
 			IsPublic:   event.IsPublic,
 			IsFinished: event.IsFinished,
 			EventType:  event.EventType,
@@ -334,7 +335,6 @@ func listEvents(ctx context.Context, service service.Event) fiber.Handler {
 }
 
 func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
-
 	return func(c *fiber.Ctx) error {
 
 		search := c.Query("search")
@@ -372,6 +372,7 @@ func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
 				EventCode:  event.EventCode,
 				Date:       event.Date,
 				CreatedAt:  event.CreatedAt,
+				CreatedBy:  event.CreatedBy,
 				IsPublic:   event.IsPublic,
 				IsFinished: event.IsFinished,
 				EventType:  event.EventType,
@@ -420,6 +421,7 @@ func listUserEvents(ctx context.Context, serviceEvent service.Event) fiber.Handl
 				EventCode:  event.EventCode,
 				Date:       event.Date,
 				CreatedAt:  event.CreatedAt,
+				CreatedBy:  event.CreatedBy,
 				IsPublic:   event.IsPublic,
 				IsFinished: event.IsFinished,
 				EventType:  event.EventType,
@@ -472,6 +474,7 @@ func listRecommendedEvents(ctx context.Context, serviceEvent service.Event) fibe
 				EventCode:  event.EventCode,
 				Date:       event.Date,
 				CreatedAt:  event.CreatedAt,
+				CreatedBy:  event.CreatedBy,
 				IsPublic:   event.IsPublic,
 				IsFinished: event.IsFinished,
 				EventType:  event.EventType,
