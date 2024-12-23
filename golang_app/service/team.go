@@ -38,12 +38,23 @@ func (e *Team) AddTeam(ctx context.Context, eventID ulid.ID, teamInput entity.Te
 		return err
 	}
 
+	eventFound, err := tx.Event.Query().Where(event.IDEQ(eventID)).WithSport().Only(ctx)
+	if err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+
 	existingTeams, err := tx.Team.Query().
 		Where(team.HasEventWith(event.IDEQ(eventID))).
 		All(ctx)
 	if err != nil {
 		_ = tx.Rollback()
 		return err
+	}
+
+	if eventFound.Edges.Sport.MaxTeams != nil && len(existingTeams) >= *eventFound.Edges.Sport.MaxTeams {
+		_ = tx.Rollback()
+		return entity.ErrCannotBeCreated
 	}
 
 	for _, existingTeam := range existingTeams {
