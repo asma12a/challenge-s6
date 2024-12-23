@@ -23,6 +23,7 @@ func (Team) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").NotEmpty(),
 		field.Int("max_players").Default(0),
+	
 	}
 }
 

@@ -58,17 +58,8 @@ var validate = validator.New()
 func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport service.Sport) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
-		var eventInput struct {
-			entity.Event // Inclut tous les champs de l'entité Event
-			Teams        []struct {
-				entity.Team
-				Players []struct {
-					Email string `json:"email"`
-					Role  string `json:"role,omitempty"`
-				} `json:"players"`
-			} `json:"teams"`
-		}
-
+		var eventInput  entity.Event // Inclut tous les champs de l'entité Event
+		
 		err := c.BodyParser(&eventInput)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
@@ -104,7 +95,7 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 			eventInput.EventType,
 		)
 
-		err = serviceEvent.Create(c.UserContext(), newEvent, eventInput.Teams)
+		err = serviceEvent.Create(c.UserContext(), newEvent)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error create event",
@@ -443,6 +434,7 @@ func listRecommendedEvents(ctx context.Context, serviceEvent service.Event) fibe
 		defaultLongitude := 1.888334
 		latitudeStr := c.Query("latitude", strconv.FormatFloat(defaultLatitude, 'f', -1, 64))
 		longitudeStr := c.Query("longitude", strconv.FormatFloat(defaultLongitude, 'f', -1, 64))
+
 
 		latitude, err := strconv.ParseFloat(latitudeStr, 64)
 		if err != nil {
