@@ -65,7 +65,6 @@ func listEventTeams(ctx context.Context, serviceTeam service.Team) fiber.Handler
 	}
 }
 
-// TODO
 func addTeam(ctx context.Context, serviceTeam service.Team) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		eventID, err := ulid.Parse(c.Params("eventId"))

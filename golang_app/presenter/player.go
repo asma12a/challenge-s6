@@ -23,6 +23,6 @@ type Player struct {
 	ID     ulid.ID `json:"id,omitempty"`
 	Name   string  `json:"name,omitempty"`
 	Email  string  `json:"email,omitempty"`
-	Role   Role    `json:"roles,omitempty"`
+	Role   Role    `json:"role,omitempty"`
 	Status Status  `json:"status,omitempty"`
 }

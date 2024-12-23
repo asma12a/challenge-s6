@@ -33,3 +33,7 @@ var ErrPasswordNotStrong = errors.New("Le mot de passe n'est pas assez fort. Veu
 var ErrInvalidPassword = errors.New("Identifiants incorrects. Veuillez vérifier vos informations et réessayer.")
 
 var ErrCannotParseJSON = errors.New("Cannot parse JSON")
+
+var ErrTeamFull = errors.New("Team is full")
+
+var ErrUserAlreadyInTeam = errors.New("User is already in a team")
