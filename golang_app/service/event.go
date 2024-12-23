@@ -78,8 +78,18 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event, teamsInput [
 		return err
 	}
 
-	teamNames := make(map[string]bool)
+	if len(teamsInput) == 0 {
+		_, err = tx.Team.Create().
+			SetName("Equipe").
+			SetEventID(createdEvent.ID).
+			Save(ctx)
+		if err != nil {
+			log.Println(err, "error creating team")
+			_ = tx.Rollback
+		}
+	}
 
+	teamNames := make(map[string]bool)
 	for _, team := range teamsInput {
 		if _, ok := teamNames[team.Name]; ok {
 			log.Println("error creating team")

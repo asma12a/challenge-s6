@@ -316,6 +316,7 @@ func listEvents(ctx context.Context, service service.Event) fiber.Handler {
 				EventCode:  event.EventCode,
 				Date:       event.Date,
 				CreatedAt:  event.CreatedAt,
+				CreatedBy:  event.CreatedBy,
 				IsPublic:   event.IsPublic,
 				IsFinished: event.IsFinished,
 				EventType:  event.EventType,
