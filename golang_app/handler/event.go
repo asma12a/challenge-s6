@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"log"
 	"strconv"
 
 	"github.com/asma12a/challenge-s6/ent"
@@ -16,18 +15,36 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Event, serviceSport service.Sport) {
+func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Event, serviceSport service.Sport, serviceTeam service.Team) {
 	// User scoped routes
 	app.Get("/user", listUserEvents(ctx, serviceEvent))
-	// user join event route: /:eventId/join
 
-	// Global routes
+	// Team scoped routes
+	TeamHandler(app.Group("/:eventId/teams", func(c *fiber.Ctx) error {
+		eventID, err := ulid.Parse(c.Params("eventId"))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "Invalid event ID format",
+			})
+		}
+
+		_, err = serviceEvent.FindOne(ctx, eventID)
+		if err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+				"status": "error find event",
+				"error":  err.Error(),
+			})
+		}
+
+		return c.Next()
+	}), ctx, serviceTeam)
+
+	// Global event routes
 	app.Get("/search", searchEvent(ctx, serviceEvent))
 	app.Get("/recommended", listRecommendedEvents(ctx, serviceEvent))
 	app.Get("/:eventId", getEvent(ctx, serviceEvent))
 	app.Post("/", createEvent(ctx, serviceEvent, serviceSport))
-	app.Post("/:eventId/team", addTeam(ctx, serviceEvent))
-	//app.Post("/:eventId/team/:teamId/player", addPlayer(ctx, serviceEvent))
 	app.Put("/:eventId", updateEvent(ctx, serviceEvent, serviceSport))
 	app.Delete("/:eventId", deleteEvent(ctx, serviceEvent))
 
@@ -67,8 +84,6 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 				"error":  err.Error(),
 			})
 		}
-
-		log.Println(eventInput.SportID, "HEEEEE")
 
 		// Vérifie si le sport existe à partir de l'ID fourni
 		sport, err := serviceSport.FindOne(ctx, eventInput.SportID)
@@ -131,6 +146,8 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 			ID:         event.ID,
 			Name:       event.Name,
 			Address:    event.Address,
+			Latitude:   event.Latitude,
+			Longitude:  event.Longitude,
 			EventCode:  event.EventCode,
 			Date:       event.Date,
 			CreatedAt:  event.CreatedAt,
@@ -147,27 +164,32 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 			}
 		}
 
+		teamsToJ := make([]presenter.Team, 0, len(event.Edges.Teams))
 		for _, eventTeam := range event.Edges.Teams {
 			if eventTeam != nil {
 				teamToj := presenter.Team{
 					ID:         eventTeam.ID,
 					Name:       eventTeam.Name,
 					MaxPlayers: eventTeam.MaxPlayers,
+					Players:    []presenter.Player{},
 				}
 
 				for _, teamUser := range eventTeam.Edges.TeamUsers {
 					user := teamUser.Edges.User
 					if user != nil {
-						teamToj.Players = append(teamToj.Players, presenter.User{
-							ID:    user.ID,
-							Name:  user.Name,
-							Email: user.Email,
+						teamToj.Players = append(teamToj.Players, presenter.Player{
+							ID:     teamUser.ID,
+							Name:   user.Name,
+							Email:  user.Email,
+							Role:   presenter.Role(teamUser.Role),
+							Status: presenter.Status(teamUser.Status),
 						})
 					}
 				}
-				toJ.Teams = append(toJ.Teams, teamToj)
+				teamsToJ = append(teamsToJ, teamToj)
 			}
 		}
+		toJ.Teams = teamsToJ
 
 		return c.JSON(toJ)
 	}
@@ -289,6 +311,8 @@ func listEvents(ctx context.Context, service service.Event) fiber.Handler {
 				ID:         event.ID,
 				Name:       event.Name,
 				Address:    event.Address,
+				Latitude:   event.Latitude,
+				Longitude:  event.Longitude,
 				EventCode:  event.EventCode,
 				Date:       event.Date,
 				CreatedAt:  event.CreatedAt,
@@ -342,6 +366,8 @@ func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
 				ID:         event.ID,
 				Name:       event.Name,
 				Address:    event.Address,
+				Latitude:   event.Latitude,
+				Longitude:  event.Longitude,
 				EventCode:  event.EventCode,
 				Date:       event.Date,
 				CreatedAt:  event.CreatedAt,
@@ -361,50 +387,6 @@ func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
 
 		return c.JSON(toJ)
 	}
-}
-
-func addTeam(ctx context.Context, serviceEvent service.Event) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		eventIDStr := c.Params("eventId")
-		eventID, err := ulid.Parse(eventIDStr)
-
-		var teamsInput []entity.Team
-		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status": "error",
-				"error":  "Invalid event ID format",
-			})
-		}
-
-		log.Println("team input", teamsInput)
-
-		err = c.BodyParser(&teamsInput)
-		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status": "error bodyparser",
-				"error":  err.Error(),
-			})
-		}
-
-		event, err := serviceEvent.FindOne(ctx, eventID)
-		if err != nil {
-			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-				"status": "error find event",
-				"error":  err.Error(),
-			})
-		}
-
-		err = serviceEvent.AddTeam(ctx, event.ID, teamsInput)
-		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status": "error add team",
-				"error":  err.Error(),
-			})
-		}
-
-		return c.SendStatus(fiber.StatusOK)
-	}
-
 }
 
 func listUserEvents(ctx context.Context, serviceEvent service.Event) fiber.Handler {
@@ -432,6 +414,8 @@ func listUserEvents(ctx context.Context, serviceEvent service.Event) fiber.Handl
 				ID:         event.ID,
 				Name:       event.Name,
 				Address:    event.Address,
+				Latitude:   event.Latitude,
+				Longitude:  event.Longitude,
 				EventCode:  event.EventCode,
 				Date:       event.Date,
 				CreatedAt:  event.CreatedAt,

@@ -61,6 +61,8 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event, teamsInput [
 	newEvent := tx.Event.Create().
 		SetName(event.Name).
 		SetAddress(event.Address).
+		SetLatitude(event.Latitude).
+		SetLongitude(event.Longitude).
 		SetEventCode(event.EventCode).
 		SetDate(event.Date).
 		SetSportID(event.SportID)
@@ -271,49 +273,6 @@ func (e *Event) Search(ctx context.Context, search, eventType string, sportID *u
 	}
 
 	return query.WithSport().All(ctx)
-}
-
-func (e *Event) AddTeam(ctx context.Context, eventID ulid.ID, teams []entity.Team) error {
-	tx, err := e.db.Tx(ctx)
-	if err != nil {
-		return err
-	}
-
-	teamNames := make(map[string]bool)
-	existingTeams, err := tx.Team.Query().Where(team.EventIDEQ(eventID)).All(ctx)
-	if err != nil {
-		_ = tx.Rollback()
-	}
-
-	existingTeamsNames := make(map[string]bool)
-	for _, existingTeam := range existingTeams {
-		existingTeamsNames[existingTeam.Name] = true
-	}
-
-	for _, team := range teams {
-		if _, exists := existingTeamsNames[team.Name]; exists {
-			_ = tx.Rollback()
-		}
-		if _, exists := teamNames[team.Name]; exists {
-			_ = tx.Rollback()
-		}
-		teamNames[team.Name] = true
-
-		_, err := tx.Team.Create().
-			SetName(team.Name).
-			SetMaxPlayers(team.MaxPlayers).
-			SetEventID(eventID). // Assuming Team has an EventID field
-			Save(ctx)
-		if err != nil {
-			_ = tx.Rollback()
-			return err
-		}
-	}
-
-	if err := tx.Commit(); err != nil {
-		return err
-	}
-	return nil
 }
 
 // ListUserEvents: Get all events for a user by getting all teams that the user is part of and then getting all events for those teams

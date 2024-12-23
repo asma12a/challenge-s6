@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/asma12a/challenge-s6/ent"
+	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/team"
 	"github.com/asma12a/challenge-s6/entity"
@@ -29,18 +30,45 @@ func NewTeamService(client *ent.Client) *Team {
 // @Failure 400 {object} map[string]interface{} "Bad Request"
 // @Failure 500 {object} map[string]interface{} "Internal Server Error"
 // @Router /teams [post]
-func (repo *Team) Create(ctx context.Context, t *entity.Team) error {
-
-	_, err := repo.db.Team.Create().
-		SetName(t.Name).
-		SetMaxPlayers(t.MaxPlayers).
-		Save(ctx)
-
+func (e *Team) AddTeam(ctx context.Context, eventID ulid.ID, teamInput entity.Team) error {
+	tx, err := e.db.Tx(ctx)
 	if err != nil {
-		return entity.ErrCannotBeCreated
+		return err
 	}
 
+	existingTeams, err := tx.Team.Query().
+		Where(team.HasEventWith(event.IDEQ(eventID))).
+		All(ctx)
+	if err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+
+	for _, existingTeam := range existingTeams {
+		if existingTeam.Name == teamInput.Name {
+			_ = tx.Rollback()
+			return entity.ErrCannotBeCreated
+		}
+	}
+
+	_, err = tx.Team.Create().
+		SetName(teamInput.Name).
+		SetMaxPlayers(teamInput.MaxPlayers).
+		SetEventID(eventID). // Assuming Team has an EventID field
+		Save(ctx)
+	if err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
 	return nil
+}
+
+func (t *Team) FindAll(ctx context.Context, eventID ulid.ID) ([]*ent.Team, error) {
+	return t.db.Team.Query().Where(team.HasEventWith(event.IDEQ(eventID))).All(ctx)
 }
 
 // @Summary Get a team by ID
@@ -116,4 +144,17 @@ func (t *Team) Delete(ctx context.Context, id ulid.ID) error {
 
 func (t *Team) List(ctx context.Context) ([]*ent.Team, error) {
 	return t.db.Team.Query().All(ctx)
+}
+
+func (e *Team) JoinTeam(ctx context.Context, eventID, teamID, userID ulid.ID) error {
+	_, err := e.db.TeamUser.Create().
+		SetTeamID(teamID).
+		SetUserID(userID).
+		SetStatus("valid").
+		Save(ctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
