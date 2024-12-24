@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"log"
 
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/event"
@@ -163,6 +164,58 @@ func (t *Team) List(ctx context.Context) ([]*ent.Team, error) {
 	return t.db.Team.Query().All(ctx)
 }
 
+func (e *Team) AddPlayerToTeam(ctx context.Context, teamID ulid.ID, email, role string) error {
+	tx, err := e.db.Tx(ctx)
+	if err != nil {
+		log.Println(err, "error creating transaction")
+		return err
+	}
+
+	// Vérifier si le joueur existe dans la base
+	user, err := tx.User.Query().Where(user.EmailEQ(email)).Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			// Création d'un utilisateur d'équipe avec un email uniquement
+			teamUserCreate := tx.TeamUser.Create().
+				SetTeamID(teamID).
+				SetEmail(email).
+				SetStatus("pending")
+
+			if role != "" {
+				teamUserCreate = teamUserCreate.SetRole(teamuser.Role(role))
+			}
+
+			_, err = teamUserCreate.Save(ctx)
+			if err != nil {
+				log.Println("error adding player to team with null userId:", err)
+				return err
+			}
+		} else {
+			log.Println("error finding user with email:", err)
+			return err
+		}
+	} else {
+		// Ajout de l'utilisateur existant à l'équipe
+		teamUserCreate := tx.TeamUser.Create().
+			SetTeamID(teamID).
+			SetUserID(user.ID).
+			SetStatus("valid")
+
+		// Ajouter le rôle si défini
+		if role != "" {
+			teamUserCreate = teamUserCreate.SetRole(teamuser.Role(role))
+		}
+
+		_, err = teamUserCreate.Save(ctx)
+		if err != nil {
+			log.Println("error adding player to team with userId:", err)
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (e *Team) JoinTeam(ctx context.Context, eventID, teamID, userID ulid.ID) error {
 	// Check if the team exists and get the current number of players
 	teamFound, err := e.db.Team.Query().
@@ -170,7 +223,7 @@ func (e *Team) JoinTeam(ctx context.Context, eventID, teamID, userID ulid.ID) er
 		WithTeamUsers().
 		Only(ctx)
 	if err != nil {
-		return entity.ErrNotFound
+		return entity.ErrEntityNotFound("Team")
 	}
 
 	// Check if the team has a max players limit and if it's full

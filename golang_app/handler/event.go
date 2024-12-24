@@ -38,7 +38,7 @@ func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Ev
 		}
 
 		return c.Next()
-	}), ctx, serviceTeam)
+	}), ctx, serviceTeam, serviceEvent)
 
 	// Global event routes
 	app.Get("/search", searchEvent(ctx, serviceEvent))
@@ -58,8 +58,8 @@ var validate = validator.New()
 func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport service.Sport) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
-		var eventInput  entity.Event // Inclut tous les champs de l'entité Event
-		
+		var eventInput entity.Event // Inclut tous les champs de l'entité Event
+
 		err := c.BodyParser(&eventInput)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
@@ -434,7 +434,6 @@ func listRecommendedEvents(ctx context.Context, serviceEvent service.Event) fibe
 		defaultLongitude := 1.888334
 		latitudeStr := c.Query("latitude", strconv.FormatFloat(defaultLatitude, 'f', -1, 64))
 		longitudeStr := c.Query("longitude", strconv.FormatFloat(defaultLongitude, 'f', -1, 64))
-
 
 		latitude, err := strconv.ParseFloat(latitudeStr, 64)
 		if err != nil {

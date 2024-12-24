@@ -5,16 +5,18 @@ import (
 
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
+	"github.com/asma12a/challenge-s6/middleware"
 	"github.com/asma12a/challenge-s6/presenter"
 	"github.com/asma12a/challenge-s6/service"
 	"github.com/asma12a/challenge-s6/viewer"
 	"github.com/gofiber/fiber/v2"
 )
 
-func TeamHandler(app fiber.Router, ctx context.Context, serviceTeam service.Team) {
+func TeamHandler(app fiber.Router, ctx context.Context, serviceTeam service.Team, serviceEvent service.Event) {
 	// User interaction with teams
 	app.Post("/:teamId/join", joinTeam(ctx, serviceTeam))
 	app.Post("/:teamId/switch", switchTeam(ctx, serviceTeam))
+	app.Post("/:teamId/players", middleware.IsEventOrganizerOrCoach(ctx, serviceEvent), addPlayerToTeam(ctx, serviceTeam))
 
 	// "/:eventId/teams" scoped
 	app.Get("/", listEventTeams(ctx, serviceTeam))
@@ -259,6 +261,17 @@ func switchTeam(ctx context.Context, serviceTeam service.Team) fiber.Handler {
 			})
 		}
 
+		return c.SendStatus(fiber.StatusOK)
+	}
+}
+
+type TeamUserInput struct {
+	Email string `json:"email" validate:"required"`
+	Role  string `json:"role,omitempty"`
+}
+
+func addPlayerToTeam(ctx context.Context, serviceTeam service.Team) fiber.Handler {
+	return func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusOK)
 	}
 }

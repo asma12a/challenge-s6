@@ -96,7 +96,7 @@ func main() {
 	// Route de gestion des erreurs (Not Found)
 	app.All("*", func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-			"error": "Not Found",
+			"error": "Route not Found",
 		})
 	})
 
