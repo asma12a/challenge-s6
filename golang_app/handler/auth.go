@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"html/template"
+	"log"
 	"strings"
 	"time"
 
@@ -27,8 +28,8 @@ type MyCustomClaims struct {
 	jwt.RegisteredClaims
 }
 
-func AuthHandler(app fiber.Router, ctx context.Context, serviceUser service.User, rdb *redis.Client) {
-	app.Post("/signup", signUp(ctx, serviceUser, rdb))
+func AuthHandler(app fiber.Router, ctx context.Context, serviceUser service.User, serviceTeamUser service.TeamUser, rdb *redis.Client) {
+	app.Post("/signup", signUp(ctx, serviceUser, serviceTeamUser, rdb))
 	app.Post("/login", login(ctx, serviceUser))
 	app.Get("/me", middleware.IsAuthMiddleware, me(ctx, serviceUser))
 }
@@ -39,7 +40,7 @@ type SignUpRequestInput struct {
 	Password string `json:"password" validate:"required"`
 }
 
-func signUp(ctx context.Context, serviceUser service.User, rdb *redis.Client) fiber.Handler {
+func signUp(ctx context.Context, serviceUser service.User, serviceTeamUser service.TeamUser, rdb *redis.Client) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var userInput SignUpRequestInput
 		err := c.BodyParser(&userInput)
@@ -84,6 +85,12 @@ func signUp(ctx context.Context, serviceUser service.User, rdb *redis.Client) fi
 				"error":  err.Error(),
 			})
 		}
+		go func() {
+			err = serviceTeamUser.UpdateTeamUserWithUser(c.UserContext(), *createdUser)
+			if err != nil {
+				log.Println("Error updating team user:", err)
+			}
+		}()
 
 		token := ulid.MustNew("")
 

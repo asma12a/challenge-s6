@@ -186,3 +186,22 @@ func (repo *TeamUser) List(ctx context.Context) ([]*entity.TeamUser, error) {
 
 	return result, nil
 }
+
+func (repo *TeamUser) UpdateTeamUserWithUser(ctx context.Context, existingUser entity.User) error {
+	teamUsers, err := repo.db.TeamUser.Query().Where(teamuser.EmailEQ(existingUser.Email)).All(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, teamUser := range teamUsers {
+		_, err := repo.db.TeamUser.UpdateOneID(teamUser.ID).
+			SetUserID(existingUser.ID).
+			SetStatus("valid").
+			Save(ctx)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
