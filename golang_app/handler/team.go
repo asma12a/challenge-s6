@@ -12,11 +12,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func TeamHandler(app fiber.Router, ctx context.Context, serviceTeam service.Team, serviceEvent service.Event) {
+func TeamHandler(app fiber.Router, ctx context.Context, serviceEvent service.Event, serviceTeam service.Team, serviceTeamUser service.TeamUser) {
 	// User interaction with teams
 	app.Post("/:teamId/join", joinTeam(ctx, serviceTeam))
 	app.Post("/:teamId/switch", switchTeam(ctx, serviceTeam))
-	app.Post("/:teamId/players", middleware.IsEventOrganizerOrCoach(ctx, serviceEvent), addPlayerToTeam(ctx, serviceTeam))
+	app.Post("/:teamId/players", middleware.IsEventOrganizerOrCoach(ctx, serviceEvent), addPlayerToTeam(ctx, serviceTeamUser))
+	app.Put("/players/:playerId", middleware.IsEventOrganizerOrCoach(ctx, serviceEvent), updatePlayer(ctx, serviceTeamUser))
 
 	// "/:eventId/teams" scoped
 	app.Get("/", listEventTeams(ctx, serviceTeam))
@@ -55,11 +56,24 @@ func listEventTeams(ctx context.Context, serviceTeam service.Team) fiber.Handler
 			for _, player := range team.Edges.TeamUsers {
 				user := player.Edges.User
 				toJ[i].Players = append(toJ[i].Players, presenter.Player{
-					ID:     player.ID,
-					Name:   user.Name,
-					Email:  user.Email,
+					ID: player.ID,
+					Name: func() string {
+						if user != nil {
+							return user.Name
+						} else {
+							return ""
+						}
+					}(),
+					Email:  player.Email,
 					Role:   presenter.Role(player.Role),
 					Status: presenter.Status(player.Status),
+					UserID: func() ulid.ID {
+						if user != nil {
+							return user.ID
+						} else {
+							return ""
+						}
+					}(),
 				})
 			}
 		}
@@ -211,8 +225,15 @@ func joinTeam(ctx context.Context, serviceTeam service.Team) fiber.Handler {
 				"error":  "Invalid team ID format",
 			})
 		}
+		team, err := serviceTeam.FindOne(ctx, teamID)
+		if err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
 
-		err = serviceTeam.JoinTeam(ctx, eventID, teamID, currentUser.ID)
+		err = serviceTeam.JoinTeam(ctx, eventID, team.ID, currentUser.ID)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
@@ -225,7 +246,6 @@ func joinTeam(ctx context.Context, serviceTeam service.Team) fiber.Handler {
 }
 
 func switchTeam(ctx context.Context, serviceTeam service.Team) fiber.Handler {
-	// user switch team in a event, must check if user isn't already in a team of the event
 	return func(c *fiber.Ctx) error {
 		currentUser, err := viewer.UserFromContext(c.UserContext())
 		if err != nil {
@@ -252,8 +272,15 @@ func switchTeam(ctx context.Context, serviceTeam service.Team) fiber.Handler {
 				"error":  "Invalid team ID format",
 			})
 		}
+		team, err := serviceTeam.FindOne(ctx, teamID)
+		if err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
 
-		err = serviceTeam.SwitchTeam(ctx, eventID, teamID, currentUser.ID)
+		err = serviceTeam.SwitchTeam(ctx, eventID, team.ID, currentUser.ID)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
@@ -265,13 +292,100 @@ func switchTeam(ctx context.Context, serviceTeam service.Team) fiber.Handler {
 	}
 }
 
-type TeamUserInput struct {
-	Email string `json:"email" validate:"required"`
-	Role  string `json:"role,omitempty"`
+func addPlayerToTeam(ctx context.Context, serviceTeamUser service.TeamUser) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		eventIDStr := c.Params("eventId")
+		teamIDStr := c.Params("teamId")
+
+		eventID, err := ulid.Parse(eventIDStr)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "Invalid event ID format",
+			})
+		}
+
+		teamID, err := ulid.Parse(teamIDStr)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "Invalid team ID format",
+			})
+		}
+
+		var teamUserInput entity.TeamUser
+		err = c.BodyParser(&teamUserInput)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "Invalid team user input",
+			})
+		}
+
+		teamUserEntity := entity.NewTeamUser(teamUserInput.Email,
+			teamUserInput.Role,
+			teamUserInput.Status,
+			teamUserInput.UserID,
+			teamID)
+
+		err = serviceTeamUser.AddPlayerToTeam(ctx, *teamUserEntity, eventID)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+
+		return c.SendStatus(fiber.StatusCreated)
+	}
 }
 
-func addPlayerToTeam(ctx context.Context, serviceTeam service.Team) fiber.Handler {
+func updatePlayer(ctx context.Context, serviceTeamUser service.TeamUser) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		playerID, err := ulid.Parse(c.Params("playerId"))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "Invalid player ID format",
+			})
+		}
+		teamUser, err := serviceTeamUser.FindOne(ctx, playerID)
+		if err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+
+		var teamUserInput entity.TeamUser
+		err = c.BodyParser(&teamUserInput)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+
+		finalTeamID := teamUser.TeamID
+		if teamUserInput.TeamID != "" {
+			finalTeamID = teamUserInput.TeamID
+		}
+
+		teamUserEntity := entity.NewTeamUser(teamUserInput.Email,
+			teamUserInput.Role,
+			teamUserInput.Status,
+			teamUserInput.UserID,
+			finalTeamID)
+		teamUserEntity.ID = teamUser.ID
+
+		err = serviceTeamUser.UpdatePlayer(ctx, *teamUserEntity)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+
 		return c.SendStatus(fiber.StatusOK)
 	}
 }

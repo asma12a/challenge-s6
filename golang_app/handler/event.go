@@ -15,7 +15,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Event, serviceSport service.Sport, serviceTeam service.Team) {
+func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Event, serviceSport service.Sport, serviceTeam service.Team, serviceTeamUser service.TeamUser) {
 	// User scoped routes
 	app.Get("/user", listUserEvents(ctx, serviceEvent))
 
@@ -38,7 +38,7 @@ func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Ev
 		}
 
 		return c.Next()
-	}), ctx, serviceTeam, serviceEvent)
+	}), ctx, serviceEvent, serviceTeam, serviceTeamUser)
 
 	// Global event routes
 	app.Get("/search", searchEvent(ctx, serviceEvent))
@@ -168,15 +168,26 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 
 				for _, teamUser := range eventTeam.Edges.TeamUsers {
 					user := teamUser.Edges.User
-					if user != nil {
-						teamToj.Players = append(teamToj.Players, presenter.Player{
-							ID:     teamUser.ID,
-							Name:   user.Name,
-							Email:  user.Email,
-							Role:   presenter.Role(teamUser.Role),
-							Status: presenter.Status(teamUser.Status),
-						})
-					}
+					teamToj.Players = append(teamToj.Players, presenter.Player{
+						ID: teamUser.ID,
+						Name: func() string {
+							if user != nil {
+								return user.Name
+							} else {
+								return ""
+							}
+						}(),
+						Email:  teamUser.Email,
+						Role:   presenter.Role(teamUser.Role),
+						Status: presenter.Status(teamUser.Status),
+						UserID: func() ulid.ID {
+							if user != nil {
+								return user.ID
+							} else {
+								return ""
+							}
+						}(),
+					})
 				}
 				teamsToJ = append(teamsToJ, teamToj)
 			}

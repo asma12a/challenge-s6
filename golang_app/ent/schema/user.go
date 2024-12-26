@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"regexp"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
@@ -21,7 +23,7 @@ func (User) Mixin() []ent.Mixin {
 func (User) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").NotEmpty().StructTag(`validate:"required"`),
-		field.String("email").NotEmpty().Unique().StructTag(`validate:"required,email"`),
+		field.String("email").NotEmpty().Unique().StructTag(`validate:"required,email"`).Match(regexp.MustCompile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")),
 		field.String("password").NotEmpty(),
 		field.Strings("roles").Default([]string{"user"}),
 	}

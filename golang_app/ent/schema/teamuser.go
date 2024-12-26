@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"regexp"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
@@ -21,7 +23,7 @@ func (TeamUser) Mixin() []ent.Mixin {
 // Fields of the TeamUser.
 func (TeamUser) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("email").NotEmpty(),
+		field.String("email").NotEmpty().StructTag(`validate:"required,email"`).Match(regexp.MustCompile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")),
 		field.Enum("role").Values("player", "coach", "org").Default("player"),
 		field.Enum("status").Values("pending", "valid").Default("pending"),
 	}
@@ -38,6 +40,6 @@ func (TeamUser) Edges() []ent.Edge {
 // Indexes of the TeamUser.
 func (TeamUser) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Edges("user", "team").Unique(),
+		index.Fields("email").Edges("team").Unique(),
 	}
 }

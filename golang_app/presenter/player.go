@@ -25,4 +25,5 @@ type Player struct {
 	Email  string  `json:"email,omitempty"`
 	Role   Role    `json:"role,omitempty"`
 	Status Status  `json:"status,omitempty"`
+	UserID ulid.ID `json:"user_id,omitempty"`
 }
