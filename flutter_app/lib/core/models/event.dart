@@ -28,7 +28,8 @@ class Event {
       address: data['address'],
       date: data['date'],
       sport: Sport.fromJson(data['sport']),
-      type: data['type'] == 'match' ? EventType.match : EventType.training,
+      type:
+          data['event_type'] == 'match' ? EventType.match : EventType.training,
       teams: data['teams'] != null
           ? (data['teams'] as List<dynamic>)
               .map((team) => Team.fromJson(team))

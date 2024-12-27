@@ -152,6 +152,7 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 			toJ.Sport = presenter.Sport{
 				ID:       condition.ID,
 				Name:     condition.Name,
+				Type:     presenter.SportType(condition.Type),
 				ImageURL: condition.ImageURL,
 			}
 		}
@@ -328,6 +329,7 @@ func listEvents(ctx context.Context, service service.Event) fiber.Handler {
 				toJ[i].Sport = presenter.Sport{
 					ID:       condition.ID,
 					Name:     condition.Name,
+					Type:     presenter.SportType(condition.Type),
 					ImageURL: condition.ImageURL,
 				}
 			}
@@ -383,6 +385,7 @@ func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
 				toJ[i].Sport = presenter.Sport{
 					ID:       condition.ID,
 					Name:     condition.Name,
+					Type:     presenter.SportType(condition.Type),
 					ImageURL: condition.ImageURL,
 				}
 
@@ -432,6 +435,7 @@ func listUserEvents(ctx context.Context, serviceEvent service.Event) fiber.Handl
 				toJ[i].Sport = presenter.Sport{
 					ID:       condition.ID,
 					Name:     condition.Name,
+					Type:     presenter.SportType(condition.Type),
 					ImageURL: condition.ImageURL,
 				}
 			}
@@ -485,6 +489,7 @@ func listRecommendedEvents(ctx context.Context, serviceEvent service.Event) fibe
 				toJ[i].Sport = presenter.Sport{
 					ID:       condition.ID,
 					Name:     condition.Name,
+					Type:     presenter.SportType(condition.Type),
 					ImageURL: condition.ImageURL,
 				}
 			}
