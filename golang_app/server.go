@@ -24,6 +24,7 @@ import (
 	"github.com/asma12a/challenge-s6/database/redis"
 	_ "github.com/asma12a/challenge-s6/docs"
 	"github.com/asma12a/challenge-s6/handler"
+
 	"github.com/asma12a/challenge-s6/internal/ws"
 	"github.com/asma12a/challenge-s6/middleware"
 	"github.com/asma12a/challenge-s6/service"
@@ -94,6 +95,12 @@ func main() {
 	handler.MessageHandler(api.Group("/message", middleware.IsAuthMiddleware), context.Background(), *service.NewMessageService(dbClient), *service.NewEventService(dbClient), *service.NewUserService(dbClient))
 	handler.SportStatLabelsHandler(api.Group("/sportstatlabels", middleware.IsAuthMiddleware), context.Background(), *service.NewSportStatLabelsService(dbClient), *service.NewSportService(dbClient), *service.NewEventService(dbClient), *service.NewUserService(dbClient))
 
+
+	userService := service.NewUserService(dbClient)
+	oauthHandler := handler.NewOAuthHandler(userService)
+
+	app.Get("/auth/login", oauthHandler.OAuthLoginHandler)
+	app.Get("/auth/google/callback", oauthHandler.OAuthCallbackHandler)
 
 	// Route de gestion des erreurs (Not Found)
 	app.All("*", func(c *fiber.Ctx) error {
