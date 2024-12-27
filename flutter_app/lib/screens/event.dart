@@ -205,9 +205,13 @@ class EventScreen extends StatelessWidget {
                                                   maxPlayers: 11,
                                                   players: [
                                                     Player(
-                                                        id: "dsqdsq",
-                                                        name: "Joueur 1",
-                                                        email: "user@test.com")
+                                                      id: "dsqdsq",
+                                                      name: "Joueur 1",
+                                                      email: "user@test.com",
+                                                      role: PlayerRole.player,
+                                                      status:
+                                                          PlayerStatus.valid,
+                                                    )
                                                   ]),
                                               Team(
                                                 id: "dsqdsq",

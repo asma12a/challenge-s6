@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:squad_go/core/models/event.dart';
-import 'package:squad_go/core/models/sport.dart';
+import 'package:squad_go/main.dart';
 import 'package:squad_go/widgets/carousel.dart';
 import 'package:squad_go/widgets/event_card.dart';
+import 'package:squad_go/core/services/event_service.dart'; // Import EventService
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,8 +15,7 @@ class HomeScreen extends StatefulWidget {
 class HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-
-  // TODO: get events from the API (my events and recommended events)
+  final EventService eventService = EventService();
 
   @override
   void initState() {
@@ -29,6 +29,33 @@ class HomeScreenState extends State<HomeScreen>
     );
 
     _animationController.forward();
+  }
+
+  Future<List<Event>> _fetchMyEvents() async {
+    try {
+      List<Event> events = await eventService.getMyEvents();
+
+      return events;
+    } catch (e) {
+      // Handle error
+      log.severe('Failed to fetch events: $e');
+      return [];
+    }
+  }
+
+  Future<List<Event>> _fetchRecommendedEvents() async {
+    try {
+      // TODO: Send Location data to the API
+      List<Event> recommendedEvents = await eventService.getRecommendedEvents();
+
+      debugPrint('recommendedEvents: $recommendedEvents');
+
+      return recommendedEvents;
+    } catch (e) {
+      // Handle error
+      log.severe('Failed to fetch events: $e');
+      return [];
+    }
   }
 
   @override
@@ -59,31 +86,37 @@ class HomeScreenState extends State<HomeScreen>
             const SizedBox(
               height: 10,
             ),
-            Carousel(
-              text: "Mes événements",
-              items: [
-                // EventCard(
-                //   event: Event(
-                //     id: "id",
-                //     name:
-                //         "Event 1 - Football Event 1 - Football Event 1 - Football Event 1 - Football Event 1 - Football Event 1 - Football Event 1 - Football ",
-                //     address:
-                //         "16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue 16, Rue de la rue ",
-                //     date: "2022-01-01",
-                //     sport: Sport(
-                //       id: "id",
-                //       name: SportName.football,
-                //       type: SportType.team,
-                //       color: Colors.blue,
-                //     ),
-                //   ),
-                //   hasJoinedEvent: true,
-                // ),
-              ],
+            FutureBuilder<List<Event>>(
+              future: _fetchMyEvents(),
+              builder: (context, snapshot) {
+                return Carousel(
+                  text: "Mes événements",
+                  isLoading:
+                      snapshot.connectionState == ConnectionState.waiting,
+                  items: snapshot.data != null
+                      ? snapshot.data!
+                          .map((event) =>
+                              EventCard(event: event, hasJoinedEvent: true))
+                          .toList()
+                      : [],
+                );
+              },
             ),
-            Carousel(
-              text: "Évenements recommandés",
-              items: [],
+            FutureBuilder<List<Event>>(
+              future: _fetchRecommendedEvents(),
+              builder: (context, snapshot) {
+                return Carousel(
+                  text: "Événements recommandés",
+                  isLoading:
+                      snapshot.connectionState == ConnectionState.waiting,
+                  items: snapshot.data != null
+                      ? snapshot.data!
+                          .map((event) =>
+                              EventCard(event: event, hasJoinedEvent: false))
+                          .toList()
+                      : [],
+                );
+              },
             ),
           ],
         ),

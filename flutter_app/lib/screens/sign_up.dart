@@ -68,6 +68,7 @@ class _FormContent extends StatefulWidget {
 }
 
 class __FormContentState extends State<_FormContent> {
+  final authService = AuthService();
   bool _isPasswordVisible = false;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -78,7 +79,7 @@ class __FormContentState extends State<_FormContent> {
   void _signUp() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      final result = await AuthService.signUp(
+      final result = await authService.signUp(
         {
           "name": _enteredPseudo,
           "email": _enteredEmail,

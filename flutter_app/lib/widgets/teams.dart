@@ -135,7 +135,9 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                 BorderRadius.circular(16),
                                           ),
                                           child: ListTile(
-                                            title: Text(player.name),
+                                            title: Text(
+                                              player.name ?? player.email,
+                                            ),
                                             trailing: Row(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [

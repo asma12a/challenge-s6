@@ -1,8 +1,9 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:squad_go/main.dart';
 import '../core/services/chat_service.dart';
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ChatPage extends StatefulWidget {
@@ -57,24 +58,25 @@ class _ChatPageState extends State<ChatPage>
       final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/users/:userId');
 
       try {
-        final response = await http.get(uri, headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        });
+        final response = await dio.get(uri.toString(),
+            options: Options(headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            }));
 
         if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
+          final data = response.data;
           setState(() {
             _currentUserId = data['id'] ?? '';
           });
         } else if (response.statusCode == 403) {
-          debugPrint('Accès refusé : ${response.body}');
+          debugPrint('Accès refusé : ${response.data}');
           setState(() {
             _currentUserId = '';
           });
         } else {
           debugPrint(
-              'Erreur inconnue (${response.statusCode}): ${response.body}');
+              'Erreur inconnue (${response.statusCode}): ${response.data}');
         }
       } catch (e) {
         debugPrint(
@@ -101,34 +103,40 @@ class _ChatPageState extends State<ChatPage>
     }
     final uri =
         Uri.http(dotenv.env['API_BASE_URL']!, 'api/message/event/$eventID');
-    final response = await http.get(uri, headers: {
-      'Content-Type': 'application/json',
-    });
+    try {
+      final response = await dio.get(uri.toString(),
+          options: Options(headers: {
+            'Content-Type': 'application/json',
+          }));
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-
-      setState(() {
-        _messages.clear();
-      });
-
-      for (var message in data) {
-        final content = message['content'];
-        final userId = message['user_id'];
-        final userName = message['user_name'];
-
-        final isSelf = userId == _currentUserId;
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
 
         setState(() {
-          _messages.add(isSelf ? 'Moi: $content' : '$userName: $content');
+          _messages.clear();
         });
+
+        for (var message in data) {
+          final content = message['content'];
+          final userId = message['user_id'];
+          final userName = message['user_name'];
+
+          final isSelf = userId == _currentUserId;
+
+          setState(() {
+            _messages.add(isSelf ? 'Moi: $content' : '$userName: $content');
+          });
+        }
+      } else {
+        debugPrint(
+            'Erreur lors de la récupération des messages : ${response.statusCode}');
       }
-    } else {
-      ('Erreur lors de la récupération des messages : ${response.statusCode}');
+    } catch (e) {
+      debugPrint('Erreur lors de la récupération des messages : $e');
     }
   }
 
-// Fonction pour envoyer un message via WebSocket et l'enregistrer dans la base de données
+  // Fonction pour envoyer un message via WebSocket et l'enregistrer dans la base de données
   void _sendMessage() async {
     final message = _controller.text;
     if (message.isNotEmpty) {
@@ -142,17 +150,21 @@ class _ChatPageState extends State<ChatPage>
       _chatService.sendMessage(message);
 
       final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/message');
-      final response = await http.post(uri,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode(messageData));
+      try {
+        final response = await dio.post(uri.toString(),
+            options: Options(headers: {
+              'Content-Type': 'application/json',
+            }),
+            data: jsonEncode(messageData));
 
-      if (response.statusCode == 201) {
-        debugPrint('Message envoyé et enregistré');
-      } else {
-        debugPrint(
-            'Erreur lors de l\'enregistrement du message : ${response.statusCode}');
+        if (response.statusCode == 201) {
+          debugPrint('Message envoyé et enregistré');
+        } else {
+          debugPrint(
+              'Erreur lors de l\'enregistrement du message : ${response.statusCode}');
+        }
+      } catch (e) {
+        debugPrint('Erreur lors de l\'enregistrement du message : $e');
       }
 
       _controller.clear();

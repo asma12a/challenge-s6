@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:squad_go/core/services/event_service.dart';
 import 'package:squad_go/core/models/event.dart';
+import 'package:squad_go/main.dart';
 import 'package:squad_go/screens/tabs.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -26,6 +26,7 @@ class _NewEventState extends State<NewEvent> {
   var _selectedType = '';
   var _selectedSport = '';
   List<Map<String, dynamic>> _sports = [];
+  final eventService = EventService();
 
   @override
   void initState() {
@@ -35,7 +36,7 @@ class _NewEventState extends State<NewEvent> {
 
   Future<void> _initSports() async {
     try {
-      final fetchedSports = await EventService.getSports();
+      final fetchedSports = await eventService.getSports();
       setState(() {
         _sports = fetchedSports;
       });
@@ -60,10 +61,10 @@ class _NewEventState extends State<NewEvent> {
     }
     final String apiUrl =
         'https://api-adresse.data.gouv.fr/search/?q=$query&limit=5';
-    final response = await http.get(Uri.parse(apiUrl));
+    final response = await dio.get(apiUrl);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
+      final Map<String, dynamic> data = response.data;
 
       setState(() {
         _suggestedAddresses = data['features']
@@ -155,7 +156,7 @@ class _NewEventState extends State<NewEvent> {
           "sport_id": _selectedSport,
           "event_type": _selectedType,
         };
-        await EventService.createEvent(newEvent);
+        await eventService.createEvent(newEvent);
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

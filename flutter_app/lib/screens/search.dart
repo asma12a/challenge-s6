@@ -19,6 +19,7 @@ class _SearchScreenState extends State<SearchScreen> {
   List<Map<String, dynamic>> _searchResults = [];
   Map<String, String> params = {};
   Timer? _debounce;
+  final eventService = EventService();
 
   @override
   void initState() {
@@ -29,7 +30,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Future<void> _initSports() async {
     try {
-      final fetchedSports = await EventService.getSports();
+      final fetchedSports = await eventService.getSports();
       setState(() {
         _sports = fetchedSports;
       });
@@ -50,7 +51,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   _getSearchResult() async {
     try {
-      final fetchedEvents = await EventService.getSearchResults(params);
+      final fetchedEvents = await eventService.getSearchResults(params);
       setState(() {
         _searchResults = fetchedEvents;
         debugPrint("Résultats de recherche : $_searchResults");

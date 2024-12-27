@@ -16,6 +16,17 @@ class Sport {
     this.imageUrl,
     this.maxTeams,
   });
+
+  factory Sport.fromJson(Map<String, dynamic> data) {
+    return Sport(
+      id: data['id'],
+      name: SportName.values.firstWhere((e) => e.toString() == data['name']),
+      type: SportType.values.firstWhere((e) => e.toString() == data['type']),
+      color: data['color'] != null ? Color(data['color']) : null,
+      imageUrl: data['image_url'],
+      maxTeams: data['max_teams'],
+    );
+  }
 }
 
 enum SportType { individual, team }

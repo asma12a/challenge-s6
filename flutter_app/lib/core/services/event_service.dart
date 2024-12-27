@@ -1,14 +1,17 @@
 import 'dart:convert';
-import 'dart:developer';
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:squad_go/core/models/event.dart';
+import 'package:squad_go/main.dart';
 
 class EventService {
-  static Future<List<Map<String, dynamic>>> getSearchResults(
+  final storage = const FlutterSecureStorage();
+
+  Future<List<Map<String, dynamic>>> getSearchResults(
       Map<String, String> params) async {
-    final storage = const FlutterSecureStorage();
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
 
     final Uri baseUrl =
@@ -26,13 +29,14 @@ class EventService {
         : baseUrl;
 
     try {
-      final response = await http.get(url, headers: {
-        'Content-Type': 'application/json',
-        'Authorization': "Bearer $token",
-      });
+      final response = await dio.get(url.toString(),
+          options: Options(headers: {
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer $token",
+          }));
 
       final List<Map<String, dynamic>> events =
-          List<Map<String, dynamic>>.from(json.decode(response.body));
+          List<Map<String, dynamic>>.from(json.decode(response.data));
       return events;
     } catch (error) {
       throw AppException(
@@ -40,19 +44,19 @@ class EventService {
     }
   }
 
-  static Future<Map<String, dynamic>> getEventById(String id) async {
-    final storage = const FlutterSecureStorage();
+  Future<Map<String, dynamic>> getEventById(String id) async {
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
 
     final Uri url = Uri.http(dotenv.env['API_BASE_URL']!, 'api/events/$id');
 
     try {
-      final response = await http.get(url, headers: {
-        'Content-Type': 'application/json',
-        'Authorization': "Bearer $token",
-      });
+      final response = await dio.get(url.toString(),
+          options: Options(headers: {
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer $token",
+          }));
 
-      final Map<String, dynamic> event = json.decode(response.body);
+      final Map<String, dynamic> event = json.decode(response.data);
       return event;
     } catch (error) {
       throw AppException(
@@ -60,41 +64,80 @@ class EventService {
     }
   }
 
-  static Future<List<Map<String, dynamic>>> getSports() async {
-    final storage = const FlutterSecureStorage();
+  Future<List<Map<String, dynamic>>> getSports() async {
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
     try {
       final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/sports');
-      final response = await http.get(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-          "Authorization": "Bearer $token",
-        },
-      );
-      final data = jsonDecode(utf8.decode(response.bodyBytes));
+      final response = await dio.get(uri.toString(),
+          options: Options(headers: {
+            'Content-Type': 'application/json',
+            "Authorization": "Bearer $token",
+          }));
+      final data = response.data;
       return List<Map<String, dynamic>>.from(data);
     } catch (error) {
-      log('An error occurred while ', error: error);
+      log.severe('An error occurred while ', {error: error});
       throw AppException(
           message: 'Failed to retrieve sports, please try again.');
     }
   }
 
-  static Future<void> createEvent(Map<String, String> event) async {
-    final storage = const FlutterSecureStorage();
+  Future<void> createEvent(Map<String, String> event) async {
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
     try {
       final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/events');
-      await http.post(uri,
-          headers: {
+      await dio.post(uri.toString(),
+          options: Options(headers: {
             'Content-Type': 'application/json',
             "Authorization": "Bearer $token",
-          },
-          body: jsonEncode(event));
+          }),
+          data: jsonEncode(event));
     } catch (error) {
-      log('An error occurred while ', error: error);
+      log.severe('An error occurred while ', {error: error});
       throw AppException(message: 'Failed to create event, please try again.');
+    }
+  }
+
+  Future<List<Event>> getMyEvents() async {
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    try {
+      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/events/user');
+      final response = await dio.get(uri.toString(),
+          options: Options(headers: {
+            'Content-Type': 'application/json',
+            "Authorization": "Bearer $token",
+          }));
+      final List<dynamic> data = response.data;
+      return data.map((event) => Event.fromJson(event)).toList();
+    } catch (error) {
+      log.severe('An error occurred while ', {error: error});
+      throw AppException(
+          message: 'Failed to retrieve my events, please try again.');
+    }
+  }
+
+  Future<List<Event>> getRecommendedEvents(
+      {double? latitude, double? longitude}) async {
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    try {
+      final Map<String, String> queryParams = {};
+      if (latitude != null && longitude != null) {
+        queryParams['latitude'] = latitude.toString();
+        queryParams['longitude'] = longitude.toString();
+      }
+      final uri = Uri.http(
+          dotenv.env['API_BASE_URL']!, 'api/events/recommended', queryParams);
+      final response = await dio.get(uri.toString(),
+          options: Options(headers: {
+            'Content-Type': 'application/json',
+            "Authorization": "Bearer $token",
+          }));
+      final List<dynamic> data = response.data;
+      return data.map((event) => Event.fromJson(event)).toList();
+    } catch (error) {
+      log.severe('An error occurred while ', {error: error});
+      throw AppException(
+          message: 'Failed to retrieve recommended events, please try again.');
     }
   }
 }

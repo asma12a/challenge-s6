@@ -1,13 +1,27 @@
+import 'package:dio/dio.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart' as provider;
 import 'package:squad_go/core/providers/auth_state_provider.dart';
 import 'package:squad_go/screens/sign_in.dart';
 import 'package:squad_go/screens/tabs.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+final log = Logger("AppLogger");
+final dio = Dio();
+
 void main() async {
   await dotenv.load(fileName: "assets/../.env");
+  dio.interceptors.add(
+    DioCacheInterceptor(
+      options: CacheOptions(
+        store: MemCacheStore(),
+        policy: CachePolicy.forceCache,
+      ),
+    ),
+  );
   runApp(const App());
 }
 

@@ -230,6 +230,13 @@ func me(ctx context.Context, serviceUser service.User) fiber.Handler {
 
 		user, err := serviceUser.FindOne(ctx, currentUser.ID)
 
+		if err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+				"status": "error",
+				"error":  entity.ErrEntityNotFound("User").Error(),
+			})
+		}
+
 		data := presenter.User{
 			ID:    user.ID,
 			Name:  user.Name,

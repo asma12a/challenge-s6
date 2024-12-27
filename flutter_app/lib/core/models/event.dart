@@ -20,6 +20,22 @@ class Event {
   final Sport sport;
   final EventType type;
   final List<Team>? teams;
+
+  factory Event.fromJson(Map<String, dynamic> data) {
+    return Event(
+      id: data['id'],
+      name: data['name'],
+      address: data['address'],
+      date: data['date'],
+      sport: Sport.fromJson(data['sport']),
+      type: data['type'] == 'match' ? EventType.match : EventType.training,
+      teams: data['teams'] != null
+          ? (data['teams'] as List<dynamic>)
+              .map((team) => Team.fromJson(team))
+              .toList()
+          : null,
+    );
+  }
 }
 
 enum EventType { match, training }
