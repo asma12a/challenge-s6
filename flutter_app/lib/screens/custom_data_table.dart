@@ -18,10 +18,10 @@ class CustomDataTable extends StatelessWidget {
       margin: const EdgeInsets.all(16.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Colors.white, // Fond blanc par défaut
+        color: Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: Colors.grey[300]!, // Bordure légère grise
+          color: Colors.grey[300]!,
           width: 1,
         ),
       ),

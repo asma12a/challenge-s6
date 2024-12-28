@@ -4,6 +4,7 @@ import 'package:squad_go/core/models/user_app.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
 import 'package:squad_go/core/services/user_service.dart';
 import 'add_edit_user_page.dart';
+import '../../custom_data_table.dart';
 import 'dart:ui';
 
 class AdminUsersPage extends StatefulWidget {
@@ -66,15 +67,53 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
 
           final users = snapshot.data!;
 
-          return UsersList(
-            users: users,
-            onRefresh: _loadUsers, // Passer la fonction de rafraîchissement
+          final columns = [
+            DataColumn(label: Text('Nom')),
+            DataColumn(label: Text('Email')),
+            DataColumn(label: Text('Rôles')),
+            DataColumn(label: Text('Actions')),
+          ];
+
+          final rows = users.map((user) {
+            return DataRow(cells: [
+              DataCell(Text(user.name)),
+              DataCell(Text(user.email)),
+              DataCell(Text(user.roles.map((role) => role.name).join(', '))),
+              DataCell(Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.blue),
+                    onPressed: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddEditUserPage(user: user),
+                        ),
+                      );
+                      _loadUsers(); // Rafraîchir après modification
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      _confirmDelete(context, user);
+                    },
+                  ),
+                ],
+              )),
+            ]);
+          }).toList();
+
+          return CustomDataTable(
+            title: 'Utilisateurs',
+            columns: columns,
+            rows: rows,
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Affichage du modal avec flou d'arrière-plan
           _showAddEditUserDialog(context);
         },
         child: const Icon(Icons.add),
@@ -82,51 +121,40 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
     );
   }
 
-  // Fonction pour afficher le formulaire dans un dialog avec arrière-plan flouté
   void _showAddEditUserDialog(BuildContext context) {
     showDialog(
       context: context,
-      barrierDismissible:
-          true, // Permet de fermer le modal en cliquant en dehors
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return Dialog(
-          backgroundColor:
-              Colors.transparent, // Transparent pour laisser passer le flou
+          backgroundColor: Colors.transparent,
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
             child: Material(
-              color:
-                  Colors.transparent, // Transparent pour laisser passer le flou
+              color: Colors.transparent,
               child: Center(
-                // Centre le contenu de la modal
                 child: Container(
                   padding: const EdgeInsets.all(16.0),
-                  constraints: BoxConstraints(
-                    maxWidth: 600, // Limite la largeur maximale de la modal
-                  ),
+                  constraints: BoxConstraints(maxWidth: 600),
                   decoration: BoxDecoration(
-                    color: Colors.white, // Fond blanc pour la modal
-                    borderRadius: BorderRadius.circular(12), // Bordure arrondie
-                    border: Border.all(
-                      color: Colors
-                          .transparent, // Bordure transparente (ou modifiez la couleur)
-                      width: 1,
-                    ),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.transparent, width: 1),
                   ),
                   child: Stack(
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(16.0),
-                        child: AddEditUserPage(), // Le formulaire ici
+                        child: AddEditUserPage(),
                       ),
                       Positioned(
                         top: 16,
                         right: 16,
                         child: IconButton(
                           icon: const Icon(Icons.close,
-                              color: Colors.black, size: 30), // Croix noire
+                              color: Colors.black, size: 30),
                           onPressed: () {
-                            Navigator.of(context).pop(); // Ferme la modal
+                            Navigator.of(context).pop();
                           },
                         ),
                       ),
@@ -140,102 +168,45 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
       },
     );
   }
-}
-
-class UsersList extends StatelessWidget {
-  final List<UserApp> users;
-  final VoidCallback onRefresh;
-
-  const UsersList({Key? key, required this.users, required this.onRefresh})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: users.length,
-      itemBuilder: (context, index) {
-        final user = users[index];
-
-        return Card(
-          key: ValueKey(user.id),
-          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  user.name,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                const SizedBox(height: 8),
-                Text(user.email, style: Theme.of(context).textTheme.bodyLarge),
-                const SizedBox(height: 4),
-                Text(
-                  user.roles.map((role) => role.name).join(', '),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                ),
-                const Divider(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.blue),
-                      onPressed: () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AddEditUserPage(user: user),
-                          ),
-                        );
-                        onRefresh(); // Rafraîchir après modification
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () {
-                        _confirmDelete(context, user);
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
 
   void _confirmDelete(BuildContext context, UserApp user) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Supprimer utilisateur'),
+          title: const Text('Supprimer l\'utilisateur'),
           content: Text('Voulez-vous vraiment supprimer ${user.email} ?'),
           actions: [
+            // Bouton Annuler - couleur gris et texte noir
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Annuler'),
+              child: const Text(
+                'Annuler',
+                style:
+                    TextStyle(color: Colors.black), // Texte noir pour Annuler
+              ),
             ),
+            // Bouton Confirmer - avec bordure rouge et texte blanc
             TextButton(
               onPressed: () async {
-                await UserService.deleteUser(user.id); // Suppression réelle
+                await UserService.deleteUser(user.id);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('${user.email} a été supprimé.')),
                 );
                 Navigator.of(context).pop();
-                onRefresh(); // Rafraîchir la liste après suppression
+                _loadUsers(); // Rafraîchir après suppression
               },
-              child: const Text('Confirmer'),
+              style: TextButton.styleFrom(
+                side: BorderSide(color: Colors.red, width: 2), // Bordure rouge
+                backgroundColor: Colors.red, // Fond rouge
+                padding: EdgeInsets.symmetric(
+                    vertical: 12, horizontal: 24), // Espacement intérieur
+              ),
+              child: const Text(
+                'Confirmer',
+                style: TextStyle(
+                    color: Colors.white), // Texte blanc pour Confirmer
+              ),
             ),
           ],
         );

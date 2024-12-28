@@ -5,7 +5,7 @@ import 'package:squad_go/core/services/user_service.dart';
 class AddEditUserPage extends StatefulWidget {
   final UserApp? user;
 
-  const AddEditUserPage({Key? key, this.user}) : super(key: key);
+  const AddEditUserPage({super.key, this.user});
 
   @override
   _AddEditUserPageState createState() => _AddEditUserPageState();
@@ -22,7 +22,7 @@ class _AddEditUserPageState extends State<AddEditUserPage> {
     super.initState();
     _name = widget.user?.name ?? '';
     _email = widget.user?.email ?? '';
-    _selectedRole = widget.user?.roles.first ?? UserRole.user;
+    _selectedRole = widget.user?.roles.isNotEmpty == true ? widget.user!.roles.first : UserRole.user;
   }
 
   Future<void> _submit() async {
@@ -39,14 +39,14 @@ class _AddEditUserPageState extends State<AddEditUserPage> {
           {
             'name': _name,
             'email': _email,
-            'roles': [_selectedRole.name],
+            'roles': [_selectedRole.name], // Assurez-vous d'envoyer le rôle correctement
           },
         );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Utilisateur mis à jour avec succès.')),
         );
       } else {
-        // Appel POST pour créer un nouvel utilisateur (non inclus ici)
+        // Code pour ajouter un nouvel utilisateur (non inclus ici)
       }
 
       Navigator.of(context).pop();
@@ -102,6 +102,7 @@ class _AddEditUserPageState extends State<AddEditUserPage> {
                 },
               ),
               const SizedBox(height: 20),
+              // Dropdown pour le rôle
               DropdownButtonFormField<UserRole>(
                 value: _selectedRole,
                 items: UserRole.values
