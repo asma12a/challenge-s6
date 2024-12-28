@@ -3,9 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:squad_go/core/models/user_app.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
 import 'package:squad_go/core/services/user_service.dart';
-import 'add_edit_user_page.dart';
+import './add_edit_user_page.dart';
 import '../../custom_data_table.dart';
-import 'dart:ui';
 
 class AdminUsersPage extends StatefulWidget {
   const AdminUsersPage({super.key});
@@ -85,13 +84,17 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                   IconButton(
                     icon: const Icon(Icons.edit, color: Colors.blue),
                     onPressed: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddEditUserPage(user: user),
-                        ),
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AddEditUserModal(
+                            user: user,
+                            onUserSaved: () {
+                              _loadUsers(); // Rafraîchir la liste
+                            },
+                          );
+                        },
                       );
-                      _loadUsers(); // Rafraîchir après modification
                     },
                   ),
                   IconButton(
@@ -105,67 +108,29 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
             ]);
           }).toList();
 
-          return CustomDataTable(
-            title: 'Utilisateurs',
-            columns: columns,
-            rows: rows,
+          return SingleChildScrollView(
+            child: CustomDataTable(
+              title: 'Utilisateurs',
+              columns: columns,
+              rows: rows,
+              buttonText: 'Ajouter un utilisateur',
+              onButtonPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AddEditUserModal(
+                      user: null,
+                      onUserSaved: () {
+                        _loadUsers(); // Rafraîchir la liste
+                      },
+                    );
+                  },
+                );
+              },
+            ),
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showAddEditUserDialog(context);
-        },
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
-
-  void _showAddEditUserDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-            child: Material(
-              color: Colors.transparent,
-              child: Center(
-                child: Container(
-                  padding: const EdgeInsets.all(16.0),
-                  constraints: BoxConstraints(maxWidth: 600),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.transparent, width: 1),
-                  ),
-                  child: Stack(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: AddEditUserPage(),
-                      ),
-                      Positioned(
-                        top: 16,
-                        right: 16,
-                        child: IconButton(
-                          icon: const Icon(Icons.close,
-                              color: Colors.black, size: 30),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 
@@ -177,16 +142,13 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
           title: const Text('Supprimer l\'utilisateur'),
           content: Text('Voulez-vous vraiment supprimer ${user.email} ?'),
           actions: [
-            // Bouton Annuler - couleur gris et texte noir
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: const Text(
                 'Annuler',
-                style:
-                    TextStyle(color: Colors.black), // Texte noir pour Annuler
+                style: TextStyle(color: Colors.black),
               ),
             ),
-            // Bouton Confirmer - avec bordure rouge et texte blanc
             TextButton(
               onPressed: () async {
                 await UserService.deleteUser(user.id);
@@ -194,18 +156,16 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                   SnackBar(content: Text('${user.email} a été supprimé.')),
                 );
                 Navigator.of(context).pop();
-                _loadUsers(); // Rafraîchir après suppression
+                _loadUsers();
               },
               style: TextButton.styleFrom(
-                side: BorderSide(color: Colors.red, width: 2), // Bordure rouge
-                backgroundColor: Colors.red, // Fond rouge
-                padding: EdgeInsets.symmetric(
-                    vertical: 12, horizontal: 24), // Espacement intérieur
+                side: BorderSide(color: Colors.red, width: 2),
+                backgroundColor: Colors.red,
+                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
               ),
               child: const Text(
                 'Confirmer',
-                style: TextStyle(
-                    color: Colors.white), // Texte blanc pour Confirmer
+                style: TextStyle(color: Colors.white),
               ),
             ),
           ],

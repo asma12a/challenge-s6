@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:squad_go/core/models/user_app.dart';
 import 'package:squad_go/core/services/user_service.dart';
 
-class AddEditUserPage extends StatefulWidget {
+class AddEditUserModal extends StatefulWidget {
   final UserApp? user;
+  final VoidCallback?
+      onUserSaved; // Callback pour notifier que l'utilisateur a été ajouté ou modifié
 
-  const AddEditUserPage({super.key, this.user});
+  const AddEditUserModal({super.key, this.user, this.onUserSaved});
 
   @override
-  _AddEditUserPageState createState() => _AddEditUserPageState();
+  _AddEditUserModalState createState() => _AddEditUserModalState();
 }
 
-class _AddEditUserPageState extends State<AddEditUserPage> {
+class _AddEditUserModalState extends State<AddEditUserModal> {
   final _formKey = GlobalKey<FormState>();
   late String _name;
   late String _email;
@@ -20,9 +22,17 @@ class _AddEditUserPageState extends State<AddEditUserPage> {
   @override
   void initState() {
     super.initState();
-    _name = widget.user?.name ?? '';
-    _email = widget.user?.email ?? '';
-    _selectedRole = widget.user?.roles.isNotEmpty == true ? widget.user!.roles.first : UserRole.user;
+    if (widget.user != null) {
+      _name = widget.user!.name;
+      _email = widget.user!.email;
+      _selectedRole = widget.user!.roles.isNotEmpty
+          ? widget.user!.roles.first
+          : UserRole.user;
+    } else {
+      _name = '';
+      _email = '';
+      _selectedRole = UserRole.user;
+    }
   }
 
   Future<void> _submit() async {
@@ -33,23 +43,36 @@ class _AddEditUserPageState extends State<AddEditUserPage> {
 
     try {
       if (isEditing) {
-        // Appel PUT pour mettre à jour l'utilisateur
         await UserService.updateUser(
           widget.user!.id,
           {
             'name': _name,
             'email': _email,
-            'roles': [_selectedRole.name], // Assurez-vous d'envoyer le rôle correctement
+            'roles': [_selectedRole.name],
           },
         );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Utilisateur mis à jour avec succès.')),
         );
       } else {
-        // Code pour ajouter un nouvel utilisateur (non inclus ici)
+        await UserService.createUser(
+          {
+            'name': _name,
+            'email': _email,
+            'roles': [_selectedRole.name],
+          },
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Utilisateur créé avec succès.')),
+        );
       }
 
-      Navigator.of(context).pop();
+      // Appeler le callback pour notifier que l'utilisateur a été sauvegardé
+      if (widget.onUserSaved != null) {
+        widget.onUserSaved!();
+      }
+
+      Navigator.of(context).pop(); // Fermer la modal
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -64,15 +87,13 @@ class _AddEditUserPageState extends State<AddEditUserPage> {
   Widget build(BuildContext context) {
     final isEditing = widget.user != null;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(isEditing ? 'Modifier utilisateur' : 'Ajouter utilisateur'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
+    return AlertDialog(
+      title: Text(isEditing ? 'Modifier l\'utilisateur' : 'Nouvel utilisateur'),
+      content: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextFormField(
                 initialValue: _name,
@@ -102,7 +123,6 @@ class _AddEditUserPageState extends State<AddEditUserPage> {
                 },
               ),
               const SizedBox(height: 20),
-              // Dropdown pour le rôle
               DropdownButtonFormField<UserRole>(
                 value: _selectedRole,
                 items: UserRole.values
@@ -118,15 +138,30 @@ class _AddEditUserPageState extends State<AddEditUserPage> {
                 },
                 decoration: const InputDecoration(labelText: 'Rôle'),
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _submit,
-                child: Text(isEditing ? 'Modifier' : 'Ajouter'),
-              ),
             ],
           ),
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          style: TextButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
+            side: const BorderSide(color: Colors.black),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          ),
+          child: const Text('Annuler'),
+        ),
+        ElevatedButton(
+          onPressed: _submit,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green,
+            foregroundColor: Colors.white,
+          ),
+          child: Text(isEditing ? 'Modifier' : 'Ajouter'),
+        ),
+      ],
     );
   }
 }

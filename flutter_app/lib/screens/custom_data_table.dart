@@ -4,12 +4,16 @@ class CustomDataTable extends StatelessWidget {
   final String title;
   final List<DataColumn> columns;
   final List<DataRow> rows;
+  final String buttonText; 
+  final VoidCallback onButtonPressed;
 
   const CustomDataTable({
     super.key,
     required this.title,
     required this.columns,
     required this.rows,
+    required this.buttonText,
+    required this.onButtonPressed,
   });
 
   @override
@@ -26,24 +30,44 @@ class CustomDataTable extends StatelessWidget {
         ),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment:
+            CrossAxisAlignment.start, 
         children: [
-          Text(
-            title,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).primaryColor,
-                ),
+          Center(
+            child: Text(
+              title,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).primaryColor,
+                  ),
+            ),
           ),
           const SizedBox(height: 16),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DataTable(
-              headingRowColor:
-                  MaterialStateColor.resolveWith((states) => Colors.grey[200]!),
-              columns: columns,
-              rows: rows,
+
+          Align(
+            alignment: Alignment.topRight,
+            child: ElevatedButton(
+              onPressed: onButtonPressed,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context)
+                    .colorScheme
+                    .primary, // Bleu clair
+                foregroundColor: Colors.white, // Texte blanc
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+              child: Text(buttonText),
             ),
+          ),
+          const SizedBox(height: 16),
+
+          // Affichage du DataTable
+          DataTable(
+            headingRowColor:
+                MaterialStateColor.resolveWith((states) => Colors.grey[200]!),
+            columns: columns,
+            rows: rows,
+            columnSpacing: 12, // Ajuster l'espace entre les colonnes
           ),
         ],
       ),
