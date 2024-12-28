@@ -4,6 +4,7 @@ import 'package:squad_go/core/providers/auth_state_provider.dart';
 import 'package:squad_go/screens/sign_in.dart';
 import 'package:squad_go/widgets/logo.dart';
 import 'package:provider/provider.dart';
+import 'package:squad_go/screens/admin/users/admin_users_page.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({super.key, required this.onSelectScreen});
@@ -23,6 +24,9 @@ class MainDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authState =
+        context.watch<AuthState>(); // Observe l'état d'authentification
+
     return Drawer(
       child: Column(
         children: [
@@ -65,6 +69,28 @@ class MainDrawer extends StatelessWidget {
               onSelectScreen('meals');
             },
           ),
+          if (authState.isAdmin) // Afficher seulement pour les admins
+            ListTile(
+              leading: Icon(
+                Icons.admin_panel_settings,
+                size: 26,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              title: Text(
+                'Utilisateurs',
+                style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 24,
+                    ),
+              ),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (ctx) => const AdminUsersPage(),
+                  ),
+                );
+              },
+            ),
           ListTile(
             leading: Icon(
               Icons.logout,
