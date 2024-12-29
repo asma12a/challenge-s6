@@ -6,7 +6,8 @@ import 'package:squad_go/widgets/carousel.dart';
 import 'package:squad_go/widgets/event_card.dart';
 
 class HomeRecommendedEvents extends StatefulWidget {
-  const HomeRecommendedEvents({super.key});
+  final Future<void> Function()? onRefresh;
+  const HomeRecommendedEvents({super.key, this.onRefresh});
 
   @override
   State<HomeRecommendedEvents> createState() => HomeRecommendedEventsState();
@@ -44,6 +45,7 @@ class HomeRecommendedEventsState extends State<HomeRecommendedEvents> {
           .map((event) => EventCard(
                 event: event,
                 hasJoinedEvent: false,
+                onRefresh: widget.onRefresh,
               ))
           .toList(),
     );

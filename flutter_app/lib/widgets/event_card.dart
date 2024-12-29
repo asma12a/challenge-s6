@@ -9,9 +9,14 @@ import 'package:squad_go/widgets/dialog/join_event.dart';
 class EventCard extends StatelessWidget {
   final Event event;
   final bool hasJoinedEvent;
+  final Future<void> Function()? onRefresh;
 
-  const EventCard(
-      {super.key, required this.event, this.hasJoinedEvent = false});
+  const EventCard({
+    super.key,
+    required this.event,
+    this.hasJoinedEvent = false,
+    this.onRefresh,
+  });
 
   void onCardClick(BuildContext context) {
     if (hasJoinedEvent) {
@@ -28,7 +33,10 @@ class EventCard extends StatelessWidget {
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          return JoinEventDialog(eventId: event.id!);
+          return JoinEventDialog(
+            eventId: event.id!,
+            onRefresh: onRefresh,
+          );
         },
       );
     }

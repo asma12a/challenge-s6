@@ -37,7 +37,7 @@ class HomeScreenState extends State<HomeScreen>
     super.dispose();
   }
 
-  Future<void> _refresh() async {
+  Future<void> onRefresh() async {
     await myEventsKey.currentState?.fetchMyEvents();
     await recommendedEventsKey.currentState?.fetchRecommendedEvents();
   }
@@ -59,7 +59,7 @@ class HomeScreenState extends State<HomeScreen>
       ),
       animation: _animationController,
       child: RefreshIndicator(
-        onRefresh: _refresh,
+        onRefresh: onRefresh,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
@@ -68,7 +68,10 @@ class HomeScreenState extends State<HomeScreen>
                 height: 10,
               ),
               HomeMyEvents(key: myEventsKey),
-              HomeRecommendedEvents(key: recommendedEventsKey)
+              HomeRecommendedEvents(
+                key: recommendedEventsKey,
+                onRefresh: onRefresh,
+              )
             ],
           ),
         ),
