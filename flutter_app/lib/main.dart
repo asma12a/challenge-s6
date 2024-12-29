@@ -10,7 +10,13 @@ import 'package:squad_go/screens/tabs.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 final log = Logger("AppLogger");
-final dio = Dio();
+final dio = Dio(BaseOptions(
+  connectTimeout: Duration(seconds: 5),
+  receiveTimeout: Duration(seconds: 5),
+  headers: {
+    'Accept': 'application/json',
+  },
+));
 
 void main() async {
   await dotenv.load(fileName: "assets/../.env");

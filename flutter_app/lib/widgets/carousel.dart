@@ -47,13 +47,16 @@ class CarouselState extends State<Carousel> {
                 padding: const EdgeInsets.only(left: 40),
                 child: Text('Aucun élément à afficher'),
               ),
-            CarouselSlider(
-              options: CarouselOptions(
-                enableInfiniteScroll: false,
-                padEnds: false,
-                height: widget.items.isEmpty ? 0 : 20,
+            Padding(
+              padding: const EdgeInsets.only(left: 20),
+              child: CarouselSlider(
+                options: CarouselOptions(
+                  enableInfiniteScroll: false,
+                  padEnds: false,
+                  height: widget.items.isEmpty ? 20 : null,
+                ),
+                items: widget.items,
               ),
-              items: widget.items,
             ),
             const SizedBox(
               height: 20,

@@ -20,8 +20,12 @@ class Sport {
   factory Sport.fromJson(Map<String, dynamic> data) {
     return Sport(
       id: data['id'],
-      name: SportName.values.firstWhere((e) => e.toString() == data['name']),
-      type: SportType.values.firstWhere((e) => e.toString() == data['type']),
+      name: SportName.values.firstWhere((e) =>
+          e.toString().split('.').last.toLowerCase() ==
+          data['name'].toLowerCase()),
+      type: SportType.values.firstWhere((e) =>
+          e.toString().split('.').last.toLowerCase() ==
+          data['type'].toLowerCase()),
       color: data['color'] != null ? Color(data['color']) : null,
       imageUrl: data['image_url'],
       maxTeams: data['max_teams'],

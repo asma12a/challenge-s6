@@ -460,7 +460,15 @@ func listRecommendedEvents(ctx context.Context, serviceEvent service.Event) fibe
 			longitude = defaultLongitude
 		}
 
-		events, err := serviceEvent.ListRecommendedEvents(ctx, latitude, longitude)
+		currentUser, err := viewer.UserFromContext(c.UserContext())
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+
+		events, err := serviceEvent.ListRecommendedEvents(ctx, latitude, longitude, currentUser.ID)
 
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{

@@ -235,8 +235,21 @@ func (e *Event) ListUserEvents(ctx context.Context, userID ulid.ID) ([]*ent.Even
 	return events, nil
 }
 
-func (e *Event) ListRecommendedEvents(ctx context.Context, lat, long float64) ([]*ent.Event, error) {
-	events, err := e.db.Event.Query().Where(event.IsPublicEQ(true)).WithSport().All(ctx)
+func (e *Event) ListRecommendedEvents(ctx context.Context, lat, long float64, userID ulid.ID) ([]*ent.Event, error) {
+	userEvents, err := e.ListUserEvents(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	var userEventIDs []ulid.ID
+	for _, ue := range userEvents {
+		userEventIDs = append(userEventIDs, ue.ID)
+	}
+
+	events, err := e.db.Event.Query().
+		Where(event.IsPublicEQ(true)).
+		Where(event.IDNotIn(userEventIDs...)).
+		WithSport().All(ctx)
 	if err != nil {
 		return nil, err
 	}

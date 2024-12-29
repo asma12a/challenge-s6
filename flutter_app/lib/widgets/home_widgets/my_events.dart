@@ -27,8 +27,6 @@ class _HomeMyEventsState extends State<HomeMyEvents> {
     try {
       List<Event> events = await eventService.getMyEvents();
 
-      debugPrint('my events: $events');
-
       setState(() {
         myEvents = events;
       });
