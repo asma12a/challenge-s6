@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../core/services/chat_service.dart';
+import '../../../core/services/chat_service.dart';
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;

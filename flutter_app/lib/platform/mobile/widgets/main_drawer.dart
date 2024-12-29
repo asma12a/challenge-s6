@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
-import 'package:squad_go/screens/sign_in.dart';
-import 'package:squad_go/widgets/logo.dart';
+import 'package:squad_go/shared_widgets/sign_in.dart';
+import 'package:squad_go/platform/mobile/widgets/logo.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 

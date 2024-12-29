@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:squad_go/core/models/user_stats.dart';
 import 'package:squad_go/core/services/sport_stat_labels_service.dart';

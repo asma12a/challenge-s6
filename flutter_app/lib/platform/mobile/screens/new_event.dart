@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:squad_go/core/services/event_service.dart';
 import 'package:squad_go/core/models/event.dart';
-import 'package:squad_go/screens/tabs.dart';
+import 'package:squad_go/platform/mobile/screens/tabs.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';

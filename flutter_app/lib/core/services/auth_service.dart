@@ -12,7 +12,8 @@ class AuthService {
 
   Future<Map<String, dynamic>> signIn(body) async {
     try {
-      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/auth/login');
+     final uri = Uri.parse('http://localhost:3001/api/auth/login');
+
       final response = await http.post(uri,
           headers: {
             'Content-Type': 'application/json',
@@ -20,8 +21,7 @@ class AuthService {
           body: jsonEncode(body));
 
       final data = jsonDecode(utf8.decode(response.bodyBytes));
-      await _storage.write(
-          key: dotenv.env['JWT_STORAGE_KEY']!, value: data['token']);
+      await _storage.write(key: 'squadgo-jwt', value: data['token']);
 
       return data;
     } catch (error) {
@@ -53,7 +53,7 @@ class AuthService {
 
   Future<UserApp?> getUserInfo() async {
     try {
-      final token = await _storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+      final token = await _storage.read(key: 'squadgo-jwt');
       if (token == null) return null;
 
       final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/auth/me');
