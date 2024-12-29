@@ -24,7 +24,7 @@ void main() async {
     DioCacheInterceptor(
       options: CacheOptions(
         store: MemCacheStore(),
-        policy: CachePolicy.forceCache,
+        policy: CachePolicy.request,
       ),
     ),
   );

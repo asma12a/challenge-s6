@@ -4,6 +4,7 @@ import 'package:squad_go/core/models/sport.dart';
 import 'package:intl/intl.dart';
 import 'package:squad_go/screens/event.dart';
 import 'package:squad_go/widgets/custom_label.dart';
+import 'package:squad_go/widgets/dialog/join_event.dart';
 
 class EventCard extends StatelessWidget {
   final Event event;
@@ -22,7 +23,14 @@ class EventCard extends StatelessWidget {
       );
     } else {
       // Show the join event dialog/modal
-      debugPrint('Join event.');
+      if (event.id == null) return;
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return JoinEventDialog(eventId: event.id!);
+        },
+      );
     }
   }
 
@@ -70,7 +78,7 @@ class EventCard extends StatelessWidget {
                           leading: Icon(
                             sportIcon[event.sport.name],
                             size: 32,
-                            color: event.sport.color,
+                            color: event.sport.color?.withOpacity(0.5),
                           ),
                           title: Text(
                             event.name,

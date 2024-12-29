@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/asma12a/challenge-s6/ent/team"
 	"github.com/asma12a/challenge-s6/ent/user"
@@ -249,6 +250,7 @@ func (e *Event) ListRecommendedEvents(ctx context.Context, lat, long float64, us
 	events, err := e.db.Event.Query().
 		Where(event.IsPublicEQ(true)).
 		Where(event.IDNotIn(userEventIDs...)).
+		Where(event.DateGTE(time.Now().Format(time.RFC3339))).
 		WithSport().All(ctx)
 	if err != nil {
 		return nil, err

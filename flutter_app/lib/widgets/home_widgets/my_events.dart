@@ -9,10 +9,10 @@ class HomeMyEvents extends StatefulWidget {
   const HomeMyEvents({super.key});
 
   @override
-  State<HomeMyEvents> createState() => _HomeMyEventsState();
+  State<HomeMyEvents> createState() => HomeMyEventsState();
 }
 
-class _HomeMyEventsState extends State<HomeMyEvents> {
+class HomeMyEventsState extends State<HomeMyEvents> {
   final EventService eventService = EventService();
   List<Event> myEvents = [];
 
@@ -20,10 +20,10 @@ class _HomeMyEventsState extends State<HomeMyEvents> {
   void initState() {
     super.initState();
 
-    _fetchMyEvents();
+    fetchMyEvents();
   }
 
-  void _fetchMyEvents() async {
+  Future<void> fetchMyEvents() async {
     try {
       List<Event> events = await eventService.getMyEvents();
 

@@ -12,6 +12,10 @@ class HomeScreen extends StatefulWidget {
 class HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
+  final GlobalKey<HomeRecommendedEventsState> recommendedEventsKey =
+      GlobalKey<HomeRecommendedEventsState>();
+  final GlobalKey<HomeMyEventsState> myEventsKey =
+      GlobalKey<HomeMyEventsState>();
 
   @override
   void initState() {
@@ -33,6 +37,11 @@ class HomeScreenState extends State<HomeScreen>
     super.dispose();
   }
 
+  Future<void> _refresh() async {
+    await myEventsKey.currentState?.fetchMyEvents();
+    await recommendedEventsKey.currentState?.fetchRecommendedEvents();
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -49,15 +58,19 @@ class HomeScreenState extends State<HomeScreen>
         child: child,
       ),
       animation: _animationController,
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 10,
-            ),
-            HomeMyEvents(),
-            HomeRecommendedEvents()
-          ],
+      child: RefreshIndicator(
+        onRefresh: _refresh,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 10,
+              ),
+              HomeMyEvents(key: myEventsKey),
+              HomeRecommendedEvents(key: recommendedEventsKey)
+            ],
+          ),
         ),
       ),
     );

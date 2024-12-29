@@ -47,9 +47,12 @@ class Player {
       id: data['id'],
       name: data['name'],
       email: data['email'],
-      role: PlayerRole.values.firstWhere((e) => e.toString() == data['role']),
-      status:
-          PlayerStatus.values.firstWhere((e) => e.toString() == data['status']),
+      role: PlayerRole.values.firstWhere((e) =>
+          e.toString().split('.').last.toLowerCase() ==
+          data['role'].toLowerCase()),
+      status: PlayerStatus.values.firstWhere((e) =>
+          e.toString().split('.').last.toLowerCase() ==
+          data['status'].toLowerCase()),
       userID: data['user_id'],
     );
   }

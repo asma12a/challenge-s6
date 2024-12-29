@@ -154,6 +154,8 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 				Name:     condition.Name,
 				Type:     presenter.SportType(condition.Type),
 				ImageURL: condition.ImageURL,
+				Color:    condition.Color,
+				MaxTeams: condition.MaxTeams,
 			}
 		}
 
@@ -331,6 +333,8 @@ func listEvents(ctx context.Context, service service.Event) fiber.Handler {
 					Name:     condition.Name,
 					Type:     presenter.SportType(condition.Type),
 					ImageURL: condition.ImageURL,
+					Color:    condition.Color,
+					MaxTeams: condition.MaxTeams,
 				}
 			}
 		}
@@ -387,6 +391,8 @@ func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
 					Name:     condition.Name,
 					Type:     presenter.SportType(condition.Type),
 					ImageURL: condition.ImageURL,
+					Color:    condition.Color,
+					MaxTeams: condition.MaxTeams,
 				}
 
 			}
@@ -437,6 +443,8 @@ func listUserEvents(ctx context.Context, serviceEvent service.Event) fiber.Handl
 					Name:     condition.Name,
 					Type:     presenter.SportType(condition.Type),
 					ImageURL: condition.ImageURL,
+					Color:    condition.Color,
+					MaxTeams: condition.MaxTeams,
 				}
 			}
 		}
@@ -499,6 +507,8 @@ func listRecommendedEvents(ctx context.Context, serviceEvent service.Event) fibe
 					Name:     condition.Name,
 					Type:     presenter.SportType(condition.Type),
 					ImageURL: condition.ImageURL,
+					Color:    condition.Color,
+					MaxTeams: condition.MaxTeams,
 				}
 			}
 		}

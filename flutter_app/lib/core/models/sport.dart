@@ -26,7 +26,9 @@ class Sport {
       type: SportType.values.firstWhere((e) =>
           e.toString().split('.').last.toLowerCase() ==
           data['type'].toLowerCase()),
-      color: data['color'] != null ? Color(data['color']) : null,
+      color: data['color'] != null
+          ? Color(int.parse('FF${data['color']}', radix: 16))
+          : null,
       imageUrl: data['image_url'],
       maxTeams: data['max_teams'],
     );

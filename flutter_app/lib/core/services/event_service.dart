@@ -44,7 +44,7 @@ class EventService {
     }
   }
 
-  Future<Map<String, dynamic>> getEventById(String id) async {
+  Future<Event> getEventById(String id) async {
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
 
     final Uri url = Uri.http(dotenv.env['API_BASE_URL']!, 'api/events/$id');
@@ -56,8 +56,9 @@ class EventService {
             'Authorization': "Bearer $token",
           }));
 
-      final Map<String, dynamic> event = json.decode(response.data);
-      return event;
+      final Map<String, dynamic> event =
+          Map<String, dynamic>.from(response.data);
+      return Event.fromJson(event);
     } catch (error) {
       throw AppException(
           message: 'Failed to retrieve event, please try again.');

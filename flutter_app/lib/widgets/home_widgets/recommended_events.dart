@@ -9,10 +9,10 @@ class HomeRecommendedEvents extends StatefulWidget {
   const HomeRecommendedEvents({super.key});
 
   @override
-  State<HomeRecommendedEvents> createState() => _HomeRecommendedEventsState();
+  State<HomeRecommendedEvents> createState() => HomeRecommendedEventsState();
 }
 
-class _HomeRecommendedEventsState extends State<HomeRecommendedEvents> {
+class HomeRecommendedEventsState extends State<HomeRecommendedEvents> {
   final EventService eventService = EventService();
   List<Event> recommendedEvents = [];
 
@@ -20,10 +20,10 @@ class _HomeRecommendedEventsState extends State<HomeRecommendedEvents> {
   void initState() {
     super.initState();
 
-    _fetchRecommendedEvents();
+    fetchRecommendedEvents();
   }
 
-  void _fetchRecommendedEvents() async {
+  Future<void> fetchRecommendedEvents() async {
     try {
       List<Event> events = await eventService.getRecommendedEvents();
 
