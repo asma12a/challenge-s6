@@ -83,6 +83,9 @@ class _JoinEventDialogState extends State<JoinEventDialog> {
                   children: event?.teams
                           ?.map((team) => RadioListTile<String>(
                                 title: Text(team.name),
+                                subtitle: Text(
+                                  '${team.players.length}${team.maxPlayers > 0 ? '/${team.maxPlayers}' : ''} sportifs',
+                                ),
                                 value: team.id,
                                 groupValue: _selectedTeamId,
                                 onChanged: (String? newValue) {
