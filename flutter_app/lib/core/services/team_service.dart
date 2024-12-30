@@ -23,4 +23,21 @@ class TeamService {
       throw AppException(message: 'Failed to join team, please try again.');
     }
   }
+
+  Future<void> switchTeam(String eventID, String teamID) async {
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+
+    final Uri url = Uri.http(dotenv.env['API_BASE_URL']!,
+        'api/events/$eventID/teams/$teamID/switch');
+
+    try {
+      await dio.post(url.toString(),
+          options: Options(headers: {
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer $token",
+          }));
+    } catch (error) {
+      throw AppException(message: 'Failed to switch team, please try again.');
+    }
+  }
 }

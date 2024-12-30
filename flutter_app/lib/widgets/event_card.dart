@@ -48,10 +48,13 @@ class EventCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Card(
-        shadowColor: event.sport.color,
         clipBehavior: Clip.hardEdge,
+        color: Theme.of(context).colorScheme.surface,
         child: InkWell(
-          splashColor: Theme.of(context).colorScheme.secondary.withAlpha(30),
+          splashColor: event.sport.color?.withAlpha(30) ??
+              Theme.of(context).colorScheme.secondary.withAlpha(30),
+          highlightColor: event.sport.color?.withAlpha(30) ??
+              Theme.of(context).colorScheme.secondary.withAlpha(30),
           onTap: () {
             onCardClick(context);
           },

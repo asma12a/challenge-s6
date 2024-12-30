@@ -3,6 +3,8 @@ import 'package:squad_go/core/models/team.dart';
 import 'package:squad_go/core/models/user_app.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:squad_go/core/services/team_service.dart';
+import 'package:squad_go/main.dart';
 
 class TeamsHandle extends StatefulWidget {
   final String eventId;
@@ -10,6 +12,7 @@ class TeamsHandle extends StatefulWidget {
   final int maxTeams;
   final bool canEdit;
   final Color color;
+  final Future<void> Function()? onRefresh;
 
   const TeamsHandle({
     super.key,
@@ -18,6 +21,7 @@ class TeamsHandle extends StatefulWidget {
     required this.canEdit,
     required this.maxTeams,
     required this.color,
+    this.onRefresh,
   });
 
   @override
@@ -25,6 +29,8 @@ class TeamsHandle extends StatefulWidget {
 }
 
 class _TeamsHandleState extends State<TeamsHandle> {
+  final TeamService teamService = TeamService();
+
   UserApp? currentUser;
   bool userHasTeam = false;
 
@@ -33,12 +39,72 @@ class _TeamsHandleState extends State<TeamsHandle> {
     super.initState();
 
     currentUser = context.read<AuthState>().userInfo;
-    userHasTeam = widget.teams.any(
-        (team) => team.players.any((player) => player.id == currentUser!.id));
+  }
+
+  void _joinTeam(String teamId, String teamName) async {
+    _showAlertDialog(
+      "Rejoindre $teamName",
+      "Voulez-vous vraiment rejoindre cette équipe?",
+      () async {
+        try {
+          await teamService.joinTeam(widget.eventId, teamId);
+          widget.onRefresh?.call();
+        } catch (e) {
+          // Handle error
+          log.severe('Failed to join team: $e');
+        }
+      },
+    );
+  }
+
+  void _switchTeam(String teamId, String teamName) async {
+    _showAlertDialog(
+      "Changer d'équipe",
+      "Voulez-vous vraiment changer d'équipe et rejoindre $teamName ?",
+      () async {
+        try {
+          await teamService.switchTeam(widget.eventId, teamId);
+          widget.onRefresh?.call();
+        } catch (e) {
+          // Handle error
+          log.severe('Failed to switch team: $e');
+        }
+      },
+    );
+  }
+
+  void _showAlertDialog(String title, String content, void Function() onOk) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: [
+            TextButton(
+              child: Text("Annuler"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                onOk();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    userHasTeam = widget.teams.any(
+      (team) => team.players.any((player) => player.userID == currentUser!.id),
+    );
     return DefaultTabController(
       length: widget.teams.length,
       child: Column(
@@ -134,10 +200,56 @@ class _TeamsHandleState extends State<TeamsHandle> {
                       child: Column(
                         children: [
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
+                              if (!userHasTeam ||
+                                  (userHasTeam &&
+                                      !team.players.any((player) =>
+                                          player.userID == currentUser!.id)))
+                                TextButton(
+                                  onPressed: () {
+                                    if (userHasTeam) {
+                                      _switchTeam(team.id, team.name);
+                                    } else {
+                                      _joinTeam(team.id, team.name);
+                                    }
+                                  },
+                                  child: Badge(
+                                    label: Row(
+                                      children: [
+                                        Icon(
+                                          userHasTeam
+                                              ? Icons.swap_horiz
+                                              : Icons.group_add,
+                                          size: 16,
+                                          color: Colors.white,
+                                        ),
+                                        SizedBox(width: 6),
+                                        Text(
+                                          userHasTeam
+                                              ? "Changer d'équipe"
+                                              : "Rejoindre l'équipe",
+                                        ),
+                                      ],
+                                    ),
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.primary,
+                                    textStyle: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 7,
+                                      vertical: 5,
+                                    ),
+                                  ),
+                                ),
+                              if (userHasTeam &&
+                                  team.players.any((player) =>
+                                      player.userID == currentUser!.id))
+                                Spacer(),
                               Badge(
                                 label: Text(
-                                    '${team.players.length}${team.maxPlayers > 0 ? '/${team.maxPlayers}' : ''}'),
+                                    '${team.players.length}${team.maxPlayers > 0 ? ' / ${team.maxPlayers}' : ''}'),
                                 backgroundColor: team.maxPlayers == 0
                                     ? Colors.grey.shade400
                                     : team.players.length < team.maxPlayers
@@ -165,6 +277,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                           // Show player details in dialog
                                         },
                                         child: Container(
+                                          margin: EdgeInsets.only(bottom: 16),
                                           decoration: BoxDecoration(
                                             color: widget.color.withAlpha(20),
                                             borderRadius:
