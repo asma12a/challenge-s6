@@ -246,13 +246,14 @@ class _EventScreenState extends State<EventScreen> {
                                       borderRadius: BorderRadius.circular(16),
                                     ),
                                     padding: const EdgeInsets.all(16),
-                                    child: event.id != null
-                                        ? TeamsHandle(
-                                            eventId: event.id!,
-                                            maxTeams: event.sport.maxTeams,
-                                            teams: event.teams ?? [],
-                                          )
-                                        : Container(),
+                                    child: TeamsHandle(
+                                      eventId: event.id!,
+                                      maxTeams: event.sport.maxTeams,
+                                      teams: event.teams ?? [],
+                                      canEdit: isOrganizer || isCoach,
+                                      color: event.sport.color ??
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
                                   ),
                                   Container(
                                     margin: const EdgeInsets.only(top: 16),

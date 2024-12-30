@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:squad_go/core/models/team.dart';
+import 'package:squad_go/core/models/user_app.dart';
+import 'package:squad_go/core/providers/auth_state_provider.dart';
+import 'package:provider/provider.dart';
 
 class TeamsHandle extends StatefulWidget {
   final String eventId;
   final List<Team> teams;
-  final int? maxTeams;
+  final int maxTeams;
+  final bool canEdit;
+  final Color color;
 
   const TeamsHandle({
     super.key,
     required this.teams,
     required this.eventId,
-    this.maxTeams,
+    required this.canEdit,
+    required this.maxTeams,
+    required this.color,
   });
 
   @override
@@ -18,6 +25,18 @@ class TeamsHandle extends StatefulWidget {
 }
 
 class _TeamsHandleState extends State<TeamsHandle> {
+  UserApp? currentUser;
+  bool userHasTeam = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    currentUser = context.read<AuthState>().userInfo;
+    userHasTeam = widget.teams.any(
+        (team) => team.players.any((player) => player.id == currentUser!.id));
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -56,12 +75,31 @@ class _TeamsHandleState extends State<TeamsHandle> {
                             Text(
                               team.name,
                             ),
-                            IconButton(
-                              icon: Icon(Icons.edit),
-                              onPressed: () {
-                                // Show dialog to edit team name
-                              },
-                            ),
+                            SizedBox(width: 8),
+                            if (widget.canEdit) ...[
+                              Container(
+                                width: 30,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .secondary
+                                      .withOpacity(0.1),
+                                ),
+                                child: IconButton(
+                                  icon: Icon(
+                                    Icons.edit,
+                                    size: 16,
+                                  ),
+                                  padding: EdgeInsets.zero,
+                                  onPressed: () {
+                                    // TODO: Edit team Dialog
+                                  },
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                            ],
                           ],
                         ),
                       );
@@ -69,9 +107,9 @@ class _TeamsHandleState extends State<TeamsHandle> {
                   ).toList(),
                 ),
               ),
-              if (widget.maxTeams == null ||
-                  (widget.maxTeams != null &&
-                      widget.teams.length < widget.maxTeams!))
+              if (widget.canEdit &&
+                  (widget.maxTeams == 0 ||
+                      widget.teams.length < widget.maxTeams))
                 Positioned(
                   right: 0,
                   child: SizedBox(
@@ -92,16 +130,17 @@ class _TeamsHandleState extends State<TeamsHandle> {
               children: widget.teams
                   .map(
                     (team) => Container(
-                      margin: EdgeInsets.only(top: 16),
+                      margin: EdgeInsets.only(top: 8),
                       child: Column(
                         children: [
                           Row(
                             children: [
                               Badge(
                                 label: Text(
-                                    '${team.players.length}/${team.maxPlayers}'),
-                                backgroundColor:
-                                    team.players.length < team.maxPlayers
+                                    '${team.players.length}${team.maxPlayers > 0 ? '/${team.maxPlayers}' : ''}'),
+                                backgroundColor: team.maxPlayers == 0
+                                    ? Colors.grey.shade400
+                                    : team.players.length < team.maxPlayers
                                         ? Colors.green.shade300
                                         : Colors.red.shade300,
                                 textStyle: TextStyle(
@@ -127,10 +166,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                         },
                                         child: Container(
                                           decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: Colors.grey,
-                                              width: 1,
-                                            ),
+                                            color: widget.color.withAlpha(20),
                                             borderRadius:
                                                 BorderRadius.circular(16),
                                           ),
@@ -141,18 +177,29 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                             trailing: Row(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
-                                                IconButton(
-                                                  icon: Icon(Icons.edit),
-                                                  onPressed: () {
-                                                    // Edit player details
-                                                  },
-                                                ),
-                                                IconButton(
-                                                  icon: Icon(Icons.bar_chart),
-                                                  onPressed: () {
-                                                    // Show player stats
-                                                  },
-                                                ),
+                                                if (widget.canEdit) ...[
+                                                  IconButton(
+                                                    icon: Icon(Icons.edit),
+                                                    onPressed: () {
+                                                      // TODO: Edit player Dialog
+                                                    },
+                                                  ),
+                                                  IconButton(
+                                                    icon: Icon(Icons.bar_chart),
+                                                    onPressed: () {
+                                                      // TODO: Show/Edit player stats Dialog
+                                                    },
+                                                  ),
+                                                ],
+                                                if (!widget.canEdit)
+                                                  IconButton(
+                                                    icon: Icon(
+                                                      Icons.remove_red_eye,
+                                                    ),
+                                                    onPressed: () {
+                                                      // TODO: Show player details Dialog
+                                                    },
+                                                  ),
                                               ],
                                             ),
                                           ),
@@ -162,10 +209,12 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                   ),
                                 )
                               : SizedBox(),
-                          if (team.players.length < team.maxPlayers)
+                          if (widget.canEdit &&
+                              (team.maxPlayers == 0 ||
+                                  team.players.length < team.maxPlayers))
                             ElevatedButton(
                               onPressed: () {
-                                // Show dialog to add player to team
+                                // TODO: Show dialog to add player to team
                               },
                               child: Text('Add Player'),
                             ),

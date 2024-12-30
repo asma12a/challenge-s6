@@ -193,6 +193,8 @@ class _SearchScreenState extends State<SearchScreen> {
                         ),
                         orElse: () => SportName.football,
                       ),
+                      maxTeams:
+                          _searchResults[index]["sport"]["max_teams"] ?? 0,
                       type: SportType.values.firstWhere(
                         (st) => st.name.contains(
                           _searchResults[index]["sport"]["type"]

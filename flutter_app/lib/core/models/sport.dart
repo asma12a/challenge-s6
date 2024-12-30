@@ -6,15 +6,15 @@ class Sport {
   final SportType type;
   final Color? color;
   final String? imageUrl;
-  final int? maxTeams;
+  final int maxTeams;
 
   const Sport({
     required this.id,
     required this.name,
+    required this.maxTeams,
     required this.type,
     this.color,
     this.imageUrl,
-    this.maxTeams,
   });
 
   factory Sport.fromJson(Map<String, dynamic> data) {
@@ -30,7 +30,7 @@ class Sport {
           ? Color(int.parse('FF${data['color']}', radix: 16))
           : null,
       imageUrl: data['image_url'],
-      maxTeams: data['max_teams'],
+      maxTeams: data['max_teams'] ?? 0,
     );
   }
 }

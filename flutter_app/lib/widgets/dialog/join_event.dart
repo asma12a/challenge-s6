@@ -3,7 +3,6 @@ import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/services/event_service.dart';
 import 'package:squad_go/core/services/team_service.dart';
 import 'package:squad_go/main.dart';
-import 'package:squad_go/screens/home.dart';
 
 class JoinEventDialog extends StatefulWidget {
   final String eventId;
