@@ -9,11 +9,13 @@ class Event {
     required this.address,
     required this.date,
     required this.sport,
+    this.createdBy,
     this.teams,
     this.type = EventType.match,
   });
 
   final String? id;
+  final String? createdBy;
   final String name;
   final String address;
   final String date;
@@ -35,6 +37,7 @@ class Event {
               .map((team) => Team.fromJson(team))
               .toList()
           : null,
+      createdBy: data['created_by'],
     );
   }
 }

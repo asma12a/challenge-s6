@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/models/sport.dart';
 import 'package:intl/intl.dart';
+import 'package:squad_go/core/utils/tools.dart';
 import 'package:squad_go/screens/event.dart';
 import 'package:squad_go/widgets/custom_label.dart';
 import 'package:squad_go/widgets/dialog/join_event.dart';
@@ -20,7 +21,8 @@ class EventCard extends StatelessWidget {
 
   void onCardClick(BuildContext context) {
     if (hasJoinedEvent) {
-      // Navigate to the event details screen (by adding to stack)
+      if (event.id == null) return;
+
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (ctx) => EventScreen(event: event),
@@ -128,10 +130,11 @@ class EventCard extends StatelessWidget {
                                   label: DateFormat('dd/MM/yyyy')
                                       .format(DateTime.parse(event.date)),
                                   icon: Icons.date_range,
-                                  backgroundColor: Theme.of(context)
-                                      .colorScheme
-                                      .secondary
-                                      .withAlpha(30),
+                                  color: getColorBasedOnDate(event.date),
+                                  iconColor: getColorBasedOnDate(event.date),
+                                  backgroundColor:
+                                      getColorBasedOnDate(event.date)
+                                          .withAlpha(20),
                                 ),
                                 TextButton(
                                   onPressed: () {

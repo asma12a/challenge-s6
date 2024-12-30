@@ -3,12 +3,58 @@ import 'package:intl/intl.dart';
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/core/models/team.dart';
+import 'package:squad_go/core/providers/auth_state_provider.dart';
+import 'package:squad_go/core/services/event_service.dart';
+import 'package:squad_go/core/utils/tools.dart';
+import 'package:squad_go/main.dart';
 import 'package:squad_go/widgets/custom_label.dart';
 import 'package:squad_go/widgets/teams.dart';
+import 'package:provider/provider.dart';
 
-class EventScreen extends StatelessWidget {
+class EventScreen extends StatefulWidget {
   final Event event;
   const EventScreen({super.key, required this.event});
+
+  @override
+  State<EventScreen> createState() => _EventScreenState();
+}
+
+class _EventScreenState extends State<EventScreen> {
+  final EventService eventService = EventService();
+  late Event event;
+  bool isOrganizer = false;
+  bool isCoach = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    event = widget.event;
+
+    _fetchEventDetails();
+  }
+
+  void _fetchEventDetails() async {
+    if (widget.event.id == null) return;
+    try {
+      final eventDetails = await eventService.getEventById(widget.event.id!);
+
+      final currentUserId = context.read<AuthState>().userInfo?.id;
+      final isUserCoach =
+          hasRole(PlayerRole.coach, currentUserId, eventDetails.teams);
+      final isUserOrg =
+          hasRole(PlayerRole.org, currentUserId, eventDetails.teams);
+
+      setState(() {
+        event = eventDetails;
+        isOrganizer = event.createdBy == currentUserId || isUserOrg;
+        isCoach = isUserCoach;
+      });
+    } catch (e) {
+      // Handle error
+      log.severe('Failed to fetch event details: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,13 +64,13 @@ class EventScreen extends StatelessWidget {
           slivers: [
             SliverAppBar(
               actions: [
-                // TODO: DIsplay only if the user is the event creator
-                IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: () {
-                    // Edit event
-                  },
-                ),
+                if (isOrganizer)
+                  IconButton(
+                    icon: const Icon(Icons.edit),
+                    onPressed: () {
+                      // TODO: Edit event dialog
+                    },
+                  ),
               ],
               title: Tooltip(
                 message: event.name,
@@ -58,10 +104,11 @@ class EventScreen extends StatelessWidget {
                       margin: const EdgeInsets.only(
                           bottom: 16, left: 16, right: 16),
                       decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withOpacity(0.05),
+                        color: event.sport.color?.withOpacity(0.03) ??
+                            Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withOpacity(0.03),
                         borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(16),
                           bottomRight: Radius.circular(16),
@@ -118,10 +165,11 @@ class EventScreen extends StatelessWidget {
                                   label: DateFormat('dd/MM/yyyy')
                                       .format(DateTime.parse(event.date)),
                                   icon: Icons.date_range,
-                                  color: Colors
-                                      .green, // TODO: Change color based on date
-                                  iconColor: Colors.green,
-                                  backgroundColor: Colors.green.withAlpha(20),
+                                  color: getColorBasedOnDate(event.date),
+                                  iconColor: getColorBasedOnDate(event.date),
+                                  backgroundColor:
+                                      getColorBasedOnDate(event.date)
+                                          .withAlpha(20),
                                 ),
                               ],
                             ),
@@ -145,20 +193,22 @@ class EventScreen extends StatelessWidget {
                             Container(
                               height: 40,
                               decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .primary
-                                    .withOpacity(0.2),
+                                color: event.sport.color?.withOpacity(0.2) ??
+                                    Theme.of(context)
+                                        .colorScheme
+                                        .primary
+                                        .withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: TabBar(
                                 indicatorSize: TabBarIndicatorSize.tab,
                                 dividerColor: Colors.transparent,
                                 indicator: BoxDecoration(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .primary
-                                      .withOpacity(0.5),
+                                  color: event.sport.color?.withOpacity(0.5) ??
+                                      Theme.of(context)
+                                          .colorScheme
+                                          .primary
+                                          .withOpacity(0.5),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 labelColor: Colors.white,
@@ -187,10 +237,12 @@ class EventScreen extends StatelessWidget {
                                   Container(
                                     margin: const EdgeInsets.only(top: 16),
                                     decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary
-                                          .withOpacity(0.05),
+                                      color: event.sport.color
+                                              ?.withOpacity(0.03) ??
+                                          Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                              .withOpacity(0.03),
                                       borderRadius: BorderRadius.circular(16),
                                     ),
                                     padding: const EdgeInsets.all(16),
