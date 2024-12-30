@@ -8,6 +8,7 @@ import 'package:squad_go/core/services/event_service.dart';
 import 'package:squad_go/core/utils/tools.dart';
 import 'package:squad_go/main.dart';
 import 'package:squad_go/widgets/custom_label.dart';
+import 'package:squad_go/widgets/dialog/edit_event.dart';
 import 'package:squad_go/widgets/teams.dart';
 import 'package:provider/provider.dart';
 
@@ -76,7 +77,15 @@ class _EventScreenState extends State<EventScreen> {
                     IconButton(
                       icon: const Icon(Icons.edit),
                       onPressed: () {
-                        // TODO: Edit event dialog
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return EditEventDialog(
+                              event: event,
+                              onRefresh: onRefresh,
+                            );
+                          },
+                        );
                       },
                     ),
                 ],
@@ -268,6 +277,7 @@ class _EventScreenState extends State<EventScreen> {
                                                 .colorScheme
                                                 .primary,
                                         onRefresh: onRefresh,
+                                        eventCreatorId: event.createdBy,
                                       ),
                                     ),
                                     Container(

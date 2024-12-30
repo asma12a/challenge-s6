@@ -5,9 +5,11 @@ import 'package:squad_go/core/providers/auth_state_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:squad_go/core/services/team_service.dart';
 import 'package:squad_go/main.dart';
+import 'package:squad_go/widgets/dialog/edit_team.dart';
 
 class TeamsHandle extends StatefulWidget {
   final String eventId;
+  final String? eventCreatorId;
   final List<Team> teams;
   final int maxTeams;
   final bool canEdit;
@@ -22,6 +24,7 @@ class TeamsHandle extends StatefulWidget {
     required this.maxTeams,
     required this.color,
     this.onRefresh,
+    this.eventCreatorId,
   });
 
   @override
@@ -127,21 +130,15 @@ class _TeamsHandleState extends State<TeamsHandle> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   labelColor: Colors.white,
-                  labelStyle: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                  labelPadding: EdgeInsets.only(
-                    left: 16,
-                  ),
+                  labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                  labelPadding: EdgeInsets.only(left: 16),
                   tabs: widget.teams.map(
                     (team) {
                       return Tab(
                         child: Row(
                           children: [
-                            Text(
-                              team.name,
-                            ),
-                            SizedBox(width: 8),
+                            Text(team.name),
+                            SizedBox(width: widget.canEdit ? 8 : 16),
                             if (widget.canEdit) ...[
                               Container(
                                 width: 30,
@@ -160,7 +157,15 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                   ),
                                   padding: EdgeInsets.zero,
                                   onPressed: () {
-                                    // TODO: Edit team Dialog
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return EditTeamDialog(
+                                          team: team,
+                                          onRefresh: widget.onRefresh,
+                                        );
+                                      },
+                                    );
                                   },
                                 ),
                               ),
@@ -246,7 +251,10 @@ class _TeamsHandleState extends State<TeamsHandle> {
                               if (userHasTeam &&
                                   team.players.any((player) =>
                                       player.userID == currentUser!.id))
-                                Spacer(),
+                                TextButton(
+                                  onPressed: null,
+                                  child: Spacer(),
+                                ),
                               Badge(
                                 label: Text(
                                     '${team.players.length}${team.maxPlayers > 0 ? ' / ${team.maxPlayers}' : ''}'),
@@ -272,49 +280,146 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                     itemCount: team.players.length,
                                     itemBuilder: (context, index) {
                                       final player = team.players[index];
-                                      return GestureDetector(
-                                        onTap: () {
-                                          // Show player details in dialog
-                                        },
-                                        child: Container(
-                                          margin: EdgeInsets.only(bottom: 16),
-                                          decoration: BoxDecoration(
-                                            color: widget.color.withAlpha(20),
-                                            borderRadius:
-                                                BorderRadius.circular(16),
-                                          ),
+                                      final isCurrentUser =
+                                          player.userID == currentUser!.id;
+                                      final isEventCreator =
+                                          widget.eventCreatorId ==
+                                              player.userID;
+                                      final Color roleColor =
+                                          player.role == PlayerRole.coach
+                                              ? Colors.blue
+                                              : Colors.deepOrange;
+                                      return Container(
+                                        margin: EdgeInsets.only(bottom: 16),
+                                        decoration: BoxDecoration(
+                                          color: isCurrentUser
+                                              ? widget.color.withAlpha(40)
+                                              : widget.color.withAlpha(20),
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                        ),
+                                        child: InkWell(
+                                          onTap: () {
+                                            // TODO: Show player details Dialog
+                                          },
                                           child: ListTile(
-                                            title: Text(
-                                              player.name ?? player.email,
-                                            ),
-                                            trailing: Row(
-                                              mainAxisSize: MainAxisSize.min,
+                                            title: Row(
                                               children: [
-                                                if (widget.canEdit) ...[
-                                                  IconButton(
-                                                    icon: Icon(Icons.edit),
-                                                    onPressed: () {
-                                                      // TODO: Edit player Dialog
-                                                    },
+                                                Text(
+                                                  player.name ?? player.email,
+                                                  style: TextStyle(
+                                                    fontWeight: isCurrentUser
+                                                        ? FontWeight.bold
+                                                        : FontWeight.normal,
+                                                    color: isCurrentUser
+                                                        ? widget.color
+                                                        : null,
                                                   ),
-                                                  IconButton(
-                                                    icon: Icon(Icons.bar_chart),
-                                                    onPressed: () {
-                                                      // TODO: Show/Edit player stats Dialog
-                                                    },
-                                                  ),
-                                                ],
-                                                if (!widget.canEdit)
-                                                  IconButton(
-                                                    icon: Icon(
-                                                      Icons.remove_red_eye,
+                                                ),
+                                                if (isEventCreator)
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 8.0),
+                                                    child: Icon(
+                                                      Icons.star,
+                                                      color: Colors.amber,
+                                                      size: 16,
                                                     ),
-                                                    onPressed: () {
-                                                      // TODO: Show player details Dialog
-                                                    },
                                                   ),
                                               ],
                                             ),
+                                            subtitle: player.role !=
+                                                    PlayerRole.player
+                                                ? Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    children: [
+                                                      Badge(
+                                                        label: Text(
+                                                          player.role ==
+                                                                  PlayerRole
+                                                                      .coach
+                                                              ? 'Coach'
+                                                              : 'Organisateur',
+                                                          style: TextStyle(
+                                                            color: roleColor,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                        backgroundColor:
+                                                            roleColor
+                                                                .withAlpha(40),
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                          horizontal: 5,
+                                                          vertical: 2,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  )
+                                                : null,
+                                            trailing: player.status ==
+                                                    PlayerStatus.valid
+                                                ? Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      if (widget.canEdit) ...[
+                                                        IconButton(
+                                                          icon:
+                                                              Icon(Icons.edit),
+                                                          color: isCurrentUser
+                                                              ? widget.color
+                                                              : null,
+                                                          onPressed: () {
+                                                            // TODO: Edit player Dialog
+                                                          },
+                                                        ),
+                                                        IconButton(
+                                                          icon: Icon(
+                                                              Icons.bar_chart),
+                                                          color: isCurrentUser
+                                                              ? widget.color
+                                                              : null,
+                                                          onPressed: () {
+                                                            // TODO: Show/Edit player stats Dialog
+                                                          },
+                                                        ),
+                                                      ],
+                                                      if (!widget.canEdit)
+                                                        IconButton(
+                                                          icon: Icon(
+                                                            Icons
+                                                                .remove_red_eye,
+                                                          ),
+                                                          color: isCurrentUser
+                                                              ? widget.color
+                                                              : null,
+                                                          onPressed: () {
+                                                            // TODO: Show player details Dialog
+                                                          },
+                                                        ),
+                                                    ],
+                                                  )
+                                                : Badge(
+                                                    label: Text(
+                                                      'En attente',
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    backgroundColor:
+                                                        Colors.grey,
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                      horizontal: 7,
+                                                      vertical: 5,
+                                                    ),
+                                                  ),
                                           ),
                                         ),
                                       );
