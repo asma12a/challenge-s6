@@ -250,27 +250,7 @@ class _EventScreenState extends State<EventScreen> {
                                         ? TeamsHandle(
                                             eventId: event.id!,
                                             maxTeams: event.sport.maxTeams,
-                                            teams: [
-                                              Team(
-                                                  id: "dsqdsq",
-                                                  name: "Equipe A",
-                                                  maxPlayers: 11,
-                                                  players: [
-                                                    Player(
-                                                      id: "dsqdsq",
-                                                      name: "Joueur 1",
-                                                      email: "user@test.com",
-                                                      role: PlayerRole.player,
-                                                      status:
-                                                          PlayerStatus.valid,
-                                                    )
-                                                  ]),
-                                              Team(
-                                                id: "dsqdsq",
-                                                name: "Equipe B",
-                                                maxPlayers: 11,
-                                              ),
-                                            ],
+                                            teams: event.teams ?? [],
                                           )
                                         : Container(),
                                   ),

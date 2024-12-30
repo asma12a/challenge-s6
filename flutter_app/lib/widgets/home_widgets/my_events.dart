@@ -26,9 +26,14 @@ class HomeMyEventsState extends State<HomeMyEvents> {
   Future<void> fetchMyEvents() async {
     try {
       List<Event> events = await eventService.getMyEvents();
+      DateTime now = DateTime.now();
+      final filteredEvents = events.where((event) {
+        DateTime eventDate = DateTime.parse(event.date);
+        return eventDate.isAfter(now.subtract(Duration(days: 1)));
+      }).toList();
 
       setState(() {
-        myEvents = events;
+        myEvents = filteredEvents;
       });
     } catch (e) {
       // Handle error
@@ -39,7 +44,7 @@ class HomeMyEventsState extends State<HomeMyEvents> {
   @override
   Widget build(BuildContext context) {
     return Carousel(
-      text: "Mes événements",
+      text: "Mes événements en cours",
       items: myEvents
           .map((event) => EventCard(
                 event: event,

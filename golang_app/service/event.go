@@ -228,7 +228,14 @@ func (e *Event) ListUserEvents(ctx context.Context, userID ulid.ID) ([]*ent.Even
 		teamIDs = append(teamIDs, team.Edges.Team.ID)
 	}
 
-	events, err := e.db.Event.Query().Where(event.HasTeamsWith(team.IDIn(teamIDs...))).WithSport().All(ctx)
+	events, err := e.db.Event.Query().
+		Where(
+			event.Or(
+				event.HasTeamsWith(team.IDIn(teamIDs...)),
+				event.CreatedByEQ(userID),
+			),
+		).
+		WithSport().All(ctx)
 	if err != nil {
 		return nil, err
 	}
