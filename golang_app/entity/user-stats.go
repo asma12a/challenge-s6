@@ -9,11 +9,13 @@ type UserStats struct {
 	ent.UserStats
 }
 
-func NewUserStats(userID, eventID ulid.ID) *UserStats {
+func NewUserStats(userID, eventID, statId ulid.ID, statValue int) *UserStats {
 	return &UserStats{
 		UserStats: ent.UserStats{
 			UserID:  userID,
 			EventID: eventID,
+			StatID:  statId,
+			StatValue: statValue,
 		},
 	}
 }

@@ -148,6 +148,9 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 				toJ.Teams = append(toJ.Teams, teamToj)
 			}
 		}
+
+
+
 		return c.JSON(toJ)
 	}
 }

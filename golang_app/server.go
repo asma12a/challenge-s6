@@ -92,6 +92,7 @@ func main() {
 	handler.AuthHandler(api.Group("/auth"), context.Background(), *service.NewUserService(dbClient), rdb)
 	handler.MessageHandler(api.Group("/message"), context.Background(), *service.NewMessageService(dbClient), *service.NewEventService(dbClient), *service.NewUserService(dbClient))
 	handler.TeamHandler(api.Group("/teams"), context.Background(), *service.NewTeamService(dbClient))
+	handler.SportStatLabelsHandler(api.Group("/sportstatlabels"), context.Background(), *service.NewSportStatLabelsService(dbClient), *service.NewSportService(dbClient), *service.NewEventService(dbClient), *service.NewUserService(dbClient))
 
 	// Route de gestion des erreurs (Not Found)
 	app.All("*", func(c *fiber.Ctx) error {
