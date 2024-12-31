@@ -62,7 +62,7 @@ class CustomDataTable extends StatelessWidget {
             builder: (context, constraints) {
               return SingleChildScrollView(
                 scrollDirection: Axis
-                    .horizontal, // Permet un défilement horizontal si nécessaire
+                    .horizontal,
                 child: SizedBox(
                   width:
                       constraints.maxWidth, // Prend toute la largeur disponible
@@ -72,7 +72,7 @@ class CustomDataTable extends StatelessWidget {
                     columns: columns,
                     rows: rows,
                     columnSpacing:
-                        16, // Ajuster l'espacement entre les colonnes
+                        16,
                   ),
                 ),
               );
