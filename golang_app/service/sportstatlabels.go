@@ -3,10 +3,14 @@ package service
 import (
 	"context"
 	"log"
+
 	"github.com/asma12a/challenge-s6/ent"
+	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/sport"
 	"github.com/asma12a/challenge-s6/ent/sportstatlabels"
+	"github.com/asma12a/challenge-s6/ent/user"
+	"github.com/asma12a/challenge-s6/ent/userstats"
 	"github.com/asma12a/challenge-s6/entity"
 )
 
@@ -63,6 +67,27 @@ func (repo *SportStatLabels) FindOne(ctx context.Context, id ulid.ID) (*entity.S
 func (repo *SportStatLabels) List(ctx context.Context) ([]*ent.SportStatLabels, error) {
 	return repo.db.SportStatLabels.Query().WithSport().All(ctx)
 }
+
+func (repo *SportStatLabels) Delete(ctx context.Context, id ulid.ID) error {
+	tx, err := repo.db.Tx(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = tx.SportStatLabels.DeleteOneID(id).Exec(ctx)
+	if err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+
 
 func (repo *SportStatLabels) FindBySportID(ctx context.Context, sportID ulid.ID) ([]*ent.SportStatLabels, error) {
 	return repo.db.SportStatLabels.Query().Where(sportstatlabels.HasSportWith(sport.IDEQ(sportID))).WithSport().All(ctx)
@@ -123,5 +148,9 @@ func (repo *SportStatLabels) Update(ctx context.Context, sportStatLabel *entity.
 	}
 
 	return nil
+}
+
+func (repo *SportStatLabels) GetUserStatsByEventID(ctx context.Context,userId, eventID ulid.ID) ([]*ent.UserStats, error) {
+	return repo.db.UserStats.Query().Where(userstats.HasEventWith(event.IDEQ(eventID)), userstats.HasUserWith(user.IDEQ(userId))).WithStat().WithUser().All(ctx)
 }
 

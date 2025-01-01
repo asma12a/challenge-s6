@@ -10,5 +10,5 @@ type SportStatLabels struct {
 	Label      string           `json:"label,omitempty"`
 	Unit       string           `json:"unit,omitempty"`
 	IsMain     bool             `json:"is_main,omitempty"`
-	Sport      Sport            `json:"sport,omitempty"` 
+	Sport      *Sport            `json:"sport,omitempty"` 
 }
