@@ -5,7 +5,12 @@ import 'package:squad_go/core/providers/auth_state_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:squad_go/core/services/team_service.dart';
 import 'package:squad_go/main.dart';
+import 'package:squad_go/widgets/dialog/add_player.dart';
+import 'package:squad_go/widgets/dialog/add_team.dart';
+import 'package:squad_go/widgets/dialog/edit_player.dart';
+import 'package:squad_go/widgets/dialog/edit_stats_player.dart';
 import 'package:squad_go/widgets/dialog/edit_team.dart';
+import 'package:squad_go/widgets/dialog/show_player_details.dart';
 
 class TeamsHandle extends StatefulWidget {
   final String eventId;
@@ -186,7 +191,16 @@ class _TeamsHandleState extends State<TeamsHandle> {
                   child: SizedBox(
                     height: 40,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AddTeamDialog(
+                              onRefresh: widget.onRefresh,
+                            );
+                          },
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         shape: CircleBorder(),
                       ),
@@ -253,7 +267,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                       player.userID == currentUser!.id))
                                 TextButton(
                                   onPressed: null,
-                                  child: Spacer(),
+                                  child: SizedBox.shrink(),
                                 ),
                               Badge(
                                 label: Text(
@@ -300,7 +314,14 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                         ),
                                         child: InkWell(
                                           onTap: () {
-                                            // TODO: Show player details Dialog
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return ShowPlayerDetailsDialog(
+                                                  onRefresh: widget.onRefresh,
+                                                );
+                                              },
+                                            );
                                           },
                                           child: ListTile(
                                             title: Row(
@@ -374,7 +395,16 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                               ? widget.color
                                                               : null,
                                                           onPressed: () {
-                                                            // TODO: Edit player Dialog
+                                                            showDialog(
+                                                              context: context,
+                                                              builder:
+                                                                  (context) {
+                                                                return EditPlayerDialog(
+                                                                  onRefresh: widget
+                                                                      .onRefresh,
+                                                                );
+                                                              },
+                                                            );
                                                           },
                                                         ),
                                                         IconButton(
@@ -384,7 +414,16 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                               ? widget.color
                                                               : null,
                                                           onPressed: () {
-                                                            // TODO: Show/Edit player stats Dialog
+                                                            showDialog(
+                                                              context: context,
+                                                              builder:
+                                                                  (context) {
+                                                                return EditStatsPlayerDialog(
+                                                                  onRefresh: widget
+                                                                      .onRefresh,
+                                                                );
+                                                              },
+                                                            );
                                                           },
                                                         ),
                                                       ],
@@ -398,7 +437,16 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                               ? widget.color
                                                               : null,
                                                           onPressed: () {
-                                                            // TODO: Show player details Dialog
+                                                            showDialog(
+                                                              context: context,
+                                                              builder:
+                                                                  (context) {
+                                                                return ShowPlayerDetailsDialog(
+                                                                  onRefresh: widget
+                                                                      .onRefresh,
+                                                                );
+                                                              },
+                                                            );
                                                           },
                                                         ),
                                                     ],
@@ -432,7 +480,14 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                   team.players.length < team.maxPlayers))
                             ElevatedButton(
                               onPressed: () {
-                                // TODO: Show dialog to add player to team
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AddPlayerDialog(
+                                      onRefresh: widget.onRefresh,
+                                    );
+                                  },
+                                );
                               },
                               child: Text('Add Player'),
                             ),

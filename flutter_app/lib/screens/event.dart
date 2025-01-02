@@ -9,6 +9,7 @@ import 'package:squad_go/core/utils/tools.dart';
 import 'package:squad_go/main.dart';
 import 'package:squad_go/widgets/custom_label.dart';
 import 'package:squad_go/widgets/dialog/edit_event.dart';
+import 'package:squad_go/widgets/dialog/map_location.dart';
 import 'package:squad_go/widgets/teams.dart';
 import 'package:provider/provider.dart';
 
@@ -140,7 +141,12 @@ class _EventScreenState extends State<EventScreen> {
                             children: [
                               InkWell(
                                 onTap: () {
-                                  // Open map modal with the event location
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return MapLocation();
+                                    },
+                                  );
                                 },
                                 child: Row(
                                   children: [
