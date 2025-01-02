@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/models/sport.dart';
 import 'package:intl/intl.dart';
-import 'package:squad_go/widgets/player_rating.dart';
 
 class EventCard extends StatelessWidget {
   final Event event;
@@ -12,17 +11,8 @@ class EventCard extends StatelessWidget {
       {super.key, required this.event, this.hasJoinedEvent = false});
 
   // make the on card click
-  void onCardClick(BuildContext context) {
+  void onCardClick() {
     debugPrint('Card tapped.');
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return PlayerRating(
-          event: event
-        );
-      },
-    );
-
   }
 
   @override
@@ -33,9 +23,7 @@ class EventCard extends StatelessWidget {
         clipBehavior: Clip.hardEdge,
         child: InkWell(
           splashColor: Theme.of(context).colorScheme.secondary.withAlpha(30),
-          onTap: (){
-            onCardClick(context);
-          },
+          onTap: onCardClick,
           child: SizedBox(
             width: 300,
             height: 200,
@@ -122,9 +110,7 @@ class EventCard extends StatelessWidget {
                                   ),
                                 ),
                                 TextButton(
-                                  onPressed: () {
-                                    onCardClick(context);
-                                  },
+                                  onPressed: onCardClick,
                                   child: Text(
                                     hasJoinedEvent ? "VOIR" : 'REJOINDRE',
                                   ),

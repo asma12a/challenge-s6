@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:squad_go/core/models/user_stats.dart';
 import 'package:squad_go/core/services/sport_stat_labels_service.dart';
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/models/sport_stat_labels.dart';
@@ -20,12 +21,14 @@ class _PlayerRatingState extends State<PlayerRating> {
   final SportStatLabelsService statLabelsService = SportStatLabelsService();
   Event? event;
   List<SportStatLabels> statLabels = [];
+  List<UserStats> ratings = [];
 
   @override
   void initState() {
     super.initState();
     _fetchEventDetails();
     _fetchStatLabels();
+    _loadEventRatings();
   }
 
 
@@ -48,7 +51,18 @@ class _PlayerRatingState extends State<PlayerRating> {
       });
 
     } catch (e) {
+    }
+  }
 
+  void _loadEventRatings() async {
+    try {
+      if (widget.event.id == null) return;
+      final labels = await SportStatLabelsService.getUserStatByEvent(widget.event.id!, '01JCBH35S8EDHF9FYKER9YJ075');
+      setState(() {
+        ratings = labels;
+      });
+
+    } catch (e) {
     }
   }
 
