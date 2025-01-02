@@ -72,4 +72,25 @@ class TeamService {
       }
     }
   }
+
+  Future<void> updatePlayer(String eventID, Player player) async {
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+
+    final Uri url = Uri.http(dotenv.env['API_BASE_URL']!,
+        'api/events/$eventID/teams/players/${player.id}');
+
+    try {
+      await dio.put(url.toString(),
+          data: {
+            'role': player.role.name,
+            'team_id': player.teamID,
+          },
+          options: Options(headers: {
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer $token",
+          }));
+    } catch (error) {
+      throw AppException(message: 'Failed to update player, please try again.');
+    }
+  }
 }

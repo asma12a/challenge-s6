@@ -18,7 +18,7 @@ class Team {
       maxPlayers: data['maxPlayers'] ?? 0,
       players: data['players'] != null
           ? (data['players'] as List<dynamic>)
-              .map((player) => Player.fromJson(player))
+              .map((player) => Player.fromJson(player, teamId: data['id']))
               .toList()
           : [],
     );
@@ -41,6 +41,7 @@ class Player {
   final PlayerRole role;
   final PlayerStatus status;
   final String? userID;
+  final String? teamID;
 
   const Player({
     required this.id,
@@ -49,9 +50,10 @@ class Player {
     required this.status,
     this.name,
     this.userID,
+    this.teamID,
   });
 
-  factory Player.fromJson(Map<String, dynamic> data) {
+  factory Player.fromJson(Map<String, dynamic> data, {String? teamId}) {
     return Player(
       id: data['id'],
       name: data['name'],
@@ -63,6 +65,7 @@ class Player {
           e.toString().split('.').last.toLowerCase() ==
           data['status'].toLowerCase()),
       userID: data['user_id'],
+      teamID: teamId,
     );
   }
 
@@ -75,6 +78,26 @@ class Player {
       'status': status.toString().split('.').last,
       'user_id': userID,
     };
+  }
+
+  Player copyWith({
+    String? id,
+    String? name,
+    String? email,
+    PlayerRole? role,
+    PlayerStatus? status,
+    String? userID,
+    String? teamID,
+  }) {
+    return Player(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      role: role ?? this.role,
+      status: status ?? this.status,
+      userID: userID ?? this.userID,
+      teamID: teamID ?? this.teamID,
+    );
   }
 }
 
