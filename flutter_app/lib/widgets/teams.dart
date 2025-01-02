@@ -477,13 +477,16 @@ class _TeamsHandleState extends State<TeamsHandle> {
                               : SizedBox(),
                           if (widget.canEdit &&
                               (team.maxPlayers == 0 ||
-                                  team.players.length < team.maxPlayers))
+                                  team.players.length < team.maxPlayers)) ...[
+                            SizedBox(height: 8),
                             ElevatedButton.icon(
                               onPressed: () {
                                 showDialog(
                                   context: context,
                                   builder: (context) {
                                     return AddPlayerDialog(
+                                      eventId: widget.eventId,
+                                      teamId: team.id,
                                       onRefresh: widget.onRefresh,
                                     );
                                   },
@@ -502,6 +505,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                 ),
                               ),
                             ),
+                          ]
                         ],
                       ),
                     ),

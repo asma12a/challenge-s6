@@ -66,7 +66,6 @@ class _EditEventDialogState extends State<EditEventDialog> {
       final String apiUrl =
           'https://api-adresse.data.gouv.fr/search/?q=$query&limit=5';
       final response = await dio.get(apiUrl);
-      debugPrint('Response: ${response.statusCode}');
 
       final Map<String, dynamic> data = response.data;
 
@@ -108,7 +107,6 @@ class _EditEventDialogState extends State<EditEventDialog> {
   }
 
   void _updateEvent() async {
-    debugPrint('Event: ${event.toJson()}');
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 

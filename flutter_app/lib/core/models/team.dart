@@ -80,4 +80,10 @@ class Player {
 
 enum PlayerRole { player, coach, org }
 
+final Map<PlayerRole, String> playerRoleLabel = {
+  PlayerRole.player: 'Joueur',
+  PlayerRole.coach: 'Coach',
+  PlayerRole.org: 'Organisateur',
+};
+
 enum PlayerStatus { pending, valid }

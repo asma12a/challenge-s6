@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
+import 'package:squad_go/core/models/team.dart';
 import 'package:squad_go/main.dart';
 
 class TeamService {
@@ -38,6 +40,36 @@ class TeamService {
           }));
     } catch (error) {
       throw AppException(message: 'Failed to switch team, please try again.');
+    }
+  }
+
+  Future<void> addPlayerToTeam(
+      String eventID, String teamID, String email, PlayerRole? role) async {
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+
+    final Uri url = Uri.http(dotenv.env['API_BASE_URL']!,
+        'api/events/$eventID/teams/$teamID/players');
+
+    try {
+      await dio.post(url.toString(),
+          data: {
+            'email': email,
+            'role': role?.name,
+          },
+          options: Options(headers: {
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer $token",
+          }));
+    } catch (error) {
+      if (error is DioException && error.response != null) {
+        // debugPrint(error.response?.data["error"]);
+        throw AppException(
+            message: error.response?.data['error'] ??
+                'Failed to add player to team, please try again.');
+      } else {
+        throw AppException(
+            message: 'Failed to add player to team, please try again.');
+      }
     }
   }
 }
