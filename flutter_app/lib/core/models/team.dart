@@ -32,6 +32,20 @@ class Team {
       'players': players.map((player) => player.toJson()).toList(),
     };
   }
+
+  Team copyWith({
+    String? id,
+    String? name,
+    int? maxPlayers,
+    List<Player>? players,
+  }) {
+    return Team(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      maxPlayers: maxPlayers ?? this.maxPlayers,
+      players: players ?? this.players,
+    );
+  }
 }
 
 class Player {

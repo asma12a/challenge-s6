@@ -166,6 +166,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                       context: context,
                                       builder: (context) {
                                         return EditTeamDialog(
+                                          eventId: widget.eventId,
                                           team: team,
                                           onRefresh: widget.onRefresh,
                                         );
@@ -218,6 +219,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
               children: widget.teams
                   .map(
                     (team) => Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -468,7 +470,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                   },
                                 ),
                               )
-                            : SizedBox(),
+                            : Expanded(child: Container()),
                         if (widget.canEdit &&
                             (team.maxPlayers == 0 ||
                                 team.players.length < team.maxPlayers)) ...[
@@ -499,7 +501,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                               ),
                             ),
                           ),
-                        ]
+                        ],
                       ],
                     ),
                   )

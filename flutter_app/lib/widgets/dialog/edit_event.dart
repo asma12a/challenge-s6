@@ -1,3 +1,4 @@
+import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart';
@@ -141,7 +142,39 @@ class _EditEventDialogState extends State<EditEventDialog> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 16),
+                SizedBox(height: 8),
+                AnimatedToggleSwitch.dual(
+                  first: false,
+                  second: true,
+                  current: event.isPublic,
+                  onChanged: (value) => setState(() {
+                    event = event.copyWith(isPublic: value);
+                  }),
+                  iconBuilder: (value) => value
+                      ? const Icon(
+                          Icons.public,
+                          color: Colors.white,
+                        )
+                      : const Icon(
+                          Icons.lock,
+                          color: Colors.white,
+                        ),
+                  height: 40,
+                  style: ToggleStyle(
+                    indicatorColor: Colors.blue,
+                    borderColor: Colors.blue,
+                  ),
+                  textBuilder: (value) => value
+                      ? Text(
+                          'Public',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        )
+                      : Text(
+                          'Privé',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                ),
+                SizedBox(height: 8),
                 TextFormField(
                   initialValue: event.name,
                   onTapOutside: (event) {

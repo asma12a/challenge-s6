@@ -93,9 +93,10 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
 func (e *Event) FindOneWithDetails(ctx context.Context, id ulid.ID) (*entity.Event, error) {
 	event, err := e.db.Event.Query().Where(event.IDEQ(id)).
 		WithTeams(func(tq *ent.TeamQuery) {
-			tq.WithTeamUsers(func(tuq *ent.TeamUserQuery) {
-				tuq.WithUser()
-			})
+			tq.Order(ent.Asc(team.FieldCreatedAt)).
+				WithTeamUsers(func(tuq *ent.TeamUserQuery) {
+					tuq.WithUser()
+				})
 		}).
 		WithSport().
 		Only(ctx)

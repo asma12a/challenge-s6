@@ -10,6 +10,7 @@ class Event {
     required this.address,
     required this.date,
     required this.sport,
+    this.isPublic = true,
     this.createdBy,
     this.teams,
     this.type = EventType.match,
@@ -22,6 +23,7 @@ class Event {
   final String date;
   final Sport sport;
   final EventType type;
+  final bool isPublic;
   final List<Team>? teams;
 
   factory Event.fromJson(Map<String, dynamic> data) {
@@ -39,6 +41,7 @@ class Event {
               .toList()
           : null,
       createdBy: data['created_by'],
+      isPublic: data['is_public'] ?? true,
     );
   }
 
@@ -50,6 +53,7 @@ class Event {
       'date': DateFormat('yyyy-MM-dd').format(DateTime.parse(date)),
       'sport_id': sport.id,
       'event_type': type == EventType.match ? 'match' : 'training',
+      'is_public': isPublic,
     };
   }
 
@@ -62,6 +66,7 @@ class Event {
     EventType? type,
     List<Team>? teams,
     String? createdBy,
+    bool? isPublic,
   }) {
     return Event(
       id: id ?? this.id,
@@ -72,6 +77,7 @@ class Event {
       type: type ?? this.type,
       teams: teams ?? this.teams,
       createdBy: createdBy ?? this.createdBy,
+      isPublic: isPublic ?? this.isPublic,
     );
   }
 }
