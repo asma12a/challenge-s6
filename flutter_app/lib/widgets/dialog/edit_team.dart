@@ -13,7 +13,7 @@ class EditTeamDialog extends StatefulWidget {
 }
 
 class _EditTeamDialogState extends State<EditTeamDialog> {
-  final TeamService eventService = TeamService();
+  final TeamService teamService = TeamService();
 
   @override
   Widget build(BuildContext context) {

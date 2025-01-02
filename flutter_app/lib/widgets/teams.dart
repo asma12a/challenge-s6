@@ -196,6 +196,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                           context: context,
                           builder: (context) {
                             return AddTeamDialog(
+                              eventId: widget.eventId,
                               onRefresh: widget.onRefresh,
                             );
                           },

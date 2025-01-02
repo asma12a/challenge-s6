@@ -52,7 +52,6 @@ func (e *Team) AddTeam(ctx context.Context, eventID ulid.ID, teamInput entity.Te
 		return err
 	}
 
-	// if teamFound.MaxPlayers > 0 && len(teamFound.Edges.TeamUsers) >= teamFound.MaxPlayers {
 	if eventFound.Edges.Sport.MaxTeams > 0 && len(existingTeams) >= eventFound.Edges.Sport.MaxTeams {
 		_ = tx.Rollback()
 		return entity.ErrCannotBeCreated
@@ -68,7 +67,7 @@ func (e *Team) AddTeam(ctx context.Context, eventID ulid.ID, teamInput entity.Te
 	_, err = tx.Team.Create().
 		SetName(teamInput.Name).
 		SetMaxPlayers(teamInput.MaxPlayers).
-		SetEventID(eventID). // Assuming Team has an EventID field
+		SetEventID(eventID).
 		Save(ctx)
 	if err != nil {
 		_ = tx.Rollback()

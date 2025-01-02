@@ -9,6 +9,34 @@ import 'package:squad_go/main.dart';
 class TeamService {
   final storage = const FlutterSecureStorage();
 
+  Future<void> createTeam(String eventID, String name, int? maxPlayers) async {
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+
+    final Uri url =
+        Uri.http(dotenv.env['API_BASE_URL']!, 'api/events/$eventID/teams');
+
+    try {
+      await dio.post(url.toString(),
+          data: {
+            'name': name,
+            'max_players': maxPlayers,
+          },
+          options: Options(headers: {
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer $token",
+          }));
+    } catch (error) {
+      if (error is DioException && error.response != null) {
+        throw AppException(
+            message: error.response?.data['error'] ??
+                'Failed to add player to team, please try again.');
+      } else {
+        throw AppException(
+            message: 'Failed to add player to team, please try again.');
+      }
+    }
+  }
+
   Future<void> joinTeam(String eventID, String teamID) async {
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
 

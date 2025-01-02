@@ -28,7 +28,7 @@ class Team {
     return {
       'id': id,
       'name': name,
-      'maxPlayers': maxPlayers,
+      'max_players': maxPlayers,
       'players': players.map((player) => player.toJson()).toList(),
     };
   }
