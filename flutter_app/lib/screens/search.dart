@@ -14,7 +14,7 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  List<Map<String, dynamic>> _sports = [];
+  List<Sport> _sports = [];
   bool _isLoading = true;
   List<Map<String, dynamic>> _searchResults = [];
   Map<String, String> params = {};
@@ -108,9 +108,9 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                     items: _sports.map((sport) {
                       return DropdownMenuItem<String>(
-                        value: sport['id'],
+                        value: sport.id,
                         child: Text(
-                          sport['name'],
+                          sport.name.name,
                           style: TextStyle(
                               color: Theme.of(context).colorScheme.onSecondary),
                         ),

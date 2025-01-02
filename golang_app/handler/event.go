@@ -134,18 +134,17 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 
 		// Mapper les données de event vers presenter.Event
 		toJ := presenter.Event{
-			ID:         event.ID,
-			Name:       event.Name,
-			Address:    event.Address,
-			Latitude:   event.Latitude,
-			Longitude:  event.Longitude,
-			EventCode:  event.EventCode,
-			Date:       event.Date,
-			CreatedAt:  event.CreatedAt,
-			CreatedBy:  event.CreatedBy,
-			IsPublic:   event.IsPublic,
-			IsFinished: event.IsFinished,
-			EventType:  event.EventType,
+			ID:        event.ID,
+			Name:      event.Name,
+			Address:   event.Address,
+			Latitude:  event.Latitude,
+			Longitude: event.Longitude,
+			EventCode: event.EventCode,
+			Date:      event.Date,
+			CreatedAt: event.CreatedAt,
+			CreatedBy: event.CreatedBy,
+			IsPublic:  event.IsPublic,
+			EventType: event.EventType,
 		}
 
 		if condition := event.Edges.Sport; condition != nil {
@@ -255,9 +254,11 @@ func updateEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 
 		existingEvent.Name = eventInput.Name
 		existingEvent.Address = eventInput.Address
-		existingEvent.EventCode = eventInput.EventCode
+		existingEvent.Latitude = eventInput.Latitude
+		existingEvent.Longitude = eventInput.Longitude
 		existingEvent.Date = eventInput.Date
 		existingEvent.EventType = eventInput.EventType
+		existingEvent.IsPublic = eventInput.IsPublic
 
 		_, err = serviceEvent.Update(c.UserContext(), existingEvent)
 		if err != nil {
@@ -314,18 +315,17 @@ func listEvents(ctx context.Context, service service.Event) fiber.Handler {
 
 		for i, event := range events {
 			toJ[i] = presenter.Event{
-				ID:         event.ID,
-				Name:       event.Name,
-				Address:    event.Address,
-				Latitude:   event.Latitude,
-				Longitude:  event.Longitude,
-				EventCode:  event.EventCode,
-				Date:       event.Date,
-				CreatedAt:  event.CreatedAt,
-				CreatedBy:  event.CreatedBy,
-				IsPublic:   event.IsPublic,
-				IsFinished: event.IsFinished,
-				EventType:  event.EventType,
+				ID:        event.ID,
+				Name:      event.Name,
+				Address:   event.Address,
+				Latitude:  event.Latitude,
+				Longitude: event.Longitude,
+				EventCode: event.EventCode,
+				Date:      event.Date,
+				CreatedAt: event.CreatedAt,
+				CreatedBy: event.CreatedBy,
+				IsPublic:  event.IsPublic,
+				EventType: event.EventType,
 			}
 			if condition := event.Edges.Sport; condition != nil {
 				toJ[i].Sport = presenter.Sport{
@@ -372,18 +372,17 @@ func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
 
 		for i, event := range events {
 			toJ[i] = presenter.Event{
-				ID:         event.ID,
-				Name:       event.Name,
-				Address:    event.Address,
-				Latitude:   event.Latitude,
-				Longitude:  event.Longitude,
-				EventCode:  event.EventCode,
-				Date:       event.Date,
-				CreatedAt:  event.CreatedAt,
-				CreatedBy:  event.CreatedBy,
-				IsPublic:   event.IsPublic,
-				IsFinished: event.IsFinished,
-				EventType:  event.EventType,
+				ID:        event.ID,
+				Name:      event.Name,
+				Address:   event.Address,
+				Latitude:  event.Latitude,
+				Longitude: event.Longitude,
+				EventCode: event.EventCode,
+				Date:      event.Date,
+				CreatedAt: event.CreatedAt,
+				CreatedBy: event.CreatedBy,
+				IsPublic:  event.IsPublic,
+				EventType: event.EventType,
 			}
 			if condition := event.Edges.Sport; condition != nil {
 				toJ[i].Sport = presenter.Sport{
@@ -424,18 +423,17 @@ func listUserEvents(ctx context.Context, serviceEvent service.Event) fiber.Handl
 
 		for i, event := range events {
 			toJ[i] = presenter.Event{
-				ID:         event.ID,
-				Name:       event.Name,
-				Address:    event.Address,
-				Latitude:   event.Latitude,
-				Longitude:  event.Longitude,
-				EventCode:  event.EventCode,
-				Date:       event.Date,
-				CreatedAt:  event.CreatedAt,
-				CreatedBy:  event.CreatedBy,
-				IsPublic:   event.IsPublic,
-				IsFinished: event.IsFinished,
-				EventType:  event.EventType,
+				ID:        event.ID,
+				Name:      event.Name,
+				Address:   event.Address,
+				Latitude:  event.Latitude,
+				Longitude: event.Longitude,
+				EventCode: event.EventCode,
+				Date:      event.Date,
+				CreatedAt: event.CreatedAt,
+				CreatedBy: event.CreatedBy,
+				IsPublic:  event.IsPublic,
+				EventType: event.EventType,
 			}
 			if condition := event.Edges.Sport; condition != nil {
 				toJ[i].Sport = presenter.Sport{
@@ -488,18 +486,17 @@ func listRecommendedEvents(ctx context.Context, serviceEvent service.Event) fibe
 
 		for i, event := range events {
 			toJ[i] = presenter.Event{
-				ID:         event.ID,
-				Name:       event.Name,
-				Address:    event.Address,
-				Latitude:   event.Latitude,
-				Longitude:  event.Longitude,
-				EventCode:  event.EventCode,
-				Date:       event.Date,
-				CreatedAt:  event.CreatedAt,
-				CreatedBy:  event.CreatedBy,
-				IsPublic:   event.IsPublic,
-				IsFinished: event.IsFinished,
-				EventType:  event.EventType,
+				ID:        event.ID,
+				Name:      event.Name,
+				Address:   event.Address,
+				Latitude:  event.Latitude,
+				Longitude: event.Longitude,
+				EventCode: event.EventCode,
+				Date:      event.Date,
+				CreatedAt: event.CreatedAt,
+				CreatedBy: event.CreatedBy,
+				IsPublic:  event.IsPublic,
+				EventType: event.EventType,
 			}
 			if condition := event.Edges.Sport; condition != nil {
 				toJ[i].Sport = presenter.Sport{

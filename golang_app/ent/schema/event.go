@@ -28,7 +28,6 @@ func (Event) Fields() []ent.Field {
 		field.String("date").NotEmpty().StructTag(`validate:"required"`),
 		field.String("event_code"),
 		field.Bool("is_public").Default(true),
-		field.Bool("is_finished").Default(false),
 		field.Enum("event_type").Values("match", "training").Default("match").Nillable(), // Permet de ne pas demander le champ lors de la création, à condition de gérer partout le pointeur
 	}
 }

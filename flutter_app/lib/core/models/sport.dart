@@ -33,6 +33,17 @@ class Sport {
       maxTeams: data['max_teams'] ?? 0,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name.toString().split('.').last,
+      'type': type.toString().split('.').last,
+      'color': color?.value.toRadixString(16).substring(2),
+      'image_url': imageUrl,
+      'max_teams': maxTeams,
+    };
+  }
 }
 
 enum SportType { individual, team }

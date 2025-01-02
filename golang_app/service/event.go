@@ -138,13 +138,21 @@ func (e *Event) FindOne(ctx context.Context, id ulid.ID) (*entity.Event, error) 
 func (repo *Event) Update(ctx context.Context, event *entity.Event) (*entity.Event, error) {
 
 	// Prepare the update query
-	e, err := repo.db.Event.
+	updatedEvent := repo.db.Event.
 		UpdateOneID(event.ID).
 		SetName(event.Name).
 		SetAddress(event.Address).
-		SetEventCode(event.EventCode).
-		SetDate(event.Date).
-		Save(ctx)
+		SetLatitude(event.Latitude).
+		SetLongitude(event.Longitude).
+		SetIsPublic(event.IsPublic).
+		SetSportID(event.SportID).
+		SetDate(event.Date)
+
+	if event.EventType != nil {
+		updatedEvent.SetEventType(*event.EventType)
+	}
+
+	e, err := updatedEvent.Save(ctx)
 
 	if err != nil {
 		return nil, entity.ErrInvalidEntity

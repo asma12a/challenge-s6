@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/core/services/event_service.dart';
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/main.dart';
@@ -25,7 +26,7 @@ class _NewEventState extends State<NewEvent> {
   List<String> _suggestedAddresses = [];
   var _selectedType = '';
   var _selectedSport = '';
-  List<Map<String, dynamic>> _sports = [];
+  List<Sport> _sports = [];
   final eventService = EventService();
 
   @override
@@ -394,9 +395,9 @@ class _NewEventState extends State<NewEvent> {
                                 ),
                                 ..._sports.map((sport) {
                                   return DropdownMenuItem<String>(
-                                    value: sport['id'],
+                                    value: sport.id,
                                     child: Text(
-                                      sport['name'],
+                                      sport.name.name,
                                       style: TextStyle(
                                         color: Theme.of(context)
                                             .colorScheme

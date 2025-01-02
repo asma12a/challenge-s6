@@ -5,6 +5,7 @@ import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/models/event.dart';
+import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/main.dart';
 
 class EventService {
@@ -65,7 +66,7 @@ class EventService {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getSports() async {
+  Future<List<Sport>> getSports() async {
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
     try {
       final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/sports');
@@ -74,8 +75,8 @@ class EventService {
             'Content-Type': 'application/json',
             "Authorization": "Bearer $token",
           }));
-      final data = response.data;
-      return List<Map<String, dynamic>>.from(data);
+      return List<Sport>.from(
+          response.data.map((sport) => Sport.fromJson(sport)));
     } catch (error) {
       log.severe('An error occurred while ', {error: error});
       throw AppException(
@@ -96,6 +97,22 @@ class EventService {
     } catch (error) {
       log.severe('An error occurred while ', {error: error});
       throw AppException(message: 'Failed to create event, please try again.');
+    }
+  }
+
+  Future<void> updateEvent(String id, Map<String, dynamic> event) async {
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    try {
+      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/events/$id');
+      await dio.put(uri.toString(),
+          options: Options(headers: {
+            'Content-Type': 'application/json',
+            "Authorization": "Bearer $token",
+          }),
+          data: jsonEncode(event));
+    } catch (error) {
+      log.severe('An error occurred while ', {error: error});
+      throw AppException(message: 'Failed to update event, please try again.');
     }
   }
 

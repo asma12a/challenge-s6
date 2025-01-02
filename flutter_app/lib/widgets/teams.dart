@@ -478,7 +478,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                           if (widget.canEdit &&
                               (team.maxPlayers == 0 ||
                                   team.players.length < team.maxPlayers))
-                            ElevatedButton(
+                            ElevatedButton.icon(
                               onPressed: () {
                                 showDialog(
                                   context: context,
@@ -489,7 +489,18 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                   },
                                 );
                               },
-                              child: Text('Add Player'),
+                              icon: const Icon(Icons.add),
+                              label: const Text('Ajouter un joueur'),
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor: Colors.blue,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 10),
+                                textStyle: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                         ],
                       ),

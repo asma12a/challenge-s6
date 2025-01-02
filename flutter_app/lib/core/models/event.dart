@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/core/models/team.dart';
 
@@ -38,6 +39,39 @@ class Event {
               .toList()
           : null,
       createdBy: data['created_by'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'address': address,
+      'date': DateFormat('yyyy-MM-dd').format(DateTime.parse(date)),
+      'sport_id': sport.id,
+      'event_type': type == EventType.match ? 'match' : 'training',
+    };
+  }
+
+  Event copyWith({
+    String? id,
+    String? name,
+    String? address,
+    String? date,
+    Sport? sport,
+    EventType? type,
+    List<Team>? teams,
+    String? createdBy,
+  }) {
+    return Event(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      address: address ?? this.address,
+      date: date ?? this.date,
+      sport: sport ?? this.sport,
+      type: type ?? this.type,
+      teams: teams ?? this.teams,
+      createdBy: createdBy ?? this.createdBy,
     );
   }
 }

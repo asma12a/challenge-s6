@@ -23,6 +23,15 @@ class Team {
           : [],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'maxPlayers': maxPlayers,
+      'players': players.map((player) => player.toJson()).toList(),
+    };
+  }
 }
 
 class Player {
@@ -55,6 +64,17 @@ class Player {
           data['status'].toLowerCase()),
       userID: data['user_id'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'role': role.toString().split('.').last,
+      'status': status.toString().split('.').last,
+      'user_id': userID,
+    };
   }
 }
 
