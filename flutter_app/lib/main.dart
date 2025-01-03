@@ -8,6 +8,7 @@ import 'package:squad_go/core/providers/auth_state_provider.dart';
 import 'package:squad_go/screens/sign_in.dart';
 import 'package:squad_go/screens/tabs.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 
 final log = Logger("AppLogger");
 final dio = Dio(BaseOptions(
@@ -28,6 +29,12 @@ void main() async {
       ),
     ),
   );
+
+  // Flutter Maps Tile Caching
+  WidgetsFlutterBinding.ensureInitialized();
+  await FMTCObjectBoxBackend().initialise();
+  await FMTCStore('mapStore').manage.create();
+
   runApp(const App());
 }
 

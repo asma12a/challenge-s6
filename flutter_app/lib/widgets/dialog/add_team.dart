@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
-import 'package:squad_go/core/models/team.dart';
 import 'package:squad_go/core/services/team_service.dart';
 
 class AddTeamDialog extends StatefulWidget {

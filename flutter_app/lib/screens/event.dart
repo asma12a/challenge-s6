@@ -144,7 +144,10 @@ class _EventScreenState extends State<EventScreen> {
                                   showDialog(
                                     context: context,
                                     builder: (context) {
-                                      return MapLocation();
+                                      return MapLocation(
+                                        latitude: event.latitude,
+                                        longitude: event.longitude,
+                                      );
                                     },
                                   );
                                 },

@@ -24,7 +24,7 @@ class _EditEventDialogState extends State<EditEventDialog> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
-  List<String> _suggestedAddresses = [];
+  List<dynamic> _suggestedAddresses = [];
   List<Sport> _sports = [];
 
   @override
@@ -71,12 +71,13 @@ class _EditEventDialogState extends State<EditEventDialog> {
       final Map<String, dynamic> data = response.data;
 
       setState(() {
-        _suggestedAddresses = data['features']
-            .where((feature) => feature['properties']['label'] != null)
-            .map<String>((feature) => feature['properties']['label'] as String)
-            .toList();
+        _suggestedAddresses = data['features'] as List;
       });
-      return _suggestedAddresses;
+      final List<String> addresses = data['features']
+          .where((feature) => feature['properties']['label'] != null)
+          .map<String>((feature) => feature['properties']['label'] as String)
+          .toList();
+      return addresses;
     } catch (e) {
       return [];
     }
@@ -223,7 +224,18 @@ class _EditEventDialogState extends State<EditEventDialog> {
                   },
                   onSelected: (suggestion) {
                     _addressController.text = suggestion;
-                    event = event.copyWith(address: suggestion);
+                    final selectedFeature = _suggestedAddresses.firstWhere(
+                        (feature) =>
+                            feature['properties']['label'] == suggestion);
+                    final latitude =
+                        selectedFeature['geometry']['coordinates'][1];
+                    final longitude =
+                        selectedFeature['geometry']['coordinates'][0];
+                    event = event.copyWith(
+                      address: suggestion,
+                      latitude: latitude,
+                      longitude: longitude,
+                    );
                   },
                 ),
                 SizedBox(height: 16),

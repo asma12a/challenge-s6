@@ -10,6 +10,8 @@ class Event {
     required this.address,
     required this.date,
     required this.sport,
+    this.latitude = 46.603354,
+    this.longitude = 1.888334,
     this.isPublic = true,
     this.createdBy,
     this.teams,
@@ -20,6 +22,8 @@ class Event {
   final String? createdBy;
   final String name;
   final String address;
+  final double latitude;
+  final double longitude;
   final String date;
   final Sport sport;
   final EventType type;
@@ -31,6 +35,8 @@ class Event {
       id: data['id'],
       name: data['name'],
       address: data['address'],
+      latitude: data['latitude'] ?? 46.603354,
+      longitude: data['longitude'] ?? 1.888334,
       date: data['date'],
       sport: Sport.fromJson(data['sport']),
       type:
@@ -50,6 +56,8 @@ class Event {
       'id': id,
       'name': name,
       'address': address,
+      'latitude': latitude,
+      'longitude': longitude,
       'date': DateFormat('yyyy-MM-dd').format(DateTime.parse(date)),
       'sport_id': sport.id,
       'event_type': type == EventType.match ? 'match' : 'training',
@@ -61,6 +69,8 @@ class Event {
     String? id,
     String? name,
     String? address,
+    double? latitude,
+    double? longitude,
     String? date,
     Sport? sport,
     EventType? type,
@@ -72,6 +82,8 @@ class Event {
       id: id ?? this.id,
       name: name ?? this.name,
       address: address ?? this.address,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
       date: date ?? this.date,
       sport: sport ?? this.sport,
       type: type ?? this.type,
