@@ -50,6 +50,13 @@ enum SportType { individual, team }
 
 enum SportName { football, basketball, tennis, running }
 
+final Map<SportName, String> sportLabel = {
+  SportName.football: 'Football',
+  SportName.basketball: 'Basketball',
+  SportName.tennis: 'Tennis',
+  SportName.running: 'Running',
+};
+
 final Map<SportName, IconData> sportIcon = {
   SportName.football: Icons.sports_soccer,
   SportName.basketball: Icons.sports_basketball,

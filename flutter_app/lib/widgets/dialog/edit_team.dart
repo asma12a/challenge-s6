@@ -60,7 +60,7 @@ class _EditTeamDialogState extends State<EditTeamDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Modifier l\'équipe',
+                'Modifier: ${_team.name}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(

@@ -1,8 +1,8 @@
 name: squad_go
-description: "SquadGo"
+description: 'SquadGo'
 
 # Prevent accidental publishing to pub.dev.
-publish_to: "none"
+publish_to: 'none'
 
 version: 1.0.0+1
 
@@ -54,7 +54,7 @@ flutter:
     - .env
 
 flutter_native_splash:
-  color: "#FFFFFF"
+  color: '#FFFFFF'
   image: assets/images/splash.png
   android_12:
     image: assets/images/splash.png

@@ -1,0 +1,73 @@
+{
+  "@@locale": "fr",
+  "tabs_home": "Accueil",
+  "tabs_search": "Recherche",
+  "tabs_join": "Rejoindre",
+  "tabs_profile": "Profil",
+  "password": "Mot de passe",
+  "remember": "Se souvenir de moi",
+  "login_title": "Connexion",
+  "signup_title": "Inscription",
+  "email_label": "Email",
+  "login_button": "Se connecter",
+  "signup_button": "S'inscrire",
+  "forgot_password": "Mot de passe oublié ?",
+  "search_placeholder": "Rechercher...",
+  "no_events": "Aucun événement trouvé",
+  "no_event_to_display": "Aucun événement à afficher",
+  "settings": "Paramètres",
+  "logout": "Déconnexion",
+  "recommended_events": "Évenements recommandés",
+  "my_events": "Mes événements en cours",
+  "see_button": "Voir",
+  "join_button": "Rejoindre",
+  "my_profile": "Mon profil",
+  "sport_select_label": "Sport",
+  "type_select_label": "Type",
+  "waiting": "En attente",
+  "organizer": "Organisateur",
+  "player": "Joueur",
+  "coach": "Coach",
+  "teams": "Équipes",
+  "add_player": "Ajouter un joueur",
+  "new_team": "Nouvelle équipe",
+  "edit_event": "Modifier: {name}",
+  "@edit_event": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "edit_team": "Modifier: {name}",
+  "@edit_team": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "edit_player": "Modifier: {name}",
+  "@edit_player": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "edit": "Modifier",
+  "team": "Équipe",
+  "role": "Rôle",
+  "name": "Nom",
+  "nb_players": "Nombre de joueurs",
+  "add": "Ajouter",
+  "football": "Football",
+  "basketball": "Basketball",
+  "running": "Course",
+  "tennis": "Tennis",
+  "create_event": "Créer un événement",
+  "select_date": "Sélectionner une date",
+  "no_results": "Aucun résultat trouvé",
+  "event_name": "Nom de l'événement",
+  "event_address": "Adresse de l'événement"
+}

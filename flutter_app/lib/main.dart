@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart' as provider;
 import 'package:squad_go/core/providers/auth_state_provider.dart';
@@ -48,6 +49,8 @@ class App extends StatelessWidget {
         provider.ChangeNotifierProvider(create: (_) => AuthState()),
       ],
       builder: (context, child) => MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         theme: theme,
         home: provider.Consumer<AuthState>(builder: (context, authState, _) {
           return authState.isAuthenticated

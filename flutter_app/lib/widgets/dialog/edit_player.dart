@@ -66,6 +66,15 @@ class _EditPlayerDialogState extends State<EditPlayerDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Text(
+                'Modifier: ${_player.name}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               DropdownButtonFormField<String>(
                 value: _player.teamID,
                 onChanged: (String? value) {

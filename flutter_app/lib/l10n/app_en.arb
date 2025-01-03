@@ -1,0 +1,73 @@
+{
+  "@@locale": "en",
+  "tabs_home": "Home",
+  "tabs_search": "Search",
+  "tabs_join": "Join",
+  "tabs_profile": "Profile",
+  "password": "Password",
+  "remember": "Remember me",
+  "login_title": "Login",
+  "signup_title": "Sign up",
+  "email_label": "Email",
+  "login_button": "Login",
+  "signup_button": "Sign up",
+  "forgot_password": "Forgot password?",
+  "search_placeholder": "Search...",
+  "no_events": "No events found",
+  "no_event_to_display": "No events to display",
+  "settings": "Settings",
+  "logout": "Logout",
+  "recommended_events": "Recommended events",
+  "my_events": "My current events",
+  "see_button": "View",
+  "join_button": "Join",
+  "my_profile": "My profile",
+  "sport_select_label": "Sport",
+  "type_select_label": "Type",
+  "waiting": "Waiting",
+  "organizer": "Organizer",
+  "player": "Player",
+  "coach": "Coach",
+  "teams": "Teams",
+  "add_player": "Add player",
+  "new_team": "New team",
+  "edit_event": "Edit: {name}",
+  "@edit_event": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "edit_team": "Edit: {name}",
+  "@edit_team": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "edit_player": "Edit: {name}",
+  "@edit_player": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "edit": "Edit",
+  "team": "Team",
+  "role": "Role",
+  "name": "Name",
+  "nb_players": "Number of players",
+  "add": "Add",
+  "football": "Football",
+  "basketball": "Basketball",
+  "running": "Running",
+  "tennis": "Tennis",
+  "create_event": "Create event",
+  "select_date": "Select date",
+  "no_results": "No results found",
+  "event_name": "Event name",
+  "event_address": "Event address"
+}

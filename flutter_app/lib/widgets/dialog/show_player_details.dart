@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 // TODO: Full details of player: player info + player stats
+// TODO: If coach or org : can delete player from team
 class ShowPlayerDetailsDialog extends StatefulWidget {
   final Future<void> Function()? onRefresh;
 
