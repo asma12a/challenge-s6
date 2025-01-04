@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart' as provider;
 import 'package:squad_go/core/providers/auth_state_provider.dart';
@@ -8,11 +7,6 @@ import 'package:squad_go/shared_widgets/sign_in.dart';
 import 'package:squad_go/platform/mobile/screens/tabs.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
-void main() async {
-  await dotenv.load(fileName: "assets/../.env");
-  runApp(const App());
-}
 
 final GoRouter _router = GoRouter(
   redirect: (BuildContext context, GoRouterState state) async {

@@ -3,9 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
 import 'package:squad_go/platform/web/screens/home.dart';
 
-void main() {
-  runApp(const MyAppWeb());
-}
 
 class MyAppWeb extends StatelessWidget {
   const MyAppWeb({super.key});
