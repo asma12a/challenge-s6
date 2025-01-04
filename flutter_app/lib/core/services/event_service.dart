@@ -62,7 +62,7 @@ class EventService {
     }
   }
 
-  static Future<void> createEvent(Map<String, String> event) async {
+  static Future<void> createEvent(Map<String, dynamic> event) async {
     final storage = const FlutterSecureStorage();
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
     try {
@@ -78,4 +78,27 @@ class EventService {
       throw AppException(message: 'Failed to create event, please try again.');
     }
   }
+
+  static Future<Map<String, dynamic>> getEventByCode(String code) async {
+    final storage = const FlutterSecureStorage();
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    try {
+      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/events/code/$code');
+      final response = await http.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          "Authorization": "Bearer $token",
+        },
+      );
+      final data = jsonDecode(utf8.decode(response.bodyBytes));
+      return data;
+    } catch (error) {
+      log('An error occurred while ', error: error);
+      throw AppException(
+          message: 'Failed to retrieve event, please try again.');
+    }
+  }
+
+
 }

@@ -70,7 +70,6 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
 		return err
 	}
 
-	
 	if err := tx.Commit(); err != nil {
 		log.Println("Erreur lors de la validation de la transaction :", err)
 		return err
@@ -109,6 +108,14 @@ func (e *Event) FindOne(ctx context.Context, id ulid.ID) (*entity.Event, error) 
 	event, err := e.db.Event.Query().Where(event.IDEQ(id)).WithSport().Only(ctx)
 	if err != nil {
 		return nil, entity.ErrNotFound
+	}
+	return &entity.Event{Event: *event}, nil
+}
+
+func (e *Event) FindEventByCode(ctx context.Context, code string) (*entity.Event, error) {
+	event, err := e.db.Event.Query().Where(event.EventCode(code)).Only(ctx)
+	if ent.IsNotFound(err) {
+		return nil, err
 	}
 	return &entity.Event{Event: *event}, nil
 }
@@ -203,7 +210,7 @@ func (e *Event) Search(ctx context.Context, search, eventType string, sportID *u
 	return query.WithSport().All(ctx)
 }
 
-func (e *Event) AddTeam(ctx context.Context, eventID ulid.ID, teams [] struct{
+func (e *Event) AddTeam(ctx context.Context, eventID ulid.ID, teams []struct {
 	entity.Team
 	Players []struct {
 		Email string `json:"email"`
@@ -216,13 +223,12 @@ func (e *Event) AddTeam(ctx context.Context, eventID ulid.ID, teams [] struct{
 	}
 
 	teamNames := make(map[string]bool)
-	existingTeams, err := tx.Team.Query(). Where(team.HasEventWith(event.IDEQ(eventID))).All(ctx)
+	existingTeams, err := tx.Team.Query().Where(team.HasEventWith(event.IDEQ(eventID))).All(ctx)
 	if err != nil {
 		_ = tx.Rollback()
 	}
 
 	existingTeamsNames := make(map[string]bool)
-
 
 	for _, existingTeam := range existingTeams {
 
@@ -235,7 +241,6 @@ func (e *Event) AddTeam(ctx context.Context, eventID ulid.ID, teams [] struct{
 		}
 		existingTeamsNames[team.Name] = true
 	}
-
 
 	for _, team := range teams {
 		if _, exists := existingTeamsNames[team.Name]; exists {
@@ -271,7 +276,6 @@ func (e *Event) AddTeam(ctx context.Context, eventID ulid.ID, teams [] struct{
 	return nil
 
 }
-
 
 func (repo *Event) AddPlayerToTeam(ctx context.Context, tx *ent.Tx, teamID ulid.ID, player struct {
 	Email string `json:"email"`
@@ -323,4 +327,3 @@ func (repo *Event) AddPlayerToTeam(ctx context.Context, tx *ent.Tx, teamID ulid.
 
 	return nil
 }
-
