@@ -19,12 +19,12 @@ class NewEvent extends StatefulWidget {
 class _NewEventState extends State<NewEvent> {
   final _formKey = GlobalKey<FormState>();
   var _enteredName = '';
-  var _selectedFile = '';
   String? _selectedDate;
   final TextEditingController _addressController = TextEditingController();
   List<String> _suggestedAddresses = [];
   var _selectedType = '';
   var _selectedSport = '';
+  var _isPublic = true;
   List<Map<String, dynamic>> _sports = [];
 
   @override
@@ -106,30 +106,6 @@ class _NewEventState extends State<NewEvent> {
     }
   }
 
-  void _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-    if (result != null) {
-      PlatformFile file = result.files.first;
-      setState(() {
-        _selectedFile = file.name;
-      });
-      print(file.name);
-    } else {
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Theme.of(context).colorScheme.errorContainer,
-          content: Text(
-            "Erreur lors de la sélection du document",
-            style: TextStyle(
-                color: Theme.of(context).colorScheme.onErrorContainer),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
-    }
-  }
-
   void _saveEvent() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -154,6 +130,7 @@ class _NewEventState extends State<NewEvent> {
           "date": _selectedDate!,
           "sport_id": _selectedSport,
           "event_type": _selectedType,
+          "is_public": _isPublic
         };
         await EventService.createEvent(newEvent);
         ScaffoldMessenger.of(context).clearSnackBars();
@@ -268,6 +245,26 @@ class _NewEventState extends State<NewEvent> {
                       },
                     ),
                     SizedBox(height: 40),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 2),
+                      child: Row(
+                        children: [
+                          Icon(Icons.public),
+                          SizedBox(width: 15),
+                          Checkbox(
+                            value: _isPublic,  // Utilise la valeur actuelle de _isPublic
+                            onChanged: (bool? value) {
+                              setState(() {
+                                _isPublic = value!;
+                              });
+                            },
+                          ),
+                          Text("Ouvert au public"),
+                          SizedBox(width: 20),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 15),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 2),
                       child: Row(
@@ -414,27 +411,6 @@ class _NewEventState extends State<NewEvent> {
                       ),
                     ),
                     SizedBox(height: 30),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 2),
-                      child: Row(
-                        children: [
-                          Icon(Icons.image),
-                          SizedBox(width: 15),
-                          ElevatedButton(
-                            onPressed: _pickFile,
-                            child: Text("Choisir une image"),
-                          ),
-                          SizedBox(width: 15),
-                          Expanded(
-                              child: Text(
-                            _selectedFile ?? '',
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface),
-                          )),
-                        ],
-                      ),
-                    ),
                     SizedBox(
                       height: 60,
                     ),

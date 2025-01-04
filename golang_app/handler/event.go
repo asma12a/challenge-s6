@@ -17,6 +17,7 @@ func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Ev
 	app.Get("/", middleware.IsAdminMiddleware, listEvents(ctx, serviceEvent))
 	app.Get("/search", searchEvent(ctx, serviceEvent))
 	app.Get("/:eventId", getEvent(ctx, serviceEvent))
+	app.Get("/code/:eventCode", getEventByCode(ctx, serviceEvent))
 	app.Post("/", createEvent(ctx, serviceEvent, serviceSport))
 	app.Post("/:eventId/team", addTeam(ctx, serviceEvent))
 	//app.Post("/:eventId/team/:teamId/player", addPlayer(ctx, serviceEvent))
@@ -26,15 +27,13 @@ func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Ev
 	// Handle event teams routes
 }
 
-
-
 var validate = validator.New()
 
 func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport service.Sport) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
-		var eventInput  entity.Event // Inclut tous les champs de l'entité Event
-		
+		var eventInput entity.Event // Inclut tous les champs de l'entité Event
+
 		err := c.BodyParser(&eventInput)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
@@ -130,8 +129,8 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 			if eventTeam != nil {
 				team := eventTeam
 				teamToj := presenter.Team{
-					ID:   team.ID,
-					Name: team.Name,
+					ID:         team.ID,
+					Name:       team.Name,
 					MaxPlayers: team.MaxPlayers,
 				}
 
@@ -252,6 +251,71 @@ func deleteEvent(ctx context.Context, service service.Event) fiber.Handler {
 	}
 }
 
+func getEventByCode(ctx context.Context, service service.Event) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		// id := c.Params("eventId")
+		eventCode := c.Params("eventCode")
+		event, err := service.FindEventByCode(ctx, eventCode)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+					"status": "error",
+					"error":  "Event not found",
+				})
+			}
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+
+		// Mapper les données de event vers presenter.Event
+		toJ := presenter.Event{
+			ID:         event.ID,
+			Name:       event.Name,
+			Address:    event.Address,
+			EventCode:  event.EventCode,
+			Date:       event.Date,
+			CreatedAt:  event.CreatedAt,
+			IsPublic:   event.IsPublic,
+			IsFinished: event.IsFinished,
+			EventType:  event.EventType,
+		}
+
+		if condition := event.Edges.Sport; condition != nil {
+			toJ.Sport = presenter.Sport{
+				ID:       condition.ID,
+				Name:     condition.Name,
+				ImageURL: condition.ImageURL,
+			}
+		}
+
+		for _, eventTeam := range event.Edges.EventTeam {
+			if eventTeam != nil {
+				team := eventTeam
+				teamToj := presenter.Team{
+					ID:         team.ID,
+					Name:       team.Name,
+					MaxPlayers: team.MaxPlayers,
+				}
+
+				for _, teamUser := range team.Edges.TeamUsers {
+					user := teamUser.Edges.User
+					if user != nil {
+						teamToj.Players = append(teamToj.Players, presenter.User{
+							ID:    user.ID,
+							Name:  user.Name,
+							Email: user.Email,
+						})
+					}
+				}
+				toJ.Teams = append(toJ.Teams, teamToj)
+			}
+		}
+		return c.JSON(toJ)
+	}
+}
+
 func listEvents(ctx context.Context, service service.Event) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		events, err := service.List(ctx)
@@ -354,7 +418,7 @@ func addTeam(ctx context.Context, serviceEvent service.Event) fiber.Handler {
 			})
 		}
 
-		var teamsInput [] struct{
+		var teamsInput []struct {
 			entity.Team
 			Players []struct {
 				Email string `json:"email"`
@@ -378,8 +442,6 @@ func addTeam(ctx context.Context, serviceEvent service.Event) fiber.Handler {
 			})
 		}
 
-
-
 		err = serviceEvent.AddTeam(ctx, event.ID, teamsInput)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
@@ -390,5 +452,5 @@ func addTeam(ctx context.Context, serviceEvent service.Event) fiber.Handler {
 
 		return c.SendStatus(fiber.StatusOK)
 	}
-	
+
 }

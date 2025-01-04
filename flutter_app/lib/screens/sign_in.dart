@@ -4,6 +4,7 @@ import 'package:squad_go/screens/sign_up.dart';
 import 'package:squad_go/screens/tabs.dart';
 import 'package:squad_go/widgets/logo.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
@@ -97,11 +98,7 @@ class __FormContentState extends State<_FormContent> {
           ),
         );
       } else {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (ctx) => TabsScreen(),
-          ),
-        );
+       context.go('/');
       }
     }
   }
