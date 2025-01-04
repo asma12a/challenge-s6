@@ -5,7 +5,6 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
-	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
 // UserStats holds the schema definition for the UserStats entity.
@@ -29,9 +28,9 @@ func (UserStats) Fields() []ent.Field {
 // Edges of the UserStats.
 func (UserStats) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("user", User.Type).Ref("user_stats").Field("user_id").Unique().Required(),
-		edge.From("event", Event.Type).Ref("user_stats").Field("event_id").Unique().Required(),
-		edge.From("stat", SportStatLabels.Type).Ref("user_stats").Field("stat_id").Unique().Required(),
+		edge.From("user", User.Type).Ref("user_stats").Unique().Required(),
+		edge.From("event", Event.Type).Ref("user_stats").Unique().Required(),
+		edge.From("stat", SportStatLabels.Type).Ref("user_stats").Unique().Required(),
 	}
 }
 
