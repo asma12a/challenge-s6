@@ -407,6 +407,8 @@ func getUserStatsByEvent(ctx context.Context, serviceSportStatLables service.Spo
 				StatLabel: &presenter.SportStatLabels{
 					ID:     userStat.Edges.Stat.ID,
 					Label:  userStat.Edges.Stat.Label,
+					Unit:   userStat.Edges.Stat.Unit,
+					IsMain: userStat.Edges.Stat.IsMain,
 				},
 				Value:  userStat.StatValue,
 			}

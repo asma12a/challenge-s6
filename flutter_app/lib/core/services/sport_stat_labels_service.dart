@@ -8,9 +8,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/models/user_stats.dart';
 
 class SportStatLabelsService {
+  final storage = const FlutterSecureStorage();
 
-  static Future<List<SportStatLabels>> getStatLabelsBySport(String sportId) async {
-    final storage = const FlutterSecureStorage();
+  Future<List<SportStatLabels>> getStatLabelsBySport(String sportId) async {
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
     try {
       final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/sportstatlabels/$sportId/labels');
@@ -32,8 +32,7 @@ class SportStatLabelsService {
     }
   }
 
-  static Future<List<UserStats>> getUserStatByEvent(String eventId, userId) async {
-    final storage = const FlutterSecureStorage();
+  Future<List<UserStats>> getUserStatByEvent(String eventId, userId) async {
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
     try {
       final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/sportstatlabels/$eventId/$userId/stats');
@@ -52,6 +51,22 @@ class SportStatLabelsService {
       log('An error occurred while ', error: error);
       throw AppException(
           message: 'Failed to retrieve sport stat labels, please try again.');
+    }
+  }
+
+  Future<void> addUserStat(Map<String, dynamic> stats, String eventId) async {
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    try {
+      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/sportstatlabels/$eventId/addUserStat');
+      await http.post(uri,
+          headers: {
+            'Content-Type': 'application/json',
+            "Authorization": "Bearer $token",
+          },
+          body: jsonEncode(stats));
+    } catch (error) {
+      log('An error occurred while ', error: error);
+      throw AppException(message: 'Failed to create event, please try again.');
     }
   }
 
