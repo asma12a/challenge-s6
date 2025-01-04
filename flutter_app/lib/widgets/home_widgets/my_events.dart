@@ -44,8 +44,9 @@ class HomeMyEventsState extends State<HomeMyEvents> {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     return Carousel(
-      text: "Mes événements en cours",
+      text: translate?.my_events ?? "Mes événements en cours",
       items: myEvents
           .map((event) => EventCard(
                 event: event,

@@ -83,6 +83,7 @@ func (e *TeamUser) AddPlayerToTeam(ctx context.Context, teamUserInput entity.Tea
 		}
 		// User not found, send an email to the provided email
 		log.Println("user not found, sending email")
+		// TODO: Send email
 		// err = sendEmail(teamUserInput.Email)
 		// if err != nil {
 		// 	log.Println("error sending email:", err)

@@ -262,6 +262,7 @@ class _NewEventState extends State<NewEvent> {
                         );
                       },
                       onSelected: (suggestion) {
+                        // TODO: Récuperer latitute et longitude (comme dans edit_event.dart)
                         _addressController.text =
                             suggestion; // Mise à jour du champ de texte
                       },
