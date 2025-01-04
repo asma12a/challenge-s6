@@ -14,6 +14,7 @@ dependencies:
   file_picker: ^8.1.4
   flutter:
     sdk: flutter
+  fl_chart: ^0.70.0
   flutter_dotenv: ^5.2.1
   flutter_launcher_icons: ^0.14.1
   flutter_localizations:
@@ -44,9 +45,9 @@ flutter:
   generate: true
 
   assets:
-    # Add assets from the images directory to the application.
-    - assets/images/
-    - .env
+  # Add assets from the images directory to the application.
+  - assets/images/
+  - .env
 
 flutter_native_splash:
   color: "#FFFFFF"

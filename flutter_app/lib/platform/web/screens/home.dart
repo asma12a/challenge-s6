@@ -5,6 +5,7 @@ import 'package:squad_go/shared_widgets/sign_in.dart';
 import 'package:squad_go/platform/web/screens/users/admin_users_page.dart';
 import 'package:squad_go/platform/web/screens/events/admin_events_page.dart';
 import 'package:squad_go/platform/web/screens/sports/admin_sports_page.dart';
+import 'package:squad_go/platform/web/screens/admin_dashboard_page.dart';
 
 class WebHomeScreen extends StatefulWidget {
   const WebHomeScreen({super.key});
@@ -18,6 +19,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
 
   // Liste des pages correspondantes aux index
   final List<Widget> _pages = [
+    const AdminDashboardPage(),
     const AdminUsersPage(),
     const AdminEventsPage(),
     const AdminSportsPage(),
@@ -57,11 +59,21 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                       ),
                     ),
                     _createDrawerItem(
+                      icon: Icons.dashboard,
+                      text: 'Tableau de Bord',
+                      onTap: () {
+                        setState(() {
+                          _selectedIndex =
+                              0;
+                        });
+                      },
+                    ),
+                    _createDrawerItem(
                       icon: Icons.account_circle,
                       text: 'Utilisateurs',
                       onTap: () {
                         setState(() {
-                          _selectedIndex = 0;
+                          _selectedIndex = 1;
                         });
                       },
                     ),
@@ -70,7 +82,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                       text: 'Événements',
                       onTap: () {
                         setState(() {
-                          _selectedIndex = 1;
+                          _selectedIndex = 2;
                         });
                       },
                     ),
@@ -79,7 +91,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                       text: 'Sports',
                       onTap: () {
                         setState(() {
-                          _selectedIndex = 2;
+                          _selectedIndex = 3;
                         });
                       },
                     ),
