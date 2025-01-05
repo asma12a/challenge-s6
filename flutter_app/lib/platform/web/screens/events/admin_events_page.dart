@@ -12,6 +12,7 @@ class AdminEventsPage extends StatefulWidget {
 }
 
 class _AdminEventsPageState extends State<AdminEventsPage> {
+  final EventService _eventService = EventService();
   List<Map<String, dynamic>> events = [];
   bool isLoading = true;
 
@@ -23,7 +24,7 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
 
   Future<void> fetchEvents() async {
     try {
-      final fetchedEvents = await EventService.getEvents();
+      final fetchedEvents = await _eventService.getEvents();
       setState(() {
         events = fetchedEvents;
         isLoading = false;
@@ -37,7 +38,7 @@ class _AdminEventsPageState extends State<AdminEventsPage> {
 
   Future<void> deleteEvent(String id) async {
     try {
-      await EventService.deleteEvent(id);
+      await _eventService.deleteEvent(id);
       if (mounted) {
         fetchEvents();
         ScaffoldMessenger.of(context).showSnackBar(

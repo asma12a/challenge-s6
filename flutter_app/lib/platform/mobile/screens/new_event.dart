@@ -1,13 +1,11 @@
-import 'dart:convert';
-import 'dart:io';
+import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/core/services/event_service.dart';
-import 'package:squad_go/core/models/event.dart';
-import 'package:squad_go/platform/mobile/screens/tabs.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:squad_go/main.dart';
+import 'package:squad_go/platform/mobile/screens/tabs.dart';
 
 class NewEvent extends StatefulWidget {
   const NewEvent({super.key});
@@ -24,8 +22,9 @@ class _NewEventState extends State<NewEvent> {
   List<String> _suggestedAddresses = [];
   var _selectedType = '';
   var _selectedSport = '';
+  List<Sport> _sports = [];
+  final eventService = EventService();
   var _isPublic = true;
-  List<Map<String, dynamic>> _sports = [];
 
   @override
   void initState() {
@@ -35,7 +34,7 @@ class _NewEventState extends State<NewEvent> {
 
   Future<void> _initSports() async {
     try {
-      final fetchedSports = await EventService.getSports();
+      final fetchedSports = await eventService.getSports();
       setState(() {
         _sports = fetchedSports;
       });
@@ -60,10 +59,10 @@ class _NewEventState extends State<NewEvent> {
     }
     final String apiUrl =
         'https://api-adresse.data.gouv.fr/search/?q=$query&limit=5';
-    final response = await http.get(Uri.parse(apiUrl));
+    final response = await dio.get(apiUrl);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
+      final Map<String, dynamic> data = response.data;
 
       setState(() {
         _suggestedAddresses = data['features']
@@ -132,7 +131,7 @@ class _NewEventState extends State<NewEvent> {
           "event_type": _selectedType,
           "is_public": _isPublic
         };
-        await EventService.createEvent(newEvent);
+        await eventService.createEvent(newEvent);
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -166,7 +165,6 @@ class _NewEventState extends State<NewEvent> {
 
     @override
     void dispose() {
-      // TODO: implement dispose
       _addressController.dispose();
       super.dispose();
     }
@@ -240,6 +238,7 @@ class _NewEventState extends State<NewEvent> {
                         );
                       },
                       onSelected: (suggestion) {
+                        // TODO: Récuperer latitute et longitude (comme dans edit_event.dart)
                         _addressController.text =
                             suggestion; // Mise à jour du champ de texte
                       },
@@ -252,7 +251,8 @@ class _NewEventState extends State<NewEvent> {
                           Icon(Icons.public),
                           SizedBox(width: 15),
                           Checkbox(
-                            value: _isPublic,  // Utilise la valeur actuelle de _isPublic
+                            value:
+                                _isPublic, // Utilise la valeur actuelle de _isPublic
                             onChanged: (bool? value) {
                               setState(() {
                                 _isPublic = value!;
@@ -390,9 +390,9 @@ class _NewEventState extends State<NewEvent> {
                                 ),
                                 ..._sports.map((sport) {
                                   return DropdownMenuItem<String>(
-                                    value: sport['id'],
+                                    value: sport.id,
                                     child: Text(
-                                      sport['name'],
+                                      sport.name.name,
                                       style: TextStyle(
                                         color: Theme.of(context)
                                             .colorScheme
@@ -400,7 +400,7 @@ class _NewEventState extends State<NewEvent> {
                                       ),
                                     ),
                                   );
-                                }).toList(),
+                                }),
                               ],
                               onChanged: (value) {
                                 _selectedSport = value!;

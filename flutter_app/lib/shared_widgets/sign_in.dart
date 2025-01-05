@@ -113,6 +113,9 @@ class __FormContentState extends State<_FormContent> {
           children: [
             TextFormField(
               keyboardType: TextInputType.emailAddress,
+              onTapOutside: (event) {
+                FocusScope.of(context).unfocus();
+              },
               validator: (value) {
                 // add email validation
                 if (value == null || value.isEmpty) {
@@ -143,6 +146,9 @@ class __FormContentState extends State<_FormContent> {
             ),
             _gap(),
             TextFormField(
+              onTapOutside: (event) {
+                FocusScope.of(context).unfocus();
+              },
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter some text';

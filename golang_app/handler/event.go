@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
@@ -9,22 +10,48 @@ import (
 	"github.com/asma12a/challenge-s6/middleware"
 	"github.com/asma12a/challenge-s6/presenter"
 	"github.com/asma12a/challenge-s6/service"
+	"github.com/asma12a/challenge-s6/viewer"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
-func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Event, serviceSport service.Sport) {
-	app.Get("/", middleware.IsAdminMiddleware, listEvents(ctx, serviceEvent))
+func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Event, serviceSport service.Sport, serviceTeam service.Team, serviceTeamUser service.TeamUser) {
+	// User scoped routes
+	app.Get("/user", listUserEvents(ctx, serviceEvent))
+
+	// Team scoped routes
+	TeamHandler(app.Group("/:eventId/teams", func(c *fiber.Ctx) error {
+		eventID, err := ulid.Parse(c.Params("eventId"))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "Invalid event ID format",
+			})
+		}
+
+		_, err = serviceEvent.FindOne(ctx, eventID)
+		if err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+				"status": "error find event",
+				"error":  err.Error(),
+			})
+		}
+
+		return c.Next()
+	}), ctx, serviceEvent, serviceTeam, serviceTeamUser)
+
+	// Global event routes
 	app.Get("/search", searchEvent(ctx, serviceEvent))
+	app.Get("/recommended", listRecommendedEvents(ctx, serviceEvent))
 	app.Get("/:eventId", getEvent(ctx, serviceEvent))
 	app.Get("/code/:eventCode", getEventByCode(ctx, serviceEvent))
 	app.Post("/", createEvent(ctx, serviceEvent, serviceSport))
-	app.Post("/:eventId/team", addTeam(ctx, serviceEvent))
-	//app.Post("/:eventId/team/:teamId/player", addPlayer(ctx, serviceEvent))
 	app.Put("/:eventId", updateEvent(ctx, serviceEvent, serviceSport))
-	app.Delete("/:eventId", deleteEvent(ctx, serviceEvent))
+	app.Delete("/:eventId", middleware.IsEventOrganizer(ctx, serviceEvent), deleteEvent(ctx, serviceEvent))
 
-	// Handle event teams routes
+	// Admin routes
+	app.Get("/", middleware.IsAdminMiddleware, listEvents(ctx, serviceEvent))
+
 }
 
 var validate = validator.New()
@@ -62,6 +89,8 @@ func createEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 		newEvent := entity.NewEvent(
 			eventInput.Name,
 			eventInput.Address,
+			eventInput.Latitude,
+			eventInput.Longitude,
 			eventInput.Date,
 			sport.ID,
 			eventInput.EventType,
@@ -106,49 +135,67 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 
 		// Mapper les données de event vers presenter.Event
 		toJ := presenter.Event{
-			ID:         event.ID,
-			Name:       event.Name,
-			Address:    event.Address,
-			EventCode:  event.EventCode,
-			Date:       event.Date,
-			CreatedAt:  event.CreatedAt,
-			IsPublic:   event.IsPublic,
-			IsFinished: event.IsFinished,
-			EventType:  event.EventType,
+			ID:        event.ID,
+			Name:      event.Name,
+			Address:   event.Address,
+			Latitude:  event.Latitude,
+			Longitude: event.Longitude,
+			EventCode: event.EventCode,
+			Date:      event.Date,
+			CreatedAt: event.CreatedAt,
+			CreatedBy: event.CreatedBy,
+			IsPublic:  event.IsPublic,
+			EventType: event.EventType,
 		}
 
 		if condition := event.Edges.Sport; condition != nil {
 			toJ.Sport = presenter.Sport{
 				ID:       condition.ID,
 				Name:     condition.Name,
+				Type:     presenter.SportType(condition.Type),
 				ImageURL: condition.ImageURL,
+				Color:    condition.Color,
+				MaxTeams: condition.MaxTeams,
 			}
 		}
 
-		for _, eventTeam := range event.Edges.EventTeam {
+		teamsToJ := make([]presenter.Team, 0, len(event.Edges.Teams))
+		for _, eventTeam := range event.Edges.Teams {
 			if eventTeam != nil {
-				team := eventTeam
 				teamToj := presenter.Team{
-					ID:         team.ID,
-					Name:       team.Name,
-					MaxPlayers: team.MaxPlayers,
+					ID:         eventTeam.ID,
+					Name:       eventTeam.Name,
+					MaxPlayers: eventTeam.MaxPlayers,
+					Players:    []presenter.Player{},
 				}
 
-				for _, teamUser := range team.Edges.TeamUsers {
+				for _, teamUser := range eventTeam.Edges.TeamUsers {
 					user := teamUser.Edges.User
-					if user != nil {
-						teamToj.Players = append(teamToj.Players, presenter.User{
-							ID:    user.ID,
-							Name:  user.Name,
-							Email: user.Email,
-						})
-					}
+					teamToj.Players = append(teamToj.Players, presenter.Player{
+						ID: teamUser.ID,
+						Name: func() string {
+							if user != nil {
+								return user.Name
+							} else {
+								return ""
+							}
+						}(),
+						Email:  teamUser.Email,
+						Role:   presenter.Role(teamUser.Role),
+						Status: presenter.Status(teamUser.Status),
+						UserID: func() ulid.ID {
+							if user != nil {
+								return user.ID
+							} else {
+								return ""
+							}
+						}(),
+					})
 				}
-				toJ.Teams = append(toJ.Teams, teamToj)
+				teamsToJ = append(teamsToJ, teamToj)
 			}
 		}
-
-
+		toJ.Teams = teamsToJ
 
 		return c.JSON(toJ)
 	}
@@ -208,9 +255,11 @@ func updateEvent(ctx context.Context, serviceEvent service.Event, serviceSport s
 
 		existingEvent.Name = eventInput.Name
 		existingEvent.Address = eventInput.Address
-		existingEvent.EventCode = eventInput.EventCode
+		existingEvent.Latitude = eventInput.Latitude
+		existingEvent.Longitude = eventInput.Longitude
 		existingEvent.Date = eventInput.Date
 		existingEvent.EventType = eventInput.EventType
+		existingEvent.IsPublic = eventInput.IsPublic
 
 		_, err = serviceEvent.Update(c.UserContext(), existingEvent)
 		if err != nil {
@@ -274,47 +323,68 @@ func getEventByCode(ctx context.Context, service service.Event) fiber.Handler {
 
 		// Mapper les données de event vers presenter.Event
 		toJ := presenter.Event{
-			ID:         event.ID,
-			Name:       event.Name,
-			Address:    event.Address,
-			EventCode:  event.EventCode,
-			Date:       event.Date,
-			CreatedAt:  event.CreatedAt,
-			IsPublic:   event.IsPublic,
-			IsFinished: event.IsFinished,
-			EventType:  event.EventType,
+			ID:        event.ID,
+			Name:      event.Name,
+			Address:   event.Address,
+			Latitude:  event.Latitude,
+			Longitude: event.Longitude,
+			EventCode: event.EventCode,
+			Date:      event.Date,
+			CreatedAt: event.CreatedAt,
+			CreatedBy: event.CreatedBy,
+			IsPublic:  event.IsPublic,
+			EventType: event.EventType,
 		}
 
 		if condition := event.Edges.Sport; condition != nil {
 			toJ.Sport = presenter.Sport{
 				ID:       condition.ID,
 				Name:     condition.Name,
+				Type:     presenter.SportType(condition.Type),
 				ImageURL: condition.ImageURL,
+				Color:    condition.Color,
+				MaxTeams: condition.MaxTeams,
 			}
 		}
 
-		for _, eventTeam := range event.Edges.EventTeam {
+		teamsToJ := make([]presenter.Team, 0, len(event.Edges.Teams))
+		for _, eventTeam := range event.Edges.Teams {
 			if eventTeam != nil {
-				team := eventTeam
 				teamToj := presenter.Team{
-					ID:         team.ID,
-					Name:       team.Name,
-					MaxPlayers: team.MaxPlayers,
+					ID:         eventTeam.ID,
+					Name:       eventTeam.Name,
+					MaxPlayers: eventTeam.MaxPlayers,
+					Players:    []presenter.Player{},
 				}
 
-				for _, teamUser := range team.Edges.TeamUsers {
+				for _, teamUser := range eventTeam.Edges.TeamUsers {
 					user := teamUser.Edges.User
-					if user != nil {
-						teamToj.Players = append(teamToj.Players, presenter.User{
-							ID:    user.ID,
-							Name:  user.Name,
-							Email: user.Email,
-						})
-					}
+					teamToj.Players = append(teamToj.Players, presenter.Player{
+						ID: teamUser.ID,
+						Name: func() string {
+							if user != nil {
+								return user.Name
+							} else {
+								return ""
+							}
+						}(),
+						Email:  teamUser.Email,
+						Role:   presenter.Role(teamUser.Role),
+						Status: presenter.Status(teamUser.Status),
+						UserID: func() ulid.ID {
+							if user != nil {
+								return user.ID
+							} else {
+								return ""
+							}
+						}(),
+					})
 				}
-				toJ.Teams = append(toJ.Teams, teamToj)
+				teamsToJ = append(teamsToJ, teamToj)
 			}
 		}
+		toJ.Teams = teamsToJ
+
 		return c.JSON(toJ)
 	}
 }
@@ -332,21 +402,26 @@ func listEvents(ctx context.Context, service service.Event) fiber.Handler {
 
 		for i, event := range events {
 			toJ[i] = presenter.Event{
-				ID:         event.ID,
-				Name:       event.Name,
-				Address:    event.Address,
-				EventCode:  event.EventCode,
-				Date:       event.Date,
-				CreatedAt:  event.CreatedAt,
-				IsPublic:   event.IsPublic,
-				IsFinished: event.IsFinished,
-				EventType:  event.EventType,
+				ID:        event.ID,
+				Name:      event.Name,
+				Address:   event.Address,
+				Latitude:  event.Latitude,
+				Longitude: event.Longitude,
+				EventCode: event.EventCode,
+				Date:      event.Date,
+				CreatedAt: event.CreatedAt,
+				CreatedBy: event.CreatedBy,
+				IsPublic:  event.IsPublic,
+				EventType: event.EventType,
 			}
 			if condition := event.Edges.Sport; condition != nil {
 				toJ[i].Sport = presenter.Sport{
 					ID:       condition.ID,
 					Name:     condition.Name,
+					Type:     presenter.SportType(condition.Type),
 					ImageURL: condition.ImageURL,
+					Color:    condition.Color,
+					MaxTeams: condition.MaxTeams,
 				}
 			}
 		}
@@ -355,7 +430,6 @@ func listEvents(ctx context.Context, service service.Event) fiber.Handler {
 }
 
 func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
-
 	return func(c *fiber.Ctx) error {
 
 		search := c.Query("search")
@@ -385,21 +459,26 @@ func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
 
 		for i, event := range events {
 			toJ[i] = presenter.Event{
-				ID:         event.ID,
-				Name:       event.Name,
-				Address:    event.Address,
-				EventCode:  event.EventCode,
-				Date:       event.Date,
-				CreatedAt:  event.CreatedAt,
-				IsPublic:   event.IsPublic,
-				IsFinished: event.IsFinished,
-				EventType:  event.EventType,
+				ID:        event.ID,
+				Name:      event.Name,
+				Address:   event.Address,
+				Latitude:  event.Latitude,
+				Longitude: event.Longitude,
+				EventCode: event.EventCode,
+				Date:      event.Date,
+				CreatedAt: event.CreatedAt,
+				CreatedBy: event.CreatedBy,
+				IsPublic:  event.IsPublic,
+				EventType: event.EventType,
 			}
 			if condition := event.Edges.Sport; condition != nil {
 				toJ[i].Sport = presenter.Sport{
 					ID:       condition.ID,
 					Name:     condition.Name,
+					Type:     presenter.SportType(condition.Type),
 					ImageURL: condition.ImageURL,
+					Color:    condition.Color,
+					MaxTeams: condition.MaxTeams,
 				}
 
 			}
@@ -409,51 +488,114 @@ func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
 	}
 }
 
-func addTeam(ctx context.Context, serviceEvent service.Event) fiber.Handler {
+func listUserEvents(ctx context.Context, serviceEvent service.Event) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		eventIDStr := c.Params("eventId")
-		eventID, err := ulid.Parse(eventIDStr)
-
+		currentUser, err := viewer.UserFromContext(c.UserContext())
 		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
 				"status": "error",
-				"error":  "Invalid event ID format",
+				"error":  err.Error(),
 			})
 		}
 
-		var teamsInput []struct {
-			entity.Team
-			Players []struct {
-				Email string `json:"email"`
-				Role  string `json:"role,omitempty"`
-			} `json:"players"`
-		}
+		events, err := serviceEvent.ListUserEvents(ctx, currentUser.ID)
 
-		err = c.BodyParser(&teamsInput)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status": "error bodyparser",
-				"error":  err.Error(),
+				"error": err.Error(),
 			})
 		}
 
-		event, err := serviceEvent.FindOne(ctx, eventID)
-		if err != nil {
-			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-				"status": "error find event",
-				"error":  err.Error(),
-			})
-		}
+		toJ := make([]presenter.Event, len(events))
 
-		err = serviceEvent.AddTeam(ctx, event.ID, teamsInput)
-		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status": "error add team",
-				"error":  err.Error(),
-			})
+		for i, event := range events {
+			toJ[i] = presenter.Event{
+				ID:        event.ID,
+				Name:      event.Name,
+				Address:   event.Address,
+				Latitude:  event.Latitude,
+				Longitude: event.Longitude,
+				EventCode: event.EventCode,
+				Date:      event.Date,
+				CreatedAt: event.CreatedAt,
+				CreatedBy: event.CreatedBy,
+				IsPublic:  event.IsPublic,
+				EventType: event.EventType,
+			}
+			if condition := event.Edges.Sport; condition != nil {
+				toJ[i].Sport = presenter.Sport{
+					ID:       condition.ID,
+					Name:     condition.Name,
+					Type:     presenter.SportType(condition.Type),
+					ImageURL: condition.ImageURL,
+					Color:    condition.Color,
+					MaxTeams: condition.MaxTeams,
+				}
+			}
 		}
-
-		return c.SendStatus(fiber.StatusOK)
+		return c.JSON(toJ)
 	}
+}
+func listRecommendedEvents(ctx context.Context, serviceEvent service.Event) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		defaultLatitude := 46.603354
+		defaultLongitude := 1.888334
+		latitudeStr := c.Query("latitude", strconv.FormatFloat(defaultLatitude, 'f', -1, 64))
+		longitudeStr := c.Query("longitude", strconv.FormatFloat(defaultLongitude, 'f', -1, 64))
 
+		latitude, err := strconv.ParseFloat(latitudeStr, 64)
+		if err != nil {
+			latitude = defaultLatitude
+		}
+
+		longitude, err := strconv.ParseFloat(longitudeStr, 64)
+		if err != nil {
+			longitude = defaultLongitude
+		}
+
+		currentUser, err := viewer.UserFromContext(c.UserContext())
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+
+		events, err := serviceEvent.ListRecommendedEvents(ctx, latitude, longitude, currentUser.ID)
+
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
+		toJ := make([]presenter.Event, len(events))
+
+		for i, event := range events {
+			toJ[i] = presenter.Event{
+				ID:        event.ID,
+				Name:      event.Name,
+				Address:   event.Address,
+				Latitude:  event.Latitude,
+				Longitude: event.Longitude,
+				EventCode: event.EventCode,
+				Date:      event.Date,
+				CreatedAt: event.CreatedAt,
+				CreatedBy: event.CreatedBy,
+				IsPublic:  event.IsPublic,
+				EventType: event.EventType,
+			}
+			if condition := event.Edges.Sport; condition != nil {
+				toJ[i].Sport = presenter.Sport{
+					ID:       condition.ID,
+					Name:     condition.Name,
+					Type:     presenter.SportType(condition.Type),
+					ImageURL: condition.ImageURL,
+					Color:    condition.Color,
+					MaxTeams: condition.MaxTeams,
+				}
+			}
+		}
+		return c.JSON(toJ)
+	}
 }

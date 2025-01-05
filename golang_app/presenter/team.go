@@ -1,15 +1,13 @@
 package presenter
 
 import (
-
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 )
 
-// Event représente le type de présentation pour un événement.
+// Team représente le type de présentation pour une équipe.
 type Team struct {
-	ID         ulid.ID   `json:"id,omitempty"`
-	Name       string    `json:"name,omitempty"`
-	MaxPlayers int       `json:"maxPlayers,omitempty"`
-	Players	[]User  `json:"players,omitempty"`
-	// Utiliser le type Sport personnalisé
+	ID         ulid.ID  `json:"id,omitempty"`
+	Name       string   `json:"name,omitempty"`
+	MaxPlayers int      `json:"maxPlayers,omitempty"`
+	Players    []Player `json:"players,omitempty"`
 }

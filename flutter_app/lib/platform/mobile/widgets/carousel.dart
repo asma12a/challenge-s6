@@ -6,10 +6,12 @@ class Carousel extends StatefulWidget {
     super.key,
     required this.items,
     required this.text,
+    this.isLoading = false,
   });
 
   final List<Widget> items;
   final String text;
+  final bool isLoading;
 
   @override
   State<Carousel> createState() => CarouselState();
@@ -33,12 +35,28 @@ class CarouselState extends State<Carousel> {
             const SizedBox(
               height: 10,
             ),
-            CarouselSlider(
-              options: CarouselOptions(
-                enableInfiniteScroll: false,
-                padEnds: false,
+            if (widget.isLoading)
+              Padding(
+                padding: const EdgeInsets.only(left: 40),
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
               ),
-              items: widget.items,
+            if (!widget.isLoading && widget.items.isEmpty)
+              Padding(
+                padding: const EdgeInsets.only(left: 40),
+                child: Text('Aucun élément à afficher'),
+              ),
+            Padding(
+              padding: const EdgeInsets.only(left: 20),
+              child: CarouselSlider(
+                options: CarouselOptions(
+                  enableInfiniteScroll: false,
+                  padEnds: false,
+                  height: widget.items.isEmpty ? 20 : null,
+                ),
+                items: widget.items,
+              ),
             ),
             const SizedBox(
               height: 20,

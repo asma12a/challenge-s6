@@ -7,7 +7,6 @@ import 'package:squad_go/shared_widgets/sign_in.dart';
 import 'package:squad_go/platform/mobile/screens/tabs.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
 final GoRouter _router = GoRouter(
   redirect: (BuildContext context, GoRouterState state) async {
     final authState = provider.Provider.of<AuthState>(context, listen: false);
@@ -85,6 +84,8 @@ class App extends StatelessWidget {
         provider.ChangeNotifierProvider(create: (_) => AuthState()),
       ],
       builder: (context, child) => MaterialApp.router(
+        // localizationsDelegates: AppLocalizations.localizationsDelegates,
+        // supportedLocales: AppLocalizations.supportedLocales,
         routerConfig: _router,
         theme: theme,
         debugShowCheckedModeBanner: false,

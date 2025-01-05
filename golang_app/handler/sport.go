@@ -76,7 +76,10 @@ func getSport(ctx context.Context, serviceSport service.Sport) fiber.Handler {
 		toJ := presenter.Sport{
 			ID:       sport.ID,
 			Name:     sport.Name,
+			Type:     presenter.SportType(sport.Type),
 			ImageURL: sport.ImageURL,
+			Color:    sport.Color,
+			MaxTeams: sport.MaxTeams,
 		}
 
 		return c.JSON(toJ)
@@ -175,7 +178,10 @@ func listSports(ctx context.Context, serviceSport service.Sport) fiber.Handler {
 			toJ[i] = presenter.Sport{
 				ID:       sport.ID,
 				Name:     sport.Name,
+				Type:     presenter.SportType(sport.Type),
 				ImageURL: sport.ImageURL,
+				Color:    sport.Color,
+				MaxTeams: sport.MaxTeams,
 			}
 		}
 		return c.JSON(toJ)

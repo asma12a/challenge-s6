@@ -7,15 +7,18 @@ import (
 
 type UserStats struct {
 	ent.UserStats
+	UserID  ulid.ID `json:"user_id"`
+	EventID ulid.ID `json:"event_id"`
+	StatID  ulid.ID `json:"stat_id"`
 }
 
 func NewUserStats(userID, eventID, statId ulid.ID, statValue int) *UserStats {
 	return &UserStats{
 		UserStats: ent.UserStats{
-			UserID:  userID,
-			EventID: eventID,
-			StatID:  statId,
 			StatValue: statValue,
 		},
+		UserID:  userID,
+		EventID: eventID,
+		StatID:  statId,
 	}
 }

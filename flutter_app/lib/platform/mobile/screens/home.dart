@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:squad_go/platform/mobile/widgets/home_widgets/my_events.dart';
+import 'package:squad_go/platform/mobile/widgets/home_widgets/recommended_events.dart';
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/platform/mobile/widgets/carousel.dart';
@@ -14,8 +16,10 @@ class HomeScreen extends StatefulWidget {
 class HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-
-  // TODO: get events from the API (my events and recommended events)
+  final GlobalKey<HomeRecommendedEventsState> recommendedEventsKey =
+      GlobalKey<HomeRecommendedEventsState>();
+  final GlobalKey<HomeMyEventsState> myEventsKey =
+      GlobalKey<HomeMyEventsState>();
 
   @override
   void initState() {
@@ -37,6 +41,11 @@ class HomeScreenState extends State<HomeScreen>
     super.dispose();
   }
 
+  Future<void> onRefresh() async {
+    await myEventsKey.currentState?.fetchMyEvents();
+    await recommendedEventsKey.currentState?.fetchRecommendedEvents();
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -53,77 +62,22 @@ class HomeScreenState extends State<HomeScreen>
         child: child,
       ),
       animation: _animationController,
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 10,
-            ),
-            Carousel(
-              text: "Mes événements",
-              items: [
-                EventCard(
-                  event: Event(
-                    id: "id",
-                    name: "Event 1",
-                    address: "Rue de la rue",
-                    date: "2022-01-01",
-                    sport: Sport(
-                      id: "id",
-                      name: SportName.football,
-                      type: SportType.team,
-                      color: Colors.blue,
-                    ),
-                  ),
-                  hasJoinedEvent: true,
-                ),
-                EventCard(
-                  event: Event(
-                    id: "id2",
-                    name: "Event 2",
-                    address: "Rue de la rue",
-                    date: "2022-01-01",
-                    type: EventType.training,
-                    sport: Sport(
-                      id: "id2",
-                      name: SportName.basketball,
-                      type: SportType.team,
-                    ),
-                  ),
-                ),
-                EventCard(
-                  event: Event(
-                    id: "id3",
-                    name: "Event 2",
-                    address: "Rue de la rue",
-                    date: "2022-01-01",
-                    sport: Sport(
-                      id: "id3",
-                      name: SportName.tennis,
-                      type: SportType.individual,
-                    ),
-                  ),
-                ),
-                EventCard(
-                  event: Event(
-                    id: "id4",
-                    name: "Event 2",
-                    address: "Rue de la rue",
-                    date: "2022-01-01",
-                    sport: Sport(
-                      id: "id4",
-                      name: SportName.running,
-                      type: SportType.individual,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Carousel(
-              text: "Évenements recommandés",
-              items: [],
-            ),
-          ],
+      child: RefreshIndicator(
+        onRefresh: onRefresh,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 10,
+              ),
+              HomeMyEvents(key: myEventsKey),
+              HomeRecommendedEvents(
+                key: recommendedEventsKey,
+                onRefresh: onRefresh,
+              )
+            ],
+          ),
         ),
       ),
     );

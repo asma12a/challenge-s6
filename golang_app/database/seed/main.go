@@ -30,10 +30,10 @@ func main() {
 
 func seedSports(ctx context.Context, db_client *ent.Client) {
 	sports := []ent.Sport{
-		{Name: "Football", Color: "0000FF"},
-		{Name: "Basketball", Color: "FFA500"},
+		{Name: "Football", Color: "0000FF", MaxTeams: 2},
+		{Name: "Basketball", Color: "FFA500", MaxTeams: 2},
 		{Name: "Tennis", Color: "008000"},
-		{Name: "Running", Color: "FF0000"},
+		{Name: "Running", Color: "FF0000", Type: "individual"},
 	}
 
 	for _, sport := range sports {
@@ -57,6 +57,8 @@ func seedEvents(ctx context.Context, db_client *ent.Client) {
 		_, err := db_client.Event.Create().
 			SetName(gofakeit.Name()).
 			SetAddress(gofakeit.Address().Address).
+			SetLatitude(gofakeit.Latitude()).
+			SetLongitude(gofakeit.Longitude()).
 			SetSport(sport).
 			SetEventCode("1234").
 			SetDate(time.Now().Format(time.DateOnly)).

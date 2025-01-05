@@ -30,6 +30,6 @@ func (SportStatLabels) Fields() []ent.Field {
 func (SportStatLabels) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("sport", Sport.Type).Ref("sport_stat_labels").Unique().Required(),
-		edge.To("user_stats", UserStats.Type),
+		edge.To("user_stats", UserStats.Type).StorageKey(edge.Column("sport_stat_label_id")),
 	}
 }

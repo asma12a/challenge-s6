@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/asma12a/challenge-s6/ent/team"
 	"github.com/asma12a/challenge-s6/ent/user"
@@ -55,6 +56,8 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
 	newEvent := tx.Event.Create().
 		SetName(event.Name).
 		SetAddress(event.Address).
+		SetLatitude(event.Latitude).
+		SetLongitude(event.Longitude).
 		SetEventCode(event.EventCode).
 		SetDate(event.Date).
 		SetSportID(event.SportID)
@@ -63,11 +66,20 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
 		newEvent.SetEventType(*event.EventType)
 	}
 
-	_, err = newEvent.Save(ctx)
+	createdEvent, err := newEvent.Save(ctx)
 	if err != nil {
 		log.Println(err, "error creating event")
 		_ = tx.Rollback()
 		return err
+	}
+
+	_, err = tx.Team.Create().
+		SetName("Equipe").
+		SetEventID(createdEvent.ID).
+		Save(ctx)
+	if err != nil {
+		log.Println(err, "error creating team")
+		_ = tx.Rollback
 	}
 
 	if err := tx.Commit(); err != nil {
@@ -80,10 +92,11 @@ func (repo *Event) Create(ctx context.Context, event *entity.Event) error {
 
 func (e *Event) FindOneWithDetails(ctx context.Context, id ulid.ID) (*entity.Event, error) {
 	event, err := e.db.Event.Query().Where(event.IDEQ(id)).
-		WithEventTeam(func(etq *ent.TeamQuery) {
-			etq.WithTeamUsers(func(tuq *ent.TeamUserQuery) {
-				tuq.WithUser()
-			})
+		WithTeams(func(tq *ent.TeamQuery) {
+			tq.Order(ent.Asc(team.FieldCreatedAt)).
+				WithTeamUsers(func(tuq *ent.TeamUserQuery) {
+					tuq.WithUser()
+				})
 		}).
 		WithSport().
 		Only(ctx)
@@ -134,13 +147,21 @@ func (e *Event) FindEventByCode(ctx context.Context, code string) (*entity.Event
 func (repo *Event) Update(ctx context.Context, event *entity.Event) (*entity.Event, error) {
 
 	// Prepare the update query
-	e, err := repo.db.Event.
+	updatedEvent := repo.db.Event.
 		UpdateOneID(event.ID).
 		SetName(event.Name).
 		SetAddress(event.Address).
-		SetEventCode(event.EventCode).
-		SetDate(event.Date).
-		Save(ctx)
+		SetLatitude(event.Latitude).
+		SetLongitude(event.Longitude).
+		SetIsPublic(event.IsPublic).
+		SetSportID(event.SportID).
+		SetDate(event.Date)
+
+	if event.EventType != nil {
+		updatedEvent.SetEventType(*event.EventType)
+	}
+
+	e, err := updatedEvent.Save(ctx)
 
 	if err != nil {
 		return nil, entity.ErrInvalidEntity
@@ -179,7 +200,7 @@ func (e *Event) List(ctx context.Context) ([]*ent.Event, error) {
 }
 
 // @Summary Search Events
-// @Description Search for events based on criteria such as name, address, type, and sport ID
+// @Description Search for public events based on criteria such as name, address, type, and sport ID
 // @Tags events
 // @Accept  json
 // @Produce  json
@@ -190,7 +211,7 @@ func (e *Event) List(ctx context.Context) ([]*ent.Event, error) {
 // @Failure 400 {object} map[string]interface{} "Bad Request"  // Remplacer fiber.Map par map[string]interface{}
 // @Router /events/search [get]
 func (e *Event) Search(ctx context.Context, search, eventType string, sportID *ulid.ID) ([]*ent.Event, error) {
-	query := e.db.Event.Query()
+	query := e.db.Event.Query().Where(event.IsPublicEQ(true))
 	if search != "" {
 		query.Where(
 			event.Or(
@@ -210,120 +231,64 @@ func (e *Event) Search(ctx context.Context, search, eventType string, sportID *u
 	return query.WithSport().All(ctx)
 }
 
-func (e *Event) AddTeam(ctx context.Context, eventID ulid.ID, teams []struct {
-	entity.Team
-	Players []struct {
-		Email string `json:"email"`
-		Role  string `json:"role,omitempty"`
-	} `json:"players"`
-}) error {
-	tx, err := e.db.Tx(ctx)
+// ListUserEvents: Get all events for a user by getting all teams that the user is part of and then getting all events for those teams
+func (e *Event) ListUserEvents(ctx context.Context, userID ulid.ID) ([]*ent.Event, error) {
+	// teamuser has a user edge and a team edge
+	teams, err := e.db.TeamUser.Query().Where(teamuser.HasUserWith(user.IDEQ(userID))).WithTeam().All(ctx)
+
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	teamNames := make(map[string]bool)
-	existingTeams, err := tx.Team.Query().Where(team.HasEventWith(event.IDEQ(eventID))).All(ctx)
-	if err != nil {
-		_ = tx.Rollback()
-	}
-
-	existingTeamsNames := make(map[string]bool)
-
-	for _, existingTeam := range existingTeams {
-
-		//team, err := tx.Team.Get(ctx, existingTeam.Edges.Team.ID)
-		team, err := tx.Team.Get(ctx, existingTeam.ID)
-
-		if err != nil {
-
-			_ = tx.Rollback()
-		}
-		existingTeamsNames[team.Name] = true
-	}
-
+	var teamIDs []ulid.ID
 	for _, team := range teams {
-		if _, exists := existingTeamsNames[team.Name]; exists {
-			_ = tx.Rollback()
-		}
-		if _, exists := teamNames[team.Name]; exists {
-			_ = tx.Rollback()
-		}
-		teamNames[team.Name] = true
-
-		createdTeam, err := tx.Team.Create().
-			SetName(team.Name).
-			SetMaxPlayers(team.MaxPlayers).
-			SetEventID(eventID).
-			Save(ctx)
-		if err != nil {
-			_ = tx.Rollback()
-			return err
-		}
-
-		for _, player := range team.Players {
-			err = e.AddPlayerToTeam(ctx, tx, createdTeam.ID, player)
-			if err != nil {
-				_ = tx.Rollback
-				return err
-			}
-		}
+		teamIDs = append(teamIDs, team.Edges.Team.ID)
 	}
 
-	if err := tx.Commit(); err != nil {
-		return err
+	events, err := e.db.Event.Query().
+		Where(
+			event.Or(
+				event.HasTeamsWith(team.IDIn(teamIDs...)),
+				event.CreatedByEQ(userID),
+			),
+		).
+		WithSport().All(ctx)
+	if err != nil {
+		return nil, err
 	}
-	return nil
 
+	return events, nil
 }
 
-func (repo *Event) AddPlayerToTeam(ctx context.Context, tx *ent.Tx, teamID ulid.ID, player struct {
-	Email string `json:"email"`
-	Role  string `json:"role,omitempty"`
-}) error {
-	playerEmail := player.Email
-
-	// Vérifier si le joueur existe dans la base
-	user, err := tx.User.Query().Where(user.EmailEQ(playerEmail)).Only(ctx)
+func (e *Event) ListRecommendedEvents(ctx context.Context, lat, long float64, userID ulid.ID) ([]*ent.Event, error) {
+	userEvents, err := e.ListUserEvents(ctx, userID)
 	if err != nil {
-		if ent.IsNotFound(err) {
-			// Création d'un utilisateur d'équipe avec un email uniquement
-			teamUserCreate := tx.TeamUser.Create().
-				SetTeamID(teamID).
-				SetEmail(player.Email).
-				SetStatus("pending")
-
-			if player.Role != "" {
-				teamUserCreate = teamUserCreate.SetRole(teamuser.Role(player.Role))
-			}
-
-			_, err = teamUserCreate.Save(ctx)
-			if err != nil {
-				log.Println("error adding player to team with null userId:", err)
-				return err
-			}
-		} else {
-			log.Println("error finding user with email:", err)
-			return err
-		}
-	} else {
-		// Ajout de l'utilisateur existant à l'équipe
-		teamUserCreate := tx.TeamUser.Create().
-			SetTeamID(teamID).
-			SetUserID(user.ID).
-			SetStatus("valid")
-
-		// Ajouter le rôle si défini
-		if player.Role != "" {
-			teamUserCreate = teamUserCreate.SetRole(teamuser.Role(player.Role))
-		}
-
-		_, err = teamUserCreate.Save(ctx)
-		if err != nil {
-			log.Println("error adding player to team with userId:", err)
-			return err
-		}
+		return nil, err
 	}
 
-	return nil
+	var userEventIDs []ulid.ID
+	for _, ue := range userEvents {
+		userEventIDs = append(userEventIDs, ue.ID)
+	}
+
+	events, err := e.db.Event.Query().
+		Where(event.IsPublicEQ(true)).
+		Where(event.IDNotIn(userEventIDs...)).
+		Where(event.DateGTE(time.Now().Format(time.DateOnly))).
+		WithSport().All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	events = entity.SortEventsByDistance(events, lat, long)
+
+	if len(events) > 5 {
+		events = events[:5]
+	}
+
+	return events, nil
+}
+
+func (repo *Event) FindAllTeamUsers(ctx context.Context, eventID ulid.ID) ([]*ent.TeamUser, error) {
+	return repo.db.TeamUser.Query().Where(teamuser.HasTeamWith(team.HasEventWith(event.IDEQ(eventID)))).WithUser().All(ctx)
 }

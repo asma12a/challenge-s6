@@ -14,11 +14,12 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  List<Map<String, dynamic>> _sports = [];
+  List<Sport> _sports = [];
   bool _isLoading = true;
   List<Map<String, dynamic>> _searchResults = [];
   Map<String, String> params = {};
   Timer? _debounce;
+  final eventService = EventService();
 
   @override
   void initState() {
@@ -29,7 +30,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Future<void> _initSports() async {
     try {
-      final fetchedSports = await EventService.getSports();
+      final fetchedSports = await eventService.getSports();
       setState(() {
         _sports = fetchedSports;
       });
@@ -50,10 +51,10 @@ class _SearchScreenState extends State<SearchScreen> {
 
   _getSearchResult() async {
     try {
-      final fetchedEvents = await EventService.getSearchResults(params);
+      final fetchedEvents = await eventService.getSearchResults(params);
       setState(() {
         _searchResults = fetchedEvents;
-        print(_searchResults);
+        debugPrint("Résultats de recherche : $_searchResults");
         _isLoading = false;
       });
     } catch (error) {
@@ -107,9 +108,9 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                     items: _sports.map((sport) {
                       return DropdownMenuItem<String>(
-                        value: sport['id'],
+                        value: sport.id,
                         child: Text(
-                          sport['name'],
+                          sport.name.name,
                           style: TextStyle(
                               color: Theme.of(context).colorScheme.onSecondary),
                         ),
@@ -163,10 +164,9 @@ class _SearchScreenState extends State<SearchScreen> {
             height: 10,
           ),
           Text(
-            _searchResults.length > 1
-                ? "${_searchResults.length} résultats trouvés."
-                : "${_searchResults.length} résultat trouvé.",
-            style: TextStyle(color: Colors.white),
+            _searchResults.isNotEmpty
+                ? "${_searchResults.length} événements trouvés."
+                : "Aucun événement trouvé.",
           ),
           SizedBox(
             height: 5,
@@ -193,6 +193,8 @@ class _SearchScreenState extends State<SearchScreen> {
                         ),
                         orElse: () => SportName.football,
                       ),
+                      maxTeams:
+                          _searchResults[index]["sport"]["max_teams"] ?? 0,
                       type: SportType.values.firstWhere(
                         (st) => st.name.contains(
                           _searchResults[index]["sport"]["type"]

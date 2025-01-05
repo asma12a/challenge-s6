@@ -1,22 +1,42 @@
+import 'package:dio/dio.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:logging/logging.dart';
+import 'package:provider/provider.dart' as provider;
 import 'package:squad_go/core/providers/auth_state_provider.dart';
 import 'package:squad_go/platform/mobile/main_mobile.dart';
 import 'package:squad_go/platform/web/main_web.dart';
+import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
+
+final log = Logger("AppLogger");
+final dio = Dio(BaseOptions(
+  connectTimeout: Duration(seconds: 5),
+  receiveTimeout: Duration(seconds: 5),
+  headers: {
+    'Accept': 'application/json',
+  },
+));
 
 void main() async {
-    await dotenv.load(fileName: "assets/../.env");
-
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthState()), 
-      ],
-      child: const MyApp(),
+  await dotenv.load(fileName: "assets/../.env");
+  dio.interceptors.add(
+    DioCacheInterceptor(
+      options: CacheOptions(
+        store: MemCacheStore(),
+        policy: CachePolicy.request,
+      ),
     ),
   );
+
+  // Flutter Maps Tile Caching
+  WidgetsFlutterBinding.ensureInitialized();
+  await FMTCObjectBoxBackend().initialise();
+  await FMTCStore('mapStore').manage.create();
+
+  runApp(const App());
 }
 
 class MyApp extends StatelessWidget {
