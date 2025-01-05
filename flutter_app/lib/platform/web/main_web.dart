@@ -13,8 +13,8 @@ class MyAppWeb extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthState()),
       ],
       builder: (context, child) => MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
+        // localizationsDelegates: AppLocalizations.localizationsDelegates,
+        // supportedLocales: AppLocalizations.supportedLocales,
         title: 'Application Web',
         theme: ThemeData(
           useMaterial3: true,

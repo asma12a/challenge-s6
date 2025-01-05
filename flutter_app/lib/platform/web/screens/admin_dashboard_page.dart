@@ -56,7 +56,8 @@ class AdminDashboardPage extends StatelessWidget {
                           color: Colors.teal,
                         ),
                         FutureBuilder<int>(
-                          future: EventService.getEvents()
+                          future: EventService()
+                              .getEvents()
                               .then((events) => events.length),
                           builder: (context, eventSnapshot) {
                             return _buildSummaryCard(
@@ -108,7 +109,7 @@ class AdminDashboardPage extends StatelessWidget {
                   _buildPieChartWithFuture(
                     context,
                     title: 'Événements',
-                    futureData: EventService.getEvents(),
+                    futureData: EventService().getEvents(),
                     processData: (events) {
                       final publicEvents = events
                           .where((event) => event['type'] == 'public')

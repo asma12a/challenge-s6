@@ -13,6 +13,7 @@ class AddEditEventModal extends StatefulWidget {
 }
 
 class _AddEditEventModalState extends State<AddEditEventModal> {
+  final EventService _eventService = EventService();
   final _formKey = GlobalKey<FormState>();
   late String name;
   late String date;
@@ -38,7 +39,7 @@ class _AddEditEventModalState extends State<AddEditEventModal> {
     _formKey.currentState!.save();
     try {
       if (widget.event == null) {
-        await EventService.createEvent({
+        await _eventService.createEvent({
           'name': name,
           'date': date,
           'event_code': eventCode,
@@ -47,7 +48,7 @@ class _AddEditEventModalState extends State<AddEditEventModal> {
           'address': address,
         });
       } else {
-        await EventService.updateEvent(
+        await _eventService.updateEvent(
           widget.event!['id'],
           {
             'name': name,

@@ -326,9 +326,12 @@ func getEventByCode(ctx context.Context, service service.Event) fiber.Handler {
 			ID:        event.ID,
 			Name:      event.Name,
 			Address:   event.Address,
+			Latitude:  event.Latitude,
+			Longitude: event.Longitude,
 			EventCode: event.EventCode,
 			Date:      event.Date,
 			CreatedAt: event.CreatedAt,
+			CreatedBy: event.CreatedBy,
 			IsPublic:  event.IsPublic,
 			EventType: event.EventType,
 		}
@@ -337,32 +340,51 @@ func getEventByCode(ctx context.Context, service service.Event) fiber.Handler {
 			toJ.Sport = presenter.Sport{
 				ID:       condition.ID,
 				Name:     condition.Name,
+				Type:     presenter.SportType(condition.Type),
 				ImageURL: condition.ImageURL,
+				Color:    condition.Color,
+				MaxTeams: condition.MaxTeams,
 			}
 		}
 
-		for _, eventTeam := range event.Edges.EventTeam {
+		teamsToJ := make([]presenter.Team, 0, len(event.Edges.Teams))
+		for _, eventTeam := range event.Edges.Teams {
 			if eventTeam != nil {
-				team := eventTeam
 				teamToj := presenter.Team{
-					ID:         team.ID,
-					Name:       team.Name,
-					MaxPlayers: team.MaxPlayers,
+					ID:         eventTeam.ID,
+					Name:       eventTeam.Name,
+					MaxPlayers: eventTeam.MaxPlayers,
+					Players:    []presenter.Player{},
 				}
 
-				for _, teamUser := range team.Edges.TeamUsers {
+				for _, teamUser := range eventTeam.Edges.TeamUsers {
 					user := teamUser.Edges.User
-					if user != nil {
-						teamToj.Players = append(teamToj.Players, presenter.User{
-							ID:    user.ID,
-							Name:  user.Name,
-							Email: user.Email,
-						})
-					}
+					teamToj.Players = append(teamToj.Players, presenter.Player{
+						ID: teamUser.ID,
+						Name: func() string {
+							if user != nil {
+								return user.Name
+							} else {
+								return ""
+							}
+						}(),
+						Email:  teamUser.Email,
+						Role:   presenter.Role(teamUser.Role),
+						Status: presenter.Status(teamUser.Status),
+						UserID: func() ulid.ID {
+							if user != nil {
+								return user.ID
+							} else {
+								return ""
+							}
+						}(),
+					})
 				}
-				toJ.Teams = append(toJ.Teams, teamToj)
+				teamsToJ = append(teamsToJ, teamToj)
 			}
 		}
+		toJ.Teams = teamsToJ
+
 		return c.JSON(toJ)
 	}
 }

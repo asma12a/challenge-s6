@@ -3,9 +3,9 @@ import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/models/sport.dart';
 import 'package:intl/intl.dart';
 import 'package:squad_go/core/utils/tools.dart';
-import 'package:squad_go/screens/event.dart';
-import 'package:squad_go/widgets/custom_label.dart';
-import 'package:squad_go/widgets/dialog/join_event.dart';
+import 'package:squad_go/platform/mobile/screens/event.dart';
+import 'package:squad_go/platform/mobile/widgets/custom_label.dart';
+import 'package:squad_go/platform/mobile/widgets/dialog/join_event.dart';
 
 class EventCard extends StatelessWidget {
   final Event event;

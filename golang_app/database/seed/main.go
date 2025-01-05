@@ -29,11 +29,9 @@ func main() {
 }
 
 func seedSports(ctx context.Context, db_client *ent.Client) {
-	intPtr := func(i int) *int { return &i }
-
 	sports := []ent.Sport{
-		{Name: "Football", Color: "0000FF", MaxTeams: intPtr(2)},
-		{Name: "Basketball", Color: "FFA500", MaxTeams: intPtr(2)},
+		{Name: "Football", Color: "0000FF", MaxTeams: 2},
+		{Name: "Basketball", Color: "FFA500", MaxTeams: 2},
 		{Name: "Tennis", Color: "008000"},
 		{Name: "Running", Color: "FF0000", Type: "individual"},
 	}

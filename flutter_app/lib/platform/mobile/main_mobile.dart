@@ -84,8 +84,8 @@ class App extends StatelessWidget {
         provider.ChangeNotifierProvider(create: (_) => AuthState()),
       ],
       builder: (context, child) => MaterialApp.router(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
+        // localizationsDelegates: AppLocalizations.localizationsDelegates,
+        // supportedLocales: AppLocalizations.supportedLocales,
         routerConfig: _router,
         theme: theme,
         debugShowCheckedModeBanner: false,

@@ -10,6 +10,7 @@ class JoinEventScreen extends StatefulWidget {
 }
 
 class _JoinEventScreenState extends State<JoinEventScreen> {
+  final EventService _eventService = EventService();
   final _formKey = GlobalKey<FormState>();
   var _enteredCode = '';
 
@@ -17,7 +18,7 @@ class _JoinEventScreenState extends State<JoinEventScreen> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       try {
-        var event = await EventService.getEventByCode(_enteredCode);
+        var event = await _eventService.getEventByCode(_enteredCode);
         print(event);
         context.go('/sign-in');
       } catch (error) {
@@ -35,6 +36,7 @@ class _JoinEventScreenState extends State<JoinEventScreen> {
       }
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
