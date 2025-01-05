@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:squad_go/core/services/event_service.dart';
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/models/sport.dart';
-import 'package:squad_go/widgets/event_card.dart';
+import 'package:squad_go/platform/mobile/widgets/event_card.dart';
 import 'package:intl/intl.dart';
 
 class SearchScreen extends StatefulWidget {

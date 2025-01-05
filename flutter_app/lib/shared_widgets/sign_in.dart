@@ -1,61 +1,61 @@
 import 'package:flutter/material.dart';
-import 'package:squad_go/core/services/auth_service.dart';
-import 'package:squad_go/screens/sign_in.dart';
+import 'package:squad_go/core/providers/auth_state_provider.dart';
+import 'package:squad_go/shared_widgets/sign_up.dart';
+import 'package:squad_go/platform/mobile/widgets/logo.dart';
+import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 
-class SignUpScreen extends StatelessWidget {
-  const SignUpScreen({super.key});
+class SignInScreen extends StatelessWidget {
+  const SignInScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
 
     return Scaffold(
-        body: Center(
-            child: isSmallScreen
-                ? const Column(
-                    mainAxisSize: MainAxisSize.min,
+        body: SingleChildScrollView(
+      child: Center(
+          child: isSmallScreen
+              ? const Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _Logo(),
+                    _FormContent(),
+                  ],
+                )
+              : Container(
+                  padding: const EdgeInsets.all(32.0),
+                  constraints: const BoxConstraints(maxWidth: 800),
+                  child: const Row(
                     children: [
-                      _Title(),
-                      _FormContent(),
+                      Expanded(child: _Logo()),
+                      Expanded(
+                        child: Center(child: _FormContent()),
+                      ),
                     ],
-                  )
-                : Container(
-                    padding: const EdgeInsets.all(32.0),
-                    constraints: const BoxConstraints(maxWidth: 800),
-                    child: const Row(
-                      children: [
-                        Expanded(child: _Title()),
-                        Expanded(
-                          child: Center(child: _FormContent()),
-                        ),
-                      ],
-                    ),
-                  )));
+                  ),
+                )),
+    ));
   }
 }
 
-class _Title extends StatelessWidget {
-  const _Title();
+class _Logo extends StatelessWidget {
+  const _Logo();
 
   @override
   Widget build(BuildContext context) {
     final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
 
-    return Container(
-      constraints: const BoxConstraints(
-          maxWidth: 300), // Largeur maximale pour alignement avec le formulaire
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Rejoignez votre communauté dès aujourd’hui !',
-              style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                    color: Colors.white,
-                    fontSize: 30,
-                  )),
-          const SizedBox(height: 50),
-        ],
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Logo(
+          width: isSmallScreen ? 200 : 300,
+        ),
+        SizedBox(
+          height: 25,
+        )
+      ],
     );
   }
 }
@@ -68,25 +68,21 @@ class _FormContent extends StatefulWidget {
 }
 
 class __FormContentState extends State<_FormContent> {
-  final authService = AuthService();
   bool _isPasswordVisible = false;
+  bool _rememberMe = false;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  var _enteredPseudo = '';
   var _enteredEmail = '';
   var _enteredPassword = '';
 
-  void _signUp() async {
+  void _signIn(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      final result = await authService.signUp(
-        {
-          "name": _enteredPseudo,
-          "email": _enteredEmail,
-          "password": _enteredPassword,
-        },
-      );
-      if (result?['status'] == 'error') {
+
+      final loginData = await context
+          .read<AuthState>()
+          .login(_enteredEmail, _enteredPassword);
+      if (loginData['status'] == 'error') {
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -94,24 +90,13 @@ class __FormContentState extends State<_FormContent> {
             content: Text(
               style: TextStyle(
                   color: Theme.of(context).colorScheme.onErrorContainer),
-              result?['error'],
+              loginData['error'],
               textAlign: TextAlign.center,
             ),
           ),
         );
       } else {
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            duration: const Duration(milliseconds: 5000),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            content: const Text(
-              'Un email de vérification vous a été envoyé.',
-              textAlign: TextAlign.center,
-            ),
-          ),
-        );
-        Navigator.of(context).pop();
+       context.go('/');
       }
     }
   }
@@ -127,28 +112,10 @@ class __FormContentState extends State<_FormContent> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextFormField(
-              validator: (value) {
-                // add email validation
-                if (value == null || value.isEmpty) {
-                  return 'Please enter some text';
-                }
-                return null;
+              keyboardType: TextInputType.emailAddress,
+              onTapOutside: (event) {
+                FocusScope.of(context).unfocus();
               },
-              style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-              decoration: const InputDecoration(
-                labelText: 'Pseudo',
-                hintText: 'John Doe',
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-              ),
-              onSaved: (value) {
-                _enteredPseudo = value!;
-              },
-            ),
-            _gap(),
-            TextFormField(
               validator: (value) {
                 // add email validation
                 if (value == null || value.isEmpty) {
@@ -179,6 +146,9 @@ class __FormContentState extends State<_FormContent> {
             ),
             _gap(),
             TextFormField(
+              onTapOutside: (event) {
+                FocusScope.of(context).unfocus();
+              },
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter some text';
@@ -213,6 +183,20 @@ class __FormContentState extends State<_FormContent> {
               },
             ),
             _gap(),
+            CheckboxListTile(
+              value: _rememberMe,
+              onChanged: (value) {
+                if (value == null) return;
+                setState(() {
+                  _rememberMe = value;
+                });
+              },
+              title: const Text('Se souvenir de moi'),
+              controlAffinity: ListTileControlAffinity.leading,
+              dense: true,
+              contentPadding: const EdgeInsets.all(0),
+            ),
+            _gap(),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -220,46 +204,41 @@ class __FormContentState extends State<_FormContent> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4)),
                 ),
-                onPressed: _signUp,
+                onPressed: () async => _signIn(context),
                 child: const Padding(
                   padding: EdgeInsets.all(10.0),
                   child: Text(
-                    'Créez votre compte',
+                    'Se connecter',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
             ),
-            const SizedBox(
-              height: 20,
-            ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Row(
-                children: [
-                  const Text(
-                    'Vous avez déjà un compte ?',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  InkWell(
-                    child: Text(
-                      'Connectez-vous',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
+            _gap(),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      Theme.of(context).colorScheme.primaryContainer,
+                  foregroundColor: Theme.of(context).colorScheme.secondary,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4)),
+                ),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (ctx) => const SignUpScreen(),
                     ),
-                    onTap: () {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (ctx) => const SignInScreen(),
-                        ),
-                      );
-                    },
+                  );
+                },
+                child: const Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text(
+                    'Inscription',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                ],
+                ),
               ),
             ),
           ],

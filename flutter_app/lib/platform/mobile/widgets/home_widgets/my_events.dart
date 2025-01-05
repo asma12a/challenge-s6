@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/services/event_service.dart';
 import 'package:squad_go/main.dart';
-import 'package:squad_go/widgets/carousel.dart';
+import 'package:squad_go/platform/mobile/widgets/carousel.dart';
+import 'package:squad_go/platform/mobile/widgets/event_card.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:squad_go/widgets/event_card.dart';
 
 class HomeMyEvents extends StatefulWidget {
   const HomeMyEvents({super.key});

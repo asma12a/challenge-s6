@@ -24,7 +24,6 @@ class AuthService {
       final data = response.data;
       await _storage.write(
           key: dotenv.env['JWT_STORAGE_KEY']!, value: data['token']);
-
       return data;
     } catch (error) {
       log.severe('An error occurred while ', {error: error});
@@ -58,7 +57,7 @@ class AuthService {
 
   Future<UserApp?> getUserInfo() async {
     try {
-      final token = await _storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+      final token = await _storage.read(key: 'squadgo-jwt');
       if (token == null) return null;
 
       final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/auth/me');

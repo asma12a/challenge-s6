@@ -44,6 +44,7 @@ func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Ev
 	app.Get("/search", searchEvent(ctx, serviceEvent))
 	app.Get("/recommended", listRecommendedEvents(ctx, serviceEvent))
 	app.Get("/:eventId", getEvent(ctx, serviceEvent))
+	app.Get("/code/:eventCode", getEventByCode(ctx, serviceEvent))
 	app.Post("/", createEvent(ctx, serviceEvent, serviceSport))
 	app.Put("/:eventId", updateEvent(ctx, serviceEvent, serviceSport))
 	app.Delete("/:eventId", middleware.IsEventOrganizer(ctx, serviceEvent), deleteEvent(ctx, serviceEvent))
@@ -299,6 +300,70 @@ func deleteEvent(ctx context.Context, service service.Event) fiber.Handler {
 
 		return c.SendStatus(fiber.StatusNoContent)
 
+	}
+}
+
+func getEventByCode(ctx context.Context, service service.Event) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		// id := c.Params("eventId")
+		eventCode := c.Params("eventCode")
+		event, err := service.FindEventByCode(ctx, eventCode)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+					"status": "error",
+					"error":  "Event not found",
+				})
+			}
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+
+		// Mapper les données de event vers presenter.Event
+		toJ := presenter.Event{
+			ID:        event.ID,
+			Name:      event.Name,
+			Address:   event.Address,
+			EventCode: event.EventCode,
+			Date:      event.Date,
+			CreatedAt: event.CreatedAt,
+			IsPublic:  event.IsPublic,
+			EventType: event.EventType,
+		}
+
+		if condition := event.Edges.Sport; condition != nil {
+			toJ.Sport = presenter.Sport{
+				ID:       condition.ID,
+				Name:     condition.Name,
+				ImageURL: condition.ImageURL,
+			}
+		}
+
+		for _, eventTeam := range event.Edges.EventTeam {
+			if eventTeam != nil {
+				team := eventTeam
+				teamToj := presenter.Team{
+					ID:         team.ID,
+					Name:       team.Name,
+					MaxPlayers: team.MaxPlayers,
+				}
+
+				for _, teamUser := range team.Edges.TeamUsers {
+					user := teamUser.Edges.User
+					if user != nil {
+						teamToj.Players = append(teamToj.Players, presenter.User{
+							ID:    user.ID,
+							Name:  user.Name,
+							Email: user.Email,
+						})
+					}
+				}
+				toJ.Teams = append(toJ.Teams, teamToj)
+			}
+		}
+		return c.JSON(toJ)
 	}
 }
 

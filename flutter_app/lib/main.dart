@@ -1,14 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart' as provider;
 import 'package:squad_go/core/providers/auth_state_provider.dart';
-import 'package:squad_go/screens/sign_in.dart';
-import 'package:squad_go/screens/tabs.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:squad_go/platform/mobile/main_mobile.dart';
+import 'package:squad_go/platform/web/main_web.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 
 final log = Logger("AppLogger");
@@ -39,44 +39,15 @@ void main() async {
   runApp(const App());
 }
 
-class App extends StatelessWidget {
-  const App({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return provider.MultiProvider(
-      providers: [
-        provider.ChangeNotifierProvider(create: (_) => AuthState()),
-      ],
-      builder: (context, child) => MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        theme: theme,
-        home: provider.Consumer<AuthState>(builder: (context, authState, _) {
-          return authState.isAuthenticated
-              ? const TabsScreen()
-              : FutureBuilder(
-                  future: authState.tryLogin(),
-                  builder: (context, snapshot) =>
-                      snapshot.connectionState == ConnectionState.waiting
-                          ? const Scaffold(
-                              body: Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            )
-                          : const SignInScreen(),
-                );
-        }),
-        debugShowCheckedModeBanner: false,
-      ),
-    );
+    if (kIsWeb) {
+      return const MyAppWeb();
+    } else {
+      return const App();
+    }
   }
 }
-
-final theme = ThemeData(
-  useMaterial3: true,
-  colorScheme: ColorScheme.fromSeed(
-    seedColor: const Color.fromRGBO(8, 95, 113, 1),
-  ),
-  textTheme: GoogleFonts.latoTextTheme(),
-);

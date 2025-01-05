@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:squad_go/screens/home.dart';
-import 'package:squad_go/screens/search.dart';
-import 'package:squad_go/widgets/main_drawer.dart';
-import 'package:squad_go/screens/new_event.dart';
+import 'package:squad_go/platform/mobile/screens/join.dart';
+import 'package:squad_go/platform/mobile/screens/home.dart';
+import 'package:squad_go/platform/mobile/screens/search.dart';
+import 'package:squad_go/platform/mobile/widgets/main_drawer.dart';
+import 'package:squad_go/platform/mobile/screens/new_event.dart';
 
 // import 'package:squad_go/screens/chat.dart';
 
@@ -33,6 +34,10 @@ class _TabsScreenState extends State<TabsScreen> {
 
     if (_selectPageIndex == 1) {
       activePage = SearchScreen();
+    }
+
+    if (_selectPageIndex == 2) {
+      activePage = JoinEventScreen();
     }
 
     return Scaffold(

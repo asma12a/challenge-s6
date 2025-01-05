@@ -125,6 +125,14 @@ func (e *Event) FindOne(ctx context.Context, id ulid.ID) (*entity.Event, error) 
 	return &entity.Event{Event: *event}, nil
 }
 
+func (e *Event) FindEventByCode(ctx context.Context, code string) (*entity.Event, error) {
+	event, err := e.db.Event.Query().Where(event.EventCode(code)).Only(ctx)
+	if ent.IsNotFound(err) {
+		return nil, err
+	}
+	return &entity.Event{Event: *event}, nil
+}
+
 // @Summary Update an Event
 // @Description Update an existing event by ID
 // @Tags events

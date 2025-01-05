@@ -5,12 +5,12 @@ import 'package:squad_go/core/providers/auth_state_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:squad_go/core/services/team_service.dart';
 import 'package:squad_go/main.dart';
-import 'package:squad_go/widgets/dialog/add_player.dart';
-import 'package:squad_go/widgets/dialog/add_team.dart';
-import 'package:squad_go/widgets/dialog/edit_player.dart';
-import 'package:squad_go/widgets/dialog/edit_stats_player.dart';
-import 'package:squad_go/widgets/dialog/edit_team.dart';
-import 'package:squad_go/widgets/dialog/show_player_details.dart';
+import 'package:squad_go/platform/mobile/widgets/dialog/add_player.dart';
+import 'package:squad_go/platform/mobile/widgets/dialog/add_team.dart';
+import 'package:squad_go/platform/mobile/widgets/dialog/edit_player.dart';
+import 'package:squad_go/platform/mobile/widgets/dialog/edit_stats_player.dart';
+import 'package:squad_go/platform/mobile/widgets/dialog/edit_team.dart';
+import 'package:squad_go/platform/mobile/widgets/dialog/show_player_details.dart';
 
 class TeamsHandle extends StatefulWidget {
   final String eventId;

@@ -1,15 +1,38 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/main.dart';
 
 class EventService {
   final storage = const FlutterSecureStorage();
+
+  // GET all events (backoffice)
+  Future<List<Map<String, dynamic>>> getEvents() async {
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    final url = Uri.http(dotenv.env['API_BASE_URL']!, 'api/events');
+
+    try {
+      final response = await dio.get(url.toString(),
+          options: Options(headers: {
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer $token",
+          }));
+
+      if (response.statusCode != 200) {
+        throw Exception('Erreur lors de la récupération des événements.');
+      }
+
+      final List<dynamic> data = response.data;
+      return List<Map<String, dynamic>>.from(data);
+    } catch (error) {
+      throw Exception('Erreur: ${error.toString()}');
+    }
+  }
 
   Future<List<Map<String, dynamic>>> getSearchResults(
       Map<String, String> params) async {
@@ -42,6 +65,48 @@ class EventService {
     } catch (error) {
       throw AppException(
           message: 'Failed to retrieve events, please try again.');
+    }
+  }
+
+  // GET event By CODE
+  Future<Map<String, dynamic>> getEventByCode(String code) async {
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    try {
+      final uri =
+          Uri.http(dotenv.env['API_BASE_URL']!, 'api/events/code/$code');
+      final response = await dio.get(
+        uri.toString(),
+        options: Options(headers: {
+          'Content-Type': 'application/json',
+          "Authorization": "Bearer $token",
+        }),
+      );
+      final data = response.data;
+      return data;
+    } catch (error) {
+      debugPrint('An error occurred: $error');
+      throw AppException(
+          message: 'Failed to retrieve event, please try again.');
+    }
+  }
+
+  // DELETE an event
+  Future<void> deleteEvent(String id) async {
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    final url = Uri.http(dotenv.env['API_BASE_URL']!, 'api/events/$id');
+
+    try {
+      final response = await dio.delete(url.toString(),
+          options: Options(headers: {
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer $token",
+          }));
+
+      if (response.statusCode != 204) {
+        throw Exception('Erreur lors de la suppression de l\'événement.');
+      }
+    } catch (error) {
+      throw Exception('Erreur: ${error.toString()}');
     }
   }
 
@@ -84,7 +149,7 @@ class EventService {
     }
   }
 
-  Future<void> createEvent(Map<String, String> event) async {
+  Future<void> createEvent(Map<String, dynamic> event) async {
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
     try {
       final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/events');

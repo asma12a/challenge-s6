@@ -1,11 +1,11 @@
 import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/core/services/event_service.dart';
-import 'package:squad_go/main.dart';
-import 'package:squad_go/screens/tabs.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:squad_go/main.dart';
+import 'package:squad_go/platform/mobile/screens/tabs.dart';
 
 class NewEvent extends StatefulWidget {
   const NewEvent({super.key});
@@ -17,7 +17,6 @@ class NewEvent extends StatefulWidget {
 class _NewEventState extends State<NewEvent> {
   final _formKey = GlobalKey<FormState>();
   var _enteredName = '';
-  var _selectedFile = '';
   String? _selectedDate;
   final TextEditingController _addressController = TextEditingController();
   List<String> _suggestedAddresses = [];
@@ -25,6 +24,7 @@ class _NewEventState extends State<NewEvent> {
   var _selectedSport = '';
   List<Sport> _sports = [];
   final eventService = EventService();
+  var _isPublic = true;
 
   @override
   void initState() {
@@ -105,30 +105,6 @@ class _NewEventState extends State<NewEvent> {
     }
   }
 
-  void _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-    if (result != null) {
-      PlatformFile file = result.files.first;
-      setState(() {
-        _selectedFile = file.name;
-      });
-      debugPrint(file.name);
-    } else {
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Theme.of(context).colorScheme.errorContainer,
-          content: Text(
-            "Erreur lors de la sélection du document",
-            style: TextStyle(
-                color: Theme.of(context).colorScheme.onErrorContainer),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
-    }
-  }
-
   void _saveEvent() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -153,6 +129,7 @@ class _NewEventState extends State<NewEvent> {
           "date": _selectedDate!,
           "sport_id": _selectedSport,
           "event_type": _selectedType,
+          "is_public": _isPublic
         };
         await eventService.createEvent(newEvent);
         ScaffoldMessenger.of(context).clearSnackBars();
@@ -188,7 +165,6 @@ class _NewEventState extends State<NewEvent> {
 
     @override
     void dispose() {
-      // TODO: implement dispose
       _addressController.dispose();
       super.dispose();
     }
@@ -268,6 +244,27 @@ class _NewEventState extends State<NewEvent> {
                       },
                     ),
                     SizedBox(height: 40),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 2),
+                      child: Row(
+                        children: [
+                          Icon(Icons.public),
+                          SizedBox(width: 15),
+                          Checkbox(
+                            value:
+                                _isPublic, // Utilise la valeur actuelle de _isPublic
+                            onChanged: (bool? value) {
+                              setState(() {
+                                _isPublic = value!;
+                              });
+                            },
+                          ),
+                          Text("Ouvert au public"),
+                          SizedBox(width: 20),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 15),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 2),
                       child: Row(
@@ -414,27 +411,6 @@ class _NewEventState extends State<NewEvent> {
                       ),
                     ),
                     SizedBox(height: 30),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 2),
-                      child: Row(
-                        children: [
-                          Icon(Icons.image),
-                          SizedBox(width: 15),
-                          ElevatedButton(
-                            onPressed: _pickFile,
-                            child: Text("Choisir une image"),
-                          ),
-                          SizedBox(width: 15),
-                          Expanded(
-                              child: Text(
-                            _selectedFile ?? '',
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface),
-                          )),
-                        ],
-                      ),
-                    ),
                     SizedBox(
                       height: 60,
                     ),

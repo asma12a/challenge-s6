@@ -7,11 +7,11 @@ import 'package:squad_go/core/providers/auth_state_provider.dart';
 import 'package:squad_go/core/services/event_service.dart';
 import 'package:squad_go/core/utils/tools.dart';
 import 'package:squad_go/main.dart';
-import 'package:squad_go/widgets/custom_label.dart';
-import 'package:squad_go/widgets/dialog/edit_event.dart';
-import 'package:squad_go/widgets/dialog/map_location.dart';
-import 'package:squad_go/widgets/teams.dart';
+import 'package:squad_go/platform/mobile/widgets/custom_label.dart';
+import 'package:squad_go/platform/mobile/widgets/dialog/edit_event.dart';
 import 'package:provider/provider.dart';
+import 'package:squad_go/platform/mobile/widgets/dialog/map_location.dart';
+import 'package:squad_go/platform/mobile/widgets/teams.dart';
 
 class EventScreen extends StatefulWidget {
   final Event event;
