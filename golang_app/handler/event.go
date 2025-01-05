@@ -305,7 +305,6 @@ func deleteEvent(ctx context.Context, service service.Event) fiber.Handler {
 
 func getEventByCode(ctx context.Context, service service.Event) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// id := c.Params("eventId")
 		eventCode := c.Params("eventCode")
 		event, err := service.FindEventByCode(ctx, eventCode)
 		if err != nil {

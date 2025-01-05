@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
 import 'package:squad_go/platform/web/screens/home.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MyAppWeb extends StatelessWidget {
   const MyAppWeb({super.key});
@@ -13,8 +14,8 @@ class MyAppWeb extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthState()),
       ],
       builder: (context, child) => MaterialApp(
-        // localizationsDelegates: AppLocalizations.localizationsDelegates,
-        // supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         title: 'Application Web',
         theme: ThemeData(
           useMaterial3: true,

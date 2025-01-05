@@ -126,7 +126,7 @@ func (e *Event) FindOne(ctx context.Context, id ulid.ID) (*entity.Event, error) 
 }
 
 func (e *Event) FindEventByCode(ctx context.Context, code string) (*entity.Event, error) {
-	event, err := e.db.Event.Query().Where(event.EventCode(code)).Only(ctx)
+	event, err := e.db.Event.Query().Where(event.EventCode(code)).WithSport().Only(ctx)
 	if ent.IsNotFound(err) {
 		return nil, err
 	}

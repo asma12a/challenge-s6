@@ -1,6 +1,8 @@
 package entity
 
 import (
+	"math/rand"
+
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
@@ -30,7 +32,15 @@ func NewEvent(name string, address string, latitude, longitude float64, date str
 }
 
 func GenerateEventCode() string {
-	return "TEST"
+	const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	const length = 6
+
+	code := make([]byte, length)
+	for i := range code {
+		code[i] = charset[rand.Intn(len(charset))]
+	}
+
+	return string(code)
 }
 
 func SortEventsByDistance(events []*ent.Event, latitude, longitude float64) []*ent.Event {
