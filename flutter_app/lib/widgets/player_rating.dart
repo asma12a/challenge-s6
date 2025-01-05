@@ -22,12 +22,14 @@ class _PlayerRatingState extends State<PlayerRating> {
   Event? event;
   List<SportStatLabels> statLabels = [];
   List<UserStats> ratings = [];
+  bool isLoading = true;
+  bool isUpdating = false;
 
   @override
   void initState() {
     super.initState();
     _fetchEventDetails();
-    _fetchStatLabels();
+    _initializeRatings();
   }
 
   void _fetchEventDetails() async {
@@ -40,50 +42,83 @@ class _PlayerRatingState extends State<PlayerRating> {
     }
   }
 
-  Future<void> _fetchStatLabels() async {
+  Future<void> _initializeRatings() async {
     try {
+      setState(() => isLoading = true);
+
+      // Charger les labels
       final labels = await statLabelsService.getStatLabelsBySport(widget.event.sport.id);
       setState(() {
         statLabels = labels;
-        ratings = labels.map((label) {
-          return UserStats(id: label.id, value: 0, stat: label);
-        }).toList();
+      });
+
+      // Charger les UserStats existants pour l'utilisateur
+      await _loadEventRatings();
+
+      // Si aucun UserStat existant, créer des entrées par défaut
+      if (ratings.isEmpty) {
+        setState(() {
+          ratings = labels.map((label) {
+            return UserStats(id: label.id, value: 0, stat: label);
+          }).toList();
+        });
+      }else{
+        isUpdating = true;
+      }
+    } catch (e) {
+      // Gérer l'erreur
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+
+  Future<void> _loadEventRatings() async {
+    try {
+      if (widget.event.id == null) return;
+      final existingRatings =
+          await statLabelsService.getUserStatByEvent(widget.event.id!, '01JCBH35S8EDHF9FYKER9YJ075');
+      setState(() {
+        ratings = existingRatings;
       });
     } catch (e) {}
   }
 
-  Map<String, dynamic> _generateJson() {
-    List<Map<String, dynamic>> stats = ratings.where((rating) => rating.value > 0).map((rating) {
-      return {
-        'stat_id': rating.stat?.id,
-        'stat_value': rating.value,
-      };
-    }).toList();
 
-    return {
-      'user_id': '01JCBH35S8EDHF9FYKER9YJ075',
-      'stats': stats,
-    };
+  void _saveUserStat() async {
+    try {
+
+      if(isUpdating){
+        final stats = ratings.map((rating) {
+          return {
+            'user_stat_id': rating.id,
+            'stat_value': rating.value,
+          };
+        }).toList();
+
+        final jsonData = {
+          'stats': stats,
+        };
+        await statLabelsService.updateUserStat(jsonData);
+
+      }else{
+        final stats = ratings.map((rating) {
+          return {
+            'stat_id': rating.stat?.id,
+            'stat_value': rating.value,
+          };
+        }).toList();
+
+        final jsonData = {
+          'user_id': '01JCBH35S8EDHF9FYKER9YJ075',
+          'stats': stats,
+        };
+        await statLabelsService.addUserStat(jsonData, widget.event.id!);
+      }
+
+      Navigator.of(context).pop();
+    } catch (e) {}
   }
-
-  void _addUserStat() async {
-    try{
-      await statLabelsService.addUserStat(_generateJson(), widget.event.id!);
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            textAlign: TextAlign.center,
-            "L'événement a bien été enregistré.",
-            style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-          ),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-        ),
-      );
-    }catch (e) {}
-  }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +128,7 @@ class _PlayerRatingState extends State<PlayerRating> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('${event?.name ?? 'l\'événement'}',
+            Text(event?.name ?? 'l\'événement',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -101,20 +136,21 @@ class _PlayerRatingState extends State<PlayerRating> {
                   fontWeight: FontWeight.bold,
                 )),
             const SizedBox(height: 16),
-            Text('Noter les performances de player'),
+            Text('Noter les performances du player'),
             const SizedBox(height: 16),
-            Expanded(
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: 300,
+              ),
               child: ListView.builder(
                 shrinkWrap: true,
                 itemCount: statLabels.length,
                 itemBuilder: (context, index) {
                   final statLabel = statLabels[index];
 
-
-                  // Crée un UserStats pour chaque label avec valeur initiale de 0
                   final userStat = ratings.firstWhere(
                     (stat) => stat.stat?.id == statLabel.id,
-                    orElse: () => UserStats(id: statLabel.id, value: 0, stat: statLabel),
+                    orElse: () => UserStats(id: null, value: 0, stat: statLabel),
                   );
 
                   return Padding(
@@ -177,9 +213,7 @@ class _PlayerRatingState extends State<PlayerRating> {
                 const SizedBox(width: 16),
                 ElevatedButton(
                   onPressed: () {
-                    final jsonData = _generateJson();
-                    debugPrint(jsonEncode(jsonData));
-                    _addUserStat();
+                    _saveUserStat();
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),

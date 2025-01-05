@@ -20,7 +20,7 @@ class UserStats {
   factory UserStats.fromJson(Map<String, dynamic> json) {
     return UserStats(
       id: json['id'],
-      value: json['value'],
+      value: json['value'] ?? 0,
       stat: json['stat_label'] != null
       ? SportStatLabels.fromJson(json['stat_label'])
           :null,

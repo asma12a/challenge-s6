@@ -24,7 +24,7 @@ func (UserStats) Fields() []ent.Field {
 		field.String("user_id").GoType(ulid.ID("")).NotEmpty(),
 		field.String("event_id").GoType(ulid.ID("")).NotEmpty(),
 		field.String("stat_id").GoType(ulid.ID("")).NotEmpty(),
-		field.Int("stat_value").Positive().Default(0),
+		field.Int("stat_value").Min(0).Default(0),
 	}
 }
 

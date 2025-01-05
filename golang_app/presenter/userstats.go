@@ -10,4 +10,5 @@ type UserStats struct {
 	StatLabel  *SportStatLabels  `json:"stat_label,omitempty"`
 	Value      int			  `json:"value,omitempty"`
 	User       *User             `json:"user,omitempty"`
+
 }
