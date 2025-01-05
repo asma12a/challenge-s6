@@ -11,25 +11,23 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func SportStatLabelsHandler(app fiber.Router, ctx context.Context, serviceSportStatLables service.SportStatLabels,serviceSport service.Sport, serviceEvent service.Event,serviceUser service.User) {
-	app.Post("/:eventId/addUserStat", addUserStat(ctx, serviceSportStatLables, serviceEvent,serviceUser))
-	app.Post("/", createSportStatLables(ctx, serviceSportStatLables,serviceSport))
-	app.Get("/:eventId/:userId/stats", getUserStatsByEvent(ctx, serviceSportStatLables, serviceEvent,serviceUser))
+func SportStatLabelsHandler(app fiber.Router, ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceSport service.Sport, serviceEvent service.Event, serviceUser service.User) {
+	app.Post("/:eventId/addUserStat", addUserStat(ctx, serviceSportStatLables, serviceEvent, serviceUser))
+	app.Post("/", createSportStatLables(ctx, serviceSportStatLables, serviceSport))
+	app.Get("/:eventId/:userId/stats", getUserStatsByEvent(ctx, serviceSportStatLables, serviceEvent, serviceUser))
 	app.Get("/:sportId/labels", listSportStatLabelsBySport(ctx, serviceSportStatLables))
 	app.Get("/:sportStatLabelId", getSportStatLabel(ctx, serviceSportStatLables))
 	app.Get("/", listSportStatLabels(ctx, serviceSportStatLables))
 	app.Delete("/:sportStatLabelId", deleteSportStatLabel(ctx, serviceSportStatLables))
-	app.Put("/:sportStatLabelId", updateSportStatLabel(ctx, serviceSportStatLables,serviceSport))
+	app.Put("/updateUserStats", updateUserStats(ctx, serviceSportStatLables))
+	app.Put("/:sportStatLabelId", updateSportStatLabel(ctx, serviceSportStatLables, serviceSport))
 
-} 
+}
 
-
-
-func createSportStatLables(ctx context.Context, serviceSportStatLables service.SportStatLabels,serviceSport service.Sport) fiber.Handler {
-
+func createSportStatLables(ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceSport service.Sport) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
-		var sportStatLabelInput entity.SportStatLabels	
+		var sportStatLabelInput entity.SportStatLabels
 
 		err := c.BodyParser(&sportStatLabelInput)
 		if err != nil {
@@ -41,7 +39,7 @@ func createSportStatLables(ctx context.Context, serviceSportStatLables service.S
 		if err := validate.Struct(sportStatLabelInput); err != nil {
 			return c.Status(fiber.StatusUnprocessableEntity).JSON(&fiber.Map{
 				"status": "error validate",
-				"error": err.Error(),
+				"error":  err.Error(),
 			})
 		}
 
@@ -54,9 +52,9 @@ func createSportStatLables(ctx context.Context, serviceSportStatLables service.S
 		}
 
 		newSportStatLabel := entity.NewSportStatLabels(
-			sportStatLabelInput.Label, 
-			sportStatLabelInput.Unit, 
-			sportStatLabelInput.IsMain, 
+			sportStatLabelInput.Label,
+			sportStatLabelInput.Unit,
+			sportStatLabelInput.IsMain,
 			sport.ID,
 		)
 
@@ -168,7 +166,6 @@ func updateSportStatLabel(ctx context.Context, serviceSportStatLables service.Sp
 			})
 		}
 
-
 		var sportStatLabelInput entity.SportStatLabels
 		err = c.BodyParser(&sportStatLabelInput)
 		if err != nil {
@@ -181,7 +178,7 @@ func updateSportStatLabel(ctx context.Context, serviceSportStatLables service.Sp
 		if err := validate.Struct(sportStatLabelInput); err != nil {
 			return c.Status(fiber.StatusUnprocessableEntity).JSON(&fiber.Map{
 				"status": "error validate",
-				"error": err.Error(),
+				"error":  err.Error(),
 			})
 		}
 
@@ -206,8 +203,6 @@ func updateSportStatLabel(ctx context.Context, serviceSportStatLables service.Sp
 		existingSportStatLabel.Label = sportStatLabelInput.Label
 		existingSportStatLabel.Unit = sportStatLabelInput.Unit
 		existingSportStatLabel.IsMain = sportStatLabelInput.IsMain
-
-
 
 		err = serviceSportStatLables.Update(c.UserContext(), existingSportStatLabel)
 		if err != nil {
@@ -287,8 +282,7 @@ func listSportStatLabelsBySport(ctx context.Context, serviceSportStatLables serv
 	}
 }
 
-
-func addUserStat(ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceEvent service.Event,serviceUser service.User ) fiber.Handler {
+func addUserStat(ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceEvent service.Event, serviceUser service.User) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
 		eventIDStr := c.Params("eventId")
@@ -301,10 +295,10 @@ func addUserStat(ctx context.Context, serviceSportStatLables service.SportStatLa
 			})
 		}
 		var userStatInput struct {
-			UserID   ulid.ID `json:"user_id" validate:"required"`
-			Stats    []struct {
+			UserID ulid.ID `json:"user_id" validate:"required"`
+			Stats  []struct {
 				StatID    ulid.ID `json:"stat_id" validate:"required"`
-				StatValue int    `json:"stat_value" validate:"required"`
+				StatValue int     `json:"stat_value" validate:"gte=0"`
 			} `json:"stats" validate:"required,dive"`
 		}
 
@@ -318,7 +312,7 @@ func addUserStat(ctx context.Context, serviceSportStatLables service.SportStatLa
 		if err := validate.Struct(userStatInput); err != nil {
 			return c.Status(fiber.StatusUnprocessableEntity).JSON(&fiber.Map{
 				"status": "error validate",
-				"error": err.Error(),
+				"error":  err.Error(),
 			})
 		}
 
@@ -348,10 +342,44 @@ func addUserStat(ctx context.Context, serviceSportStatLables service.SportStatLa
 		return c.SendStatus(fiber.StatusOK)
 
 	}
-	
+
 }
 
-func getUserStatsByEvent(ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceEvent service.Event,serviceUser service.User ) fiber.Handler {
+func updateUserStats(ctx context.Context, serviceSportStatLables service.SportStatLabels) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var userStatInput struct {
+			Stats []struct {
+				UserStatID ulid.ID `json:"user_stat_id" validate:"required"`
+				StatValue  int     `json:"stat_value" validate:"gte=0"`
+			} `json:"stats" validate:"required,dive"`
+		}
+
+		err := c.BodyParser(&userStatInput)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
+		if err := validate.Struct(userStatInput); err != nil {
+			return c.Status(fiber.StatusUnprocessableEntity).JSON(&fiber.Map{
+				"status": "error validate",
+				"error":  err.Error(),
+			})
+		}
+
+		err = serviceSportStatLables.UpdateUserStat(ctx, userStatInput.Stats)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error update user stat",
+				"error":  err.Error(),
+			})
+		}
+		return c.SendStatus(fiber.StatusOK)
+	}
+}
+
+func getUserStatsByEvent(ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceEvent service.Event, serviceUser service.User) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
 		eventIDStr := c.Params("eventId")
@@ -366,8 +394,6 @@ func getUserStatsByEvent(ctx context.Context, serviceSportStatLables service.Spo
 
 		userIDStr := c.Params("userId")
 		userID, err := ulid.Parse(userIDStr)
-
-	
 
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
@@ -403,18 +429,72 @@ func getUserStatsByEvent(ctx context.Context, serviceSportStatLables service.Spo
 		toJ := make([]presenter.UserStats, len(userStats))
 		for i, userStat := range userStats {
 			toJ[i] = presenter.UserStats{
-				ID:     userStat.ID,
+				ID: userStat.ID,
 				StatLabel: &presenter.SportStatLabels{
 					ID:     userStat.Edges.Stat.ID,
 					Label:  userStat.Edges.Stat.Label,
+					Unit:   userStat.Edges.Stat.Unit,
+					IsMain: userStat.Edges.Stat.IsMain,
 				},
-				Value:  userStat.StatValue,
+				Value: userStat.StatValue,
 			}
 		}
 		return c.JSON(toJ)
 	}
 }
 
+func getUserStatsBySport(ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceEvent service.Event, serviceUser service.User) fiber.Handler {
+	return func(c *fiber.Ctx) error {
 
+		sportIDStr := c.Params("sportId")
+		sportID, err := ulid.Parse(sportIDStr)
 
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
 
+		userIDStr := c.Params("userId")
+		userID, err := ulid.Parse(userIDStr)
+
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+
+		user, err := serviceUser.FindOne(ctx, userID)
+		if err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+				"status": "error find user",
+				"error":  err.Error(),
+			})
+		}
+
+		userStats, err := serviceSportStatLables.GetUserStatsBySportId(ctx, user.ID, sportID)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error get user stats",
+				"error":  err.Error(),
+			})
+		}
+
+		toJ := make([]presenter.UserStats, len(userStats))
+		for i, userStat := range userStats {
+			toJ[i] = presenter.UserStats{
+				ID: userStat.ID,
+				StatLabel: &presenter.SportStatLabels{
+					ID:     userStat.Edges.Stat.ID,
+					Label:  userStat.Edges.Stat.Label,
+					Unit:   userStat.Edges.Stat.Unit,
+					IsMain: userStat.Edges.Stat.IsMain,
+				},
+				Value: userStat.StatValue,
+			}
+		}
+		return c.JSON(toJ)
+	}
+}

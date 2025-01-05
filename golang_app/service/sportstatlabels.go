@@ -24,10 +24,8 @@ func NewSportStatLabelsService(client *ent.Client) *SportStatLabels {
 	}
 }
 
-
-
 func (repo *SportStatLabels) Create(ctx context.Context, sportStatLabel *entity.SportStatLabels) error {
-	
+
 	tx, err := repo.db.Tx(ctx)
 	if err != nil {
 		log.Println(err, "error creating transaction")
@@ -39,7 +37,7 @@ func (repo *SportStatLabels) Create(ctx context.Context, sportStatLabel *entity.
 		SetUnit(sportStatLabel.Unit).
 		SetIsMain(sportStatLabel.IsMain).
 		SetSportID(sportStatLabel.SportID)
-	
+
 	_, err = newSportStatLabels.Save(ctx)
 	if err != nil {
 		log.Println(err, "error saving sport stat labels")
@@ -87,16 +85,14 @@ func (repo *SportStatLabels) Delete(ctx context.Context, id ulid.ID) error {
 	return nil
 }
 
-
-
 func (repo *SportStatLabels) FindBySportID(ctx context.Context, sportID ulid.ID) ([]*ent.SportStatLabels, error) {
 	return repo.db.SportStatLabels.Query().Where(sportstatlabels.HasSportWith(sport.IDEQ(sportID))).WithSport().All(ctx)
 }
 
 func (repo *SportStatLabels) AddUserStat(ctx context.Context, eventID, userId ulid.ID, stats []struct {
 	StatID    ulid.ID `json:"stat_id" validate:"required"`
-	StatValue int    `json:"stat_value" validate:"required"`
-} ,
+	StatValue int     `json:"stat_value" validate:"gte=0"`
+},
 ) error {
 	tx, err := repo.db.Tx(ctx)
 	if err != nil {
@@ -113,9 +109,10 @@ func (repo *SportStatLabels) AddUserStat(ctx context.Context, eventID, userId ul
 			Save(ctx)
 
 		if err != nil {
+			log.Println(err, "error saving user stats")
 			_ = tx.Rollback()
 			return err
-		}	
+		}
 	}
 
 	if err := tx.Commit(); err != nil {
@@ -124,6 +121,34 @@ func (repo *SportStatLabels) AddUserStat(ctx context.Context, eventID, userId ul
 
 	return nil
 }
+
+func (repo *SportStatLabels) UpdateUserStat(ctx context.Context, stats []struct {
+	UserStatID ulid.ID `json:"user_stat_id" validate:"required"`
+	StatValue  int     `json:"stat_value" validate:"gte=0"`
+},
+) error {
+	tx, err := repo.db.Tx(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, stat := range stats {
+
+		_, err := tx.UserStats.UpdateOneID(stat.UserStatID).SetStatValue(stat.StatValue).Save(ctx)
+
+		if err != nil {
+			log.Println(err, "error updating user stats")
+			_ = tx.Rollback()
+			return err
+		}
+	}
+	 if err := tx.Commit(); err != nil {
+		return err
+	}
+	return nil
+}
+
+
 
 func (repo *SportStatLabels) Update(ctx context.Context, sportStatLabel *entity.SportStatLabels) error {
 	tx, err := repo.db.Tx(ctx)
@@ -150,7 +175,10 @@ func (repo *SportStatLabels) Update(ctx context.Context, sportStatLabel *entity.
 	return nil
 }
 
-func (repo *SportStatLabels) GetUserStatsByEventID(ctx context.Context,userId, eventID ulid.ID) ([]*ent.UserStats, error) {
+func (repo *SportStatLabels) GetUserStatsByEventID(ctx context.Context, userId, eventID ulid.ID) ([]*ent.UserStats, error) {
 	return repo.db.UserStats.Query().Where(userstats.HasEventWith(event.IDEQ(eventID)), userstats.HasUserWith(user.IDEQ(userId))).WithStat().WithUser().All(ctx)
 }
 
+func (repo *SportStatLabels) GetUserStatsBySportId(ctx context.Context, userId, sportID ulid.ID) ([]*ent.UserStats, error) {
+	return repo.db.UserStats.Query().Where(userstats.HasStatWith(sportstatlabels.HasSportWith(sport.IDEQ(sportID))), userstats.HasUserWith(user.IDEQ(userId))).WithStat().WithUser().All(ctx)
+}

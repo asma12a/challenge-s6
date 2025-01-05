@@ -21,7 +21,7 @@ func (UserStats) Mixin() []ent.Mixin {
 // Fields of the UserStats.
 func (UserStats) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("stat_value").Positive().Default(0),
+		field.Int("stat_value").Min(0).Default(0),
 	}
 }
 
