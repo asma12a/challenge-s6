@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/services/event_service.dart';
 import 'package:go_router/go_router.dart';
+import 'package:squad_go/platform/mobile/widgets/event_card.dart';
 
 class UpperCaseTextFormatter extends TextInputFormatter {
   @override
@@ -25,14 +27,22 @@ class _JoinEventScreenState extends State<JoinEventScreen> {
   final EventService _eventService = EventService();
   final _formKey = GlobalKey<FormState>();
   var _enteredCode = '';
+  Event? _event;
+  bool hasSearched = false;
 
   void _joinEvent() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       try {
         var event = await _eventService.getEventByCode(_enteredCode);
-        context.go('/sign-in');
+
+        setState(() {
+          _event = event;
+        });
       } catch (error) {
+        setState(() {
+          _event = null;
+        });
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -45,6 +55,9 @@ class _JoinEventScreenState extends State<JoinEventScreen> {
           ),
         );
       }
+      setState(() {
+        hasSearched = true;
+      });
     }
   }
 
@@ -54,12 +67,9 @@ class _JoinEventScreenState extends State<JoinEventScreen> {
       padding: EdgeInsets.all(20),
       child: Column(
         children: [
-          Title(
-            color: Colors.red,
-            child: Text(
-              "Rejoinde un événement",
-              style: TextStyle(fontSize: 22),
-            ),
+          Text(
+            "Rejoinde un événement",
+            style: TextStyle(fontSize: 22),
           ),
           SizedBox(height: 45),
           Form(
@@ -68,6 +78,9 @@ class _JoinEventScreenState extends State<JoinEventScreen> {
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Veuillez saisir une valeur.';
+                }
+                if (value.length < 6) {
+                  return 'Le code doit contenir 6 caractères.';
                 }
                 return null;
               },
@@ -89,7 +102,10 @@ class _JoinEventScreenState extends State<JoinEventScreen> {
           ),
           SizedBox(height: 30),
           ElevatedButton(
-            onPressed: _joinEvent,
+            onPressed: _formKey.currentState == null ||
+                    !_formKey.currentState!.validate()
+                ? null
+                : _joinEvent,
             style: ElevatedButton.styleFrom(
               foregroundColor: Colors.white,
               backgroundColor: Colors.blue,
@@ -99,8 +115,13 @@ class _JoinEventScreenState extends State<JoinEventScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            child: Text("Rejoindre"),
-          )
+            child: Text("Rechercher par code"),
+          ),
+          SizedBox(height: 30),
+          if (hasSearched && _event != null)
+            EventCard(event: _event!, hasJoinedEvent: _event!.hasJoined),
+          if (hasSearched && _event == null)
+            Text("Aucun événement ne correspond à ce code."),
         ],
       ),
     );

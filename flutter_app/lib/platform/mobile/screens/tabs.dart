@@ -5,10 +5,9 @@ import 'package:squad_go/platform/mobile/screens/search.dart';
 import 'package:squad_go/platform/mobile/widgets/main_drawer.dart';
 import 'package:squad_go/platform/mobile/screens/new_event.dart';
 
-// import 'package:squad_go/screens/chat.dart';
-
 class TabsScreen extends StatefulWidget {
-  const TabsScreen({super.key});
+  final int? initialPageIndex;
+  const TabsScreen({super.key, this.initialPageIndex});
 
   @override
   State<TabsScreen> createState() => _TabsScreenState();
@@ -16,6 +15,14 @@ class TabsScreen extends StatefulWidget {
 
 class _TabsScreenState extends State<TabsScreen> {
   int _selectPageIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialPageIndex != null) {
+      _selectPageIndex = widget.initialPageIndex!;
+    }
+  }
 
   void _selectPage(int index) {
     setState(() {
@@ -29,7 +36,6 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Widget activePage = ChatPage(eventID: "01JEP2VWKHA6RVTVBDAY0552D9");
     Widget activePage = HomeScreen();
 
     if (_selectPageIndex == 1) {

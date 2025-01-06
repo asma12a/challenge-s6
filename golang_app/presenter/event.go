@@ -19,7 +19,8 @@ type Event struct {
 	CreatedAt time.Time        `json:"created_at,omitempty"`
 	CreatedBy ulid.ID          `json:"created_by,omitempty"`
 	IsPublic  bool             `json:"is_public"`
-	EventType *event.EventType `json:"event_type,omitempty"` // Utiliser le type EventType personnalisé
+	HasJoined bool             `json:"has_joined,omitempty"`
+	EventType *event.EventType `json:"event_type,omitempty"`
 	Sport     Sport            `json:"sport,omitempty"`
 	Teams     []Team           `json:"teams,omitempty"`
 }

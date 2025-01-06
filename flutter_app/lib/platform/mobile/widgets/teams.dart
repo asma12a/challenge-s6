@@ -208,7 +208,10 @@ class _TeamsHandleState extends State<TeamsHandle> {
                         foregroundColor: Colors.white,
                         backgroundColor: Colors.blue,
                       ),
-                      child: Icon(Icons.add),
+                      child: Icon(
+                        Icons.add,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 )
@@ -470,7 +473,13 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                   },
                                 ),
                               )
-                            : Expanded(child: Container()),
+                            : Expanded(
+                                child: Container(
+                                  margin: EdgeInsets.only(top: 16),
+                                  child: Text(
+                                      "Actuellement aucun joueur dans cette équipe"),
+                                ),
+                              ),
                         if (widget.canEdit &&
                             (team.maxPlayers == 0 ||
                                 team.players.length < team.maxPlayers)) ...[
@@ -488,7 +497,10 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                 },
                               );
                             },
-                            icon: const Icon(Icons.add),
+                            icon: const Icon(
+                              Icons.add,
+                              color: Colors.white,
+                            ),
                             label: const Text('Ajouter un joueur'),
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,

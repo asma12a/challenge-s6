@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/models/sport.dart';
 import 'package:intl/intl.dart';
@@ -23,11 +24,7 @@ class EventCard extends StatelessWidget {
     if (hasJoinedEvent) {
       if (event.id == null) return;
 
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (ctx) => EventScreen(event: event),
-        ),
-      );
+      context.go("/event/${event.id}", extra: event);
     } else {
       // Show the join event dialog/modal
       if (event.id == null) return;

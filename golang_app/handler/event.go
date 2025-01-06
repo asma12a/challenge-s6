@@ -319,6 +319,23 @@ func getEventByCode(ctx context.Context, service service.Event) fiber.Handler {
 				"error":  err.Error(),
 			})
 		}
+		// Check user is in a team of the event or is creator of the event
+		currentUser, err := viewer.UserFromContext(c.UserContext())
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+
+		isUserInEvent, err := service.IsUserInEvent(ctx, event.ID, currentUser.ID)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+		userJoinedEvent := isUserInEvent || event.CreatedBy == currentUser.ID
 
 		// Mapper les données de event vers presenter.Event
 		toJ := presenter.Event{
@@ -333,6 +350,7 @@ func getEventByCode(ctx context.Context, service service.Event) fiber.Handler {
 			CreatedBy: event.CreatedBy,
 			IsPublic:  event.IsPublic,
 			EventType: event.EventType,
+			HasJoined: userJoinedEvent,
 		}
 
 		if condition := event.Edges.Sport; condition != nil {

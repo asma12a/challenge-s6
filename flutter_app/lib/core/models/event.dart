@@ -16,6 +16,7 @@ class Event {
     this.createdBy,
     this.teams,
     this.type = EventType.match,
+    this.hasJoined = false,
   });
 
   final String? id;
@@ -29,6 +30,7 @@ class Event {
   final EventType type;
   final bool isPublic;
   final List<Team>? teams;
+  final bool hasJoined;
 
   factory Event.fromJson(Map<String, dynamic> data) {
     return Event(
@@ -48,6 +50,7 @@ class Event {
           : null,
       createdBy: data['created_by'],
       isPublic: data['is_public'] ?? true,
+      hasJoined: data['has_joined'] ?? false,
     );
   }
 
@@ -90,6 +93,15 @@ class Event {
       teams: teams ?? this.teams,
       createdBy: createdBy ?? this.createdBy,
       isPublic: isPublic ?? this.isPublic,
+    );
+  }
+
+  static Event empty() {
+    return Event(
+      name: '',
+      address: '',
+      date: DateTime.now().toString(),
+      sport: Sport.empty(),
     );
   }
 }

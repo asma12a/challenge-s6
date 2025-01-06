@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/services/event_service.dart';
 import 'package:squad_go/core/services/team_service.dart';
@@ -50,6 +51,7 @@ class _JoinEventDialogState extends State<JoinEventDialog> {
     try {
       await teamService.joinTeam(event!.id!, _selectedTeamId!);
       widget.onRefresh?.call();
+      context.go('/event/${event!.id}', extra: event);
       Navigator.of(context).pop();
     } catch (e) {
       // Handle error

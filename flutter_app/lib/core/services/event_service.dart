@@ -69,7 +69,7 @@ class EventService {
   }
 
   // GET event By CODE
-  Future<Map<String, dynamic>> getEventByCode(String code) async {
+  Future<Event> getEventByCode(String code) async {
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
     try {
       final uri =
@@ -81,8 +81,8 @@ class EventService {
           "Authorization": "Bearer $token",
         }),
       );
-      final data = response.data;
-      return data;
+      final Map<String, dynamic> data = response.data;
+      return Event.fromJson(data);
     } catch (error) {
       debugPrint('An error occurred: $error');
       throw AppException(

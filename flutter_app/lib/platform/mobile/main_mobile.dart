@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart' as provider;
+import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
+import 'package:squad_go/platform/mobile/screens/event.dart';
 import 'package:squad_go/platform/mobile/screens/join.dart';
 import 'package:squad_go/shared_widgets/sign_in.dart';
 import 'package:squad_go/platform/mobile/screens/tabs.dart';
@@ -31,27 +33,36 @@ final GoRouter _router = GoRouter(
       },
       routes: <RouteBase>[
         GoRoute(
+          path: 'home',
+          builder: (BuildContext context, GoRouterState state) {
+            return const TabsScreen(
+              initialPageIndex: 0,
+            );
+          },
+        ),
+        GoRoute(
+          path: 'search',
+          builder: (BuildContext context, GoRouterState state) {
+            return const TabsScreen(
+              initialPageIndex: 1,
+            );
+          },
+        ),
+        GoRoute(
           path: 'join',
           builder: (BuildContext context, GoRouterState state) {
             return const JoinEventScreen();
           },
         ),
         GoRoute(
-          path: 'tabs',
-          builder: (BuildContext context, GoRouterState state) {
-            return const TabsScreen();
-          },
-        ),
-        GoRoute(
-          path: 'tabs',
-          builder: (BuildContext context, GoRouterState state) {
-            return const TabsScreen();
-          },
-        ),
-        GoRoute(
           path: 'event/:id',
           builder: (BuildContext context, GoRouterState state) {
-            return const TabsScreen();
+            final eventId = state.pathParameters['id'];
+            final eventData = state.extra as Event?;
+            return EventScreen(
+              eventId: eventId!,
+              event: eventData,
+            );
           },
         ),
         GoRoute(

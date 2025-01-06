@@ -44,6 +44,15 @@ class Sport {
       'max_teams': maxTeams,
     };
   }
+
+  static Sport empty() {
+    return const Sport(
+      id: '',
+      name: SportName.football,
+      maxTeams: 0,
+      type: SportType.team,
+    );
+  }
 }
 
 enum SportType { individual, team }

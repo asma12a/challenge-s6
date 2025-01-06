@@ -292,3 +292,16 @@ func (e *Event) ListRecommendedEvents(ctx context.Context, lat, long float64, us
 func (repo *Event) FindAllTeamUsers(ctx context.Context, eventID ulid.ID) ([]*ent.TeamUser, error) {
 	return repo.db.TeamUser.Query().Where(teamuser.HasTeamWith(team.HasEventWith(event.IDEQ(eventID)))).WithUser().All(ctx)
 }
+
+func (repo *Event) IsUserInEvent(ctx context.Context, eventID, userID ulid.ID) (bool, error) {
+	teamUsers, err := repo.db.TeamUser.Query().
+		Where(
+			teamuser.HasTeamWith(team.HasEventWith(event.IDEQ(eventID))),
+			teamuser.HasUserWith(user.IDEQ(userID)),
+		).
+		All(ctx)
+	if err != nil {
+		return false, err
+	}
+	return len(teamUsers) > 0, nil
+}
