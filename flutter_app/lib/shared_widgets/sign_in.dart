@@ -96,7 +96,7 @@ class __FormContentState extends State<_FormContent> {
           ),
         );
       } else {
-       context.go('/');
+        context.go('/home');
       }
     }
   }
