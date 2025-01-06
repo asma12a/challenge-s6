@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/core/services/sport_stat_labels_service.dart';
 import 'package:squad_go/core/services/sport_service.dart';
 import 'package:squad_go/core/models/sport_stat_labels.dart';
@@ -23,7 +24,7 @@ class _AdminSportStatLabelsPageState extends State<AdminSportStatLabelsPage> {
   void initState() {
     super.initState();
     fetchSports();
-    fetchStatLabels(); 
+    fetchStatLabels();
   }
 
   Future<void> fetchSports() async {
@@ -81,7 +82,9 @@ class _AdminSportStatLabelsPageState extends State<AdminSportStatLabelsPage> {
         _isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur lors du chargement des stats pour ce sport: $e')),
+        SnackBar(
+            content:
+                Text('Erreur lors du chargement des stats pour ce sport: $e')),
       );
     }
   }
@@ -89,7 +92,6 @@ class _AdminSportStatLabelsPageState extends State<AdminSportStatLabelsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
@@ -119,9 +121,38 @@ class _AdminSportStatLabelsPageState extends State<AdminSportStatLabelsPage> {
                       items: _sports
                           .map((sport) => DropdownMenuItem<String>(
                                 value: sport['id'].toString(),
-                                child: Text(
-                                  sport['name'],
-                                  style: const TextStyle(fontSize: 16),
+                                child: Row(
+                                  children: [
+                                    // Vérifie si l'icône existe dans le Map sportIcon
+                                    if (sportIcon.containsKey(SportName.values
+                                        .firstWhere((e) =>
+                                            e
+                                                .toString()
+                                                .split('.')
+                                                .last
+                                                .toLowerCase() ==
+                                            sport['name'].toLowerCase())))
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 8.0),
+                                        child: Icon(
+                                          sportIcon[SportName.values.firstWhere(
+                                              (e) =>
+                                                  e
+                                                      .toString()
+                                                      .split('.')
+                                                      .last
+                                                      .toLowerCase() ==
+                                                  sport['name'].toLowerCase())],
+                                          size: 20,
+                                          color: Colors.blue,
+                                        ),
+                                      ),
+                                    Text(
+                                      sport['name'],
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                  ],
                                 ),
                               ))
                           .toList(),
