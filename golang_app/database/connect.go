@@ -19,7 +19,7 @@ func GetClient() *ent.Client {
 	sslMode := "disable"
 
 	if env == "production" {
-		sslMode = "enable"
+		sslMode = "require"
 
 	}
 	// Postgres DSN
