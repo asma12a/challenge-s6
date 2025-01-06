@@ -65,23 +65,23 @@ final GoRouter _router = GoRouter(
             );
           },
         ),
-        GoRoute(
-          path: 'sign-in',
-          redirect: (BuildContext context, GoRouterState state) {
-            final authState =
-                provider.Provider.of<AuthState>(context, listen: false);
-
-            // Redirection vers /tabs si déjà connecté
-            if (authState.isAuthenticated) {
-              return '/';
-            }
-            return null;
-          },
-          builder: (BuildContext context, GoRouterState state) {
-            return const SignInScreen();
-          },
-        ),
       ],
+    ),
+    GoRoute(
+      path: '/sign-in',
+      redirect: (BuildContext context, GoRouterState state) {
+        final authState =
+            provider.Provider.of<AuthState>(context, listen: false);
+
+        // Redirection vers /tabs si déjà connecté
+        if (authState.isAuthenticated) {
+          return '/';
+        }
+        return null;
+      },
+      builder: (BuildContext context, GoRouterState state) {
+        return const SignInScreen();
+      },
     ),
   ],
 );
