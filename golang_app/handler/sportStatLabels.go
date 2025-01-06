@@ -16,7 +16,7 @@ func SportStatLabelsHandler(app fiber.Router, ctx context.Context, serviceSportS
 	app.Post("/:eventId/addUserStat", middleware.IsEventOrganizerOrCoach(ctx , serviceEvent), addUserStat(ctx, serviceSportStatLables, serviceEvent, serviceUser))
 	app.Post("/", middleware.IsAdminMiddleware, createSportStatLables(ctx, serviceSportStatLables, serviceSport))
 	app.Get("/:eventId/:userId/stats", middleware.IsAuthMiddleware, getUserStatsByEvent(ctx, serviceSportStatLables, serviceEvent, serviceUser))
-	app.Get("/:sportId/:userId/stats", middleware.IsAuthMiddleware, getUserStatsBySport(ctx, serviceSportStatLables, serviceUser))
+	app.Get("/:sportId/:userId/performance", middleware.IsAuthMiddleware, getUserPerformanceBySport(ctx, serviceSportStatLables, serviceUser))
 	app.Get("/:sportId/labels",middleware.IsAuthMiddleware, listSportStatLabelsBySport(ctx, serviceSportStatLables))
 	app.Get("/:sportStatLabelId",middleware.IsAdminMiddleware, getSportStatLabel(ctx, serviceSportStatLables))
 	app.Get("/",middleware.IsAdminMiddleware, listSportStatLabels(ctx, serviceSportStatLables))
@@ -445,7 +445,7 @@ func getUserStatsByEvent(ctx context.Context, serviceSportStatLables service.Spo
 	}
 }
 
-func getUserStatsBySport(ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceUser service.User) fiber.Handler {
+func getUserPerformanceBySport(ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceUser service.User) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
 		sportIDStr := c.Params("sportId")
@@ -484,19 +484,40 @@ func getUserStatsBySport(ctx context.Context, serviceSportStatLables service.Spo
 			})
 		}
 
-		toJ := make([]presenter.UserStats, len(userStats))
-		for i, userStat := range userStats {
-			toJ[i] = presenter.UserStats{
-				ID: userStat.ID,
-				StatLabel: &presenter.SportStatLabels{
-					ID:     userStat.Edges.Stat.ID,
-					Label:  userStat.Edges.Stat.Label,
-					Unit:   userStat.Edges.Stat.Unit,
-					IsMain: userStat.Edges.Stat.IsMain,
-				},
-				Value: userStat.StatValue,
+
+		aggregatedStats := make(map[string]int) // key: label, value: sum of values
+		eventIDs := make(map[ulid.ID]bool)       // to track unique events
+
+		for _, userStat := range userStats {
+			if userStat.Edges.Stat != nil {
+				// Aggregate stats by label
+				label := userStat.Edges.Stat.Label
+				aggregatedStats[label] += userStat.StatValue
+			}
+
+			if userStat.Edges.Event != nil {
+				// Track unique events (using a map to ensure uniqueness)
+				eventID := userStat.Edges.Event.ID // Use the actual `event_id` field
+
+				eventIDs[eventID] = true
 			}
 		}
-		return c.JSON(toJ)
+
+		toj := presenter.UserPerformance{
+			NbEvents: len(eventIDs),
+		}
+
+		for label, value := range aggregatedStats {
+			toj.Stats = append(toj.Stats, presenter.UserStats{
+				StatLabel: &presenter.SportStatLabels{
+					Label: label,
+				},
+				Value: value,
+			})
+		}
+		
+
+
+		return c.JSON(toj)
 	}
 }

@@ -25,7 +25,8 @@ class _ShowPlayerDetailsDialogState extends State<ShowPlayerDetailsDialog> {
   final EventService eventService = EventService();
   Event? event;
   late Player _player;
-  List<UserStats> ratings = [];
+  int nbEvents = 0;
+  List<Map<String, dynamic>> stats = [];
 
   @override
   void initState() {
@@ -40,9 +41,30 @@ class _ShowPlayerDetailsDialogState extends State<ShowPlayerDetailsDialog> {
       setState(() {
         event = eventDetails;
       });
+      _loadUserPerformance();
     } catch (e) {
       // Handle error
       log.severe('Failed to fetch event details: $e');
+    }
+  }
+
+  Future<void> _loadUserPerformance() async {
+    try {
+      if (event!.id == null) return;
+
+      final userPerformances = await statLabelsService.getUserPerformanceBySport(event!.sport.id, _player.userID);
+      setState(() {
+        nbEvents = userPerformances.nbEvents;
+        stats = userPerformances.stats
+                ?.map((stat) => {
+                      'stat_label': {'label': stat.stat?.label ?? ''},
+                      'value': stat.value,
+                    })
+                .toList() ??
+            [];
+      });
+    } catch (e) {
+      log.severe('Failed to fetch user performance: $e');
     }
   }
 
@@ -62,13 +84,36 @@ class _ShowPlayerDetailsDialogState extends State<ShowPlayerDetailsDialog> {
               ),
             ),
             const SizedBox(height: 16),
-            Text('Performances pour le ${event?.sport.name.name}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                )),
+            if (nbEvents != 0)
+              Text('Performances pour le ${event?.sport.name.name}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  )),
+            const SizedBox(height: 16),
+            if (nbEvents != 0)
+              Text(
+                'Nombre d\'événements : $nbEvents',
+                style: const TextStyle(fontSize: 16),
+              ),
+            const SizedBox(height: 16),
+            if (stats.isNotEmpty)
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: stats.length,
+                itemBuilder: (context, index) {
+                  final stat = stats[index];
+                  return ListTile(
+                    dense: true,
+                    title: Text(stat['stat_label']['label']),
+                    trailing: Text(stat['value'].toString()),
+                  );
+                },
+              )
+            else
+              const Text('Aucune performance disponible.', style: TextStyle(fontSize: 16)),
           ],
         ),
       ),

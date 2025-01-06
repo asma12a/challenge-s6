@@ -17,4 +17,26 @@ class UserStats {
           : null,
     );
   }
+
+}
+
+class UserPerformance {
+  final int nbEvents ;
+  final List<UserStats>? stats;
+
+  UserPerformance({
+    required this.nbEvents,
+    this.stats,
+  });
+
+  factory UserPerformance.fromJson(Map<String, dynamic> json) {
+    return UserPerformance(
+        nbEvents: json['nb_events'],
+        stats: json['stats'] != null
+            ? List<UserStats>.from(
+            json['stats'].map((json) => UserStats.fromJson(json)))
+            : null
+    );
+  }
+
 }

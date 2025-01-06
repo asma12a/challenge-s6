@@ -27,7 +27,6 @@ class SportStatLabelsService {
         data.map((json) => SportStatLabels.fromJson(json)),
       );
     } catch (error) {
-      log('An error occurred while ', error: error);
       throw AppException(
           message: 'Failed to retrieve sport stat labels, please try again.');
     }
@@ -50,9 +49,27 @@ class SportStatLabelsService {
         data.map((json) => UserStats.fromJson(json)),
       );
     } catch (error) {
-      log('An error occurred while ', error: error);
       throw AppException(
           message: 'Failed to retrieve sport stat labels, please try again.');
+    }
+  }
+
+  Future<UserPerformance> getUserPerformanceBySport(String sportId, userId) async {
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    try {
+      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/sportstatlabels/$sportId/$userId/performance');
+      final response = await http.get(
+          uri,
+          headers: {
+          'Content-Type': 'application/json',
+          "Authorization": "Bearer $token",
+        },
+      );
+      final data = jsonDecode(utf8.decode(response.bodyBytes));
+      return UserPerformance.fromJson(data);
+    } catch (error) {
+      throw AppException(
+          message: 'Failed to retrieve user performance, please try again.');
     }
   }
 
@@ -67,7 +84,6 @@ class SportStatLabelsService {
           },
           body: jsonEncode(stats));
     } catch (error) {
-      log('An error occurred while ', error: error);
       throw AppException(message: 'Failed to add user stats, please try again.');
     }
   }
@@ -83,7 +99,6 @@ class SportStatLabelsService {
           },
           body: jsonEncode(stats));
     } catch (error) {
-      log('An error occurred while ', error: error);
       throw AppException(message: 'Failed to update user stat, please try again.');
     }
   }

@@ -180,5 +180,5 @@ func (repo *SportStatLabels) GetUserStatsByEventID(ctx context.Context, userId, 
 }
 
 func (repo *SportStatLabels) GetUserStatsBySportId(ctx context.Context, userId, sportID ulid.ID) ([]*ent.UserStats, error) {
-	return repo.db.UserStats.Query().Where(userstats.HasStatWith(sportstatlabels.HasSportWith(sport.IDEQ(sportID))), userstats.HasUserWith(user.IDEQ(userId))).WithStat().WithUser().All(ctx)
+	return repo.db.UserStats.Query().Where(userstats.HasStatWith(sportstatlabels.HasSportWith(sport.IDEQ(sportID))), userstats.HasUserWith(user.IDEQ(userId))).WithStat().WithEvent().WithUser().All(ctx)
 }

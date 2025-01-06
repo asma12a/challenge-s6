@@ -231,7 +231,10 @@ class _EditStatsPlayerDialogState extends State<EditStatsPlayerDialog> {
                     _saveUserStat();
                   },
                   style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.blue,
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+
                   ),
                   child: const Text('Soumettre'),
                 ),
