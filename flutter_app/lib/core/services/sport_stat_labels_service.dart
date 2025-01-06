@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:flutter/cupertino.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/sport_stat_labels.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -33,6 +34,7 @@ class SportStatLabelsService {
   }
 
   Future<List<UserStats>> getUserStatByEvent(String eventId, userId) async {
+    debugPrint('UserId $userId');
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
     try {
       final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/sportstatlabels/$eventId/$userId/stats');
@@ -70,10 +72,10 @@ class SportStatLabelsService {
     }
   }
 
-  Future<void> updateUserStat(Map<String, dynamic> stats) async {
+  Future<void> updateUserStat(Map<String, dynamic> stats, String eventId) async {
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
     try {
-      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/sportstatlabels/updateUserStats');
+      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/sportstatlabels/$eventId/updateUserStats');
       await http.put(uri,
           headers: {
             'Content-Type': 'application/json',

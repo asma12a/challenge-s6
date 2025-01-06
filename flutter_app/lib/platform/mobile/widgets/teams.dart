@@ -128,10 +128,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                   indicatorSize: TabBarIndicatorSize.tab,
                   tabAlignment: TabAlignment.start,
                   indicator: BoxDecoration(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .secondary
-                        .withOpacity(0.5),
+                    color: Theme.of(context).colorScheme.secondary.withOpacity(0.5),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   labelColor: Colors.white,
@@ -150,10 +147,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                 height: 30,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .secondary
-                                      .withOpacity(0.1),
+                                  color: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
                                 ),
                                 child: IconButton(
                                   icon: Icon(
@@ -184,9 +178,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                   ).toList(),
                 ),
               ),
-              if (widget.canEdit &&
-                  (widget.maxTeams == 0 ||
-                      widget.teams.length < widget.maxTeams))
+              if (widget.canEdit && (widget.maxTeams == 0 || widget.teams.length < widget.maxTeams))
                 Positioned(
                   right: 0,
                   child: SizedBox(
@@ -225,9 +217,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             if (!userHasTeam ||
-                                (userHasTeam &&
-                                    !team.players.any((player) =>
-                                        player.userID == currentUser!.id)))
+                                (userHasTeam && !team.players.any((player) => player.userID == currentUser!.id)))
                               TextButton(
                                 onPressed: () {
                                   if (userHasTeam) {
@@ -240,22 +230,17 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                   label: Row(
                                     children: [
                                       Icon(
-                                        userHasTeam
-                                            ? Icons.swap_horiz
-                                            : Icons.group_add,
+                                        userHasTeam ? Icons.swap_horiz : Icons.group_add,
                                         size: 16,
                                         color: Colors.white,
                                       ),
                                       SizedBox(width: 6),
                                       Text(
-                                        userHasTeam
-                                            ? "Changer d'équipe"
-                                            : "Rejoindre l'équipe",
+                                        userHasTeam ? "Changer d'équipe" : "Rejoindre l'équipe",
                                       ),
                                     ],
                                   ),
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.primary,
+                                  backgroundColor: Theme.of(context).colorScheme.primary,
                                   textStyle: TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -265,16 +250,14 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                   ),
                                 ),
                               ),
-                            if (userHasTeam &&
-                                team.players.any((player) =>
-                                    player.userID == currentUser!.id))
+                            if (userHasTeam && team.players.any((player) => player.userID == currentUser!.id))
                               TextButton(
                                 onPressed: null,
                                 child: SizedBox.shrink(),
                               ),
                             Badge(
-                              label: Text(
-                                  '${team.players.length}${team.maxPlayers > 0 ? ' / ${team.maxPlayers}' : ''}'),
+                              label:
+                                  Text('${team.players.length}${team.maxPlayers > 0 ? ' / ${team.maxPlayers}' : ''}'),
                               backgroundColor: team.maxPlayers == 0
                                   ? Colors.grey.shade400
                                   : team.players.length < team.maxPlayers
@@ -296,20 +279,14 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                   itemCount: team.players.length,
                                   itemBuilder: (context, index) {
                                     final player = team.players[index];
-                                    final isCurrentUser =
-                                        player.userID == currentUser!.id;
-                                    final isEventCreator =
-                                        widget.eventCreatorId == player.userID;
+                                    final isCurrentUser = player.userID == currentUser!.id;
+                                    final isEventCreator = widget.eventCreatorId == player.userID;
                                     final Color roleColor =
-                                        player.role == PlayerRole.coach
-                                            ? Colors.blue
-                                            : Colors.deepOrange;
+                                        player.role == PlayerRole.coach ? Colors.blue : Colors.deepOrange;
                                     return Container(
                                       margin: EdgeInsets.only(bottom: 16),
                                       decoration: BoxDecoration(
-                                        color: isCurrentUser
-                                            ? widget.color.withAlpha(40)
-                                            : widget.color.withAlpha(20),
+                                        color: isCurrentUser ? widget.color.withAlpha(40) : widget.color.withAlpha(20),
                                         borderRadius: BorderRadius.circular(16),
                                       ),
                                       child: InkWell(
@@ -318,6 +295,8 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                             context: context,
                                             builder: (context) {
                                               return ShowPlayerDetailsDialog(
+                                                eventId: widget.eventId,
+                                                player: player,
                                                 onRefresh: widget.onRefresh,
                                               );
                                             },
@@ -329,19 +308,13 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                               Text(
                                                 player.name ?? player.email,
                                                 style: TextStyle(
-                                                  fontWeight: isCurrentUser
-                                                      ? FontWeight.bold
-                                                      : FontWeight.normal,
-                                                  color: isCurrentUser
-                                                      ? widget.color
-                                                      : null,
+                                                  fontWeight: isCurrentUser ? FontWeight.bold : FontWeight.normal,
+                                                  color: isCurrentUser ? widget.color : null,
                                                 ),
                                               ),
                                               if (isEventCreator)
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 8.0),
+                                                  padding: const EdgeInsets.only(left: 8.0),
                                                   child: Icon(
                                                     Icons.star,
                                                     color: Colors.amber,
@@ -350,28 +323,20 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                 ),
                                             ],
                                           ),
-                                          subtitle: player.role !=
-                                                  PlayerRole.player
+                                          subtitle: player.role != PlayerRole.player
                                               ? Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
+                                                  mainAxisAlignment: MainAxisAlignment.start,
                                                   children: [
                                                     Badge(
                                                       label: Text(
-                                                        player.role ==
-                                                                PlayerRole.coach
-                                                            ? 'Coach'
-                                                            : 'Organisateur',
+                                                        player.role == PlayerRole.coach ? 'Coach' : 'Organisateur',
                                                         style: TextStyle(
                                                           color: roleColor,
-                                                          fontWeight:
-                                                              FontWeight.bold,
+                                                          fontWeight: FontWeight.bold,
                                                         ),
                                                       ),
-                                                      backgroundColor: roleColor
-                                                          .withAlpha(40),
-                                                      padding:
-                                                          EdgeInsets.symmetric(
+                                                      backgroundColor: roleColor.withAlpha(40),
+                                                      padding: EdgeInsets.symmetric(
                                                         horizontal: 5,
                                                         vertical: 2,
                                                       ),
@@ -379,48 +344,39 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                   ],
                                                 )
                                               : null,
-                                          trailing: player.status ==
-                                                  PlayerStatus.valid
+                                          trailing: player.status == PlayerStatus.valid
                                               ? Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
+                                                  mainAxisSize: MainAxisSize.min,
                                                   children: [
                                                     if (widget.canEdit) ...[
                                                       IconButton(
                                                         icon: Icon(Icons.edit),
-                                                        color: isCurrentUser
-                                                            ? widget.color
-                                                            : null,
+                                                        color: isCurrentUser ? widget.color : null,
                                                         onPressed: () {
                                                           showDialog(
                                                             context: context,
                                                             builder: (context) {
                                                               return EditPlayerDialog(
-                                                                eventId: widget
-                                                                    .eventId,
+                                                                eventId: widget.eventId,
                                                                 player: player,
-                                                                teams: widget
-                                                                    .teams,
-                                                                onRefresh: widget
-                                                                    .onRefresh,
+                                                                teams: widget.teams,
+                                                                onRefresh: widget.onRefresh,
                                                               );
                                                             },
                                                           );
                                                         },
                                                       ),
                                                       IconButton(
-                                                        icon: Icon(
-                                                            Icons.bar_chart),
-                                                        color: isCurrentUser
-                                                            ? widget.color
-                                                            : null,
+                                                        icon: Icon(Icons.bar_chart),
+                                                        color: isCurrentUser ? widget.color : null,
                                                         onPressed: () {
                                                           showDialog(
                                                             context: context,
                                                             builder: (context) {
                                                               return EditStatsPlayerDialog(
-                                                                onRefresh: widget
-                                                                    .onRefresh,
+                                                                eventId: widget.eventId,
+                                                                player: player,
+                                                                onRefresh: widget.onRefresh,
                                                               );
                                                             },
                                                           );
@@ -432,16 +388,15 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                         icon: Icon(
                                                           Icons.remove_red_eye,
                                                         ),
-                                                        color: isCurrentUser
-                                                            ? widget.color
-                                                            : null,
+                                                        color: isCurrentUser ? widget.color : null,
                                                         onPressed: () {
                                                           showDialog(
                                                             context: context,
                                                             builder: (context) {
                                                               return ShowPlayerDetailsDialog(
-                                                                onRefresh: widget
-                                                                    .onRefresh,
+                                                                eventId: widget.eventId,
+                                                                player: player,
+                                                                onRefresh: widget.onRefresh,
                                                               );
                                                             },
                                                           );
@@ -454,8 +409,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                     'En attente',
                                                     style: TextStyle(
                                                       color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                      fontWeight: FontWeight.bold,
                                                     ),
                                                   ),
                                                   backgroundColor: Colors.grey,
@@ -471,9 +425,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                 ),
                               )
                             : Expanded(child: Container()),
-                        if (widget.canEdit &&
-                            (team.maxPlayers == 0 ||
-                                team.players.length < team.maxPlayers)) ...[
+                        if (widget.canEdit && (team.maxPlayers == 0 || team.players.length < team.maxPlayers)) ...[
                           SizedBox(height: 8),
                           ElevatedButton.icon(
                             onPressed: () {
@@ -493,8 +445,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,
                               backgroundColor: Colors.blue,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 10),
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                               textStyle: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,

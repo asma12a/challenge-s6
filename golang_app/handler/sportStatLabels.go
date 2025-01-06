@@ -6,22 +6,23 @@ import (
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
+	"github.com/asma12a/challenge-s6/middleware"
 	"github.com/asma12a/challenge-s6/presenter"
 	"github.com/asma12a/challenge-s6/service"
 	"github.com/gofiber/fiber/v2"
 )
 
 func SportStatLabelsHandler(app fiber.Router, ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceSport service.Sport, serviceEvent service.Event, serviceUser service.User) {
-	app.Post("/:eventId/addUserStat", addUserStat(ctx, serviceSportStatLables, serviceEvent, serviceUser))
-	app.Post("/", createSportStatLables(ctx, serviceSportStatLables, serviceSport))
-	app.Get("/:eventId/:userId/stats", getUserStatsByEvent(ctx, serviceSportStatLables, serviceEvent, serviceUser))
-	app.Get("/:sportId/:userId/stats", getUserStatsBySport(ctx, serviceSportStatLables, serviceUser))
-	app.Get("/:sportId/labels", listSportStatLabelsBySport(ctx, serviceSportStatLables))
-	app.Get("/:sportStatLabelId", getSportStatLabel(ctx, serviceSportStatLables))
-	app.Get("/", listSportStatLabels(ctx, serviceSportStatLables))
-	app.Delete("/:sportStatLabelId", deleteSportStatLabel(ctx, serviceSportStatLables))
-	app.Put("/updateUserStats", updateUserStats(ctx, serviceSportStatLables))
-	app.Put("/:sportStatLabelId", updateSportStatLabel(ctx, serviceSportStatLables, serviceSport))
+	app.Post("/:eventId/addUserStat", middleware.IsEventOrganizerOrCoach(ctx , serviceEvent), addUserStat(ctx, serviceSportStatLables, serviceEvent, serviceUser))
+	app.Post("/", middleware.IsAdminMiddleware, createSportStatLables(ctx, serviceSportStatLables, serviceSport))
+	app.Get("/:eventId/:userId/stats", middleware.IsAuthMiddleware, getUserStatsByEvent(ctx, serviceSportStatLables, serviceEvent, serviceUser))
+	app.Get("/:sportId/:userId/stats", middleware.IsAuthMiddleware, getUserStatsBySport(ctx, serviceSportStatLables, serviceUser))
+	app.Get("/:sportId/labels",middleware.IsAuthMiddleware, listSportStatLabelsBySport(ctx, serviceSportStatLables))
+	app.Get("/:sportStatLabelId",middleware.IsAdminMiddleware, getSportStatLabel(ctx, serviceSportStatLables))
+	app.Get("/",middleware.IsAdminMiddleware, listSportStatLabels(ctx, serviceSportStatLables))
+	app.Delete("/:sportStatLabelId", middleware.IsAdminMiddleware, deleteSportStatLabel(ctx, serviceSportStatLables))
+	app.Put("/:eventId/updateUserStats", middleware.IsEventOrganizerOrCoach(ctx , serviceEvent), updateUserStats(ctx, serviceSportStatLables))
+	app.Put("/:sportStatLabelId",middleware.IsAdminMiddleware, updateSportStatLabel(ctx, serviceSportStatLables, serviceSport))
 
 }
 
