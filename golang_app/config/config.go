@@ -47,8 +47,15 @@ func LoadEnvironment() {
 }
 
 func LoadEnvironmentFile() {
+	env := os.Getenv("ENV")
+
 	if err := godotenv.Load(); err != nil {
-		fmt.Printf("Error on load environment file: %s", err)
+		if env == "production" {
+			log.Println("No .env file found, falling back to system environment variables.")
+		} else {
+			fmt.Printf("Error on load environment file: %s\n", err)
+		}
 	}
+
 	LoadEnvironment()
 }
