@@ -1,4 +1,4 @@
-import 'package:squad_go/core/models/sport.dart';
+// import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/core/models/sport_stat_labels.dart';
 
 class UserStats {

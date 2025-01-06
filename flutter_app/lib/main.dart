@@ -30,9 +30,10 @@ void main() async {
 
   // Flutter Maps Tile Caching
   WidgetsFlutterBinding.ensureInitialized();
-  await FMTCObjectBoxBackend().initialise();
-  await FMTCStore('mapStore').manage.create();
-
+  if (!kIsWeb) {
+    await FMTCObjectBoxBackend().initialise();
+    await FMTCStore('mapStore').manage.create();
+  }
   runApp(const App());
 }
 

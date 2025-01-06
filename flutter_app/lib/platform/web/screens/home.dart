@@ -33,79 +33,79 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
           appBar: PreferredSize(
             preferredSize: Size.fromHeight(60.0),
             child: AppBar(
-              backgroundColor: Colors.teal,
+              backgroundColor: Theme.of(context).colorScheme.primary,
               elevation: 0,
             ),
           ),
-          // Structure en deux colonnes : Sidebar à gauche et contenu à droite
+          // Structure principale
           body: Row(
             children: [
-              // Sidebar (fixe sur la gauche)
-              Container(
-                width: 250, // Largeur de la sidebar
-                color: Colors.teal[50],
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  children: <Widget>[
-                    // Remplacer le DrawerHeader par une image
-                    DrawerHeader(
-                      child: Center(
-                        child: Image.asset(
-                          'assets/images/app_icon.png',
-                          width: 200,
-                          height: 200,
-                          fit: BoxFit.contain,
+              // Affiche la sidebar seulement si l'utilisateur est authentifié
+              if (authState.isAuthenticated)
+                Container(
+                  width: 250, // Largeur de la sidebar
+                  color: Colors.teal[50],
+                  child: ListView(
+                    padding: EdgeInsets.zero,
+                    children: <Widget>[
+                      // Remplacer le DrawerHeader par une image
+                      DrawerHeader(
+                        child: Center(
+                          child: Image.asset(
+                            'assets/images/app_icon.png',
+                            width: 200,
+                            height: 200,
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
-                    ),
-                    _createDrawerItem(
-                      icon: Icons.dashboard,
-                      text: 'Tableau de Bord',
-                      onTap: () {
-                        setState(() {
-                          _selectedIndex =
-                              0;
-                        });
-                      },
-                    ),
-                    _createDrawerItem(
-                      icon: Icons.account_circle,
-                      text: 'Utilisateurs',
-                      onTap: () {
-                        setState(() {
-                          _selectedIndex = 1;
-                        });
-                      },
-                    ),
-                    _createDrawerItem(
-                      icon: Icons.event,
-                      text: 'Événements',
-                      onTap: () {
-                        setState(() {
-                          _selectedIndex = 2;
-                        });
-                      },
-                    ),
-                    _createDrawerItem(
-                      icon: Icons.sports,
-                      text: 'Sports',
-                      onTap: () {
-                        setState(() {
-                          _selectedIndex = 3;
-                        });
-                      },
-                    ),
-                    _createDrawerItem(
-                      icon: Icons.exit_to_app,
-                      text: 'Déconnexion',
-                      onTap: () {
-                        authState.logout();
-                      },
-                    ),
-                  ],
+                      _createDrawerItem(
+                        icon: Icons.dashboard,
+                        text: 'Tableau de Bord',
+                        onTap: () {
+                          setState(() {
+                            _selectedIndex = 0;
+                          });
+                        },
+                      ),
+                      _createDrawerItem(
+                        icon: Icons.account_circle,
+                        text: 'Utilisateurs',
+                        onTap: () {
+                          setState(() {
+                            _selectedIndex = 1;
+                          });
+                        },
+                      ),
+                      _createDrawerItem(
+                        icon: Icons.event,
+                        text: 'Événements',
+                        onTap: () {
+                          setState(() {
+                            _selectedIndex = 2;
+                          });
+                        },
+                      ),
+                      _createDrawerItem(
+                        icon: Icons.sports,
+                        text: 'Sports',
+                        onTap: () {
+                          setState(() {
+                            _selectedIndex = 3;
+                          });
+                        },
+                      ),
+                      _createDrawerItem(
+                        icon: Icons.exit_to_app,
+                        text: 'Déconnexion',
+                        onTap: () {
+                          authState.logout();
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              // Contenu principal (à droite)
+              // Contenu principal (ajusté pour le cas non connecté)
               Expanded(
                 child: authState.isAuthenticated
                     ? _pages[_selectedIndex] // Affiche la page sélectionnée
@@ -118,12 +118,13 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     );
   }
 
-  Widget _createDrawerItem(
-      {required IconData icon,
-      required String text,
-      required GestureTapCallback onTap}) {
+  Widget _createDrawerItem({
+    required IconData icon,
+    required String text,
+    required GestureTapCallback onTap,
+  }) {
     return ListTile(
-      leading: Icon(icon, color: Colors.teal),
+      // leading: Icon(icon, color: Colors.teal),
       title: Text(
         text,
         style: TextStyle(

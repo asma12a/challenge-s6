@@ -1,7 +1,3 @@
-import 'dart:ffi';
-
-import 'package:squad_go/core/models/sport.dart';
-
 class SportStatLabels {
 
   final String? id;
