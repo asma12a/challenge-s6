@@ -207,10 +207,8 @@ class _AddEditUserModalState extends State<AddEditUserModal> {
                     ElevatedButton(
                       onPressed: _submit,
                       style: ElevatedButton.styleFrom(
-                        foregroundColor: const Color.fromARGB(
-                            255, 0, 0, 0), // Texte en blanc
-
-                        backgroundColor: Colors.teal,
+                        foregroundColor: const Color.fromARGB(255, 255, 255, 255), 
+                        backgroundColor: Theme.of(context).primaryColor,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 24, vertical: 12),
                         shape: RoundedRectangleBorder(
