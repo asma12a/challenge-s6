@@ -6,14 +6,14 @@ class SportStatLabels {
 
   final String? id;
   final String label;
-  final String unit;
-  final bool isMain;
+  final String? unit;
+  final bool? isMain;
 
   SportStatLabels({
     this.id,
     required this.label,
-    required this.unit,
-    required this.isMain
+    this.unit,
+    this.isMain
   });
 
 
