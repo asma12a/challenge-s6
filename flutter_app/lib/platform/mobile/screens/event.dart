@@ -29,6 +29,8 @@ class _EventScreenState extends State<EventScreen> {
   late Event event = widget.event ?? Event.empty();
   bool isOrganizer = false;
   bool isCoach = false;
+  bool get isEventFinished => DateTime.parse(event.date)
+      .isBefore(DateTime.now().subtract(Duration(days: 1)));
 
   @override
   void initState() {
@@ -82,7 +84,7 @@ class _EventScreenState extends State<EventScreen> {
                         },
                       ),
                       actions: [
-                        if (isOrganizer)
+                        if (isOrganizer && !isEventFinished)
                           IconButton(
                             icon: const Icon(Icons.edit),
                             onPressed: () {
@@ -310,6 +312,8 @@ class _EventScreenState extends State<EventScreen> {
                                                     onRefresh: onRefresh,
                                                     eventCreatorId:
                                                         event.createdBy,
+                                                    isEventFinished:
+                                                        isEventFinished,
                                                   )
                                                 : null,
                                           ),
