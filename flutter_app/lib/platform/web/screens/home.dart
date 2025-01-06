@@ -6,6 +6,7 @@ import 'package:squad_go/platform/web/screens/users/admin_users_page.dart';
 import 'package:squad_go/platform/web/screens/events/admin_events_page.dart';
 import 'package:squad_go/platform/web/screens/sports/admin_sports_page.dart';
 import 'package:squad_go/platform/web/screens/admin_dashboard_page.dart';
+import 'package:squad_go/platform/web/screens/sports_stat_labels/admin_sport_stat_labels_page.dart';
 
 class WebHomeScreen extends StatefulWidget {
   const WebHomeScreen({super.key});
@@ -23,6 +24,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     const AdminUsersPage(),
     const AdminEventsPage(),
     const AdminSportsPage(),
+    const AdminSportStatLabelsPage(),
   ];
 
   @override
@@ -95,6 +97,17 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                           });
                         },
                       ),
+                      _createDrawerItem(
+                        icon: Icons.bar_chart,
+                        text: 'Statistiques sportives',
+                        onTap: () {
+                          setState(() {
+                            _selectedIndex =
+                                4;
+                          });
+                        },
+                      ),
+
                       _createDrawerItem(
                         icon: Icons.exit_to_app,
                         text: 'Déconnexion',
