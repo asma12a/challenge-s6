@@ -118,51 +118,60 @@ class _AdminSportStatLabelsPageState extends State<AdminSportStatLabelsPage> {
                         'Sélectionnez un sport',
                         style: TextStyle(color: Colors.blueGrey),
                       ),
-                      items: _sports
-                          .map((sport) => DropdownMenuItem<String>(
-                                value: sport['id'].toString(),
-                                child: Row(
-                                  children: [
-                                    // Vérifie si l'icône existe dans le Map sportIcon
-                                    if (sportIcon.containsKey(SportName.values
-                                        .firstWhere((e) =>
-                                            e
-                                                .toString()
-                                                .split('.')
-                                                .last
-                                                .toLowerCase() ==
-                                            sport['name'].toLowerCase())))
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 8.0),
-                                        child: Icon(
-                                          sportIcon[SportName.values.firstWhere(
-                                              (e) =>
-                                                  e
-                                                      .toString()
-                                                      .split('.')
-                                                      .last
-                                                      .toLowerCase() ==
-                                                  sport['name'].toLowerCase())],
-                                          size: 20,
-                                          color: Colors.blue,
+                      items: [
+                        // Option "Tous les sports"
+                        const DropdownMenuItem<String>(
+                          value: null, // null signifie "Tous les sports"
+                          child: Text('Tous les sports'),
+                        ),
+                        // Liste des sports disponibles
+                        ..._sports
+                            .map((sport) => DropdownMenuItem<String>(
+                                  value: sport['id'].toString(),
+                                  child: Row(
+                                    children: [
+                                      // Vérifie si l'icône existe dans le Map sportIcon
+                                      if (sportIcon.containsKey(SportName.values
+                                          .firstWhere((e) =>
+                                              e
+                                                  .toString()
+                                                  .split('.')
+                                                  .last
+                                                  .toLowerCase() ==
+                                              sport['name'].toLowerCase())))
+                                        Padding(
+                                          padding: const EdgeInsets.only(right: 8.0),
+                                          child: Icon(
+                                            sportIcon[SportName.values.firstWhere(
+                                                (e) =>
+                                                    e
+                                                        .toString()
+                                                        .split('.')
+                                                        .last
+                                                        .toLowerCase() ==
+                                                    sport['name'].toLowerCase())],
+                                            size: 20,
+                                            color: Colors.blue,
+                                          ),
                                         ),
+                                      Text(
+                                        sport['name'],
+                                        style: const TextStyle(fontSize: 16),
                                       ),
-                                    Text(
-                                      sport['name'],
-                                      style: const TextStyle(fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                              ))
-                          .toList(),
+                                    ],
+                                  ),
+                                ))
+                            .toList(),
+                      ],
                       onChanged: (value) {
                         setState(() {
-                          _selectedSportId = value;
-                          if (value != null) {
-                            fetchStatLabelsBySport(value);
+                          _selectedSportId = value; // La valeur peut être null
+                          if (value == null) {
+                            // Si "Tous les sports" est sélectionné
+                            fetchStatLabels(); // Charger toutes les statistiques
                           } else {
-                            fetchStatLabels();
+                            // Sinon, charger les statistiques pour un sport spécifique
+                            fetchStatLabelsBySport(value);
                           }
                         });
                       },
@@ -182,7 +191,7 @@ class _AdminSportStatLabelsPageState extends State<AdminSportStatLabelsPage> {
                           columns: [
                             DataColumn(label: Text('Nom')),
                             DataColumn(label: Text('Unité')),
-                            DataColumn(label: Text('Prioritaire')),
+                            DataColumn(label: Text('Décisif')),
                           ],
                           rows: _statLabels.map((stat) {
                             return DataRow(cells: [
