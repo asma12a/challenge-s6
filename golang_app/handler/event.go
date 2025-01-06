@@ -464,8 +464,15 @@ func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
 			}
 			sportID = &parsedID
 		}
+		currentUser, err := viewer.UserFromContext(c.UserContext())
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
 
-		events, err := service.Search(ctx, search, eventType, sportID)
+		events, err := service.Search(ctx, search, eventType, sportID, currentUser.ID)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"error": err.Error(),
