@@ -1,3 +1,17 @@
+//	@title			Challenge S6 API
+//	@version		1.0
+//	@description	API pour gérer des groupes de personnes autour d'une thématique
+//	@termsOfService	http://swagger.io/terms/
+
+//	@contact.name	Support Technique
+//	@contact.url	http://www.example.com/support
+//	@contact.email	support@example.com
+
+//	@license.name	MIT
+//	@license.url	https://opensource.org/licenses/MIT
+
+// @host		localhost:3001
+// @BasePath	/api
 package main
 
 import (
@@ -7,8 +21,13 @@ import (
 
 	"github.com/asma12a/challenge-s6/config"
 	"github.com/asma12a/challenge-s6/database"
+	"github.com/asma12a/challenge-s6/database/redis"
+	_ "github.com/asma12a/challenge-s6/docs"
 	"github.com/asma12a/challenge-s6/handler"
+	"github.com/asma12a/challenge-s6/internal/ws"
+	"github.com/asma12a/challenge-s6/middleware"
 	"github.com/asma12a/challenge-s6/service"
+	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -18,17 +37,21 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
+	fiberSwagger "github.com/swaggo/fiber-swagger"
 )
 
 func main() {
 	config.LoadEnvironmentFile()
 
-	db_client := database.GetClient()
-	defer db_client.Close()
+	dbClient := database.GetClient()
+	rdb := redis.GetClient()
+
+	defer dbClient.Close()
+	defer rdb.Close()
 
 	app := fiber.New()
 
-	// Middlewares
+	// Middleware
 	app.Use(cors.New())
 	app.Use(compress.New())
 	app.Use(etag.New())
@@ -41,21 +64,44 @@ func main() {
 			})
 		},
 	}))
+
 	app.Use(logger.New())
 	app.Use(recover.New())
-	app.Use(requestid.New())
+	app.Use(requestid.New()) // Générer un identifiant unique pour chaque requête
+	app.Use(func(c *fiber.Ctx) error {
+		// Ajouter le client DB au contexte de la requête
+		ctx := context.WithValue(c.Context(), "db", dbClient)
+		c.SetUserContext(ctx)
+		return c.Next()
+	})
 
-	// Routes
+	// Route pour afficher Swagger UI
+	app.Get("/swagger/*", fiberSwagger.WrapHandler)
+
+	// Créer un Hub WebSocket
+	hub := ws.NewHub()
+	go hub.Run() // Lancer le Hub dans une goroutine
+
+	// Route WebSocket
+	app.Get("/ws", websocket.New(ws.WebSocketHandler(hub)))
+
+	// Routes API (sans authentification middleware)
 	api := app.Group("/api")
+	handler.EventHandler(api.Group("/events", middleware.IsAuthMiddleware), context.Background(), *service.NewEventService(dbClient), *service.NewSportService(dbClient), *service.NewTeamService(dbClient), *service.NewTeamUserService(dbClient))
+	handler.SportHandler(api.Group("/sports", middleware.IsAuthMiddleware), context.Background(), *service.NewSportService(dbClient))
+	handler.UserHandler(api.Group("/users", middleware.IsAuthMiddleware), context.Background(), *service.NewUserService(dbClient))
+	handler.AuthHandler(api.Group("/auth"), context.Background(), *service.NewUserService(dbClient), *service.NewTeamUserService(dbClient), rdb)
+	handler.MessageHandler(api.Group("/message", middleware.IsAuthMiddleware), context.Background(), *service.NewMessageService(dbClient), *service.NewEventService(dbClient), *service.NewUserService(dbClient))
+	handler.SportStatLabelsHandler(api.Group("/sportstatlabels", middleware.IsAuthMiddleware), context.Background(), *service.NewSportStatLabelsService(dbClient), *service.NewSportService(dbClient), *service.NewEventService(dbClient), *service.NewUserService(dbClient))
 
-	handler.UserHandler(api.Group("/users"), context.Background(), *service.NewService(db_client))
 
-	// Any other routes: Not Found
+	// Route de gestion des erreurs (Not Found)
 	app.All("*", func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-			"error": "Not Found",
+			"error": "Route not Found",
 		})
 	})
 
+	// Serveur Fiber
 	log.Fatal(app.Listen(fmt.Sprintf(":%s", config.Env.APIPort)))
 }

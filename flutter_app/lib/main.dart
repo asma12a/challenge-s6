@@ -1,20 +1,51 @@
+import 'package:dio/dio.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:logging/logging.dart';
+import 'package:squad_go/platform/mobile/main_mobile.dart';
+import 'package:squad_go/platform/web/main_web.dart';
+import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 
-import 'src/app.dart';
-import 'src/settings/settings_controller.dart';
-import 'src/settings/settings_service.dart';
+final log = Logger("AppLogger");
+final dio = Dio(BaseOptions(
+  connectTimeout: Duration(seconds: 5),
+  receiveTimeout: Duration(seconds: 5),
+  headers: {
+    'Accept': 'application/json',
+  },
+));
 
 void main() async {
-  // Set up the SettingsController, which will glue user settings to multiple
-  // Flutter Widgets.
-  final settingsController = SettingsController(SettingsService());
+  await dotenv.load(fileName: "assets/../.env");
+  dio.interceptors.add(
+    DioCacheInterceptor(
+      options: CacheOptions(
+        store: MemCacheStore(),
+        policy: CachePolicy.request,
+      ),
+    ),
+  );
 
-  // Load the user's preferred theme while the splash screen is displayed.
-  // This prevents a sudden theme change when the app is first displayed.
-  await settingsController.loadSettings();
+  // Flutter Maps Tile Caching
+  WidgetsFlutterBinding.ensureInitialized();
+  if (!kIsWeb) {
+    await FMTCObjectBoxBackend().initialise();
+    await FMTCStore('mapStore').manage.create();
+  }
+  runApp(const MyApp());
+}
 
-  // Run the app and pass in the SettingsController. The app listens to the
-  // SettingsController for changes, then passes it further down to the
-  // SettingsView.
-  runApp(MyApp(settingsController: settingsController));
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    if (kIsWeb) {
+      return const MyAppWeb();
+    } else {
+      return const MyAppMobile();
+    }
+  }
 }

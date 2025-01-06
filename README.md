@@ -1,48 +1,60 @@
 # Challenge 5IWJ-S2
 
-#### Frontend: Flutter
-
 #### Backend: Golang
 
 - Framework Web: [Fiber](https://gofiber.io/)
 - ORM: [Ent](https://entgo.io/)
 
-## Commandes utiles
+## 🚀 Procédure d'installation et de lancement
 
-### Golang
+1- Créer un fichier `.env` au même niveau que le `.env.example` et dupliquer son contenu dedans.
 
-```
-docker compose up -d
-```
+2 - Lancer le `docker-compose` en mode détaché et s'assurer que les 3 containers sont up :
+    ```bash
+    docker compose up -d
+    ```
 
-Lancer le serveur (watcher [air](https://github.com/air-verse/air))
+3 - Lancer le serveur (avec le watcher [air](https://github.com/air-verse/air)) :
+    ```bash
+    air
+    ```
 
-```
-air
-```
+4 - Migration de la base de données :
+    ```bash
+    go run database/migrate/main.go
+    ```
 
-Migration de la base de données
+5 - Créer un modèle :
+    ```bash
+    go run entgo.io/ent/cmd/ent new <nom-de-modele>
+    ```
 
-```
-go run database/migrate/main.go
-```
+6 - Après avoir édité le modèle, exécuter :
+    ```bash
+    go generate ./ent
+    ```
 
-Créer un modèle
+### 📜 Documentation Swagger
 
-```
-go run entgo.io/ent/cmd/ent new <nom-de-modele>
-```
+Une fois que l'application backend est en cours d'exécution, tu peux accéder à la documentation interactive de l'API via **Swagger UI**. Cela te permettra de découvrir et tester facilement les différentes routes de l'API.
 
-Après avoir édité le modèle:
+1. Démarre ton serveur backend avec la commande suivante :
 
-```
-go generate ./ent
-```
+    ```bash
+    air
+    ```
 
-### Flutter
+2. Une fois l'application démarrée, lance la commande **go run server.go**, ouvre ton navigateur et rends-toi à l'URL suivante pour accéder à **Swagger UI** :
 
-Lancer l'application
+    ```
+    http://localhost:3001/swagger/index.html
+    ```
 
-```
-flutter run
-```
+3. Dans Swagger UI, tu pourras explorer toutes les routes disponibles, avec la possibilité de tester les différentes requêtes directement depuis l'interface web.
+
+#### Frontend: Flutter
+
+Lancer l'application :
+    ```bash
+    flutter run
+    ```

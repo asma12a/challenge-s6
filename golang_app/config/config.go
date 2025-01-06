@@ -16,6 +16,9 @@ type Environment struct {
 	DBName        string
 	APIPort       string
 	DragonFlyPort string
+	BrevoAPIKey   string
+	JWTSecret     string
+	Environment   string
 }
 
 var Env *Environment
@@ -39,12 +42,22 @@ func LoadEnvironment() {
 	Env.DBPass = getEnv("DB_PASS", true)
 	Env.DBName = getEnv("DB_NAME", true)
 	Env.APIPort = getEnv("API_PORT", true)
+	Env.BrevoAPIKey = getEnv("BREVO_API_KEY", true)
 	Env.DragonFlyPort = getEnv("DRAGONFLY_PORT", true)
+	Env.JWTSecret = getEnv("JWT_SECRET", true)
+	Env.Environment = getEnv("ENV", true)
 }
 
 func LoadEnvironmentFile() {
+	env := os.Getenv("ENV")
+
 	if err := godotenv.Load(); err != nil {
-		fmt.Printf("Error on load environment file: %s", err)
+		if env == "production" {
+			log.Println("No .env file found, falling back to system environment variables.")
+		} else {
+			fmt.Printf("Error on load environment file: %s\n", err)
+		}
 	}
+
 	LoadEnvironment()
 }
