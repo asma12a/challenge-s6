@@ -61,6 +61,7 @@ class EventService {
 
       final List<Map<String, dynamic>> events =
           List<Map<String, dynamic>>.from(json.decode(response.data));
+      debugPrint("Events $events");
       return events;
     } catch (error) {
       throw AppException(

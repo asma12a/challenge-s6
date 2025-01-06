@@ -15,6 +15,7 @@ func SportStatLabelsHandler(app fiber.Router, ctx context.Context, serviceSportS
 	app.Post("/:eventId/addUserStat", addUserStat(ctx, serviceSportStatLables, serviceEvent, serviceUser))
 	app.Post("/", createSportStatLables(ctx, serviceSportStatLables, serviceSport))
 	app.Get("/:eventId/:userId/stats", getUserStatsByEvent(ctx, serviceSportStatLables, serviceEvent, serviceUser))
+	app.Get("/:sportId/:userId/stats", getUserStatsBySport(ctx, serviceSportStatLables, serviceUser))
 	app.Get("/:sportId/labels", listSportStatLabelsBySport(ctx, serviceSportStatLables))
 	app.Get("/:sportStatLabelId", getSportStatLabel(ctx, serviceSportStatLables))
 	app.Get("/", listSportStatLabels(ctx, serviceSportStatLables))
@@ -443,7 +444,7 @@ func getUserStatsByEvent(ctx context.Context, serviceSportStatLables service.Spo
 	}
 }
 
-func getUserStatsBySport(ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceEvent service.Event, serviceUser service.User) fiber.Handler {
+func getUserStatsBySport(ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceUser service.User) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
 		sportIDStr := c.Params("sportId")

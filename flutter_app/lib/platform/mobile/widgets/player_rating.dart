@@ -4,6 +4,8 @@ import 'package:squad_go/core/services/sport_stat_labels_service.dart';
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/models/sport_stat_labels.dart';
 
+import '../../../main.dart';
+
 class PlayerRating extends StatefulWidget {
   final Event event;
 
@@ -62,7 +64,7 @@ class _PlayerRatingState extends State<PlayerRating> {
         isUpdating = true;
       }
     } catch (e) {
-      // Gérer l'erreur
+      log.severe('Failed to fetch stat labels details: $e');
     } finally {
       setState(() => isLoading = false);
     }
