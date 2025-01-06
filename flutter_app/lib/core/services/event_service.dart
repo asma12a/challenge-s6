@@ -34,7 +34,7 @@ class EventService {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getSearchResults(
+  Future<List<Event>> getSearchResults(
       Map<String, String> params) async {
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
 
@@ -58,10 +58,11 @@ class EventService {
             'Content-Type': 'application/json',
             'Authorization': "Bearer $token",
           }));
+      debugPrint('Search $response');
 
-      final List<Map<String, dynamic>> events =
-          List<Map<String, dynamic>>.from(json.decode(response.data));
-      return events;
+      final List<dynamic> events = response.data;
+      return events.map((event) => Event.fromJson(event)).toList();
+
     } catch (error) {
       throw AppException(
           message: 'Failed to retrieve events, please try again.');
