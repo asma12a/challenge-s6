@@ -8,12 +8,9 @@ class UserService {
   // GET all users
   static Future<List<UserApp>> getUsers() async {
     final storage = const FlutterSecureStorage();
-    //     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
 
-    final token = await storage.read(key: 'squadgo-jwt');
-
-    // final Uri url = Uri.http(dotenv.env['API_BASE_URL']!, 'api/users');
-    final url = Uri.parse('http://localhost:3001/api/users');
+    final Uri url = Uri.http(dotenv.env['API_BASE_URL']!, 'api/users');
 
     try {
       final response = await http.get(url, headers: {
@@ -35,11 +32,9 @@ class UserService {
   // DELETE a specific user
   static Future<void> deleteUser(String id) async {
     final storage = const FlutterSecureStorage();
-    // final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
-    final token = await storage.read(key: 'squadgo-jwt');
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
 
-    // final Uri url = Uri.http(dotenv.env['API_BASE_URL']!, 'api/users/$id');
-    final url = Uri.parse('http://localhost:3001/api/users/$id');
+    final Uri url = Uri.http(dotenv.env['API_BASE_URL']!, 'api/users/$id');
 
     try {
       final response = await http.delete(url, headers: {
@@ -58,11 +53,9 @@ class UserService {
   // CREATE a new user
   static Future<void> createUser(Map<String, dynamic> userData) async {
     final storage = const FlutterSecureStorage();
-    // final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
-    final token = await storage.read(key: 'squadgo-jwt');
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
 
-    // final Uri url = Uri.http(dotenv.env['API_BASE_URL']!, 'api/users');
-    final url = Uri.parse('http://localhost:3001/api/users');
+    final Uri url = Uri.http(dotenv.env['API_BASE_URL']!, 'api/users');
 
     try {
       final response = await http.post(
@@ -73,8 +66,6 @@ class UserService {
         },
         body: json.encode(userData),
       );
-
-      print('body ================= $userData');
 
       if (response.statusCode != 201) {
         throw Exception('Erreur lors de la création de l\'utilisateur.');
@@ -88,11 +79,9 @@ class UserService {
   static Future<void> updateUser(
       String id, Map<String, dynamic> updates) async {
     final storage = const FlutterSecureStorage();
-    // final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
-    final token = await storage.read(key: 'squadgo-jwt');
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
 
-    // final Uri url = Uri.http(dotenv.env['API_BASE_URL']!, 'api/users/$id');
-    final url = Uri.parse('http://localhost:3001/api/users/$id');
+    final Uri url = Uri.http(dotenv.env['API_BASE_URL']!, 'api/users/$id');
 
     try {
       final response = await http.put(
