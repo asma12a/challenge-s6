@@ -8,6 +8,7 @@ import (
 	"github.com/asma12a/challenge-s6/config"
 	"github.com/asma12a/challenge-s6/database"
 	"github.com/asma12a/challenge-s6/ent"
+	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/entity"
 	"github.com/brianvoe/gofakeit/v7"
 )
@@ -49,18 +50,31 @@ func seedSports(ctx context.Context, db_client *ent.Client) {
 	log.Println("Sports seeded!")
 }
 
+func GenerateUniqueEventCode(ctx context.Context, db_client *ent.Client) string {
+	var code string
+	for {
+		code = gofakeit.LetterN(4)
+		_, err := db_client.Event.Query().Where(event.EventCode(code)).First(ctx)
+		if err != nil {
+			break
+		}
+	}
+	return code
+}
+
 func seedEvents(ctx context.Context, db_client *ent.Client) {
-	// foot, basket, tennis, running
 	sports := db_client.Sport.Query().AllX(ctx)
 
 	for _, sport := range sports {
+		eventCode := GenerateUniqueEventCode(ctx, db_client)
+
 		_, err := db_client.Event.Create().
 			SetName(gofakeit.Name()).
 			SetAddress(gofakeit.Address().Address).
 			SetLatitude(gofakeit.Latitude()).
 			SetLongitude(gofakeit.Longitude()).
 			SetSport(sport).
-			SetEventCode("1234").
+			SetEventCode(eventCode).
 			SetDate(time.Now().Format(time.DateOnly)).
 			Save(ctx)
 		if err != nil {
