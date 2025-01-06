@@ -129,7 +129,10 @@ class _AddPlayerDialogState extends State<AddPlayerDialog> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                icon: const Icon(Icons.add),
+                icon: const Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
                 label: const Text('Ajouter'),
               ),
             ],

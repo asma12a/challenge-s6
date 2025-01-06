@@ -3,7 +3,6 @@ package database
 import (
 	"fmt"
 	"log"
-	"os"
 
 	"entgo.io/ent/dialect"
 	"github.com/asma12a/challenge-s6/config"
@@ -15,10 +14,9 @@ import (
 // Returns a ent ORM client
 func GetClient() *ent.Client {
 
-	env := os.Getenv("ENV")
 	sslMode := "disable"
 
-	if env == "production" {
+	if config.Env.Environment == "production" {
 		sslMode = "require"
 
 	}

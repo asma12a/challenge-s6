@@ -141,4 +141,19 @@ class TeamService {
       throw AppException(message: 'Failed to update player, please try again.');
     }
   }
+
+  Future<void> deletePlayer(String eventID, String playerID) async {
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    final Uri url = Uri.http(dotenv.env['API_BASE_URL']!,
+        'api/events/$eventID/teams/players/$playerID');
+    try {
+      await dio.delete(url.toString(),
+          options: Options(headers: {
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer $token",
+          }));
+    } catch (error) {
+      throw AppException(message: 'Failed to delete player, please try again.');
+    }
+  }
 }

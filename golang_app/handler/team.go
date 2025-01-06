@@ -18,6 +18,7 @@ func TeamHandler(app fiber.Router, ctx context.Context, serviceEvent service.Eve
 	app.Post("/:teamId/switch", switchTeam(ctx, serviceTeam))
 	app.Post("/:teamId/players", middleware.IsEventOrganizerOrCoach(ctx, serviceEvent), addPlayerToTeam(ctx, serviceTeamUser))
 	app.Put("/players/:playerId", middleware.IsEventOrganizerOrCoach(ctx, serviceEvent), updatePlayer(ctx, serviceTeamUser))
+	app.Delete("/players/:playerId", middleware.IsEventOrganizerOrCoach(ctx, serviceEvent), deletePlayer(ctx, serviceTeamUser))
 
 	// "/:eventId/teams" scoped
 	app.Get("/", listEventTeams(ctx, serviceTeam))
@@ -387,5 +388,26 @@ func updatePlayer(ctx context.Context, serviceTeamUser service.TeamUser) fiber.H
 		}
 
 		return c.SendStatus(fiber.StatusOK)
+	}
+}
+
+func deletePlayer(ctx context.Context, serviceTeamUser service.TeamUser) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		playerID, err := ulid.Parse(c.Params("playerId"))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "Invalid player ID format",
+			})
+		}
+		err = serviceTeamUser.Delete(ctx, playerID)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+
+		return c.SendStatus(fiber.StatusNoContent)
 	}
 }
