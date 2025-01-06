@@ -7,7 +7,8 @@ import 'package:squad_go/platform/mobile/widgets/event_card.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomeMyEvents extends StatefulWidget {
-  const HomeMyEvents({super.key});
+  final Future<void> Function()? onRefresh;
+  const HomeMyEvents({super.key, this.onRefresh});
 
   @override
   State<HomeMyEvents> createState() => HomeMyEventsState();
@@ -51,6 +52,7 @@ class HomeMyEventsState extends State<HomeMyEvents> {
           .map((event) => EventCard(
                 event: event,
                 hasJoinedEvent: true,
+                onRefresh: widget.onRefresh,
               ))
           .toList(),
     );

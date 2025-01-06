@@ -7,7 +7,8 @@ import 'package:squad_go/platform/mobile/widgets/carousel.dart';
 import 'package:squad_go/platform/mobile/widgets/event_card.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final bool? shouldRefresh;
+  const HomeScreen({super.key, this.shouldRefresh});
 
   @override
   State<HomeScreen> createState() => HomeScreenState();
@@ -33,6 +34,12 @@ class HomeScreenState extends State<HomeScreen>
     );
 
     _animationController.forward();
+
+    if (widget.shouldRefresh == true) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        onRefresh();
+      });
+    }
   }
 
   @override
@@ -71,7 +78,10 @@ class HomeScreenState extends State<HomeScreen>
               const SizedBox(
                 height: 10,
               ),
-              HomeMyEvents(key: myEventsKey),
+              HomeMyEvents(
+                key: myEventsKey,
+                onRefresh: onRefresh,
+              ),
               HomeRecommendedEvents(
                 key: recommendedEventsKey,
                 onRefresh: onRefresh,

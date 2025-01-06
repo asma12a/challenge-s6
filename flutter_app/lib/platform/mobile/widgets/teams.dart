@@ -328,6 +328,8 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                               return ShowPlayerDetailsDialog(
                                                 eventId: widget.eventId,
                                                 player: player,
+                                                canEdit: widget.canEdit,
+                                                isCurrentUser: isCurrentUser,
                                                 onRefresh: widget.onRefresh,
                                               );
                                             },
@@ -459,6 +461,10 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                                 eventId: widget
                                                                     .eventId,
                                                                 player: player,
+                                                                canEdit: widget
+                                                                    .canEdit,
+                                                                isCurrentUser:
+                                                                    isCurrentUser,
                                                                 onRefresh: widget
                                                                     .onRefresh,
                                                               );

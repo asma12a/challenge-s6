@@ -7,7 +7,8 @@ import 'package:squad_go/platform/mobile/screens/new_event.dart';
 
 class TabsScreen extends StatefulWidget {
   final int? initialPageIndex;
-  const TabsScreen({super.key, this.initialPageIndex});
+  final bool? shouldRefresh;
+  const TabsScreen({super.key, this.initialPageIndex, this.shouldRefresh});
 
   @override
   State<TabsScreen> createState() => _TabsScreenState();
@@ -36,7 +37,7 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget activePage = HomeScreen();
+    Widget activePage = HomeScreen(shouldRefresh: widget.shouldRefresh);
 
     if (_selectPageIndex == 1) {
       activePage = SearchScreen();

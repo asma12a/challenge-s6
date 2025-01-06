@@ -56,47 +56,6 @@ class _EditPlayerDialogState extends State<EditPlayerDialog> {
     }
   }
 
-  void _deletePlayer() async {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Supprimer le joueur'),
-          content: Text(
-              'Êtes-vous sûr de vouloir supprimer le joueur ${_player.name} ?'),
-          actions: [
-            TextButton(
-              child: Text("Annuler"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text("OK"),
-              onPressed: () async {
-                try {
-                  await teamService.deletePlayer(widget.eventId, _player.id);
-                  widget.onRefresh?.call();
-                } on AppException catch (e) {
-                  // Handle AppException error
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Erreur: ${e.message}')),
-                  );
-                } catch (e) {
-                  // Handle other errors
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Une erreur est survenue')),
-                  );
-                }
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -165,21 +124,6 @@ class _EditPlayerDialogState extends State<EditPlayerDialog> {
                   ),
                 ),
                 child: const Text('Modifier'),
-              ),
-              // TODO: Move to player details dialog
-              ElevatedButton(
-                onPressed: _deletePlayer,
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.red,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  textStyle: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                child: const Text('Supprimer'),
               ),
             ],
           ),
