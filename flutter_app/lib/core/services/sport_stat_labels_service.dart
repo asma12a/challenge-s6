@@ -14,7 +14,8 @@ class SportStatLabelsService {
   Future<List<SportStatLabels>> getStatLabelsBySport(String sportId) async {
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
     try {
-      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/sportstatlabels/$sportId/labels');
+      final uri = Uri.http(
+          dotenv.env['API_BASE_URL']!, 'api/sportstatlabels/$sportId/labels');
       final response = await http.get(
         uri,
         headers: {
@@ -36,7 +37,8 @@ class SportStatLabelsService {
     debugPrint('UserId $userId');
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
     try {
-      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/sportstatlabels/$eventId/$userId/stats');
+      final uri = Uri.http(dotenv.env['API_BASE_URL']!,
+          'api/sportstatlabels/$eventId/$userId/stats');
       final response = await http.get(
         uri,
         headers: {
@@ -76,7 +78,8 @@ class SportStatLabelsService {
   Future<void> addUserStat(Map<String, dynamic> stats, String eventId) async {
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
     try {
-      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/sportstatlabels/$eventId/addUserStat');
+      final uri = Uri.http(dotenv.env['API_BASE_URL']!,
+          'api/sportstatlabels/$eventId/addUserStat');
       await http.post(uri,
           headers: {
             'Content-Type': 'application/json',
@@ -84,14 +87,17 @@ class SportStatLabelsService {
           },
           body: jsonEncode(stats));
     } catch (error) {
-      throw AppException(message: 'Failed to add user stats, please try again.');
+      throw AppException(
+          message: 'Failed to add user stats, please try again.');
     }
   }
 
-  Future<void> updateUserStat(Map<String, dynamic> stats, String eventId) async {
+  Future<void> updateUserStat(
+      Map<String, dynamic> stats, String eventId) async {
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
     try {
-      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/sportstatlabels/$eventId/updateUserStats');
+      final uri = Uri.http(dotenv.env['API_BASE_URL']!,
+          'api/sportstatlabels/$eventId/updateUserStats');
       await http.put(uri,
           headers: {
             'Content-Type': 'application/json',
@@ -103,11 +109,32 @@ class SportStatLabelsService {
     }
   }
 
+  Future<List<SportStatLabels>> getAllStatLabels() async {
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    try {
+      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/sportstatlabels');
+      final response = await http.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          "Authorization": "Bearer $token",
+        },
+      );
 
-
-
-
-
-
-
+      if (response.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
+        return List<SportStatLabels>.from(
+          data.map((json) => SportStatLabels.fromJson(json)),
+        );
+      } else {
+        throw AppException(message: 'Failed to load stat labels');
+      }
+    } catch (error) {
+      log('An error occurred while fetching sport stat labels', error: error);
+      throw AppException(
+        message:
+            'An error occurred while fetching stat labels, please try again.',
+      );
+    }
+  }
 }

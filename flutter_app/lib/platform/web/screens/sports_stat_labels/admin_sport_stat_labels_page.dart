@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:squad_go/core/services/sport_stat_labels_service.dart';
 import 'package:squad_go/core/services/sport_service.dart';
 import 'package:squad_go/core/models/sport_stat_labels.dart';
-import '../custom_data_table.dart';
+import 'package:squad_go/platform/web/screens/custom_data_table.dart';
 
 class AdminSportStatLabelsPage extends StatefulWidget {
   const AdminSportStatLabelsPage({super.key});
@@ -23,9 +23,9 @@ class _AdminSportStatLabelsPageState extends State<AdminSportStatLabelsPage> {
   void initState() {
     super.initState();
     fetchSports();
+    fetchStatLabels(); 
   }
 
-  /// Récupérer la liste des sports
   Future<void> fetchSports() async {
     try {
       setState(() {
@@ -46,13 +46,12 @@ class _AdminSportStatLabelsPageState extends State<AdminSportStatLabelsPage> {
     }
   }
 
-  /// Récupérer les statistiques pour un sport donné
-  Future<void> fetchStatLabels(String sportId) async {
+  Future<void> fetchStatLabels() async {
     try {
       setState(() {
         _isLoading = true;
       });
-      final labels = await _statLabelsService.getStatLabelsBySport(sportId);
+      final labels = await _statLabelsService.getAllStatLabels();
       setState(() {
         _statLabels = labels;
         _isLoading = false;
@@ -67,35 +66,80 @@ class _AdminSportStatLabelsPageState extends State<AdminSportStatLabelsPage> {
     }
   }
 
+  Future<void> fetchStatLabelsBySport(String sportId) async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+      final labels = await _statLabelsService.getStatLabelsBySport(sportId);
+      setState(() {
+        _statLabels = labels;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur lors du chargement des stats pour ce sport: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-    
+     
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                // Dropdown pour sélectionner un sport
+                // Container amélioré pour le dropdown
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: DropdownButtonFormField<String>(
-                    value: _selectedSportId,
-                    hint: const Text('Sélectionnez un sport'),
-                    items: _sports
-                        .map((sport) => DropdownMenuItem<String>(
-                              value: sport['id'].toString(),
-                              child: Text(sport['name']),
-                            ))
-                        .toList(),
-                    onChanged: (value) {
-                      if (value != null) {
+                  padding: const EdgeInsets.all(16.0),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[50], // Arrière-plan léger
+                      borderRadius: BorderRadius.circular(12.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 8.0,
+                          offset: Offset(2, 2),
+                        ),
+                      ],
+                    ),
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedSportId,
+                      hint: const Text(
+                        'Sélectionnez un sport',
+                        style: TextStyle(color: Colors.blueGrey),
+                      ),
+                      items: _sports
+                          .map((sport) => DropdownMenuItem<String>(
+                                value: sport['id'].toString(),
+                                child: Text(
+                                  sport['name'],
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
                         setState(() {
                           _selectedSportId = value;
-                          _statLabels = [];
+                          if (value != null) {
+                            fetchStatLabelsBySport(value);
+                          } else {
+                            fetchStatLabels();
+                          }
                         });
-                        fetchStatLabels(value);
-                      }
-                    },
+                      },
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        icon: const Icon(Icons.sports, color: Colors.blue),
+                      ),
+                    ),
                   ),
                 ),
                 // Utilisation de CustomDataTable
@@ -103,11 +147,11 @@ class _AdminSportStatLabelsPageState extends State<AdminSportStatLabelsPage> {
                   child: _statLabels.isEmpty
                       ? const Center(child: Text('Aucune donnée disponible'))
                       : CustomDataTable(
-                          title: 'Statistiques sportives',
+                          title: 'Statistiques Sportives',
                           columns: [
                             DataColumn(label: Text('Nom')),
                             DataColumn(label: Text('Unité')),
-                            DataColumn(label: Text('Décisif')),
+                            DataColumn(label: Text('Prioritaire')),
                           ],
                           rows: _statLabels.map((stat) {
                             return DataRow(cells: [
