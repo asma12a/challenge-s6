@@ -147,46 +147,68 @@ type LoginRequestInput struct {
 
 func login(ctx context.Context, serviceUser service.User) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		log.Println("Parsing request body...")
+
 		// Parse le corps de la requête
 		var loginInput LoginRequestInput
 
 		err := c.BodyParser(&loginInput)
 		if err != nil {
+			log.Printf("Error parsing body: %v", err)
+
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
 				"error":  entity.ErrCannotParseJSON.Error(),
 			})
 		}
+		log.Println("Request body parsed successfully.")
+		log.Println("Validating input fields...")
 
 		// Valide les champs du JSON
 		if err := validate.Struct(loginInput); err != nil {
+			log.Printf("Validation error: %v", err)
+
 			return c.Status(fiber.StatusUnprocessableEntity).JSON(&fiber.Map{
 				"status": "error",
 				"error":  err.Error(),
 			})
 		}
 
+		log.Println("Input fields validated successfully.")
+
 		// Récupération des informations d'email et de mot de passe
 		email := loginInput.Email
 		password := loginInput.Password
 
+		log.Printf("User attempting to log in with email: %s", email)
+
 		// Rechercher l'utilisateur par email
 		user, err := serviceUser.FindByEmail(ctx, email)
 		if err != nil {
+			log.Printf("User not found: %v", err)
+
 			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 				"status": "error",
 				"error":  entity.ErrEntityNotFound("User").Error(),
 			})
 		}
 
+		log.Printf("User found: %s", user.Email)
+		log.Println("Validating password...")
+
 		// Validation du mot de passe
 		err = entity.ValidatePassword(user, password)
 		if err != nil {
+			log.Printf("Invalid password for user: %s", user.Email)
+
 			return c.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
 				"status": "error",
 				"error":  entity.ErrInvalidPassword.Error(),
 			})
 		}
+
+		log.Println("Password validated successfully.")
+		log.Println("Creating JWT token...")
 
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 			"id":    user.ID,
@@ -204,6 +226,10 @@ func login(ctx context.Context, serviceUser service.User) fiber.Handler {
 				"error":  err.Error(),
 			})
 		}
+
+		log.Println("JWT token created successfully.")
+		log.Println("Returning response with user and token...")
+
 		return c.Status(fiber.StatusOK).JSON(&fiber.Map{
 			"status": "success",
 			"user": presenter.User{
@@ -219,6 +245,8 @@ func login(ctx context.Context, serviceUser service.User) fiber.Handler {
 
 func me(ctx context.Context, serviceUser service.User) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		log.Println("Parsing request body...")
+
 		currentUser, err := viewer.UserFromContext(c.UserContext())
 
 		if err != nil {
