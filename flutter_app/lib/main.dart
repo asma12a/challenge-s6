@@ -34,7 +34,7 @@ void main() async {
     await FMTCObjectBoxBackend().initialise();
     await FMTCStore('mapStore').manage.create();
   }
-  runApp(const App());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
     if (kIsWeb) {
       return const MyAppWeb();
     } else {
-      return const App();
+      return const MyAppMobile();
     }
   }
 }

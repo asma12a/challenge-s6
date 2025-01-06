@@ -86,8 +86,8 @@ final GoRouter _router = GoRouter(
   ],
 );
 
-class App extends StatelessWidget {
-  const App({super.key});
+class MyAppMobile extends StatelessWidget {
+  const MyAppMobile({super.key});
 
   @override
   Widget build(BuildContext context) {
