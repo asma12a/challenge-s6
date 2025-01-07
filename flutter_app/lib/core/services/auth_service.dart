@@ -9,7 +9,11 @@ class AuthService {
   final _storage = const FlutterSecureStorage();
 
   Future<Map<String, dynamic>> signIn(body) async {
-      print('signIn  ${dotenv.env['API_BASE_URL']!}');
+    print(
+        'URL  ${String.fromEnvironment('API_BASE_URL', defaultValue: 'marche-pas')}');
+
+    print(
+        'token  ${String.fromEnvironment('JWT_STORAGE_KEY', defaultValue: 'marche-pas')}');
 
     try {
       final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/auth/login');
