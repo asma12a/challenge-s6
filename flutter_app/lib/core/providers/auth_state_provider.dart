@@ -22,6 +22,9 @@ class AuthState with ChangeNotifier {
   }
 
   Future<Map<String, dynamic>> login(String email, String password) async {
+    print('email  $email');
+    print('password  $password');
+
     try {
       final loginData =
           await _authService.signIn({'email': email, 'password': password});
