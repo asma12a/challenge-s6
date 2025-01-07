@@ -34,7 +34,6 @@ class SportStatLabelsService {
   }
 
   Future<List<UserStats>> getUserStatByEvent(String eventId, userId) async {
-    debugPrint('UserId $userId');
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
     try {
       final uri = Uri.http(dotenv.env['API_BASE_URL']!,
@@ -56,13 +55,15 @@ class SportStatLabelsService {
     }
   }
 
-  Future<UserPerformance> getUserPerformanceBySport(String sportId, userId) async {
+  Future<UserPerformance> getUserPerformanceBySport(
+      String sportId, userId) async {
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
     try {
-      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/sportstatlabels/$sportId/$userId/performance');
+      final uri = Uri.http(dotenv.env['API_BASE_URL']!,
+          'api/sportstatlabels/$sportId/$userId/performance');
       final response = await http.get(
-          uri,
-          headers: {
+        uri,
+        headers: {
           'Content-Type': 'application/json',
           "Authorization": "Bearer $token",
         },
@@ -105,7 +106,8 @@ class SportStatLabelsService {
           },
           body: jsonEncode(stats));
     } catch (error) {
-      throw AppException(message: 'Failed to update user stat, please try again.');
+      throw AppException(
+          message: 'Failed to update user stat, please try again.');
     }
   }
 
@@ -202,8 +204,7 @@ class SportStatLabelsService {
       );
 
       if (response.statusCode != 204) {
-                throw Exception('Erreur lors de la suppression de la statistique.');
-
+        throw Exception('Erreur lors de la suppression de la statistique.');
       }
     } catch (error) {
       throw Exception('Erreur: ${error.toString()}');
