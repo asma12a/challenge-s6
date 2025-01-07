@@ -116,6 +116,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
   @override
   Widget build(BuildContext context) {
     final translate = AppLocalizations.of(context);
+    final translate = AppLocalizations.of(context);
     userHasTeam = widget.teams.any(
       (team) => team.players.any((player) => player.userID == currentUser!.id),
     );
@@ -349,6 +350,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                                 PlayerRole.coach
                                                             ? 'Coach'
                                                             : translate?.organizer ?? 'Organisateur',
+                                                            : translate?.organizer ?? 'Organisateur',
                                                         style: TextStyle(
                                                           color: roleColor,
                                                           fontWeight: FontWeight.bold,
@@ -435,7 +437,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                   ],
                                                 )
                                               : Badge(
-                                                  label: Text(translate?.waiting ??
+                                                  label: Text(transalte?.waiting ??
                                                     'En attente',
                                                     style: TextStyle(
                                                       color: Colors.white,
@@ -481,7 +483,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                               Icons.add,
                               color: Colors.white,
                             ),
-                            label: Text(
+                            label: const Text(
                                 translate?.add_player ?? 'Ajouter un joueur'),
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,

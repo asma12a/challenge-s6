@@ -67,6 +67,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final translate = AppLocalizations.of(context);
+    final translate = AppLocalizations.of(context);
     return Padding(
       padding: EdgeInsets.all(15),
       child: Column(
@@ -102,7 +103,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     value: params["sport"],
                     iconEnabledColor: Colors.black,
                     dropdownColor: Theme.of(context).colorScheme.secondary,
-                    hint: Text(translate?.sport_select_label ??
+                    hint: Text(translate?.sport ??
                       "Sport",
                       style: TextStyle(
                           color: Theme.of(context).colorScheme.onSecondary),
@@ -139,6 +140,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     dropdownColor: Theme.of(context).colorScheme.secondary,
                     iconEnabledColor: Colors.black,
                     hint: Text(translate?.type_select_label ??
+                    hint: Text(translate?.type_select_label ??
                       "Type",
                       style: TextStyle(
                           color: Theme.of(context).colorScheme.onSecondary),
@@ -167,6 +169,7 @@ class _SearchScreenState extends State<SearchScreen> {
           Text(
             _searchResults.isNotEmpty
                 ? "${_searchResults.length} événements trouvés."
+                : translate?.no_events ?? "Aucun événement trouvé.",
                 : translate?.no_events ?? "Aucun événement trouvé.",
           ),
           SizedBox(

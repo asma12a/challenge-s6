@@ -19,8 +19,6 @@ class MainDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = context.read<AuthState>().userInfo;
-
     final translate = AppLocalizations.of(context);
     return Drawer(
       child: Column(
@@ -54,7 +52,7 @@ class MainDrawer extends StatelessWidget {
               color: Theme.of(context).colorScheme.onSurface,
             ),
             title: Text(
-              translate?.my_profile ?? currentUser!.name,
+              translate?.my_profile ?? 'Mon compte',
               style: Theme.of(context).textTheme.titleSmall!.copyWith(
                     color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 24,
@@ -71,6 +69,7 @@ class MainDrawer extends StatelessWidget {
               color: Theme.of(context).colorScheme.onSurface,
             ),
             title: Text(
+              translate?.logout ?? 'Déconnexion',
               translate?.logout ?? 'Déconnexion',
               style: Theme.of(context).textTheme.titleSmall!.copyWith(
                     color: Theme.of(context).colorScheme.onSurface,
