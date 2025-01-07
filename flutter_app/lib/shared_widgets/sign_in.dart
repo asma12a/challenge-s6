@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
 import 'package:squad_go/shared_widgets/sign_up.dart';
 import 'package:squad_go/platform/mobile/widgets/logo.dart';
@@ -76,7 +79,7 @@ class __FormContentState extends State<_FormContent> {
   var _enteredPassword = '';
 
   void _signIn(BuildContext context) async {
-    debugPrint('_signIn ======');
+    print('test signIN');
 
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -88,7 +91,11 @@ class __FormContentState extends State<_FormContent> {
         'loginData ====== $loginData',
       );
 
+      print('loginData $loginData');
+
       if (loginData['status'] == 'error') {
+        print('loginData $loginData');
+
         debugPrint(
           'oginDataStatus ====== ${loginData['status']}',
         );
@@ -105,6 +112,8 @@ class __FormContentState extends State<_FormContent> {
           ),
         );
       } else {
+        print('loginData $loginData');
+
         debugPrint('Going to home ======');
 
         context.go('/home');
