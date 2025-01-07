@@ -9,13 +9,10 @@ class AuthService {
   final _storage = const FlutterSecureStorage();
 
   Future<Map<String, dynamic>> signIn(body) async {
-          print('DEBUT signIn ===');
       print('signIn  ${dotenv.env['API_BASE_URL']!}');
 
     try {
       final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/auth/login');
-      print('signIn on service ${dotenv.env['API_BASE_URL']!}');
-
       final response = await dio.post(
         uri.toString(),
         options: Options(
@@ -26,14 +23,10 @@ class AuthService {
         data: body,
       );
 
-      print('response $response');
-
       final data = response.data;
-      print('data before token $data');
 
       await _storage.write(
           key: dotenv.env['JWT_STORAGE_KEY']!, value: data['token']);
-      print('data after token $data');
 
       return data;
     } catch (error) {

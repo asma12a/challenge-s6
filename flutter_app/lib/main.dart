@@ -23,10 +23,6 @@ void main() async {
   if (!kIsWeb) {
     debugPrint('Production ====== $kIsWeb');
     await dotenv.load(fileName: "assets/../.env");
-  } else {
-    dotenv.testLoad(
-      mergeWith: Platform.environment,
-    );
   }
 
   dio.interceptors.add(

@@ -79,25 +79,14 @@ class __FormContentState extends State<_FormContent> {
   var _enteredPassword = '';
 
   void _signIn(BuildContext context) async {
-    print('test signIN');
-
     if (_formKey.currentState!.validate()) {
-      print(
-          '_formKey.currentState!.validate() ${_formKey.currentState!.validate()}');
-
       _formKey.currentState!.save();
-      print('After save formKey');
 
       final loginData = await context
           .read<AuthState>()
           .login(_enteredEmail, _enteredPassword);
 
-      print('loginData $loginData');
-
       if (loginData['status'] == 'error') {
-        print('loginData Status $loginData');
-
-     
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -111,10 +100,6 @@ class __FormContentState extends State<_FormContent> {
           ),
         );
       } else {
-        print('Going to HOME');
-
-        debugPrint('Going to home ======');
-
         context.go('/home');
       }
     }
