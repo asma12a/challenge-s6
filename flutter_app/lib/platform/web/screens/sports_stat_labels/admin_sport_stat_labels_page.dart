@@ -107,8 +107,8 @@ class _AdminSportStatLabelsPageState extends State<AdminSportStatLabelsPage> {
                   filter: ImageFilter.blur(
                       sigmaX: 10.0, sigmaY: 10.0), // Valeur de flou
                   child: Container(
-                    color: Colors.black
-                        .withOpacity(0), // Pour appliquer un fond transparent
+                    color: const Color.fromRGBO(0, 0, 0, 1)
+                        .withOpacity(0.0), // Pour appliquer un fond transparent
                   ),
                 ),
               ),
