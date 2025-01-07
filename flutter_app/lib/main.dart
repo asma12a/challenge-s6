@@ -18,7 +18,10 @@ final dio = Dio(BaseOptions(
 ));
 
 void main() async {
-  await dotenv.load(fileName: "assets/../.env");
+  if (!kIsWeb) {
+    await dotenv.load(fileName: "assets/../.env");
+  }
+
   dio.interceptors.add(
     DioCacheInterceptor(
       options: CacheOptions(

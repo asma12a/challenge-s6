@@ -51,9 +51,9 @@ flutter:
   generate: true
 
   assets:
-    # Add assets from the images directory to the application.
-    - assets/images/
-    - .env
+  # Add assets from the images directory to the application.
+  - assets/images/
+  # - .env
 
 flutter_native_splash:
   color: '#FFFFFF'
