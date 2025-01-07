@@ -103,6 +103,7 @@ class __FormContentState extends State<_FormContent> {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     return Container(
       constraints: const BoxConstraints(maxWidth: 300),
       child: Form(
@@ -135,7 +136,7 @@ class __FormContentState extends State<_FormContent> {
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
               decoration: const InputDecoration(
-                labelText: 'Email',
+                labelText: translate?.email_label ?? 'Email',
                 hintText: 'Entrez votre adresse email',
                 prefixIcon: Icon(Icons.email_outlined),
                 border: OutlineInputBorder(),
@@ -164,7 +165,7 @@ class __FormContentState extends State<_FormContent> {
                   ),
               obscureText: !_isPasswordVisible,
               decoration: InputDecoration(
-                  labelText: 'Mot de passe',
+                  labelText: translate?.password ?? 'Mot de passe',
                   hintText: 'Entrez votre mot de passe',
                   prefixIcon: const Icon(Icons.lock_outline_rounded),
                   border: const OutlineInputBorder(),
@@ -191,7 +192,7 @@ class __FormContentState extends State<_FormContent> {
                   _rememberMe = value;
                 });
               },
-              title: const Text('Se souvenir de moi'),
+              title: const Text(translate?.remember ?? 'Se souvenir de moi'),
               controlAffinity: ListTileControlAffinity.leading,
               dense: true,
               contentPadding: const EdgeInsets.all(0),
@@ -207,7 +208,7 @@ class __FormContentState extends State<_FormContent> {
                 onPressed: () async => _signIn(context),
                 child: const Padding(
                   padding: EdgeInsets.all(10.0),
-                  child: Text(
+                  child: Text(translate?.login_button ??
                     'Se connecter',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
@@ -234,7 +235,7 @@ class __FormContentState extends State<_FormContent> {
                 },
                 child: const Padding(
                   padding: EdgeInsets.all(10.0),
-                  child: Text(
+                  child: Text(translate?.signup_title ??
                     'Inscription',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),

@@ -39,8 +39,9 @@ class HomeRecommendedEventsState extends State<HomeRecommendedEvents> {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     return Carousel(
-      text: "Évenements recommandés",
+      text: translate?.recommended_events ?? "Évenements recommandés",
       items: recommendedEvents
           .map((event) => EventCard(
                 event: event,

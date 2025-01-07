@@ -3,7 +3,6 @@ import 'package:squad_go/core/models/team.dart';
 import 'package:squad_go/core/services/sport_stat_labels_service.dart';
 import 'package:squad_go/core/services/event_service.dart';
 import 'package:squad_go/core/models/event.dart';
-import 'package:squad_go/core/models/user_stats.dart';
 
 import '../../../../main.dart';
 

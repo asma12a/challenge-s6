@@ -1,7 +1,6 @@
 import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/core/services/event_service.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:squad_go/main.dart';
@@ -172,9 +171,10 @@ class _NewEventState extends State<NewEvent> {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text("Créer un événement"),
+        title: Text(translate?.create_event ?? "Créer un événement"),
       ),
       body: Center(
         child: Column(
@@ -202,7 +202,7 @@ class _NewEventState extends State<NewEvent> {
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         icon: Icon(Icons.title),
-                        label: Text('Nom de l\'événement'),
+                        label: Text(translate?.event_name ?? 'Nom de l\'événement'),
                       ),
                       onSaved: (value) {
                         _enteredName = value!;
@@ -222,7 +222,7 @@ class _NewEventState extends State<NewEvent> {
                           decoration: InputDecoration(
                             border: OutlineInputBorder(),
                             icon: Icon(Icons.place),
-                            labelText: 'Adresse de l\'événement',
+                            labelText: translate?.event_address ?? 'Adresse de l\'événement',
                           ),
                           validator: _validateAddress,
                           onSaved: (value) {
@@ -273,7 +273,7 @@ class _NewEventState extends State<NewEvent> {
                           SizedBox(width: 15),
                           ElevatedButton(
                             onPressed: _presentDatePicker,
-                            child: Text("Sélectionner une date"),
+                            child: Text(translate?.select_date ?? "Sélectionner une date"),
                           ),
                           SizedBox(width: 20),
                           Text(
@@ -300,7 +300,7 @@ class _NewEventState extends State<NewEvent> {
                                 }
                                 return null;
                               },
-                              hint: Text(
+                              hint: Text(translate?.type_select_label ??
                                 "Type",
                                 style: TextStyle(
                                     color: Theme.of(context)
@@ -313,7 +313,7 @@ class _NewEventState extends State<NewEvent> {
                               items: [
                                 DropdownMenuItem(
                                   value: null,
-                                  child: Text(
+                                  child: Text(translate?.type_select_label ??
                                     "Type",
                                     style: TextStyle(
                                         color: Theme.of(context)
@@ -366,7 +366,7 @@ class _NewEventState extends State<NewEvent> {
                                 }
                                 return null;
                               },
-                              hint: Text(
+                              hint: Text(translate?.sport_select_label ??
                                 "Sport",
                                 style: TextStyle(
                                     color: Theme.of(context)
@@ -379,7 +379,7 @@ class _NewEventState extends State<NewEvent> {
                               items: [
                                 DropdownMenuItem<String>(
                                   value: null,
-                                  child: Text(
+                                  child: Text(translate?.sport_select_label ??
                                     "Sport",
                                     style: TextStyle(
                                       color: Theme.of(context)

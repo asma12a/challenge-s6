@@ -118,6 +118,7 @@ class __FormContentState extends State<_FormContent> {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     return Container(
       constraints: const BoxConstraints(maxWidth: 300),
       child: Form(
@@ -168,7 +169,7 @@ class __FormContentState extends State<_FormContent> {
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
               decoration: const InputDecoration(
-                labelText: 'Email',
+                labelText: translate?.email_label ?? 'Email',
                 hintText: 'Entrez votre adresse email',
                 prefixIcon: Icon(Icons.email_outlined),
                 border: OutlineInputBorder(),
@@ -194,7 +195,7 @@ class __FormContentState extends State<_FormContent> {
                   ),
               obscureText: !_isPasswordVisible,
               decoration: InputDecoration(
-                  labelText: 'Mot de passe',
+                  labelText: translate?.password ?? 'Mot de passe',
                   hintText: 'Entrez votre mot de passe',
                   prefixIcon: const Icon(Icons.lock_outline_rounded),
                   border: const OutlineInputBorder(),
@@ -223,7 +224,7 @@ class __FormContentState extends State<_FormContent> {
                 onPressed: _signUp,
                 child: const Padding(
                   padding: EdgeInsets.all(10.0),
-                  child: Text(
+                  child: Text(translate?.signup_button ??
                     'Créez votre compte',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
@@ -245,7 +246,7 @@ class __FormContentState extends State<_FormContent> {
                     width: 10,
                   ),
                   InkWell(
-                    child: Text(
+                    child: Text(translate?.login_button ??
                       'Connectez-vous',
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.primary,
