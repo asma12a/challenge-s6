@@ -18,16 +18,13 @@ final dio = Dio(BaseOptions(
 ));
 
 void main() async {
-  await dotenv.load();
-
-  String? environment = dotenv.env['env'];
-  environment ??= 'development';
-
-  if (environment != 'production') {
+  if (!kReleaseMode) {
     await dotenv.load(fileName: "assets/../.env");
+  } else {
+    await dotenv
+        .load();
   }
-
-  await dotenv.load(fileName: "assets/../.env");
+  
   dio.interceptors.add(
     DioCacheInterceptor(
       options: CacheOptions(
