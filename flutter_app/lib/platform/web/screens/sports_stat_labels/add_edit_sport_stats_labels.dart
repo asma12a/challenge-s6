@@ -36,8 +36,8 @@ class _AddEditSportStatLabelModalState
     super.initState();
     if (widget.statLabel != null) {
       _label = widget.statLabel!.label;
-      _unit = widget.statLabel!.unit;
-      _isMain = widget.statLabel!.isMain;
+      _unit = widget.statLabel!.unit!;
+      _isMain = widget.statLabel!.isMain!;
     }
   }
 

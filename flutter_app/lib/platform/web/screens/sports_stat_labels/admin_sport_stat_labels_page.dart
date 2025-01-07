@@ -107,8 +107,8 @@ class _AdminSportStatLabelsPageState extends State<AdminSportStatLabelsPage> {
                   filter: ImageFilter.blur(
                       sigmaX: 10.0, sigmaY: 10.0), // Valeur de flou
                   child: Container(
-                    color: const Color.fromRGBO(0, 0, 0, 1)
-                        .withOpacity(0.0), // Pour appliquer un fond transparent
+                    color: const Color.from(alpha: 1, red: 0, green: 0, blue: 0)
+                        .withValues(), // Pour appliquer un fond transparent
                   ),
                 ),
               ),
@@ -263,8 +263,8 @@ class _AdminSportStatLabelsPageState extends State<AdminSportStatLabelsPage> {
                           rows: _statLabels.map((stat) {
                             return DataRow(cells: [
                               DataCell(Text(stat.label)),
-                              DataCell(Text(stat.unit)),
-                              DataCell(Text(stat.isMain ? 'Oui' : 'Non')),
+                              DataCell(Text(stat.unit!)),
+                              DataCell(Text(stat.isMain! ? 'Oui' : 'Non')),
                               DataCell(
                                 Row(
                                   children: [
