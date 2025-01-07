@@ -1,9 +1,12 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/core/services/sport_stat_labels_service.dart';
 import 'package:squad_go/core/services/sport_service.dart';
 import 'package:squad_go/core/models/sport_stat_labels.dart';
 import 'package:squad_go/platform/web/screens/custom_data_table.dart';
+import 'package:squad_go/platform/web/screens/sports_stat_labels/add_edit_sport_stats_labels.dart';
 
 class AdminSportStatLabelsPage extends StatefulWidget {
   const AdminSportStatLabelsPage({super.key});
@@ -89,6 +92,78 @@ class _AdminSportStatLabelsPageState extends State<AdminSportStatLabelsPage> {
     }
   }
 
+  void _confirmDelete(BuildContext context, SportStatLabels statLabel) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors
+              .transparent, // Rendre le fond transparent pour voir le flou
+          child: Stack(
+            children: [
+              // Appliquer un flou sur l'arrière-plan
+              Positioned.fill(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(
+                      sigmaX: 10.0, sigmaY: 10.0), // Valeur de flou
+                  child: Container(
+                    color: Colors.black
+                        .withOpacity(0), // Pour appliquer un fond transparent
+                  ),
+                ),
+              ),
+              // Modal principale
+              AlertDialog(
+                title: const Text('Supprimer la statistique'),
+                content: Text(
+                    'Voulez-vous vraiment supprimer la statistique "${statLabel.label}" ?'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text(
+                      'Annuler',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      try {
+                        await _statLabelsService
+                            .deleteStatLabel(statLabel.id);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text('La statistique a été supprimée.')),
+                        );
+                        Navigator.of(context).pop();
+                        fetchStatLabels();
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content:
+                                  Text('Erreur lors de la suppression: $e')),
+                        );
+                      }
+                    },
+                    style: TextButton.styleFrom(
+                      side: BorderSide(color: Colors.red, width: 2),
+                      backgroundColor: Colors.red,
+                      padding:
+                          EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                    ),
+                    child: const Text(
+                      'Confirmer',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,13 +171,12 @@ class _AdminSportStatLabelsPageState extends State<AdminSportStatLabelsPage> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                // Container amélioré pour le dropdown
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
                     decoration: BoxDecoration(
-                      color: Colors.blue[50], // Arrière-plan léger
+                      color: Colors.blue[50],
                       borderRadius: BorderRadius.circular(12.0),
                       boxShadow: [
                         BoxShadow(
@@ -119,58 +193,52 @@ class _AdminSportStatLabelsPageState extends State<AdminSportStatLabelsPage> {
                         style: TextStyle(color: Colors.blueGrey),
                       ),
                       items: [
-                        // Option "Tous les sports"
                         const DropdownMenuItem<String>(
-                          value: null, // null signifie "Tous les sports"
+                          value: null,
                           child: Text('Tous les sports'),
                         ),
-                        // Liste des sports disponibles
-                        ..._sports
-                            .map((sport) => DropdownMenuItem<String>(
-                                  value: sport['id'].toString(),
-                                  child: Row(
-                                    children: [
-                                      // Vérifie si l'icône existe dans le Map sportIcon
-                                      if (sportIcon.containsKey(SportName.values
-                                          .firstWhere((e) =>
-                                              e
-                                                  .toString()
-                                                  .split('.')
-                                                  .last
-                                                  .toLowerCase() ==
-                                              sport['name'].toLowerCase())))
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 8.0),
-                                          child: Icon(
-                                            sportIcon[SportName.values.firstWhere(
-                                                (e) =>
-                                                    e
-                                                        .toString()
-                                                        .split('.')
-                                                        .last
-                                                        .toLowerCase() ==
-                                                    sport['name'].toLowerCase())],
-                                            size: 20,
-                                            color: Colors.blue,
-                                          ),
-                                        ),
-                                      Text(
-                                        sport['name'],
-                                        style: const TextStyle(fontSize: 16),
+                        ..._sports.map((sport) => DropdownMenuItem<String>(
+                              value: sport['id'].toString(),
+                              child: Row(
+                                children: [
+                                  if (sportIcon.containsKey(SportName.values
+                                      .firstWhere((e) =>
+                                          e
+                                              .toString()
+                                              .split('.')
+                                              .last
+                                              .toLowerCase() ==
+                                          sport['name'].toLowerCase())))
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 8.0),
+                                      child: Icon(
+                                        sportIcon[SportName.values.firstWhere(
+                                            (e) =>
+                                                e
+                                                    .toString()
+                                                    .split('.')
+                                                    .last
+                                                    .toLowerCase() ==
+                                                sport['name'].toLowerCase())],
+                                        size: 20,
+                                        color: Colors.blue,
                                       ),
-                                    ],
+                                    ),
+                                  Text(
+                                    sport['name'],
+                                    style: const TextStyle(fontSize: 16),
                                   ),
-                                ))
-                            .toList(),
+                                ],
+                              ),
+                            ))
                       ],
                       onChanged: (value) {
                         setState(() {
-                          _selectedSportId = value; // La valeur peut être null
+                          _selectedSportId = value;
                           if (value == null) {
-                            // Si "Tous les sports" est sélectionné
-                            fetchStatLabels(); // Charger toutes les statistiques
+                            fetchStatLabels();
                           } else {
-                            // Sinon, charger les statistiques pour un sport spécifique
                             fetchStatLabelsBySport(value);
                           }
                         });
@@ -182,7 +250,6 @@ class _AdminSportStatLabelsPageState extends State<AdminSportStatLabelsPage> {
                     ),
                   ),
                 ),
-                // Utilisation de CustomDataTable
                 Expanded(
                   child: _statLabels.isEmpty
                       ? const Center(child: Text('Aucune donnée disponible'))
@@ -192,20 +259,40 @@ class _AdminSportStatLabelsPageState extends State<AdminSportStatLabelsPage> {
                             DataColumn(label: Text('Nom')),
                             DataColumn(label: Text('Unité')),
                             DataColumn(label: Text('Décisif')),
+                            DataColumn(label: Text('Actions')),
                           ],
                           rows: _statLabels.map((stat) {
                             return DataRow(cells: [
                               DataCell(Text(stat.label)),
                               DataCell(Text(stat.unit)),
                               DataCell(Text(stat.isMain ? 'Oui' : 'Non')),
+                              DataCell(Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.delete,
+                                        color: Colors.red),
+                                    onPressed: () {
+                                      _confirmDelete(context,
+                                          stat); // Appel de la fonction de confirmation
+                                    },
+                                  ),
+                                ],
+                              )),
                             ]);
                           }).toList(),
                           buttonText: 'Ajouter une Statistique',
                           onButtonPressed: () {
-                            // Ajouter la logique pour ajouter une nouvelle statistique
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AddEditSportStatLabelModal(
+                                  onStatLabelSaved: fetchStatLabels,
+                                );
+                              },
+                            );
                           },
                         ),
-                ),
+                )
               ],
             ),
     );
