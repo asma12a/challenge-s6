@@ -25,16 +25,24 @@ class AuthState with ChangeNotifier {
     try {
       final loginData =
           await _authService.signIn({'email': email, 'password': password});
+      print('loginData on login $loginData');
 
       if (loginData['status'] == 'error') {
         return loginData;
       }
+
+      print('loginData status on login ${loginData['status']}');
+
       // make UserApp from : loginData['user'] props + loginData['token']
       final userData = UserApp.fromJson({
         ...loginData['user'],
         'apiToken': loginData['token'],
       });
+      print('userData on login $userData');
+
       setUser(userData);
+
+      print('loginData after === $loginData');
 
       return loginData;
     } catch (e) {

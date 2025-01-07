@@ -82,23 +82,22 @@ class __FormContentState extends State<_FormContent> {
     print('test signIN');
 
     if (_formKey.currentState!.validate()) {
+      print(
+          '_formKey.currentState!.validate() ${_formKey.currentState!.validate()}');
+
       _formKey.currentState!.save();
+      print('After save formKey');
 
       final loginData = await context
           .read<AuthState>()
           .login(_enteredEmail, _enteredPassword);
-      debugPrint(
-        'loginData ====== $loginData',
-      );
 
       print('loginData $loginData');
 
       if (loginData['status'] == 'error') {
-        print('loginData $loginData');
+        print('loginData Status $loginData');
 
-        debugPrint(
-          'oginDataStatus ====== ${loginData['status']}',
-        );
+     
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -112,7 +111,7 @@ class __FormContentState extends State<_FormContent> {
           ),
         );
       } else {
-        print('loginData $loginData');
+        print('Going to HOME');
 
         debugPrint('Going to home ======');
 
