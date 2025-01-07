@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:squad_go/platform/mobile/screens/account.dart';
 import 'package:squad_go/platform/mobile/screens/join.dart';
 import 'package:squad_go/platform/mobile/screens/home.dart';
 import 'package:squad_go/platform/mobile/screens/search.dart';
@@ -46,6 +47,10 @@ class _TabsScreenState extends State<TabsScreen> {
       activePage = JoinEventScreen();
     }
 
+    if (_selectPageIndex == 3) {
+      activePage = AccountScreen();
+    }
+
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -82,8 +87,8 @@ class _TabsScreenState extends State<TabsScreen> {
             label: 'Rejoindre',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.event_available),
-            label: 'Mes évents',
+            icon: Icon(Icons.person),
+            label: 'Profile',
           ),
         ],
       ),
