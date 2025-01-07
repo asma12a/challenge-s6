@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/foundation.dart';
@@ -21,6 +23,9 @@ void main() async {
   if (!kIsWeb) {
     debugPrint('Production ====== $kIsWeb');
     await dotenv.load(fileName: "assets/../.env");
+  } else {
+    await dotenv.load(mergeWith: Platform.environment);
+
   }
 
   dio.interceptors.add(
