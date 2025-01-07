@@ -24,8 +24,9 @@ void main() async {
     debugPrint('Production ====== $kIsWeb');
     await dotenv.load(fileName: "assets/../.env");
   } else {
-    await dotenv.load(mergeWith: Platform.environment);
-
+    dotenv.testLoad(
+      mergeWith: Platform.environment,
+    );
   }
 
   dio.interceptors.add(
