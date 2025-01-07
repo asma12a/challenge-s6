@@ -10,6 +10,7 @@ class Event {
     required this.address,
     required this.date,
     required this.sport,
+    required this.code,
     this.latitude = 46.603354,
     this.longitude = 1.888334,
     this.isPublic = true,
@@ -31,6 +32,7 @@ class Event {
   final bool isPublic;
   final List<Team>? teams;
   final bool hasJoined;
+  final String code;
 
   factory Event.fromJson(Map<String, dynamic> data) {
     return Event(
@@ -51,6 +53,7 @@ class Event {
       createdBy: data['created_by'],
       isPublic: data['is_public'] ?? true,
       hasJoined: data['has_joined'] ?? false,
+      code: data['event_code'] ?? '',
     );
   }
 
@@ -93,6 +96,7 @@ class Event {
       teams: teams ?? this.teams,
       createdBy: createdBy ?? this.createdBy,
       isPublic: isPublic ?? this.isPublic,
+      code: code,
     );
   }
 
@@ -102,6 +106,7 @@ class Event {
       address: '',
       date: DateTime.now().toString(),
       sport: Sport.empty(),
+      code: '',
     );
   }
 }

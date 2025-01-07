@@ -12,6 +12,7 @@ import 'package:squad_go/platform/mobile/widgets/custom_label.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/edit_event.dart';
 import 'package:provider/provider.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/map_location.dart';
+import 'package:squad_go/platform/mobile/widgets/dialog/share_event.dart';
 import 'package:squad_go/platform/mobile/widgets/teams.dart';
 
 class EventScreen extends StatefulWidget {
@@ -68,6 +69,23 @@ class _EventScreenState extends State<EventScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          shape: const CircleBorder(),
+          backgroundColor: event.sport.color?.withValues(alpha: 0.5) ??
+              Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return ShareEventDialog(event: event);
+              },
+            );
+          },
+          child: const Icon(
+            Icons.share,
+            color: Colors.white,
+          ),
+        ),
         body: event.id == null
             ? const Center(child: CircularProgressIndicator())
             : RefreshIndicator(

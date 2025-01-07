@@ -358,7 +358,10 @@ class _EditEventDialogState extends State<EditEventDialog> {
                   onPressed: () {
                     _updateEvent();
                   },
-                  icon: const Icon(Icons.update),
+                  icon: const Icon(
+                    Icons.update,
+                    color: Colors.white,
+                  ),
                   label: const Text('Metre à jour'),
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
