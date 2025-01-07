@@ -35,8 +35,10 @@ final GoRouter _router = GoRouter(
         GoRoute(
           path: 'home',
           builder: (BuildContext context, GoRouterState state) {
-            return const TabsScreen(
+            final shouldRefresh = state.extra as bool?;
+            return TabsScreen(
               initialPageIndex: 0,
+              shouldRefresh: shouldRefresh,
             );
           },
         ),

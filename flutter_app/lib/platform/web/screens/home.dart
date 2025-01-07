@@ -6,6 +6,7 @@ import 'package:squad_go/platform/web/screens/users/admin_users_page.dart';
 import 'package:squad_go/platform/web/screens/events/admin_events_page.dart';
 import 'package:squad_go/platform/web/screens/sports/admin_sports_page.dart';
 import 'package:squad_go/platform/web/screens/admin_dashboard_page.dart';
+import 'package:squad_go/platform/web/screens/sports_stat_labels/admin_sport_stat_labels_page.dart';
 
 class WebHomeScreen extends StatefulWidget {
   const WebHomeScreen({super.key});
@@ -23,6 +24,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     const AdminUsersPage(),
     const AdminEventsPage(),
     const AdminSportsPage(),
+    const AdminSportStatLabelsPage(),
   ];
 
   @override
@@ -45,16 +47,15 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                 Container(
                   width: 250, // Largeur de la sidebar
                   color: Colors.teal[50],
-                  child: ListView(
-                    padding: EdgeInsets.zero,
+                  child: Column(
                     children: <Widget>[
                       // Remplacer le DrawerHeader par une image
                       DrawerHeader(
                         child: Center(
                           child: Image.asset(
                             'assets/images/app_icon.png',
-                            width: 200,
-                            height: 200,
+                            width: 150,
+                            height: 150,
                             fit: BoxFit.contain,
                           ),
                         ),
@@ -96,6 +97,17 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                         },
                       ),
                       _createDrawerItem(
+                        icon: Icons.bar_chart,
+                        text: 'Statistiques sportives',
+                        onTap: () {
+                          setState(() {
+                            _selectedIndex = 4;
+                          });
+                        },
+                      ),
+                      const Divider(), // Séparateur
+                      Spacer(), // Espace pour pousser "Déconnexion" en bas
+                      _createDrawerItem(
                         icon: Icons.exit_to_app,
                         text: 'Déconnexion',
                         onTap: () {
@@ -124,12 +136,13 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     required GestureTapCallback onTap,
   }) {
     return ListTile(
-      // leading: Icon(icon, color: Colors.teal),
+      leading: Icon(icon, color: Colors.teal),
       title: Text(
         text,
         style: TextStyle(
           color: Colors.black,
-          fontSize: 18,
+          fontSize: 16,
+          fontFamily: 'Poppins', // Utilisation d'une police plus moderne
           fontWeight: FontWeight.w600,
         ),
       ),

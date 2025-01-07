@@ -128,7 +128,9 @@ class _AddEditSportModalState extends State<AddEditSportModal> {
                     ElevatedButton(
                       onPressed: saveSport,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.teal,
+                        foregroundColor:
+                            const Color.fromARGB(255, 255, 255, 255),
+                        backgroundColor: Theme.of(context).primaryColor,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 24, vertical: 12),
                         shape: RoundedRectangleBorder(

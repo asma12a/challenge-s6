@@ -61,18 +61,16 @@ class CustomDataTable extends StatelessWidget {
           LayoutBuilder(
             builder: (context, constraints) {
               return SingleChildScrollView(
-                scrollDirection: Axis
-                    .horizontal,
+                scrollDirection: Axis.horizontal,
                 child: SizedBox(
                   width:
                       constraints.maxWidth, // Prend toute la largeur disponible
                   child: DataTable(
-                    headingRowColor: MaterialStateColor.resolveWith(
+                    headingRowColor: WidgetStateColor.resolveWith(
                         (states) => Colors.grey[200]!),
                     columns: columns,
                     rows: rows,
-                    columnSpacing:
-                        16,
+                    columnSpacing: 16,
                   ),
                 ),
               );

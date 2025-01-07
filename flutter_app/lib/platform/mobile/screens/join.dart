@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/services/event_service.dart';
-import 'package:go_router/go_router.dart';
 import 'package:squad_go/platform/mobile/widgets/event_card.dart';
 
 class UpperCaseTextFormatter extends TextInputFormatter {
@@ -63,6 +62,7 @@ class _JoinEventScreenState extends State<JoinEventScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     return Padding(
       padding: EdgeInsets.all(20),
       child: Column(
@@ -121,7 +121,7 @@ class _JoinEventScreenState extends State<JoinEventScreen> {
           if (hasSearched && _event != null)
             EventCard(event: _event!, hasJoinedEvent: _event!.hasJoined),
           if (hasSearched && _event == null)
-            Text("Aucun événement ne correspond à ce code."),
+            Text(translate?.no_events ?? "Aucun événement ne correspond à ce code."),
         ],
       ),
     );

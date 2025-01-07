@@ -16,7 +16,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   List<Sport> _sports = [];
   bool _isLoading = true;
-  List<Map<String, dynamic>> _searchResults = [];
+  List<Event> _searchResults = [];
   Map<String, String> params = {};
   Timer? _debounce;
   final eventService = EventService();
@@ -63,9 +63,9 @@ class _SearchScreenState extends State<SearchScreen> {
       });
     }
   }
-
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     return Padding(
       padding: EdgeInsets.all(15),
       child: Column(
@@ -101,7 +101,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     value: params["sport"],
                     iconEnabledColor: Colors.black,
                     dropdownColor: Theme.of(context).colorScheme.secondary,
-                    hint: Text(
+                    hint: Text(translate?.sport ??
                       "Sport",
                       style: TextStyle(
                           color: Theme.of(context).colorScheme.onSecondary),
@@ -137,7 +137,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     value: params["type"],
                     dropdownColor: Theme.of(context).colorScheme.secondary,
                     iconEnabledColor: Colors.black,
-                    hint: Text(
+                    hint: Text(translate?.type_select_label ??
                       "Type",
                       style: TextStyle(
                           color: Theme.of(context).colorScheme.onSecondary),
@@ -166,7 +166,7 @@ class _SearchScreenState extends State<SearchScreen> {
           Text(
             _searchResults.isNotEmpty
                 ? "${_searchResults.length} événements trouvés."
-                : "Aucun événement trouvé.",
+                : translate?.no_events ?? "Aucun événement trouvé.",
           ),
           SizedBox(
             height: 5,
@@ -175,43 +175,7 @@ class _SearchScreenState extends State<SearchScreen> {
             child: ListView.builder(
               itemCount: _searchResults.length,
               itemBuilder: (ctx, index) => EventCard(
-                event: Event(
-                  id: _searchResults[index]["id"],
-                  name: _searchResults[index]["name"],
-                  date: DateFormat('yyyy-MM-dd').format(
-                    DateTime.tryParse(_searchResults[index]["date"]) ??
-                        DateTime.now(),
-                  ),
-                  address: _searchResults[index]["address"],
-                  sport: Sport(
-                      id: _searchResults[index]["sport"]["id"],
-                      name: SportName.values.firstWhere(
-                        (sn) => sn.name.contains(
-                          _searchResults[index]["sport"]["name"]
-                              .toString()
-                              .toLowerCase(),
-                        ),
-                        orElse: () => SportName.football,
-                      ),
-                      maxTeams:
-                          _searchResults[index]["sport"]["max_teams"] ?? 0,
-                      type: SportType.values.firstWhere(
-                        (st) => st.name.contains(
-                          _searchResults[index]["sport"]["type"]
-                              .toString()
-                              .toLowerCase(),
-                        ),
-                        orElse: () => SportType.team,
-                      ),
-                      color: _searchResults[index]["sport"]["color"] != null
-                          ? Color(int.parse(
-                              _searchResults[index]["sport"]["color"]
-                                  .toString(),
-                              radix: 16,
-                            ))
-                          : Colors.black,
-                      imageUrl: _searchResults[index]["sport"]["imageUrl"]),
-                ),
+               event: _searchResults[index],
               ),
             ),
           ),

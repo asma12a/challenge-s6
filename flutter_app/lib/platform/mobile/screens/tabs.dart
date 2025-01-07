@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:squad_go/platform/mobile/screens/account.dart';
 import 'package:squad_go/platform/mobile/screens/join.dart';
 import 'package:squad_go/platform/mobile/screens/home.dart';
 import 'package:squad_go/platform/mobile/screens/search.dart';
@@ -7,7 +8,8 @@ import 'package:squad_go/platform/mobile/screens/new_event.dart';
 
 class TabsScreen extends StatefulWidget {
   final int? initialPageIndex;
-  const TabsScreen({super.key, this.initialPageIndex});
+  final bool? shouldRefresh;
+  const TabsScreen({super.key, this.initialPageIndex, this.shouldRefresh});
 
   @override
   State<TabsScreen> createState() => _TabsScreenState();
@@ -36,6 +38,7 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     Widget activePage = HomeScreen();
 
     if (_selectPageIndex == 1) {
@@ -44,6 +47,10 @@ class _TabsScreenState extends State<TabsScreen> {
 
     if (_selectPageIndex == 2) {
       activePage = JoinEventScreen();
+    }
+
+    if (_selectPageIndex == 3) {
+      activePage = AccountScreen();
     }
 
     return Scaffold(
@@ -71,19 +78,19 @@ class _TabsScreenState extends State<TabsScreen> {
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Accueil',
+            label: translate?.tabs.home ?? 'Accueil',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
-            label: 'Rechercher',
+            label: translate?.tabs.search ?? 'Rechercher',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.qr_code),
-            label: 'Rejoindre',
+            label: translate?.tabs.join ?? 'Rejoindre',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.event_available),
-            label: 'Mes évents',
+            icon: Icon(Icons.person),
+            label: 'Profile',
           ),
         ],
       ),

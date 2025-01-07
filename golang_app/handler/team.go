@@ -18,7 +18,7 @@ func TeamHandler(app fiber.Router, ctx context.Context, serviceEvent service.Eve
 	app.Post("/:teamId/switch", switchTeam(ctx, serviceTeam))
 	app.Post("/:teamId/players", middleware.IsEventOrganizerOrCoach(ctx, serviceEvent), addPlayerToTeam(ctx, serviceTeamUser))
 	app.Put("/players/:playerId", middleware.IsEventOrganizerOrCoach(ctx, serviceEvent), updatePlayer(ctx, serviceTeamUser))
-	app.Delete("/players/:playerId", middleware.IsEventOrganizerOrCoach(ctx, serviceEvent), deletePlayer(ctx, serviceTeamUser))
+	app.Delete("/players/:playerId", middleware.IsEventOrganizerOrCoachOrSelf(ctx, serviceEvent), deletePlayer(ctx, serviceTeamUser))
 
 	// "/:eventId/teams" scoped
 	app.Get("/", listEventTeams(ctx, serviceTeam))

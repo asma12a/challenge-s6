@@ -126,7 +126,10 @@ func (e *Event) FindOne(ctx context.Context, id ulid.ID) (*entity.Event, error) 
 }
 
 func (e *Event) FindEventByCode(ctx context.Context, code string) (*entity.Event, error) {
-	event, err := e.db.Event.Query().Where(event.EventCode(code)).WithSport().Only(ctx)
+	event, err := e.db.Event.Query().
+		Where(event.EventCode(code)).
+		Where(event.DateGTE(time.Now().Format(time.DateOnly))).
+		WithSport().Only(ctx)
 	if ent.IsNotFound(err) {
 		return nil, err
 	}
@@ -210,8 +213,23 @@ func (e *Event) List(ctx context.Context) ([]*ent.Event, error) {
 // @Success 200 {array} entity.Event "List of events matching search"
 // @Failure 400 {object} map[string]interface{} "Bad Request"  // Remplacer fiber.Map par map[string]interface{}
 // @Router /events/search [get]
-func (e *Event) Search(ctx context.Context, search, eventType string, sportID *ulid.ID) ([]*ent.Event, error) {
-	query := e.db.Event.Query().Where(event.IsPublicEQ(true))
+func (e *Event) Search(ctx context.Context, search, eventType string, sportID *ulid.ID, userId ulid.ID) ([]*ent.Event, error) {
+	userEvents, err := e.ListUserEvents(ctx, userId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var userEventIDs []ulid.ID
+	for _, ue := range userEvents {
+		userEventIDs = append(userEventIDs, ue.ID)
+	}
+
+	query := e.db.Event.Query().
+		Where(event.IsPublicEQ(true)).
+		Where(event.IDNotIn(userEventIDs...)).
+		Where(event.DateGTE(time.Now().Format(time.DateOnly)))
+
 	if search != "" {
 		query.Where(
 			event.Or(
@@ -252,6 +270,7 @@ func (e *Event) ListUserEvents(ctx context.Context, userID ulid.ID) ([]*ent.Even
 				event.CreatedByEQ(userID),
 			),
 		).
+		Order(ent.Desc(event.FieldCreatedAt)).
 		WithSport().All(ctx)
 	if err != nil {
 		return nil, err
