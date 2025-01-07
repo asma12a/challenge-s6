@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:squad_go/core/models/sport_stat_labels.dart';
 import 'package:squad_go/core/services/sport_stat_labels_service.dart';
@@ -5,7 +6,7 @@ import 'package:squad_go/core/services/sport_stat_labels_service.dart';
 class AddEditSportStatLabelModal extends StatefulWidget {
   final SportStatLabels? statLabel;
   final Function onStatLabelSaved;
-  final List<Map<String, dynamic>> sports; // Liste des sports disponibles
+  final List<Map<String, dynamic>> sports;
 
   const AddEditSportStatLabelModal({
     super.key,
@@ -69,7 +70,7 @@ class _AddEditSportStatLabelModalState
         await _statLabelsService.updateStatLabel(
           {
             ...statLabelData,
-            'sport_id': _selectedSportId, // Ajout ou mise à jour de sport_id
+            'sport_id': _selectedSportId,
           },
           widget.statLabel!.id.toString(),
         );
@@ -90,77 +91,140 @@ class _AddEditSportStatLabelModalState
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                widget.statLabel == null
-                    ? 'Ajouter une Statistique'
-                    : 'Modifier la Statistique',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+    return BackdropFilter(
+      filter: ImageFilter.blur(
+          sigmaX: 5.0, sigmaY: 5.0), // Applique un flou au fond
+      child: Dialog(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+        backgroundColor: Colors.white,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Container(
+              width: constraints.maxWidth *
+                  0.6, // Réduction supplémentaire à 60% de largeur
+              padding:
+                  const EdgeInsets.symmetric(vertical: 24.0, horizontal: 20.0),
+              child: Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Text(
+                          widget.statLabel == null
+                              ? 'Ajouter une Statistique'
+                              : 'Modifier la Statistique',
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
+                                  ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      TextFormField(
+                        initialValue: _label,
+                        decoration: InputDecoration(
+                          labelText: 'Nom',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'Nom requis'
+                            : null,
+                        onSaved: (value) => _label = value!,
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        initialValue: _unit,
+                        decoration: InputDecoration(
+                          labelText: 'Unité',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'Unité requise'
+                            : null,
+                        onSaved: (value) => _unit = value!,
+                      ),
+                      const SizedBox(height: 16),
+                      DropdownButtonFormField<String>(
+                        value: _selectedSportId,
+                        decoration: InputDecoration(
+                          labelText: 'Sport',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        items: widget.sports.map((sport) {
+                          return DropdownMenuItem<String>(
+                            value: sport['id'].toString(),
+                            child: Text(sport['name']),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedSportId = value;
+                          });
+                        },
+                        validator: (value) => value == null
+                            ? 'Veuillez sélectionner un sport'
+                            : null,
+                      ),
+                      const SizedBox(height: 16),
+                      CheckboxListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text(
+                          'Décisif',
+                          style: TextStyle(fontSize: 14.0),
+                        ),
+                        activeColor: Theme.of(context).primaryColor,
+                        value: _isMain,
+                        onChanged: (value) {
+                          setState(() {
+                            _isMain = value!;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).primaryColor,
+                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                          onPressed: _isSaving ? null : _saveStatLabel,
+                          child: _isSaving
+                              ? const CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
+                                )
+                              : Text(
+                                  widget.statLabel == null
+                                      ? 'Créer'
+                                      : 'Modifier',
+                                  style: const TextStyle(
+                                    fontSize: 16.0,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 16),
-              TextFormField(
-                initialValue: _label,
-                decoration: const InputDecoration(labelText: 'Nom'),
-                validator: (value) =>
-                    value == null || value.isEmpty ? 'Nom requis' : null,
-                onSaved: (value) => _label = value!,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                initialValue: _unit,
-                decoration: const InputDecoration(labelText: 'Unité'),
-                validator: (value) =>
-                    value == null || value.isEmpty ? 'Unité requise' : null,
-                onSaved: (value) => _unit = value!,
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: _selectedSportId,
-                decoration: const InputDecoration(labelText: 'Sport'),
-                items: widget.sports.map((sport) {
-                  return DropdownMenuItem<String>(
-                    value: sport['id'].toString(),
-                    child: Text(sport['name']),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedSportId = value;
-                  });
-                },
-                validator: (value) =>
-                    value == null ? 'Veuillez sélectionner un sport' : null,
-              ),
-              const SizedBox(height: 16),
-              CheckboxListTile(
-                title: const Text('Décisif'),
-                value: _isMain,
-                onChanged: (value) {
-                  setState(() {
-                    _isMain = value!;
-                  });
-                },
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _isSaving ? null : _saveStatLabel,
-                child: _isSaving
-                    ? const CircularProgressIndicator()
-                    : Text(widget.statLabel == null ? 'Créer' : 'Modifier'),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );

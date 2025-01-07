@@ -128,8 +128,7 @@ class _AdminSportStatLabelsPageState extends State<AdminSportStatLabelsPage> {
                   TextButton(
                     onPressed: () async {
                       try {
-                        await _statLabelsService
-                            .deleteStatLabel(statLabel.id);
+                        await _statLabelsService.deleteStatLabel(statLabel.id);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                               content: Text('La statistique a été supprimée.')),
@@ -266,18 +265,37 @@ class _AdminSportStatLabelsPageState extends State<AdminSportStatLabelsPage> {
                               DataCell(Text(stat.label)),
                               DataCell(Text(stat.unit)),
                               DataCell(Text(stat.isMain ? 'Oui' : 'Non')),
-                              DataCell(Row(
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.delete,
-                                        color: Colors.red),
-                                    onPressed: () {
-                                      _confirmDelete(context,
-                                          stat); // Appel de la fonction de confirmation
-                                    },
-                                  ),
-                                ],
-                              )),
+                              DataCell(
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.edit,
+                                          color: Colors.blue),
+                                      onPressed: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return AddEditSportStatLabelModal(
+                                              statLabel:
+                                                  stat, // Passe la statistique existante
+                                              sports: _sports,
+                                              onStatLabelSaved:
+                                                  fetchStatLabels, // Rafraîchit après modification
+                                            );
+                                          },
+                                        );
+                                      },
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete,
+                                          color: Colors.red),
+                                      onPressed: () {
+                                        _confirmDelete(context, stat);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ]);
                           }).toList(),
                           buttonText: 'Ajouter une Statistique',
