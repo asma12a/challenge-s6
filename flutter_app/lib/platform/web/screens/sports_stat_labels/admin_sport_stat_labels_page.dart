@@ -286,6 +286,7 @@ class _AdminSportStatLabelsPageState extends State<AdminSportStatLabelsPage> {
                               context: context,
                               builder: (context) {
                                 return AddEditSportStatLabelModal(
+                                  sports: _sports,
                                   onStatLabelSaved: fetchStatLabels,
                                 );
                               },

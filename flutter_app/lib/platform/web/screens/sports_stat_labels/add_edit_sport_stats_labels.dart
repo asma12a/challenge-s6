@@ -5,11 +5,13 @@ import 'package:squad_go/core/services/sport_stat_labels_service.dart';
 class AddEditSportStatLabelModal extends StatefulWidget {
   final SportStatLabels? statLabel;
   final Function onStatLabelSaved;
+  final List<Map<String, dynamic>> sports; // Liste des sports disponibles
 
   const AddEditSportStatLabelModal({
     super.key,
     this.statLabel,
     required this.onStatLabelSaved,
+    required this.sports,
   });
 
   @override
@@ -25,6 +27,7 @@ class _AddEditSportStatLabelModalState
   String _label = '';
   String _unit = '';
   bool _isMain = false;
+  String? _selectedSportId;
   bool _isSaving = false;
 
   @override
@@ -38,7 +41,14 @@ class _AddEditSportStatLabelModalState
   }
 
   Future<void> _saveStatLabel() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate() || _selectedSportId == null) {
+      if (_selectedSportId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Veuillez sélectionner un sport.')),
+        );
+      }
+      return;
+    }
 
     _formKey.currentState!.save();
     setState(() {
@@ -49,16 +59,18 @@ class _AddEditSportStatLabelModalState
       final statLabelData = {
         'label': _label,
         'unit': _unit,
-        'isMain': _isMain,
+        'is_main': _isMain,
+        'sport_id': _selectedSportId,
       };
 
       if (widget.statLabel == null) {
-        // Création
         await _statLabelsService.createStatLabel(statLabelData);
       } else {
-        // Modification
         await _statLabelsService.updateStatLabel(
-          statLabelData,
+          {
+            ...statLabelData,
+            'sport_id': _selectedSportId, // Ajout ou mise à jour de sport_id
+          },
           widget.statLabel!.id.toString(),
         );
       }
@@ -111,6 +123,24 @@ class _AddEditSportStatLabelModalState
                 validator: (value) =>
                     value == null || value.isEmpty ? 'Unité requise' : null,
                 onSaved: (value) => _unit = value!,
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: _selectedSportId,
+                decoration: const InputDecoration(labelText: 'Sport'),
+                items: widget.sports.map((sport) {
+                  return DropdownMenuItem<String>(
+                    value: sport['id'].toString(),
+                    child: Text(sport['name']),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedSportId = value;
+                  });
+                },
+                validator: (value) =>
+                    value == null ? 'Veuillez sélectionner un sport' : null,
               ),
               const SizedBox(height: 16),
               CheckboxListTile(
