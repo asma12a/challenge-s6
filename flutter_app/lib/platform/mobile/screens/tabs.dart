@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:squad_go/core/providers/connectivity_provider.dart';
 import 'package:squad_go/platform/mobile/screens/account.dart';
 import 'package:squad_go/platform/mobile/screens/join.dart';
 import 'package:squad_go/platform/mobile/screens/home.dart';
 import 'package:squad_go/platform/mobile/screens/search.dart';
+import 'package:squad_go/platform/mobile/widgets/dialog/offline.dart';
 import 'package:squad_go/platform/mobile/widgets/main_drawer.dart';
 import 'package:squad_go/platform/mobile/screens/new_event.dart';
 
@@ -59,6 +62,14 @@ class _TabsScreenState extends State<TabsScreen> {
             IconButton(
               icon: const Icon(Icons.add),
               onPressed: () {
+                if (!context.read<ConnectivityState>().isConnected) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => const OfflineDialog(),
+                  );
+                  return;
+                }
+
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (ctx) => NewEvent(),
