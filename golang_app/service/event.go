@@ -267,6 +267,7 @@ func (e *Event) ListUserEvents(ctx context.Context, userID ulid.ID) ([]*ent.Even
 				event.CreatedByEQ(userID),
 			),
 		).
+		Order(ent.Desc(event.FieldCreatedAt)).
 		WithSport().All(ctx)
 	if err != nil {
 		return nil, err

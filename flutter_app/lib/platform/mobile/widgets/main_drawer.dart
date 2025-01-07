@@ -19,6 +19,8 @@ class MainDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = context.read<AuthState>().userInfo;
+
     return Drawer(
       child: Column(
         children: [
@@ -51,7 +53,7 @@ class MainDrawer extends StatelessWidget {
               color: Theme.of(context).colorScheme.onSurface,
             ),
             title: Text(
-              'Mon compte',
+              currentUser!.name,
               style: Theme.of(context).textTheme.titleSmall!.copyWith(
                     color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 24,
