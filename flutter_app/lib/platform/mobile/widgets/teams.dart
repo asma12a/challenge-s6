@@ -20,6 +20,7 @@ class TeamsHandle extends StatefulWidget {
   final bool canEdit;
   final Color color;
   final bool isEventFinished;
+  final bool isEventNowPlaying;
   final Future<void> Function()? onRefresh;
 
   const TeamsHandle({
@@ -30,6 +31,7 @@ class TeamsHandle extends StatefulWidget {
     required this.maxTeams,
     required this.color,
     this.isEventFinished = false,
+    this.isEventNowPlaying = false,
     this.onRefresh,
     this.eventCreatorId,
   });
@@ -130,10 +132,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                   indicatorSize: TabBarIndicatorSize.tab,
                   tabAlignment: TabAlignment.start,
                   indicator: BoxDecoration(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .secondary
-                        .withOpacity(0.5),
+                    color: Colors.blue,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   labelColor: Colors.white,
@@ -152,15 +151,13 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                 height: 30,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .secondary
-                                      .withOpacity(0.1),
+                                  color: Colors.blueAccent,
                                 ),
                                 child: IconButton(
                                   icon: Icon(
                                     Icons.edit,
                                     size: 16,
+                                    color: Colors.white,
                                   ),
                                   padding: EdgeInsets.zero,
                                   onPressed: () {
@@ -422,27 +419,31 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                           );
                                                         },
                                                       ),
-                                                      IconButton(
-                                                        icon: Icon(
-                                                            Icons.bar_chart),
-                                                        color: isCurrentUser
-                                                            ? widget.color
-                                                            : null,
-                                                        onPressed: () {
-                                                          showDialog(
-                                                            context: context,
-                                                            builder: (context) {
-                                                              return EditStatsPlayerDialog(
-                                                                eventId: widget
-                                                                    .eventId,
-                                                                player: player,
-                                                                onRefresh: widget
-                                                                    .onRefresh,
-                                                              );
-                                                            },
-                                                          );
-                                                        },
-                                                      ),
+                                                      if (widget
+                                                          .isEventNowPlaying)
+                                                        IconButton(
+                                                          icon: Icon(
+                                                              Icons.bar_chart),
+                                                          color: isCurrentUser
+                                                              ? widget.color
+                                                              : null,
+                                                          onPressed: () {
+                                                            showDialog(
+                                                              context: context,
+                                                              builder:
+                                                                  (context) {
+                                                                return EditStatsPlayerDialog(
+                                                                  eventId: widget
+                                                                      .eventId,
+                                                                  player:
+                                                                      player,
+                                                                  onRefresh: widget
+                                                                      .onRefresh,
+                                                                );
+                                                              },
+                                                            );
+                                                          },
+                                                        ),
                                                     ],
                                                     if (!widget.canEdit ||
                                                         widget.isEventFinished)

@@ -30,8 +30,13 @@ class _EventScreenState extends State<EventScreen> {
   late Event event = widget.event ?? Event.empty();
   bool isOrganizer = false;
   bool isCoach = false;
-  bool get isEventFinished => DateTime.parse(event.date)
-      .isBefore(DateTime.now().subtract(Duration(days: 1)));
+
+  final DateTime today =
+      DateTime.parse(DateFormat('yyyy-MM-dd').format(DateTime.now()));
+  DateTime get eventDate => DateTime.parse(
+      DateFormat('yyyy-MM-dd').format(DateTime.parse(event.date)));
+  bool get isEventFinished => eventDate.isBefore(today);
+  bool get isEventToday => eventDate.isAtSameMomentAs(today);
 
   @override
   void initState() {
@@ -69,23 +74,28 @@ class _EventScreenState extends State<EventScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          shape: const CircleBorder(),
-          backgroundColor: event.sport.color?.withValues(alpha: 0.5) ??
-              Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) {
-                return ShareEventDialog(event: event);
-              },
-            );
-          },
-          child: const Icon(
-            Icons.share,
-            color: Colors.white,
-          ),
-        ),
+        floatingActionButton: !isEventFinished
+            ? FloatingActionButton(
+                shape: const CircleBorder(),
+                backgroundColor: event.sport.color?.withValues(alpha: 0.5) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.5),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return ShareEventDialog(event: event);
+                    },
+                  );
+                },
+                child: const Icon(
+                  Icons.share,
+                  color: Colors.white,
+                ),
+              )
+            : null,
         body: event.id == null
             ? const Center(child: CircularProgressIndicator())
             : RefreshIndicator(
@@ -332,6 +342,8 @@ class _EventScreenState extends State<EventScreen> {
                                                         event.createdBy,
                                                     isEventFinished:
                                                         isEventFinished,
+                                                    isEventNowPlaying:
+                                                        isEventToday,
                                                   )
                                                 : null,
                                           ),
