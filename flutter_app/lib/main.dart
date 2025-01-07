@@ -19,6 +19,7 @@ final dio = Dio(BaseOptions(
 
 void main() async {
   if (!kIsWeb) {
+    debugPrint('Production ====== $kIsWeb');
     await dotenv.load(fileName: "assets/../.env");
   }
 
