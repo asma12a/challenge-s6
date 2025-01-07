@@ -47,16 +47,15 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                 Container(
                   width: 250, // Largeur de la sidebar
                   color: Colors.teal[50],
-                  child: ListView(
-                    padding: EdgeInsets.zero,
+                  child: Column(
                     children: <Widget>[
                       // Remplacer le DrawerHeader par une image
                       DrawerHeader(
                         child: Center(
                           child: Image.asset(
                             'assets/images/app_icon.png',
-                            width: 200,
-                            height: 200,
+                            width: 150,
+                            height: 150,
                             fit: BoxFit.contain,
                           ),
                         ),
@@ -102,12 +101,12 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                         text: 'Statistiques sportives',
                         onTap: () {
                           setState(() {
-                            _selectedIndex =
-                                4;
+                            _selectedIndex = 4;
                           });
                         },
                       ),
-
+                      const Divider(), // Séparateur
+                      Spacer(), // Espace pour pousser "Déconnexion" en bas
                       _createDrawerItem(
                         icon: Icons.exit_to_app,
                         text: 'Déconnexion',
@@ -137,12 +136,13 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     required GestureTapCallback onTap,
   }) {
     return ListTile(
-      // leading: Icon(icon, color: Colors.teal),
+      leading: Icon(icon, color: Colors.teal),
       title: Text(
         text,
         style: TextStyle(
           color: Colors.black,
-          fontSize: 18,
+          fontSize: 16,
+          fontFamily: 'Poppins', // Utilisation d'une police plus moderne
           fontWeight: FontWeight.w600,
         ),
       ),
