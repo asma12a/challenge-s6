@@ -125,6 +125,7 @@ class _EditEventDialogState extends State<EditEventDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     return Dialog(
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -268,7 +269,7 @@ class _EditEventDialogState extends State<EditEventDialog> {
                     Expanded(
                       child: DropdownButtonFormField<String>(
                         value: event.sport.id,
-                        decoration: const InputDecoration(labelText: 'Sport'),
+                        decoration: const InputDecoration(labelText: translate?.sport_select_label ?? 'Sport'),
                         items: _sports
                             .map((sport) => DropdownMenuItem(
                                   value: sport.id,

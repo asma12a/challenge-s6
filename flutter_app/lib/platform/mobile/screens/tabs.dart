@@ -38,7 +38,8 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget activePage = HomeScreen(shouldRefresh: widget.shouldRefresh);
+    final translate = AppLocalizations.of(context);
+    Widget activePage = HomeScreen();
 
     if (_selectPageIndex == 1) {
       activePage = SearchScreen();
@@ -77,15 +78,15 @@ class _TabsScreenState extends State<TabsScreen> {
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Accueil',
+            label: translate?.tabs.home ?? 'Accueil',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
-            label: 'Rechercher',
+            label: translate?.tabs.search ?? 'Rechercher',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.qr_code),
-            label: 'Rejoindre',
+            label: translate?.tabs.join ?? 'Rejoindre',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),

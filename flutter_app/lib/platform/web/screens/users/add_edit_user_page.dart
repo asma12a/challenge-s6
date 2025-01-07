@@ -85,6 +85,7 @@ class _AddEditUserModalState extends State<AddEditUserModal> {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     final isEditing = widget.user != null;
 
     return BackdropFilter(
@@ -179,7 +180,7 @@ class _AddEditUserModalState extends State<AddEditUserModal> {
                     });
                   },
                   decoration: InputDecoration(
-                    labelText: 'Rôle',
+                    labelText: translate?.role ?? 'Rôle',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),

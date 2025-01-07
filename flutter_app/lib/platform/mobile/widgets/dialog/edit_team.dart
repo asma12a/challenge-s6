@@ -51,6 +51,7 @@ class _EditTeamDialogState extends State<EditTeamDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     return Dialog(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -86,7 +87,7 @@ class _EditTeamDialogState extends State<EditTeamDialog> {
               ),
               TextFormField(
                 initialValue: _team.maxPlayers.toString(),
-                decoration: InputDecoration(labelText: 'Nombre de joueurs'),
+                decoration: InputDecoration(labelText: translate?.nb_players ?? 'Nombre de joueurs'),
                 keyboardType: TextInputType.number,
                 onChanged: (value) {
                   _team = _team.copyWith(maxPlayers: int.tryParse(value) ?? 0);

@@ -40,6 +40,7 @@ class _AddTeamDialogState extends State<AddTeamDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     return Dialog(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -48,7 +49,7 @@ class _AddTeamDialogState extends State<AddTeamDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              Text(translate?.new_team ??
                 'Nouvelle équipe',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -72,7 +73,7 @@ class _AddTeamDialogState extends State<AddTeamDialog> {
                 },
               ),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Nombre de joueurs'),
+                decoration: InputDecoration(labelText: translate?.nb_players ?? 'Nombre de joueurs'),
                 keyboardType: TextInputType.number,
                 onChanged: (value) => _maxPlayers = int.tryParse(value),
                 onTapOutside: (event) {

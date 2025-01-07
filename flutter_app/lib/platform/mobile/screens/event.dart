@@ -72,6 +72,7 @@ class _EventScreenState extends State<EventScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     return SafeArea(
       child: Scaffold(
         floatingActionButton: !isEventFinished
@@ -294,7 +295,7 @@ class _EventScreenState extends State<EventScreen> {
                                         ),
                                         tabs: [
                                           Tab(
-                                            child: Text(
+                                            child: Text(translate?.teams ??
                                               'Équipes',
                                               overflow: TextOverflow.ellipsis,
                                             ),
