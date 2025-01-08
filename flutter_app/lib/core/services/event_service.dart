@@ -41,6 +41,7 @@ class EventService {
 
   Future<List<Event>> getSearchResults(Map<String, String> params) async {
 
+
     final token = await storage.read(key: jwtStorageToken);
 
     final Uri baseUrl = Uri.parse('$apiBaseUrl/api/events/search');
@@ -230,6 +231,7 @@ class EventService {
         queryParams['latitude'] = latitude.toString();
         queryParams['longitude'] = longitude.toString();
       }
+
       final Uri uri = Uri.https(
         apiBaseUrl
             .replaceAll('https://', '')

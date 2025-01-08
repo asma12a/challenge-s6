@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:squad_go/platform/mobile/widgets/home_widgets/sport_performances.dart';
@@ -42,7 +41,10 @@ class _PerformancesHandleState extends State<PerformancesHandle> {
                     indicatorSize: TabBarIndicatorSize.tab,
                     tabAlignment: TabAlignment.start,
                     indicator: BoxDecoration(
-                      color: Theme.of(context).colorScheme.secondary.withOpacity(0.5),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .secondary
+                          .withOpacity(0.5),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     labelColor: Colors.white,
@@ -53,7 +55,8 @@ class _PerformancesHandleState extends State<PerformancesHandle> {
                         return Tab(
                           child: Row(
                             children: [
-                              Text(sport.name.name[0].toUpperCase() + sport.name.name.substring(1)),
+                              Text(sport.name.name[0].toUpperCase() +
+                                  sport.name.name.substring(1)),
                               SizedBox(width: 16),
                             ],
                           ),
@@ -66,17 +69,17 @@ class _PerformancesHandleState extends State<PerformancesHandle> {
             ),
             Flexible(
               child: TabBarView(
-                  children: widget.sports.map(
-                      (sport) => Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SportPerformances(
+                children: widget.sports
+                    .map((sport) => Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SportPerformances(
                               sportId: sport.id,
                               userId: currentUser!.id,
-                          )
-                        ],
-                      )
-                  ).toList(),
+                            )
+                          ],
+                        ))
+                    .toList(),
               ),
             )
           ],
