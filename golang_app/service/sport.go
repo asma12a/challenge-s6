@@ -7,6 +7,9 @@ import (
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/sport"
 	"github.com/asma12a/challenge-s6/entity"
+	"github.com/asma12a/challenge-s6/ent/teamuser"
+	"github.com/asma12a/challenge-s6/ent/user"
+
 )
 
 type Sport struct {
@@ -115,4 +118,39 @@ func (sp *Sport) Delete(ctx context.Context, id ulid.ID) error {
 // @Router /sports [get]
 func (sp *Sport) List(ctx context.Context) ([]*ent.Sport, error) {
 	return sp.db.Sport.Query().All(ctx)
+}
+
+func (repo *Sport) GetUserSports(ctx context.Context, userID ulid.ID) ([]*ent.Sport, error) {
+	teams, err := repo.db.TeamUser.Query().Where(teamuser.HasUserWith(user.IDEQ(userID))).WithTeam(
+		func(q *ent.TeamQuery) {
+			q.WithEvent(func(q *ent.EventQuery) {
+				q.WithSport()
+			})
+		},
+	).All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+
+	var sportIDs []ulid.ID
+	for _, team := range teams {
+
+		if team.Edges.Team == nil {
+			continue
+		}
+
+		if team.Edges.Team.Edges.Event == nil {
+			continue
+		}
+
+		if team.Edges.Team.Edges.Event.Edges.Sport == nil {
+			continue
+		}
+
+		
+		sportIDs = append(sportIDs, team.Edges.Team.Edges.Event.Edges.Sport.ID)
+	}
+
+	return repo.db.Sport.Query().Where(sport.IDIn(sportIDs...)).All(ctx)
 }

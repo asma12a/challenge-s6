@@ -270,7 +270,7 @@ func (e *Event) ListUserEvents(ctx context.Context, userID ulid.ID) ([]*ent.Even
 				event.CreatedByEQ(userID),
 			),
 		).
-		Order(ent.Desc(event.FieldCreatedAt)).
+		Order(ent.Asc(event.FieldDate)).
 		WithSport().All(ctx)
 	if err != nil {
 		return nil, err
@@ -324,3 +324,5 @@ func (repo *Event) IsUserInEvent(ctx context.Context, eventID, userID ulid.ID) (
 	}
 	return len(teamUsers) > 0, nil
 }
+
+
