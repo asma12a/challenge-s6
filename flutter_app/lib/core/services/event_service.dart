@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/event.dart';
@@ -10,15 +9,19 @@ import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/core/utils/connectivity_handler.dart';
 import 'package:squad_go/main.dart';
 
+const apiBaseUrl = String.fromEnvironment('API_BASE_URL');
+const jwtStorageToken = String.fromEnvironment('JWT_STORAGE_KEY');
+
 class EventService {
   final storage = const FlutterSecureStorage();
 
   // GET all events (backoffice)
   Future<List<Map<String, dynamic>>> getEvents() async {
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
-    final url = Uri.http(dotenv.env['API_BASE_URL']!, 'api/events');
+    final token = await storage.read(key: jwtStorageToken);
 
     try {
+      final Uri url = Uri.parse('$apiBaseUrl/api/events');
+
       final response = await dio.get(url.toString(),
           options: Options(headers: {
             'Content-Type': 'application/json',
@@ -37,10 +40,10 @@ class EventService {
   }
 
   Future<List<Event>> getSearchResults(Map<String, String> params) async {
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
 
-    final Uri baseUrl =
-        Uri.http(dotenv.env['API_BASE_URL']!, 'api/events/search');
+    final token = await storage.read(key: jwtStorageToken);
+
+    final Uri baseUrl = Uri.parse('$apiBaseUrl/api/events/search');
 
     final Map<String, String> queryParams = {};
     if (params.isNotEmpty) {
@@ -59,7 +62,6 @@ class EventService {
             'Content-Type': 'application/json',
             'Authorization': "Bearer $token",
           }));
-      debugPrint('Search $response');
 
       final List<dynamic> events = response.data;
       return events.map((event) => Event.fromJson(event)).toList();
@@ -71,10 +73,10 @@ class EventService {
 
   // GET event By CODE
   Future<Event> getEventByCode(String code) async {
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    final token = await storage.read(key: jwtStorageToken);
     try {
-      final uri =
-          Uri.http(dotenv.env['API_BASE_URL']!, 'api/events/code/$code');
+      final Uri uri = Uri.parse('$apiBaseUrl/api/events/code/$code');
+
       final response = await dio.get(
         uri.toString(),
         options: Options(headers: {
@@ -93,10 +95,11 @@ class EventService {
 
   // DELETE an event
   Future<void> deleteEvent(String id) async {
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
-    final url = Uri.http(dotenv.env['API_BASE_URL']!, 'api/events/$id');
+    final token = await storage.read(key: jwtStorageToken);
 
     try {
+      final Uri url = Uri.parse('$apiBaseUrl/api/events/$id');
+
       final response = await dio.delete(url.toString(),
           options: Options(headers: {
             'Content-Type': 'application/json',
@@ -112,9 +115,7 @@ class EventService {
   }
 
   Future<Event> getEventById(String id) async {
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
-
-    final Uri url = Uri.http(dotenv.env['API_BASE_URL']!, 'api/events/$id');
+    final token = await storage.read(key: jwtStorageToken);
 
     try {
       final refreshCacheOptions = CacheOptions(
@@ -122,7 +123,8 @@ class EventService {
         policy: CachePolicy.refresh,
       );
 
-      // if connected then refresh cache, else use cache
+      final Uri url = Uri.parse('$apiBaseUrl/api/events/$id');
+
       final response = await dio.get(url.toString(),
           options: ConnectivityHandler().isConnected
               ? refreshCacheOptions.toOptions().copyWith(
@@ -148,9 +150,10 @@ class EventService {
   }
 
   Future<List<Sport>> getSports() async {
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    final token = await storage.read(key: jwtStorageToken);
     try {
-      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/sports');
+      final Uri uri = Uri.parse('$apiBaseUrl/api/sports');
+
       final response = await dio.get(uri.toString(),
           options: Options(headers: {
             'Content-Type': 'application/json',
@@ -166,9 +169,10 @@ class EventService {
   }
 
   Future<void> createEvent(Map<String, dynamic> event) async {
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    final token = await storage.read(key: jwtStorageToken);
     try {
-      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/events');
+      final Uri uri = Uri.parse('$apiBaseUrl/api/events');
+
       await dio.post(uri.toString(),
           options: Options(headers: {
             'Content-Type': 'application/json',
@@ -182,9 +186,10 @@ class EventService {
   }
 
   Future<void> updateEvent(String id, Map<String, dynamic> event) async {
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    final token = await storage.read(key: jwtStorageToken);
     try {
-      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/events/$id');
+      final Uri uri = Uri.parse('$apiBaseUrl/api/events/$id');
+
       await dio.put(uri.toString(),
           options: Options(headers: {
             'Content-Type': 'application/json',
@@ -198,9 +203,10 @@ class EventService {
   }
 
   Future<List<Event>> getMyEvents() async {
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    final token = await storage.read(key: jwtStorageToken);
     try {
-      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/events/user');
+      final Uri uri = Uri.parse('$apiBaseUrl/api/events/user');
+
       final response = await dio.get(uri.toString(),
           options: Options(headers: {
             'Content-Type': 'application/json',
@@ -217,15 +223,21 @@ class EventService {
 
   Future<List<Event>> getRecommendedEvents(
       {double? latitude, double? longitude}) async {
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    final token = await storage.read(key: jwtStorageToken);
     try {
       final Map<String, String> queryParams = {};
       if (latitude != null && longitude != null) {
         queryParams['latitude'] = latitude.toString();
         queryParams['longitude'] = longitude.toString();
       }
-      final uri = Uri.http(
-          dotenv.env['API_BASE_URL']!, 'api/events/recommended', queryParams);
+      final Uri uri = Uri.https(
+        apiBaseUrl
+            .replaceAll('https://', '')
+            .replaceAll('http://', ''),
+        '/api/events/recommended',
+        queryParams,
+      );
+
       final response = await dio.get(uri.toString(),
           options: Options(headers: {
             'Content-Type': 'application/json',

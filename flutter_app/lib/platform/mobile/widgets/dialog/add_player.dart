@@ -3,6 +3,7 @@ import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/team.dart';
 import 'package:squad_go/core/services/team_service.dart';
 import 'package:squad_go/main.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AddPlayerDialog extends StatefulWidget {
   final String eventId;
@@ -52,6 +53,7 @@ class _AddPlayerDialogState extends State<AddPlayerDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     return Dialog(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -60,7 +62,7 @@ class _AddPlayerDialogState extends State<AddPlayerDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              Text(translate?.add_player ?? 
                 'Ajouter un joueur',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -133,7 +135,7 @@ class _AddPlayerDialogState extends State<AddPlayerDialog> {
                   Icons.add,
                   color: Colors.white,
                 ),
-                label: const Text('Ajouter'),
+                label: Text(translate?.add ?? 'Ajouter'),
               ),
             ],
           ),

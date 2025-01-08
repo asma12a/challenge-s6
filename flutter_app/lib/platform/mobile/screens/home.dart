@@ -79,6 +79,7 @@ class HomeScreenState extends State<HomeScreen>
               HomeMyEvents(
                 key: myEventsKey,
                 onRefresh: onRefresh,
+                isHome: true,
               ),
               HomeRecommendedEvents(
                 key: recommendedEventsKey,

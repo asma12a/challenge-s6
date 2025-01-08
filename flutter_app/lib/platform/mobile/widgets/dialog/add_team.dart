@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/services/team_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AddTeamDialog extends StatefulWidget {
   final String eventId;
@@ -40,6 +41,7 @@ class _AddTeamDialogState extends State<AddTeamDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     return Dialog(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -48,7 +50,7 @@ class _AddTeamDialogState extends State<AddTeamDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              Text(translate?.new_team ??
                 'Nouvelle équipe',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -72,7 +74,7 @@ class _AddTeamDialogState extends State<AddTeamDialog> {
                 },
               ),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Nombre de joueurs'),
+                decoration: InputDecoration(labelText: translate?.nb_players ?? 'Nombre de joueurs'),
                 keyboardType: TextInputType.number,
                 onChanged: (value) => _maxPlayers = int.tryParse(value),
                 onTapOutside: (event) {

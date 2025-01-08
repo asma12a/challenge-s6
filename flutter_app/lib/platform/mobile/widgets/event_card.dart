@@ -4,9 +4,9 @@ import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/models/sport.dart';
 import 'package:intl/intl.dart';
 import 'package:squad_go/core/utils/tools.dart';
-import 'package:squad_go/platform/mobile/screens/event.dart';
 import 'package:squad_go/platform/mobile/widgets/custom_label.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/join_event.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class EventCard extends StatelessWidget {
   final Event event;
@@ -43,6 +43,7 @@ class EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     return Center(
       child: Card(
         clipBehavior: Clip.hardEdge,
@@ -141,7 +142,9 @@ class EventCard extends StatelessWidget {
                                     onCardClick(context);
                                   },
                                   child: Text(
-                                    hasJoinedEvent ? "VOIR" : 'REJOINDRE',
+                                    hasJoinedEvent
+                                        ? translate?.see_button ?? "VOIR"
+                                        : translate?.join_button ?? 'REJOINDRE',
                                   ),
                                 )
                               ],

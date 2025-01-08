@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:squad_go/core/models/team.dart';
 
 Color getColorBasedOnDate(String date) {
+  final DateTime now =
+      DateTime.parse(DateFormat('yyyy-MM-dd').format(DateTime.now()));
   final DateTime eventDate = DateTime.parse(date);
-  final DateTime now = DateTime.now();
 
-  if (eventDate.isBefore(now.subtract(const Duration(days: 1)))) {
+  if (eventDate.isBefore(now)) {
     return Colors.grey;
   } else if (eventDate.day == now.day &&
       eventDate.month == now.month &&

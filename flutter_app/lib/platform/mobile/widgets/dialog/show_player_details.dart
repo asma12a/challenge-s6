@@ -7,7 +7,6 @@ import 'package:squad_go/core/providers/connectivity_provider.dart';
 import 'package:squad_go/core/services/sport_stat_labels_service.dart';
 import 'package:squad_go/core/services/event_service.dart';
 import 'package:squad_go/core/models/event.dart';
-import 'package:squad_go/core/models/user_stats.dart';
 import 'package:squad_go/core/services/team_service.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/offline.dart';
 

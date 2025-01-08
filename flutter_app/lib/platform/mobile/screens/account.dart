@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:squad_go/core/providers/auth_state_provider.dart';
+import 'package:squad_go/core/services/sport_service.dart';
+import 'package:squad_go/platform/mobile/widgets/home_widgets/my_events.dart';
 
-import '../../../core/providers/auth_state_provider.dart';
+import 'package:squad_go/core/models/sport.dart';
+import 'package:squad_go/main.dart';
+import 'package:squad_go/platform/mobile/widgets/performances.dart';
+
+
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -12,12 +21,39 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
+  final SportService sportService = SportService();
   Future<void> onRefresh() async {}
+  int eventsCount = 0;
+  List<Sport> userSports = [];
+
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserSport();
+  }
+
+  Future<void> fetchUserSport() async {
+
+    try {
+      List<Sport> sports = await sportService.getUserSports();
+      setState(() {
+        userSports = sports;
+      });
+
+    } catch (e) {
+      // Handle error
+      log.severe('Failed to fetch user sports: $e');
+    }
+  }
+
+
+
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     final userInfo = context.read<AuthState>().userInfo;
-
     return SafeArea(
       child: Scaffold(
         body: RefreshIndicator(
@@ -29,7 +65,7 @@ class _AccountScreenState extends State<AccountScreen> {
               SliverFillRemaining(
                 child: Column(
                   children: [
-                    Expanded(
+                    Flexible(
                       flex: 1,
                       child: Container(
                         margin: const EdgeInsets.only(
@@ -67,7 +103,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                         ),
                                   ),
                                   const SizedBox(height: 8),
-                                  Text('A participer à X events')
+                                  Text('A participer à $eventsCount events')
                                 ]),
                           ),
                         ),
@@ -105,26 +141,26 @@ class _AccountScreenState extends State<AccountScreen> {
                                   tabs: [
                                     Tab(
                                       child: Text(
-                                        'Mes Events',
+                                        translate?.my_events_profile ?? 'Mes Events',
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                     Tab(
                                       child: Text(
-                                        'Performance',
+                                        translate?.performance ?? 'Performance',
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                     Tab(
                                       child: Text(
-                                        'Paramètres',
+                                        translate?.settings ?? 'Paramètres',
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                              Expanded(
+                              Flexible(
                                 child: TabBarView(
                                   children: [
                                     Container(
@@ -135,7 +171,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                       ),
                                       padding: const EdgeInsets.all(16),
                                       child: Center(
-                                        child: Text('Mes events'),
+                                        child: Text(translate?.my_events_profile ?? 'Mes events'),
                                       ),
                                     ),
                                     Container(
@@ -145,7 +181,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                         borderRadius: BorderRadius.circular(16),
                                       ),
                                       padding: const EdgeInsets.all(16),
-                                      child: Center(child: Text('Performances')),
+                                      child: Center(child: Text(translate?.performance ?? 'Performances')),
                                     ),
                                     Container(
                                       margin: const EdgeInsets.only(top: 16),
@@ -154,7 +190,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                         borderRadius: BorderRadius.circular(16),
                                       ),
                                       padding: const EdgeInsets.all(16),
-                                      child: Center(child: Text('Paramètres')),
+                                      child: Center(child: Text(translate?.settings ?? 'Paramètres')),
                                     ),
                                   ],
                                 ),

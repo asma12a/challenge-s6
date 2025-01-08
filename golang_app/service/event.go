@@ -126,7 +126,10 @@ func (e *Event) FindOne(ctx context.Context, id ulid.ID) (*entity.Event, error) 
 }
 
 func (e *Event) FindEventByCode(ctx context.Context, code string) (*entity.Event, error) {
-	event, err := e.db.Event.Query().Where(event.EventCode(code)).WithSport().Only(ctx)
+	event, err := e.db.Event.Query().
+		Where(event.EventCode(code)).
+		Where(event.DateGTE(time.Now().Format(time.DateOnly))).
+		WithSport().Only(ctx)
 	if ent.IsNotFound(err) {
 		return nil, err
 	}
@@ -223,9 +226,9 @@ func (e *Event) Search(ctx context.Context, search, eventType string, sportID *u
 	}
 
 	query := e.db.Event.Query().
-	Where(event.IsPublicEQ(true)).
-	Where(event.IDNotIn(userEventIDs...)).
-	Where(event.DateGTE(time.Now().Format(time.DateOnly)))
+		Where(event.IsPublicEQ(true)).
+		Where(event.IDNotIn(userEventIDs...)).
+		Where(event.DateGTE(time.Now().Format(time.DateOnly)))
 
 	if search != "" {
 		query.Where(
@@ -267,7 +270,7 @@ func (e *Event) ListUserEvents(ctx context.Context, userID ulid.ID) ([]*ent.Even
 				event.CreatedByEQ(userID),
 			),
 		).
-		Order(ent.Desc(event.FieldCreatedAt)).
+		Order(ent.Asc(event.FieldDate)).
 		WithSport().All(ctx)
 	if err != nil {
 		return nil, err
@@ -321,3 +324,5 @@ func (repo *Event) IsUserInEvent(ctx context.Context, eventID, userID ulid.ID) (
 	}
 	return len(teamUsers) > 0, nil
 }
+
+

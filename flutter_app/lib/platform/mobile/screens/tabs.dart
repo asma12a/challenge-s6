@@ -9,6 +9,7 @@ import 'package:squad_go/platform/mobile/screens/search.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/offline.dart';
 import 'package:squad_go/platform/mobile/widgets/main_drawer.dart';
 import 'package:squad_go/platform/mobile/screens/new_event.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TabsScreen extends StatefulWidget {
   final int? initialPageIndex;
@@ -42,7 +43,8 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget activePage = HomeScreen(shouldRefresh: widget.shouldRefresh);
+    final translate = AppLocalizations.of(context);
+    Widget activePage = HomeScreen();
 
     if (_selectPageIndex == 1) {
       activePage = SearchScreen();
@@ -137,20 +139,20 @@ class _TabsScreenState extends State<TabsScreen> {
         type: BottomNavigationBarType.fixed,
         onTap: _selectPage,
         currentIndex: _selectPageIndex,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Accueil',
+            icon: const Icon(Icons.home),
+            label: translate?.tabs_home ?? 'Accueil',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Rechercher',
+            icon: const Icon(Icons.search),
+            label: translate?.tabs_search ?? 'Rechercher',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.qr_code),
-            label: 'Rejoindre',
+            icon: const Icon(Icons.qr_code),
+            label: translate?.tabs_join ?? 'Rejoindre',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Profile',
           ),

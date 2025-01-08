@@ -5,6 +5,7 @@ import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/platform/mobile/widgets/event_card.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -63,9 +64,9 @@ class _SearchScreenState extends State<SearchScreen> {
       });
     }
   }
-
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     return Padding(
       padding: EdgeInsets.all(15),
       child: Column(
@@ -101,7 +102,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     value: params["sport"],
                     iconEnabledColor: Colors.black,
                     dropdownColor: Theme.of(context).colorScheme.secondary,
-                    hint: Text(
+                    hint: Text(translate?.sport_select_label ??
                       "Sport",
                       style: TextStyle(
                           color: Theme.of(context).colorScheme.onSecondary),
@@ -137,7 +138,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     value: params["type"],
                     dropdownColor: Theme.of(context).colorScheme.secondary,
                     iconEnabledColor: Colors.black,
-                    hint: Text(
+                    hint: Text(translate?.type_select_label ??
                       "Type",
                       style: TextStyle(
                           color: Theme.of(context).colorScheme.onSecondary),
@@ -166,7 +167,7 @@ class _SearchScreenState extends State<SearchScreen> {
           Text(
             _searchResults.isNotEmpty
                 ? "${_searchResults.length} événements trouvés."
-                : "Aucun événement trouvé.",
+                : translate?.no_events ?? "Aucun événement trouvé.",
           ),
           SizedBox(
             height: 5,

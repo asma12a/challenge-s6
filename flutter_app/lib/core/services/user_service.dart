@@ -1,18 +1,20 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/models/user_app.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+
+const apiBaseUrl = String.fromEnvironment('API_BASE_URL');
+const jwtStorageToken = String.fromEnvironment('JWT_STORAGE_KEY');
 
 class UserService {
   // GET all users
   static Future<List<UserApp>> getUsers() async {
     final storage = const FlutterSecureStorage();
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
-
-    final Uri url = Uri.http(dotenv.env['API_BASE_URL']!, 'api/users');
+    final token = await storage.read(key: jwtStorageToken);
 
     try {
+      final Uri url = Uri.parse('$apiBaseUrl/api/users');
+
       final response = await http.get(url, headers: {
         'Content-Type': 'application/json',
         'Authorization': "Bearer $token",
@@ -32,9 +34,9 @@ class UserService {
   // DELETE a specific user
   static Future<void> deleteUser(String id) async {
     final storage = const FlutterSecureStorage();
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    final token = await storage.read(key: jwtStorageToken);
 
-    final Uri url = Uri.http(dotenv.env['API_BASE_URL']!, 'api/users/$id');
+    final Uri url = Uri.parse('$apiBaseUrl/api/users/$id');
 
     try {
       final response = await http.delete(url, headers: {
@@ -53,9 +55,9 @@ class UserService {
   // CREATE a new user
   static Future<void> createUser(Map<String, dynamic> userData) async {
     final storage = const FlutterSecureStorage();
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    final token = await storage.read(key: jwtStorageToken);
 
-    final Uri url = Uri.http(dotenv.env['API_BASE_URL']!, 'api/users');
+    final Uri url = Uri.parse('$apiBaseUrl/api/users');
 
     try {
       final response = await http.post(
@@ -79,9 +81,9 @@ class UserService {
   static Future<void> updateUser(
       String id, Map<String, dynamic> updates) async {
     final storage = const FlutterSecureStorage();
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    final token = await storage.read(key: jwtStorageToken);
 
-    final Uri url = Uri.http(dotenv.env['API_BASE_URL']!, 'api/users/$id');
+    final Uri url = Uri.parse('$apiBaseUrl/api/users/$id');
 
     try {
       final response = await http.put(

@@ -9,15 +9,18 @@ import (
 	"github.com/asma12a/challenge-s6/middleware"
 	"github.com/asma12a/challenge-s6/presenter"
 	"github.com/asma12a/challenge-s6/service"
+	"github.com/asma12a/challenge-s6/viewer"
 	"github.com/gofiber/fiber/v2"
 )
 
 func SportHandler(app fiber.Router, ctx context.Context, serviceSport service.Sport) {
 	app.Get("/", listSports(ctx, serviceSport))
+	app.Get("/user", listUserSports(ctx, serviceSport))
 	app.Get("/:sportId", middleware.IsAdminMiddleware, getSport(ctx, serviceSport))
 	app.Post("/", middleware.IsAdminMiddleware, createSport(ctx, serviceSport))
 	app.Put("/:sportId", middleware.IsAdminMiddleware, updateSport(ctx, serviceSport))
 	app.Delete("/:sportId", middleware.IsAdminMiddleware, deleteSport(ctx, serviceSport))
+
 }
 
 func createSport(ctx context.Context, serviceSport service.Sport) fiber.Handler {
@@ -166,6 +169,40 @@ func deleteSport(ctx context.Context, serviceSport service.Sport) fiber.Handler 
 func listSports(ctx context.Context, serviceSport service.Sport) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		sports, err := serviceSport.List(ctx)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
+		toJ := make([]presenter.Sport, len(sports))
+
+		for i, sport := range sports {
+			toJ[i] = presenter.Sport{
+				ID:       sport.ID,
+				Name:     sport.Name,
+				Type:     presenter.SportType(sport.Type),
+				ImageURL: sport.ImageURL,
+				Color:    sport.Color,
+				MaxTeams: sport.MaxTeams,
+			}
+		}
+		return c.JSON(toJ)
+	}
+}
+
+func listUserSports(ctx context.Context, serviceSport service.Sport) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		currentUser, err := viewer.UserFromContext(c.UserContext())
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+
+		sports, err := serviceSport.GetUserSports(ctx, currentUser.ID)
+
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"error": err.Error(),

@@ -1,21 +1,24 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:flutter/cupertino.dart';
+import 'dart:developer';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/sport_stat_labels.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/models/user_stats.dart';
+
+const apiBaseUrl = String.fromEnvironment('API_BASE_URL');
+const jwtStorageToken = String.fromEnvironment('JWT_STORAGE_KEY');
 
 class SportStatLabelsService {
   final storage = const FlutterSecureStorage();
 
   Future<List<SportStatLabels>> getStatLabelsBySport(String sportId) async {
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    final token = await storage.read(key: jwtStorageToken);
     try {
-      final uri = Uri.http(
-          dotenv.env['API_BASE_URL']!, 'api/sportstatlabels/$sportId/labels');
+      final Uri uri =
+          Uri.parse('$apiBaseUrl/api/sportstatlabels/$sportId/labels');
+
       final response = await http.get(
         uri,
         headers: {
@@ -34,11 +37,11 @@ class SportStatLabelsService {
   }
 
   Future<List<UserStats>> getUserStatByEvent(String eventId, userId) async {
-    debugPrint('UserId $userId');
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    final token = await storage.read(key: jwtStorageToken);
     try {
-      final uri = Uri.http(dotenv.env['API_BASE_URL']!,
-          'api/sportstatlabels/$eventId/$userId/stats');
+      final Uri uri =
+          Uri.parse('$apiBaseUrl/api/sportstatlabels/$eventId/$userId/stats');
+
       final response = await http.get(
         uri,
         headers: {
@@ -56,13 +59,16 @@ class SportStatLabelsService {
     }
   }
 
-  Future<UserPerformance> getUserPerformanceBySport(String sportId, userId) async {
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+  Future<UserPerformance> getUserPerformanceBySport(
+      String sportId, userId) async {
+    final token = await storage.read(key: jwtStorageToken);
     try {
-      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/sportstatlabels/$sportId/$userId/performance');
+      final Uri uri = Uri.parse(
+          '$apiBaseUrl/api/sportstatlabels/$sportId/$userId/performance');
+
       final response = await http.get(
-          uri,
-          headers: {
+        uri,
+        headers: {
           'Content-Type': 'application/json',
           "Authorization": "Bearer $token",
         },
@@ -76,10 +82,11 @@ class SportStatLabelsService {
   }
 
   Future<void> addUserStat(Map<String, dynamic> stats, String eventId) async {
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    final token = await storage.read(key: jwtStorageToken);
     try {
-      final uri = Uri.http(dotenv.env['API_BASE_URL']!,
-          'api/sportstatlabels/$eventId/addUserStat');
+      final Uri uri =
+          Uri.parse('$apiBaseUrl/api/sportstatlabels/$eventId/addUserStat');
+
       await http.post(uri,
           headers: {
             'Content-Type': 'application/json',
@@ -94,10 +101,11 @@ class SportStatLabelsService {
 
   Future<void> updateUserStat(
       Map<String, dynamic> stats, String eventId) async {
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    final token = await storage.read(key: jwtStorageToken);
     try {
-      final uri = Uri.http(dotenv.env['API_BASE_URL']!,
-          'api/sportstatlabels/$eventId/updateUserStats');
+      final Uri uri =
+          Uri.parse('$apiBaseUrl/api/sportstatlabels/$eventId/updateUserStats');
+
       await http.put(uri,
           headers: {
             'Content-Type': 'application/json',
@@ -105,14 +113,16 @@ class SportStatLabelsService {
           },
           body: jsonEncode(stats));
     } catch (error) {
-      throw AppException(message: 'Failed to update user stat, please try again.');
+      throw AppException(
+          message: 'Failed to update user stat, please try again.');
     }
   }
 
   Future<List<SportStatLabels>> getAllStatLabels() async {
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    final token = await storage.read(key: jwtStorageToken);
     try {
-      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/sportstatlabels');
+      final Uri uri = Uri.parse('$apiBaseUrl/api/sportstatlabels');
+
       final response = await http.get(
         uri,
         headers: {
@@ -130,7 +140,6 @@ class SportStatLabelsService {
         throw AppException(message: 'Failed to load stat labels');
       }
     } catch (error) {
-      log('An error occurred while fetching sport stat labels', error: error);
       throw AppException(
         message:
             'An error occurred while fetching stat labels, please try again.',
@@ -139,9 +148,10 @@ class SportStatLabelsService {
   }
 
   Future<void> createStatLabel(Map<String, dynamic> statLabelData) async {
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    final token = await storage.read(key: jwtStorageToken);
     try {
-      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/sportstatlabels');
+      final Uri uri = Uri.parse('$apiBaseUrl/api/sportstatlabels');
+
       final response = await http.post(
         uri,
         headers: {
@@ -157,17 +167,16 @@ class SportStatLabelsService {
         throw AppException(message: 'Failed to create stat label');
       }
     } catch (error) {
-      log('An error occurred while creating stat label', error: error);
       throw AppException(message: 'Failed to create stat label');
     }
   }
 
   Future<void> updateStatLabel(
       Map<String, dynamic> statLabelData, String statLabelId) async {
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    final token = await storage.read(key: jwtStorageToken);
     try {
-      final uri = Uri.http(
-          dotenv.env['API_BASE_URL']!, 'api/sportstatlabels/$statLabelId');
+      final Uri uri = Uri.parse('$apiBaseUrl/api/sportstatlabels');
+
       final response = await http.put(
         uri,
         headers: {
@@ -183,16 +192,15 @@ class SportStatLabelsService {
         throw AppException(message: 'Failed to update stat label');
       }
     } catch (error) {
-      log('An error occurred while updating stat label', error: error);
       throw AppException(message: 'Failed to update stat label');
     }
   }
 
   Future<void> deleteStatLabel(String? statLabelId) async {
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    final token = await storage.read(key: jwtStorageToken);
     try {
-      final uri = Uri.http(
-          dotenv.env['API_BASE_URL']!, 'api/sportstatlabels/$statLabelId');
+      final Uri uri = Uri.parse('api/sportstatlabels/$statLabelId');
+
       final response = await http.delete(
         uri,
         headers: {
@@ -202,8 +210,7 @@ class SportStatLabelsService {
       );
 
       if (response.statusCode != 204) {
-                throw Exception('Erreur lors de la suppression de la statistique.');
-
+        throw Exception('Erreur lors de la suppression de la statistique.');
       }
     } catch (error) {
       throw Exception('Erreur: ${error.toString()}');
