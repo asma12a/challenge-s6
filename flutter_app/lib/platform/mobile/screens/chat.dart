@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:squad_go/core/providers/connectivity_provider.dart';
 import 'package:squad_go/main.dart';
 import '../../../core/services/chat_service.dart';
 import 'dart:convert';
@@ -176,6 +178,8 @@ class _ChatPageState extends State<ChatPage>
 
   @override
   Widget build(BuildContext context) {
+    var isOnline = context.watch<ConnectivityState>().isConnected;
+
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) => SlideTransition(
@@ -260,6 +264,7 @@ class _ChatPageState extends State<ChatPage>
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
+                  // TODO: when offline show a snackbar with a message and disable the send button
                   Expanded(
                     child: TextField(
                       controller: _controller,

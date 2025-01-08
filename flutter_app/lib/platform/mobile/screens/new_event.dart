@@ -203,7 +203,8 @@ class _NewEventState extends State<NewEvent> {
                       decoration: InputDecoration(
                         border: const OutlineInputBorder(),
                         icon: const Icon(Icons.title),
-                        label: Text(translate?.event_name ?? 'Nom de l\'événement'),
+                        label: Text(
+                            translate?.event_name ?? 'Nom de l\'événement'),
                       ),
                       onSaved: (value) {
                         _enteredName = value!;
@@ -223,7 +224,8 @@ class _NewEventState extends State<NewEvent> {
                           decoration: InputDecoration(
                             border: OutlineInputBorder(),
                             icon: Icon(Icons.place),
-                            labelText: translate?.event_address ?? 'Adresse de l\'événement',
+                            labelText: translate?.event_address ??
+                                'Adresse de l\'événement',
                           ),
                           validator: _validateAddress,
                           onSaved: (value) {
@@ -274,7 +276,8 @@ class _NewEventState extends State<NewEvent> {
                           SizedBox(width: 15),
                           ElevatedButton(
                             onPressed: _presentDatePicker,
-                            child: Text(translate?.select_date ?? "Sélectionner une date"),
+                            child: Text(translate?.select_date ??
+                                "Sélectionner une date"),
                           ),
                           SizedBox(width: 20),
                           Text(
@@ -301,8 +304,8 @@ class _NewEventState extends State<NewEvent> {
                                 }
                                 return null;
                               },
-                              hint: Text(translate?.type_select_label ??
-                                "Type",
+                              hint: Text(
+                                translate?.type_select_label ?? "Type",
                                 style: TextStyle(
                                     color: Theme.of(context)
                                         .colorScheme
@@ -314,8 +317,8 @@ class _NewEventState extends State<NewEvent> {
                               items: [
                                 DropdownMenuItem(
                                   value: null,
-                                  child: Text(translate?.type_select_label ??
-                                    "Type",
+                                  child: Text(
+                                    translate?.type_select_label ?? "Type",
                                     style: TextStyle(
                                         color: Theme.of(context)
                                             .colorScheme
@@ -367,8 +370,8 @@ class _NewEventState extends State<NewEvent> {
                                 }
                                 return null;
                               },
-                              hint: Text(translate?.sport_select_label ??
-                                "Sport",
+                              hint: Text(
+                                translate?.sport_select_label ?? "Sport",
                                 style: TextStyle(
                                     color: Theme.of(context)
                                         .colorScheme
@@ -380,8 +383,8 @@ class _NewEventState extends State<NewEvent> {
                               items: [
                                 DropdownMenuItem<String>(
                                   value: null,
-                                  child: Text(translate?.sport_select_label ??
-                                    "Sport",
+                                  child: Text(
+                                    translate?.sport_select_label ?? "Sport",
                                     style: TextStyle(
                                       color: Theme.of(context)
                                           .colorScheme
@@ -416,7 +419,8 @@ class _NewEventState extends State<NewEvent> {
                       height: 60,
                     ),
                     ElevatedButton(
-                        onPressed: _saveEvent, child: Text(translate?.save_event ?? "Enregistrer"))
+                        onPressed: _saveEvent,
+                        child: Text(translate?.save_event ?? "Enregistrer"))
                   ],
                 ),
               ),

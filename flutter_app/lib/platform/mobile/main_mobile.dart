@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart' as provider;
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
+import 'package:squad_go/core/providers/connectivity_provider.dart';
+import 'package:squad_go/core/utils/connectivity_handler.dart';
 import 'package:squad_go/platform/mobile/screens/event.dart';
 import 'package:squad_go/platform/mobile/screens/join.dart';
 import 'package:squad_go/shared_widgets/sign_in.dart';
@@ -96,6 +98,7 @@ class MyAppMobile extends StatelessWidget {
     return provider.MultiProvider(
       providers: [
         provider.ChangeNotifierProvider(create: (_) => AuthState()),
+        provider.ChangeNotifierProvider(create: (_) => ConnectivityState()),
       ],
       builder: (context, child) => MaterialApp.router(
         localizationsDelegates: AppLocalizations.localizationsDelegates,

@@ -17,8 +17,8 @@ class WebHomeScreen extends StatefulWidget {
 
 class _WebHomeScreenState extends State<WebHomeScreen> {
   int _selectedIndex = 0;
+  String? _errorMessage;
 
-  // Liste des pages correspondantes aux index
   final List<Widget> _pages = [
     const AdminDashboardPage(),
     const AdminUsersPage(),
@@ -31,102 +31,160 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   Widget build(BuildContext context) {
     return Consumer<AuthState>(
       builder: (context, authState, _) {
+        if (authState.isAuthenticated && !authState.isAdmin) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            setState(() {
+              _errorMessage = "Droits insuffisants. Accès refusé.";
+            });
+            authState.logout();
+          });
+        }
+
         return Scaffold(
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(60.0),
-            child: AppBar(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              elevation: 0,
-            ),
-          ),
-          // Structure principale
+          appBar: authState.isAuthenticated && authState.isAdmin
+              ? null
+              : AppBar(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  elevation: 0,
+                ),
           body: Row(
             children: [
-              // Affiche la sidebar seulement si l'utilisateur est authentifié
-              if (authState.isAuthenticated)
-                Container(
-                  width: 250, // Largeur de la sidebar
-                  color: Colors.teal[50],
-                  child: Column(
-                    children: <Widget>[
-                      // Remplacer le DrawerHeader par une image
-                      DrawerHeader(
-                        child: Center(
-                          child: Image.asset(
-                            'assets/images/app_icon.png',
-                            width: 150,
-                            height: 150,
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ),
-                      _createDrawerItem(
-                        icon: Icons.dashboard,
-                        text: 'Tableau de Bord',
-                        onTap: () {
-                          setState(() {
-                            _selectedIndex = 0;
-                          });
-                        },
-                      ),
-                      _createDrawerItem(
-                        icon: Icons.account_circle,
-                        text: 'Utilisateurs',
-                        onTap: () {
-                          setState(() {
-                            _selectedIndex = 1;
-                          });
-                        },
-                      ),
-                      _createDrawerItem(
-                        icon: Icons.event,
-                        text: 'Événements',
-                        onTap: () {
-                          setState(() {
-                            _selectedIndex = 2;
-                          });
-                        },
-                      ),
-                      _createDrawerItem(
-                        icon: Icons.sports,
-                        text: 'Sports',
-                        onTap: () {
-                          setState(() {
-                            _selectedIndex = 3;
-                          });
-                        },
-                      ),
-                      _createDrawerItem(
-                        icon: Icons.bar_chart,
-                        text: 'Statistiques sportives',
-                        onTap: () {
-                          setState(() {
-                            _selectedIndex = 4;
-                          });
-                        },
-                      ),
-                      const Divider(), // Séparateur
-                      Spacer(), // Espace pour pousser "Déconnexion" en bas
-                      _createDrawerItem(
-                        icon: Icons.exit_to_app,
-                        text: 'Déconnexion',
-                        onTap: () {
-                          authState.logout();
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              // Contenu principal (ajusté pour le cas non connecté)
+              if (authState.isAuthenticated && authState.isAdmin)
+                _buildSidebar(),
               Expanded(
-                child: authState.isAuthenticated
-                    ? _pages[_selectedIndex] // Affiche la page sélectionnée
-                    : const SignInScreen(),
+                child: authState.isAuthenticated && authState.isAdmin
+                    ? _pages[_selectedIndex]
+                    : _buildSignInOrError(authState),
               ),
             ],
           ),
         );
       },
+    );
+  }
+
+  Widget _buildSignInOrError(AuthState authState) {
+    if (_errorMessage != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.warning_amber_rounded,
+              size: 100,
+              color: Colors.redAccent,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              _errorMessage!,
+              style: TextStyle(
+                color: Colors.grey[800],
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Roboto',
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).primaryColor, 
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 40,
+                  vertical: 15,
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onPressed: () {
+                setState(() {
+                  _errorMessage = null;
+                });
+              },
+              child: const Text('Retour à la page de connexion'),
+            ),
+          ],
+        ),
+      );
+    }
+    return const SignInScreen();
+  }
+
+  Widget _buildSidebar() {
+    return Container(
+      width: 250,
+      color: Colors.teal[50],
+      child: Column(
+        children: <Widget>[
+          DrawerHeader(
+            child: Center(
+              child: Image.asset(
+                'assets/images/app_icon.png',
+                width: 120,
+                height: 120,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+          _createDrawerItem(
+            icon: Icons.dashboard,
+            text: 'Tableau de Bord',
+            onTap: () {
+              setState(() {
+                _selectedIndex = 0;
+              });
+            },
+          ),
+          _createDrawerItem(
+            icon: Icons.account_circle,
+            text: 'Utilisateurs',
+            onTap: () {
+              setState(() {
+                _selectedIndex = 1;
+              });
+            },
+          ),
+          _createDrawerItem(
+            icon: Icons.event,
+            text: 'Événements',
+            onTap: () {
+              setState(() {
+                _selectedIndex = 2;
+              });
+            },
+          ),
+          _createDrawerItem(
+            icon: Icons.sports,
+            text: 'Sports',
+            onTap: () {
+              setState(() {
+                _selectedIndex = 3;
+              });
+            },
+          ),
+          _createDrawerItem(
+            icon: Icons.bar_chart,
+            text: 'Statistiques sportives',
+            onTap: () {
+              setState(() {
+                _selectedIndex = 4;
+              });
+            },
+          ),
+          const Divider(),
+          Spacer(),
+          _createDrawerItem(
+            icon: Icons.exit_to_app,
+            text: 'Déconnexion',
+            onTap: () {
+              Provider.of<AuthState>(context, listen: false).logout();
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -139,10 +197,10 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
       leading: Icon(icon, color: Colors.teal),
       title: Text(
         text,
-        style: TextStyle(
+        style: const TextStyle(
           color: Colors.black,
           fontSize: 16,
-          fontFamily: 'Poppins', // Utilisation d'une police plus moderne
+          fontFamily: 'Poppins',
           fontWeight: FontWeight.w600,
         ),
       ),

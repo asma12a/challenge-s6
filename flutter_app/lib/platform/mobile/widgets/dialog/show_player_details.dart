@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/team.dart';
+import 'package:squad_go/core/providers/connectivity_provider.dart';
 import 'package:squad_go/core/services/sport_stat_labels_service.dart';
 import 'package:squad_go/core/services/event_service.dart';
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/services/team_service.dart';
+import 'package:squad_go/platform/mobile/widgets/dialog/offline.dart';
+
 import '../../../../main.dart';
 
 class ShowPlayerDetailsDialog extends StatefulWidget {
@@ -163,6 +167,8 @@ class _ShowPlayerDetailsDialogState extends State<ShowPlayerDetailsDialog> {
 
   @override
   Widget build(BuildContext context) {
+    var isOnline = context.watch<ConnectivityState>().isConnected;
+
     return Dialog(
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -220,7 +226,16 @@ class _ShowPlayerDetailsDialogState extends State<ShowPlayerDetailsDialog> {
             ],
             if (widget.canEdit)
               TextButton(
-                onPressed: _deletePlayer,
+                onPressed: () {
+                  if (!isOnline) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const OfflineDialog(),
+                    );
+                    return;
+                  }
+                  _deletePlayer();
+                },
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.red.shade300,
                   textStyle: const TextStyle(
@@ -233,7 +248,16 @@ class _ShowPlayerDetailsDialogState extends State<ShowPlayerDetailsDialog> {
               ),
             if (!widget.canEdit && widget.isCurrentUser)
               TextButton(
-                onPressed: _leaveTeam,
+                onPressed: () {
+                  if (!isOnline) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const OfflineDialog(),
+                    );
+                    return;
+                  }
+                  _leaveTeam();
+                },
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.red.shade300,
                   textStyle: const TextStyle(
