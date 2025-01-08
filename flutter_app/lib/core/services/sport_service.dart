@@ -1,9 +1,16 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:squad_go/core/exceptions/app_exception.dart';
+import 'package:squad_go/core/models/sport.dart';
+import 'package:squad_go/main.dart';
+
 
 class SportService {
+  final storage = const FlutterSecureStorage();
+
   // GET all sports
   static Future<List<Map<String, dynamic>>> getSports() async {
     final storage = const FlutterSecureStorage();
@@ -96,6 +103,24 @@ class SportService {
       }
     } catch (error) {
       throw Exception('Erreur: ${error.toString()}');
+    }
+  }
+
+  Future<List<Sport>> getUserSports() async {
+    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    try {
+      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/sports/user');
+      final response = await dio.get(uri.toString(),
+          options: Options(headers: {
+            'Content-Type': 'application/json',
+            "Authorization": "Bearer $token",
+          }));
+      final List<dynamic> data = response.data;
+      return data.map((sport) => Sport.fromJson(sport)).toList();
+    } catch (error) {
+      log.severe('An error occurred while ', {error: error});
+      throw AppException(
+          message: 'Failed to retrieve my sports, please try again.');
     }
   }
 }

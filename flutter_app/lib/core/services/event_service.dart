@@ -58,7 +58,6 @@ class EventService {
             'Content-Type': 'application/json',
             'Authorization': "Bearer $token",
           }));
-      debugPrint('Search $response');
 
       final List<dynamic> events = response.data;
       return events.map((event) => Event.fromJson(event)).toList();
