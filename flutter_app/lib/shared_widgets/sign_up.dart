@@ -43,7 +43,7 @@ class _Title extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
    // final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
-
+    final translate = AppLocalizations.of(context);
     return Container(
       constraints: const BoxConstraints(
           maxWidth: 300), // Largeur maximale pour alignement avec le formulaire
@@ -52,7 +52,7 @@ class _Title extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _Logo(),
-          Text('Rejoignez votre communauté dès aujourd’hui !',
+          Text(translate?.join_community ?? 'Rejoignez votre communauté dès aujourd’hui !',
               style: Theme.of(context).textTheme.titleLarge!.copyWith(
                     color: Colors.black,
                     fontSize: 30,
@@ -242,9 +242,9 @@ class __FormContentState extends State<_FormContent> {
               alignment: Alignment.centerLeft,
               child: Row(
                 children: [
-                  const Text(
+                  Text(translate?.already_account ??
                     'Vous avez déjà un compte ?',
-                    style: TextStyle(color: Colors.black),
+                    style: const TextStyle(color: Colors.black),
                   ),
                   const SizedBox(
                     width: 10,
