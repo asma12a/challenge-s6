@@ -19,6 +19,8 @@ type Environment struct {
 	BrevoAPIKey   string
 	JWTSecret     string
 	Environment   string
+	ClientID      string
+	ClientSecret  string
 }
 
 var Env *Environment
@@ -41,11 +43,14 @@ func LoadEnvironment() {
 	Env.DBUser = getEnv("DB_USER", true)
 	Env.DBPass = getEnv("DB_PASS", true)
 	Env.DBName = getEnv("DB_NAME", true)
-	Env.APIPort = getEnv("API_PORT", true)
+	Env.APIPort = getEnv("DB_PORT", true)
 	Env.BrevoAPIKey = getEnv("BREVO_API_KEY", true)
 	Env.DragonFlyPort = getEnv("DRAGONFLY_PORT", true)
 	Env.JWTSecret = getEnv("JWT_SECRET", true)
 	Env.Environment = getEnv("ENV", true)
+	Env.ClientID = getEnv("CLIENT_ID", true)
+	Env.ClientSecret = getEnv("CLIENT_SECRET", true)
+
 }
 
 func LoadEnvironmentFile() {
