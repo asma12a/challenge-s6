@@ -173,10 +173,8 @@ class _NewEventState extends State<NewEvent> {
   @override
   Widget build(BuildContext context) {
     final translate = AppLocalizations.of(context);
-    final translate = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(translate?.create_event ?? "Créer un événement"),
         title: Text(translate?.create_event ?? "Créer un événement"),
       ),
       body: Center(
@@ -225,7 +223,6 @@ class _NewEventState extends State<NewEvent> {
                           decoration: InputDecoration(
                             border: OutlineInputBorder(),
                             icon: Icon(Icons.place),
-                            labelText: translate?.event_address ?? 'Adresse de l\'événement',
                             labelText: translate?.event_address ?? 'Adresse de l\'événement',
                           ),
                           validator: _validateAddress,
@@ -278,7 +275,6 @@ class _NewEventState extends State<NewEvent> {
                           ElevatedButton(
                             onPressed: _presentDatePicker,
                             child: Text(translate?.select_date ?? "Sélectionner une date"),
-                            child: Text(translate?.select_date ?? "Sélectionner une date"),
                           ),
                           SizedBox(width: 20),
                           Text(
@@ -306,7 +302,6 @@ class _NewEventState extends State<NewEvent> {
                                 return null;
                               },
                               hint: Text(translate?.type_select_label ??
-                              hint: Text(translate?.type_select_label ??
                                 "Type",
                                 style: TextStyle(
                                     color: Theme.of(context)
@@ -319,7 +314,6 @@ class _NewEventState extends State<NewEvent> {
                               items: [
                                 DropdownMenuItem(
                                   value: null,
-                                  child: Text(translate?.type_select_label ??
                                   child: Text(translate?.type_select_label ??
                                     "Type",
                                     style: TextStyle(

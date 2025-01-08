@@ -139,7 +139,6 @@ class _SearchScreenState extends State<SearchScreen> {
                     dropdownColor: Theme.of(context).colorScheme.secondary,
                     iconEnabledColor: Colors.black,
                     hint: Text(translate?.type_select_label ??
-                    hint: Text(translate?.type_select_label ??
                       "Type",
                       style: TextStyle(
                           color: Theme.of(context).colorScheme.onSecondary),
@@ -168,7 +167,6 @@ class _SearchScreenState extends State<SearchScreen> {
           Text(
             _searchResults.isNotEmpty
                 ? "${_searchResults.length} événements trouvés."
-                : translate?.no_events ?? "Aucun événement trouvé.",
                 : translate?.no_events ?? "Aucun événement trouvé.",
           ),
           SizedBox(
