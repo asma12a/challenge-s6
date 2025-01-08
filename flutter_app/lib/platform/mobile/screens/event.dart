@@ -14,6 +14,7 @@ import 'package:provider/provider.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/map_location.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/share_event.dart';
 import 'package:squad_go/platform/mobile/widgets/teams.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class EventScreen extends StatefulWidget {
   final Event? event;

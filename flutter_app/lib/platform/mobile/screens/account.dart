@@ -10,6 +10,8 @@ import 'package:squad_go/main.dart';
 import 'package:squad_go/platform/mobile/widgets/performances.dart';
 
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -50,6 +52,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     final userInfo = context.read<AuthState>().userInfo;
     return SafeArea(
       child: Scaffold(
@@ -138,19 +141,19 @@ class _AccountScreenState extends State<AccountScreen> {
                                   tabs: [
                                     Tab(
                                       child: Text(
-                                        'Mes Events',
+                                        translate?.my_events_profile ?? 'Mes Events',
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                     Tab(
                                       child: Text(
-                                        'Performances',
+                                        translate?.performance ?? 'Performance',
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                     Tab(
                                       child: Text(
-                                        'Paramètres',
+                                        translate?.settings ?? 'Paramètres',
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -168,25 +171,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                       ),
                                       padding: const EdgeInsets.all(16),
                                       child: Center(
-                                        child: Column(
-                                          children: [
-                                            HomeMyEvents(
-                                              onRefresh: onRefresh,
-                                              isHome: false,
-                                              onEventsCountChanged: (count){
-                                                setState(() {
-                                                  eventsCount = count;
-                                                });
-                                              },
-                                              onDistinctSportsFetched: (sports){
-                                                setState(() {
-                                                  userSports = sports;
-                                                });
-                                                //debugPrint("userSports $userSports");
-                                              },
-                                            ),
-                                          ],
-                                        ),
+                                        child: Text(translate?.my_events_profile ?? 'Mes events'),
                                       ),
                                     ),
                                     Container(
@@ -196,9 +181,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                         borderRadius: BorderRadius.circular(16),
                                       ),
                                       padding: const EdgeInsets.all(16),
-                                      child: PerformancesHandle(
-                                        sports: userSports,
-                                      ),
+                                      child: Center(child: Text(translate?.performance ?? 'Performances')),
                                     ),
                                     Container(
                                       margin: const EdgeInsets.only(top: 16),
@@ -207,7 +190,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                         borderRadius: BorderRadius.circular(16),
                                       ),
                                       padding: const EdgeInsets.all(16),
-                                      child: Center(child: Text('Paramètres')),
+                                      child: Center(child: Text(translate?.settings ?? 'Paramètres')),
                                     ),
                                   ],
                                 ),

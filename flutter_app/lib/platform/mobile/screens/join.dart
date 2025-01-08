@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/services/event_service.dart';
 import 'package:squad_go/platform/mobile/widgets/event_card.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 class UpperCaseTextFormatter extends TextInputFormatter {
   @override
@@ -68,7 +70,7 @@ class _JoinEventScreenState extends State<JoinEventScreen> {
       child: Column(
         children: [
           Text(
-            "Rejoinde un événement",
+            translate?.join_event ?? "Rejoindre un événement",
             style: TextStyle(fontSize: 22),
           ),
           SizedBox(height: 45),
@@ -84,10 +86,10 @@ class _JoinEventScreenState extends State<JoinEventScreen> {
                 }
                 return null;
               },
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                icon: Icon(Icons.qr_code),
-                label: Text('Saisir le code de l\'événement'),
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                icon: const Icon(Icons.qr_code),
+                label: Text(translate?.input_code ?? 'Saisir le code de l\'événement'),
               ),
               onSaved: (value) {
                 _enteredCode = value!.toUpperCase();
@@ -115,7 +117,7 @@ class _JoinEventScreenState extends State<JoinEventScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            child: Text("Rechercher par code"),
+            child: Text(translate?.search_code ?? "Rechercher par code"),
           ),
           SizedBox(height: 30),
           if (hasSearched && _event != null)

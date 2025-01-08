@@ -4,6 +4,7 @@ import 'package:squad_go/core/services/event_service.dart';
 import 'package:squad_go/main.dart';
 import 'package:squad_go/platform/mobile/widgets/carousel.dart';
 import 'package:squad_go/platform/mobile/widgets/event_card.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomeRecommendedEvents extends StatefulWidget {
   final Future<void> Function()? onRefresh;

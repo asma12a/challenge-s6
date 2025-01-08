@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:squad_go/core/services/event_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AddEditEventModal extends StatefulWidget {
   final Map<String, dynamic>? event;

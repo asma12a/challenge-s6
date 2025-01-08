@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/services/team_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AddTeamDialog extends StatefulWidget {
   final String eventId;

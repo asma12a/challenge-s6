@@ -3,6 +3,7 @@ import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/team.dart';
 import 'package:squad_go/core/services/team_service.dart';
 import 'package:squad_go/main.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AddPlayerDialog extends StatefulWidget {
   final String eventId;
@@ -134,7 +135,7 @@ class _AddPlayerDialogState extends State<AddPlayerDialog> {
                   Icons.add,
                   color: Colors.white,
                 ),
-                label: const Text(translate?.add ?? 'Ajouter'),
+                label: Text(translate?.add ?? 'Ajouter'),
               ),
             ],
           ),
