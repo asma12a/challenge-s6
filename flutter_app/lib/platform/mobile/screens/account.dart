@@ -1,3 +1,4 @@
+import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -9,8 +10,6 @@ import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/main.dart';
 import 'package:squad_go/platform/mobile/widgets/performances.dart';
 
-
-
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
 
@@ -20,10 +19,11 @@ class AccountScreen extends StatefulWidget {
 
 class _AccountScreenState extends State<AccountScreen> {
   final SportService sportService = SportService();
+
   Future<void> onRefresh() async {}
   int eventsCount = 0;
   List<Sport> userSports = [];
-
+  List<String> labelNotifs = ["Évenements recommandés", "Évenement 1jour avant", "Personne invité inscrite"];
 
   @override
   void initState() {
@@ -32,21 +32,16 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   Future<void> fetchUserSport() async {
-
     try {
       List<Sport> sports = await sportService.getUserSports();
       setState(() {
         userSports = sports;
       });
-
     } catch (e) {
       // Handle error
       log.severe('Failed to fetch user sports: $e');
     }
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -80,19 +75,9 @@ class _AccountScreenState extends State<AccountScreen> {
                           padding: const EdgeInsets.all(4),
                           child: Center(
                             child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  CircleAvatar(
-                                    radius: 25,
-                                    backgroundColor: Colors.grey[300],
-                                    child: const Icon(
-                                      Icons.person,
-                                      size: 25,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
                                   Text(
                                     userInfo?.name ?? "Utilisateur",
                                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -173,12 +158,12 @@ class _AccountScreenState extends State<AccountScreen> {
                                             HomeMyEvents(
                                               onRefresh: onRefresh,
                                               isHome: false,
-                                              onEventsCountChanged: (count){
+                                              onEventsCountChanged: (count) {
                                                 setState(() {
                                                   eventsCount = count;
                                                 });
                                               },
-                                              onDistinctSportsFetched: (sports){
+                                              onDistinctSportsFetched: (sports) {
                                                 setState(() {
                                                   userSports = sports;
                                                 });
@@ -207,7 +192,49 @@ class _AccountScreenState extends State<AccountScreen> {
                                         borderRadius: BorderRadius.circular(16),
                                       ),
                                       padding: const EdgeInsets.all(16),
-                                      child: Center(child: Text('Paramètres')),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Notifications',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          ListView.builder(
+                                            shrinkWrap: true,
+                                            itemCount: labelNotifs.length,
+                                            itemBuilder: (context, index) {
+                                              final stat = labelNotifs[index];
+                                              return ListTile(
+                                                dense: true,
+                                                title: Text(stat),
+                                                trailing: AnimatedToggleSwitch.dual(
+                                                  first: false,
+                                                  second: true,
+                                                  current: true,
+                                                  onChanged: (value) => setState(() {}),
+                                                  iconBuilder: (value) => value
+                                                      ? const Icon(
+                                                          Icons.public,
+                                                          color: Colors.white,
+                                                        )
+                                                      : const Icon(
+                                                          Icons.lock,
+                                                          color: Colors.white,
+                                                        ),
+                                                  height: 40,
+                                                  style: ToggleStyle(
+                                                    indicatorColor: Colors.blue,
+                                                    borderColor: Colors.blue,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),
