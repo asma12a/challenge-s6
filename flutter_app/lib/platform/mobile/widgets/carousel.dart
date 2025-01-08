@@ -22,6 +22,7 @@ class CarouselState extends State<Carousel> {
   @override
   Widget build(BuildContext context) {
     final translate = AppLocalizations.of(context);
+    final translate = AppLocalizations.of(context);
     return LayoutBuilder(
       builder: (context, constraints) {
         return Column(

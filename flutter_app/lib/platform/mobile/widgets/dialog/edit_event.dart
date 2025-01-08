@@ -127,6 +127,7 @@ class _EditEventDialogState extends State<EditEventDialog> {
   @override
   Widget build(BuildContext context) {
     final translate = AppLocalizations.of(context);
+    final translate = AppLocalizations.of(context);
     return Dialog(
       child: Container(
         padding: const EdgeInsets.all(16),

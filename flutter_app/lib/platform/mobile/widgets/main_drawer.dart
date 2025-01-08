@@ -72,6 +72,7 @@ class MainDrawer extends StatelessWidget {
             ),
             title: Text(
               translate?.logout ?? 'Déconnexion',
+              translate?.logout ?? 'Déconnexion',
               style: Theme.of(context).textTheme.titleSmall!.copyWith(
                     color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 24,

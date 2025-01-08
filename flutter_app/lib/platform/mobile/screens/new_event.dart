@@ -368,7 +368,7 @@ class _NewEventState extends State<NewEvent> {
                                 return null;
                               },
                               hint: Text(translate?.sport_select_label ??
-                                translate?.sport_select_label ?? "Sport",
+                                "Sport",
                                 style: TextStyle(
                                     color: Theme.of(context)
                                         .colorScheme
@@ -381,7 +381,7 @@ class _NewEventState extends State<NewEvent> {
                                 DropdownMenuItem<String>(
                                   value: null,
                                   child: Text(translate?.sport_select_label ??
-                                    translate?.sport_select_label ?? "Sport",
+                                    "Sport",
                                     style: TextStyle(
                                       color: Theme.of(context)
                                           .colorScheme

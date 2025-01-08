@@ -54,6 +54,7 @@ class _AddPlayerDialogState extends State<AddPlayerDialog> {
   @override
   Widget build(BuildContext context) {
     final translate = AppLocalizations.of(context);
+    final translate = AppLocalizations.of(context);
     return Dialog(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -62,6 +63,7 @@ class _AddPlayerDialogState extends State<AddPlayerDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Text(translate?.add_player ?? 
               Text(translate?.add_player ?? 
                 'Ajouter un joueur',
                 maxLines: 1,

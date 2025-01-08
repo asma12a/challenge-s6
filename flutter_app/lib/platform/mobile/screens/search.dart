@@ -67,6 +67,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final translate = AppLocalizations.of(context);
+    final translate = AppLocalizations.of(context);
     return Padding(
       padding: EdgeInsets.all(15),
       child: Column(
