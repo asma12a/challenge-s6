@@ -5,6 +5,7 @@ import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/core/models/team.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
+import 'package:squad_go/core/providers/connectivity_provider.dart';
 import 'package:squad_go/core/services/event_service.dart';
 import 'package:squad_go/core/utils/tools.dart';
 import 'package:squad_go/main.dart';
@@ -12,8 +13,10 @@ import 'package:squad_go/platform/mobile/widgets/custom_label.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/edit_event.dart';
 import 'package:provider/provider.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/map_location.dart';
+import 'package:squad_go/platform/mobile/widgets/dialog/offline.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/share_event.dart';
 import 'package:squad_go/platform/mobile/widgets/teams.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class EventScreen extends StatefulWidget {
   final Event? event;
@@ -72,6 +75,9 @@ class _EventScreenState extends State<EventScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var isOnline = context.watch<ConnectivityState>().isConnected;
+
+    final translate = AppLocalizations.of(context);
     return SafeArea(
       child: Scaffold(
         floatingActionButton: !isEventFinished
@@ -116,6 +122,13 @@ class _EventScreenState extends State<EventScreen> {
                           IconButton(
                             icon: const Icon(Icons.edit),
                             onPressed: () {
+                              if (!isOnline) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => const OfflineDialog(),
+                                );
+                                return;
+                              }
                               showDialog(
                                 context: context,
                                 builder: (context) {
@@ -294,7 +307,7 @@ class _EventScreenState extends State<EventScreen> {
                                         ),
                                         tabs: [
                                           Tab(
-                                            child: Text(
+                                            child: Text(translate?.teams ??
                                               'Équipes',
                                               overflow: TextOverflow.ellipsis,
                                             ),

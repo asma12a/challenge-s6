@@ -46,7 +46,7 @@ func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Ev
 	app.Get("/:eventId", getEvent(ctx, serviceEvent))
 	app.Get("/code/:eventCode", getEventByCode(ctx, serviceEvent))
 	app.Post("/", createEvent(ctx, serviceEvent, serviceSport))
-	app.Put("/:eventId", updateEvent(ctx, serviceEvent, serviceSport))
+	app.Put("/:eventId", middleware.IsEventOrganizer(ctx, serviceEvent), updateEvent(ctx, serviceEvent, serviceSport))
 	app.Delete("/:eventId", middleware.IsEventOrganizer(ctx, serviceEvent), deleteEvent(ctx, serviceEvent))
 
 	// Admin routes
@@ -197,6 +197,7 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 		}
 		toJ.Teams = teamsToJ
 
+		c.Set("Cache-Control", "public, max-age=3600") // Cache for 1h
 		return c.JSON(toJ)
 	}
 }
@@ -557,6 +558,7 @@ func listUserEvents(ctx context.Context, serviceEvent service.Event) fiber.Handl
 				}
 			}
 		}
+		c.Set("Cache-Control", "public, max-age=3600") // Cache for 1h
 		return c.JSON(toJ)
 	}
 }

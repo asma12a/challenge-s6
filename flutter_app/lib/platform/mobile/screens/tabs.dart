@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:squad_go/core/providers/connectivity_provider.dart';
+import 'package:squad_go/core/utils/connectivity_handler.dart';
 import 'package:squad_go/platform/mobile/screens/account.dart';
 import 'package:squad_go/platform/mobile/screens/join.dart';
 import 'package:squad_go/platform/mobile/screens/home.dart';
 import 'package:squad_go/platform/mobile/screens/search.dart';
+import 'package:squad_go/platform/mobile/widgets/dialog/offline.dart';
 import 'package:squad_go/platform/mobile/widgets/main_drawer.dart';
 import 'package:squad_go/platform/mobile/screens/new_event.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TabsScreen extends StatefulWidget {
   final int? initialPageIndex;
@@ -38,7 +43,8 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget activePage = HomeScreen(shouldRefresh: widget.shouldRefresh);
+    final translate = AppLocalizations.of(context);
+    Widget activePage = HomeScreen();
 
     if (_selectPageIndex == 1) {
       activePage = SearchScreen();
@@ -52,6 +58,57 @@ class _TabsScreenState extends State<TabsScreen> {
       activePage = AccountScreen();
     }
 
+    var isOnline = context.watch<ConnectivityState>().isConnected;
+
+    if (!isOnline) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.wifi_off,
+                    color: Theme.of(context).colorScheme.onPrimary),
+                const SizedBox(width: 10),
+                Text(
+                  "Vous n'êtes pas connecté à internet.",
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.grey.shade700,
+            duration: Duration(days: 5),
+            dismissDirection: DismissDirection.none,
+          ),
+        );
+      });
+    } else if (isOnline) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.wifi,
+                    color: Theme.of(context).colorScheme.onPrimary),
+                const SizedBox(width: 10),
+                Text(
+                  "Vous êtes connecté à internet.",
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.blue,
+            duration: Duration(seconds: 1),
+          ),
+        );
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -59,6 +116,14 @@ class _TabsScreenState extends State<TabsScreen> {
             IconButton(
               icon: const Icon(Icons.add),
               onPressed: () {
+                if (!isOnline) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => const OfflineDialog(),
+                  );
+                  return;
+                }
+
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (ctx) => NewEvent(),
@@ -74,20 +139,20 @@ class _TabsScreenState extends State<TabsScreen> {
         type: BottomNavigationBarType.fixed,
         onTap: _selectPage,
         currentIndex: _selectPageIndex,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Accueil',
+            icon: const Icon(Icons.home),
+            label: translate?.tabs_home ?? 'Accueil',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Rechercher',
+            icon: const Icon(Icons.search),
+            label: translate?.tabs_search ?? 'Rechercher',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.qr_code),
-            label: 'Rejoindre',
+            icon: const Icon(Icons.qr_code),
+            label: translate?.tabs_join ?? 'Rejoindre',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Profile',
           ),

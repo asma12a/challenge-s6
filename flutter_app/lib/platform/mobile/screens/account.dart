@@ -9,6 +9,7 @@ import 'package:squad_go/platform/mobile/widgets/home_widgets/my_events.dart';
 import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/main.dart';
 import 'package:squad_go/platform/mobile/widgets/performances.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -158,12 +159,12 @@ class _AccountScreenState extends State<AccountScreen> {
                                             HomeMyEvents(
                                               onRefresh: onRefresh,
                                               isHome: false,
-                                              onEventsCountChanged: (count) {
+                                              onEventsCountChanged: (count){
                                                 setState(() {
                                                   eventsCount = count;
                                                 });
                                               },
-                                              onDistinctSportsFetched: (sports) {
+                                              onDistinctSportsFetched: (sports){
                                                 setState(() {
                                                   userSports = sports;
                                                 });

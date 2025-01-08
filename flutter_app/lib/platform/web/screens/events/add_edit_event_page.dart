@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:squad_go/core/services/event_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AddEditEventModal extends StatefulWidget {
   final Map<String, dynamic>? event;
@@ -72,6 +73,7 @@ class _AddEditEventModalState extends State<AddEditEventModal> {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
       child: Dialog(
