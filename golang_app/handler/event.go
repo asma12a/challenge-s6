@@ -197,6 +197,7 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 		}
 		toJ.Teams = teamsToJ
 
+		c.Set("Cache-Control", "public, max-age=3600") // Cache for 1h
 		return c.JSON(toJ)
 	}
 }
@@ -557,6 +558,7 @@ func listUserEvents(ctx context.Context, serviceEvent service.Event) fiber.Handl
 				}
 			}
 		}
+		c.Set("Cache-Control", "public, max-age=3600") // Cache for 1h
 		return c.JSON(toJ)
 	}
 }

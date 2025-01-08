@@ -13,16 +13,16 @@ import (
 )
 
 func SportStatLabelsHandler(app fiber.Router, ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceSport service.Sport, serviceEvent service.Event, serviceUser service.User) {
-	app.Post("/:eventId/addUserStat", middleware.IsEventOrganizerOrCoach(ctx , serviceEvent), addUserStat(ctx, serviceSportStatLables, serviceEvent, serviceUser))
+	app.Post("/:eventId/addUserStat", middleware.IsEventOrganizerOrCoach(ctx, serviceEvent), addUserStat(ctx, serviceSportStatLables, serviceEvent, serviceUser))
 	app.Post("/", middleware.IsAdminMiddleware, createSportStatLables(ctx, serviceSportStatLables, serviceSport))
 	app.Get("/:eventId/:userId/stats", middleware.IsAuthMiddleware, getUserStatsByEvent(ctx, serviceSportStatLables, serviceEvent, serviceUser))
 	app.Get("/:sportId/:userId/performance", middleware.IsAuthMiddleware, getUserPerformanceBySport(ctx, serviceSportStatLables, serviceUser))
-	app.Get("/:sportId/labels",middleware.IsAuthMiddleware, listSportStatLabelsBySport(ctx, serviceSportStatLables))
-	app.Get("/:sportStatLabelId",middleware.IsAdminMiddleware, getSportStatLabel(ctx, serviceSportStatLables))
-	app.Get("/",middleware.IsAdminMiddleware, listSportStatLabels(ctx, serviceSportStatLables))
+	app.Get("/:sportId/labels", middleware.IsAuthMiddleware, listSportStatLabelsBySport(ctx, serviceSportStatLables))
+	app.Get("/:sportStatLabelId", middleware.IsAdminMiddleware, getSportStatLabel(ctx, serviceSportStatLables))
+	app.Get("/", middleware.IsAdminMiddleware, listSportStatLabels(ctx, serviceSportStatLables))
 	app.Delete("/:sportStatLabelId", middleware.IsAdminMiddleware, deleteSportStatLabel(ctx, serviceSportStatLables))
-	app.Put("/:eventId/updateUserStats", middleware.IsEventOrganizerOrCoach(ctx , serviceEvent), updateUserStats(ctx, serviceSportStatLables))
-	app.Put("/:sportStatLabelId",middleware.IsAdminMiddleware, updateSportStatLabel(ctx, serviceSportStatLables, serviceSport))
+	app.Put("/:eventId/updateUserStats", middleware.IsEventOrganizerOrCoach(ctx, serviceEvent), updateUserStats(ctx, serviceSportStatLables))
+	app.Put("/:sportStatLabelId", middleware.IsAdminMiddleware, updateSportStatLabel(ctx, serviceSportStatLables, serviceSport))
 
 }
 
@@ -484,9 +484,8 @@ func getUserPerformanceBySport(ctx context.Context, serviceSportStatLables servi
 			})
 		}
 
-
 		aggregatedStats := make(map[string]int) // key: label, value: sum of values
-		eventIDs := make(map[ulid.ID]bool)       // to track unique events
+		eventIDs := make(map[ulid.ID]bool)      // to track unique events
 
 		for _, userStat := range userStats {
 			if userStat.Edges.Stat != nil {
@@ -515,9 +514,8 @@ func getUserPerformanceBySport(ctx context.Context, serviceSportStatLables servi
 				Value: value,
 			})
 		}
-		
 
-
+		c.Set("Cache-Control", "public, max-age=3600") // Cache for 1h
 		return c.JSON(toj)
 	}
 }

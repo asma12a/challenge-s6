@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/models/sport.dart';
+import 'package:squad_go/core/utils/connectivity_handler.dart';
 import 'package:squad_go/main.dart';
 
 const apiBaseUrl = String.fromEnvironment('API_BASE_URL');
@@ -38,6 +40,7 @@ class EventService {
   }
 
   Future<List<Event>> getSearchResults(Map<String, String> params) async {
+
     final token = await storage.read(key: jwtStorageToken);
 
     final Uri baseUrl = Uri.parse('$apiBaseUrl/api/events/search');
@@ -115,13 +118,27 @@ class EventService {
     final token = await storage.read(key: jwtStorageToken);
 
     try {
+      final refreshCacheOptions = CacheOptions(
+        store: MemCacheStore(),
+        policy: CachePolicy.refresh,
+      );
+
       final Uri url = Uri.parse('$apiBaseUrl/api/events/$id');
 
       final response = await dio.get(url.toString(),
-          options: Options(headers: {
-            'Content-Type': 'application/json',
-            'Authorization': "Bearer $token",
-          }));
+          options: ConnectivityHandler().isConnected
+              ? refreshCacheOptions.toOptions().copyWith(
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': "Bearer $token",
+                  },
+                )
+              : Options(
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': "Bearer $token",
+                  },
+                ));
 
       final Map<String, dynamic> event =
           Map<String, dynamic>.from(response.data);
