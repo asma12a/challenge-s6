@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/models/sport.dart';
+import 'package:squad_go/core/utils/connectivity_handler.dart';
 import 'package:squad_go/main.dart';
 
 class EventService {
@@ -34,8 +36,7 @@ class EventService {
     }
   }
 
-  Future<List<Event>> getSearchResults(
-      Map<String, String> params) async {
+  Future<List<Event>> getSearchResults(Map<String, String> params) async {
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
 
     final Uri baseUrl =
@@ -62,7 +63,6 @@ class EventService {
 
       final List<dynamic> events = response.data;
       return events.map((event) => Event.fromJson(event)).toList();
-
     } catch (error) {
       throw AppException(
           message: 'Failed to retrieve events, please try again.');
@@ -117,11 +117,18 @@ class EventService {
     final Uri url = Uri.http(dotenv.env['API_BASE_URL']!, 'api/events/$id');
 
     try {
+      if (ConnectivityHandler().isConnected) {
+        // dio.interceptors.clear();
+        // clear only cache for get event
+      }
+
       final response = await dio.get(url.toString(),
-          options: Options(headers: {
-            'Content-Type': 'application/json',
-            'Authorization': "Bearer $token",
-          }));
+          options: Options(
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': "Bearer $token",
+            },
+          ));
 
       final Map<String, dynamic> event =
           Map<String, dynamic>.from(response.data);

@@ -3,6 +3,7 @@ import 'package:squad_go/core/models/team.dart';
 import 'package:squad_go/core/models/user_app.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:squad_go/core/providers/connectivity_provider.dart';
 import 'package:squad_go/core/services/team_service.dart';
 import 'package:squad_go/main.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/add_player.dart';
@@ -10,6 +11,7 @@ import 'package:squad_go/platform/mobile/widgets/dialog/add_team.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/edit_player.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/edit_stats_player.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/edit_team.dart';
+import 'package:squad_go/platform/mobile/widgets/dialog/offline.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/show_player_details.dart';
 
 class TeamsHandle extends StatefulWidget {
@@ -115,6 +117,9 @@ class _TeamsHandleState extends State<TeamsHandle> {
     userHasTeam = widget.teams.any(
       (team) => team.players.any((player) => player.userID == currentUser!.id),
     );
+
+    var isOnline = context.watch<ConnectivityState>().isConnected;
+
     return DefaultTabController(
       length: widget.teams.length,
       child: Column(
@@ -164,6 +169,14 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                   ),
                                   padding: EdgeInsets.zero,
                                   onPressed: () {
+                                    if (!isOnline) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) =>
+                                            const OfflineDialog(),
+                                      );
+                                      return;
+                                    }
                                     showDialog(
                                       context: context,
                                       builder: (context) {
@@ -196,6 +209,13 @@ class _TeamsHandleState extends State<TeamsHandle> {
                     height: 40,
                     child: ElevatedButton(
                       onPressed: () {
+                        if (!isOnline) {
+                          showDialog(
+                            context: context,
+                            builder: (context) => const OfflineDialog(),
+                          );
+                          return;
+                        }
                         showDialog(
                           context: context,
                           builder: (context) {
@@ -237,6 +257,14 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                             player.userID == currentUser!.id))))
                               TextButton(
                                 onPressed: () {
+                                  if (!isOnline) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) =>
+                                          const OfflineDialog(),
+                                    );
+                                    return;
+                                  }
                                   if (userHasTeam) {
                                     _switchTeam(team.id, team.name);
                                   } else {
@@ -406,6 +434,14 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                             ? widget.color
                                                             : null,
                                                         onPressed: () {
+                                                          if (!isOnline) {
+                                                            showDialog(
+                                                              context: context,
+                                                              builder: (context) =>
+                                                                  const OfflineDialog(),
+                                                            );
+                                                            return;
+                                                          }
                                                           showDialog(
                                                             context: context,
                                                             builder: (context) {
@@ -429,6 +465,14 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                             ? widget.color
                                                             : null,
                                                         onPressed: () {
+                                                          if (!isOnline) {
+                                                            showDialog(
+                                                              context: context,
+                                                              builder: (context) =>
+                                                                  const OfflineDialog(),
+                                                            );
+                                                            return;
+                                                          }
                                                           showDialog(
                                                             context: context,
                                                             builder: (context) {
@@ -509,6 +553,13 @@ class _TeamsHandleState extends State<TeamsHandle> {
                           SizedBox(height: 8),
                           ElevatedButton.icon(
                             onPressed: () {
+                              if (!isOnline) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => const OfflineDialog(),
+                                );
+                                return;
+                              }
                               showDialog(
                                 context: context,
                                 builder: (context) {
