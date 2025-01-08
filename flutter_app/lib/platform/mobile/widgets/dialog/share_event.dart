@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:squad_go/core/models/event.dart';
 
 class ShareEventDialog extends StatefulWidget {
@@ -12,7 +11,8 @@ class ShareEventDialog extends StatefulWidget {
 }
 
 class _ShareEventDialogState extends State<ShareEventDialog> {
-  final String appUrl = dotenv.env['APP_URL'] ?? 'https://squad-go.com';
+  final String appUrl =
+      String.fromEnvironment('APP_URL', defaultValue: 'https://squad-go.com');
 
   @override
   Widget build(BuildContext context) {

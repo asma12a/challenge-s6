@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:squad_go/core/providers/connectivity_provider.dart';
+import 'package:squad_go/core/utils/connectivity_handler.dart';
 import 'package:squad_go/platform/mobile/screens/account.dart';
 import 'package:squad_go/platform/mobile/screens/join.dart';
 import 'package:squad_go/platform/mobile/screens/home.dart';
 import 'package:squad_go/platform/mobile/screens/search.dart';
+import 'package:squad_go/platform/mobile/widgets/dialog/offline.dart';
 import 'package:squad_go/platform/mobile/widgets/main_drawer.dart';
 import 'package:squad_go/platform/mobile/screens/new_event.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -54,6 +58,57 @@ class _TabsScreenState extends State<TabsScreen> {
       activePage = AccountScreen();
     }
 
+    var isOnline = context.watch<ConnectivityState>().isConnected;
+
+    if (!isOnline) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.wifi_off,
+                    color: Theme.of(context).colorScheme.onPrimary),
+                const SizedBox(width: 10),
+                Text(
+                  "Vous n'êtes pas connecté à internet.",
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.grey.shade700,
+            duration: Duration(days: 5),
+            dismissDirection: DismissDirection.none,
+          ),
+        );
+      });
+    } else if (isOnline) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.wifi,
+                    color: Theme.of(context).colorScheme.onPrimary),
+                const SizedBox(width: 10),
+                Text(
+                  "Vous êtes connecté à internet.",
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.blue,
+            duration: Duration(seconds: 1),
+          ),
+        );
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -61,6 +116,14 @@ class _TabsScreenState extends State<TabsScreen> {
             IconButton(
               icon: const Icon(Icons.add),
               onPressed: () {
+                if (!isOnline) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => const OfflineDialog(),
+                  );
+                  return;
+                }
+
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (ctx) => NewEvent(),
