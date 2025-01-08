@@ -12,6 +12,8 @@
   "login_button": "Iniciar sesión",
   "signup_button": "Registrarse",
   "forgot_password": "¿Olvidaste tu contraseña?",
+  "email_placeholder": "Introduce tu dirección de correo electrónico",
+  "password_placeholder": "Introduce tu contraseña",
   "search_placeholder": "Buscar...",
   "no_events": "No se encontraron eventos",
   "no_event_to_display": "No hay eventos para mostrar",
@@ -21,6 +23,9 @@
   "my_events": "Mis eventos actuales",
   "see_button": "Ver",
   "join_button": "Unirse",
+  "join_event": "Unirse a un evento",
+  "input_code": "Ingrese el código del evento",
+  "search_code": "Buscar por código",
   "my_profile": "Mi perfil",
   "sport_select_label": "Deporte",
   "type_select_label": "Tipo",
@@ -69,5 +74,9 @@
   "select_date": "Seleccionar fecha",
   "no_results": "No se encontraron resultados",
   "event_name": "Nombre del evento",
-  "event_address": "Dirección del evento"
+  "event_address": "Dirección del evento",
+  "open_public": "Hacer públicos",
+  "save_event": "Ahorrar",
+  "my_events_profile": "Mis eventos",
+  "performance"; "Actuación"
 }

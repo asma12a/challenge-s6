@@ -131,7 +131,6 @@ class SportStatLabelsService {
         throw AppException(message: 'Failed to load stat labels');
       }
     } catch (error) {
-      log('An error occurred while fetching sport stat labels', error: error);
       throw AppException(
         message:
             'An error occurred while fetching stat labels, please try again.',
@@ -158,7 +157,6 @@ class SportStatLabelsService {
         throw AppException(message: 'Failed to create stat label');
       }
     } catch (error) {
-      log('An error occurred while creating stat label', error: error);
       throw AppException(message: 'Failed to create stat label');
     }
   }
@@ -184,7 +182,6 @@ class SportStatLabelsService {
         throw AppException(message: 'Failed to update stat label');
       }
     } catch (error) {
-      log('An error occurred while updating stat label', error: error);
       throw AppException(message: 'Failed to update stat label');
     }
   }

@@ -11,6 +11,7 @@ import 'package:squad_go/platform/mobile/widgets/dialog/edit_player.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/edit_stats_player.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/edit_team.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/show_player_details.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TeamsHandle extends StatefulWidget {
   final String eventId;
@@ -477,7 +478,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                   ],
                                                 )
                                               : Badge(
-                                                  label: Text(transalte?.waiting ??
+                                                  label: Text(translate?.waiting ??
                                                     'En attente',
                                                     style: TextStyle(
                                                       color: Colors.white,
@@ -526,7 +527,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                               Icons.add,
                               color: Colors.white,
                             ),
-                            label: const Text(
+                            label: Text(
                                 translate?.add_player ?? 'Ajouter un joueur'),
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,

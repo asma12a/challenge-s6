@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:squad_go/core/utils/tools.dart';
 import 'package:squad_go/platform/mobile/widgets/custom_label.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/join_event.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class EventCard extends StatelessWidget {
   final Event event;

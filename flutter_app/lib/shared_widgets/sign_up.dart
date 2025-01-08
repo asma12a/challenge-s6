@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:squad_go/core/services/auth_service.dart';
 import 'package:squad_go/shared_widgets/sign_in.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import '../platform/mobile/widgets/logo.dart';
 
 class SignUpScreen extends StatelessWidget {
   const SignUpScreen({super.key});
@@ -46,11 +49,12 @@ class _Title extends StatelessWidget {
           maxWidth: 300), // Largeur maximale pour alignement avec le formulaire
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          _Logo(),
           Text('Rejoignez votre communauté dès aujourd’hui !',
               style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 30,
                   )),
           const SizedBox(height: 50),
@@ -168,11 +172,11 @@ class __FormContentState extends State<_FormContent> {
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: translate?.email_label ?? 'Email',
-                hintText: 'Entrez votre adresse email',
-                prefixIcon: Icon(Icons.email_outlined),
-                border: OutlineInputBorder(),
+                hintText: translate?.email_placeholder ?? 'Entrez votre adresse email',
+                prefixIcon: const Icon(Icons.email_outlined),
+                border: const OutlineInputBorder(),
               ),
               onSaved: (value) {
                 _enteredEmail = value!;
@@ -196,7 +200,7 @@ class __FormContentState extends State<_FormContent> {
               obscureText: !_isPasswordVisible,
               decoration: InputDecoration(
                   labelText: translate?.password ?? 'Mot de passe',
-                  hintText: 'Entrez votre mot de passe',
+                  hintText: translate?.password_placeholder ?? 'Entrez votre mot de passe',
                   prefixIcon: const Icon(Icons.lock_outline_rounded),
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
@@ -222,11 +226,11 @@ class __FormContentState extends State<_FormContent> {
                       borderRadius: BorderRadius.circular(4)),
                 ),
                 onPressed: _signUp,
-                child: const Padding(
-                  padding: EdgeInsets.all(10.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
                   child: Text(translate?.signup_button ??
                     'Créez votre compte',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -240,7 +244,7 @@ class __FormContentState extends State<_FormContent> {
                 children: [
                   const Text(
                     'Vous avez déjà un compte ?',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.black),
                   ),
                   const SizedBox(
                     width: 10,
@@ -270,4 +274,25 @@ class __FormContentState extends State<_FormContent> {
   }
 
   Widget _gap() => const SizedBox(height: 16);
+}
+
+class _Logo extends StatelessWidget {
+  const _Logo();
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Logo(
+          width: isSmallScreen ? 200 : 300,
+        ),
+        SizedBox(
+          height: 25,
+        )
+      ],
+    );
+  }
 }
