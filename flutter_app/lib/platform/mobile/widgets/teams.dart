@@ -435,7 +435,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                   ],
                                                 )
                                               : Badge(
-                                                  label: Text(transalte?.waiting ??
+                                                  label: Text(translate?.waiting ??
                                                     'En attente',
                                                     style: TextStyle(
                                                       color: Colors.white,
@@ -481,7 +481,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                               Icons.add,
                               color: Colors.white,
                             ),
-                            label: const Text(
+                            label: Text(
                                 translate?.add_player ?? 'Ajouter un joueur'),
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,

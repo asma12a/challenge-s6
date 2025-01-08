@@ -102,7 +102,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     value: params["sport"],
                     iconEnabledColor: Colors.black,
                     dropdownColor: Theme.of(context).colorScheme.secondary,
-                    hint: Text(translate?.sport ??
+                    hint: Text(translate?.sport_select_label ??
                       "Sport",
                       style: TextStyle(
                           color: Theme.of(context).colorScheme.onSecondary),

@@ -47,7 +47,7 @@ class CarouselState extends State<Carousel> {
             if (!widget.isLoading && widget.items.isEmpty)
               Padding(
                 padding: const EdgeInsets.only(left: 40),
-                child: Text(translate?.no_events_to_display ?? 'Aucun événement à afficher'),
+                child: Text(translate?.no_event_to_display ?? 'Aucun événement à afficher'),
               ),
             Padding(
               padding: const EdgeInsets.only(left: 20),

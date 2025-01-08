@@ -135,7 +135,7 @@ class _AddPlayerDialogState extends State<AddPlayerDialog> {
                   Icons.add,
                   color: Colors.white,
                 ),
-                label: const Text(translate?.add ?? 'Ajouter'),
+                label: Text(translate?.add ?? 'Ajouter'),
               ),
             ],
           ),

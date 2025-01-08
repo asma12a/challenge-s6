@@ -202,9 +202,9 @@ class _NewEventState extends State<NewEvent> {
                       style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface),
                       maxLength: 50,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        icon: Icon(Icons.title),
+                      decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
+                        icon: const Icon(Icons.title),
                         label: Text(translate?.event_name ?? 'Nom de l\'événement'),
                       ),
                       onSaved: (value) {

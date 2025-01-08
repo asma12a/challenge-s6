@@ -78,16 +78,16 @@ class _TabsScreenState extends State<TabsScreen> {
         currentIndex: _selectPageIndex,
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: translate?.tabs.home ?? 'Accueil',
+            icon: const Icon(Icons.home),
+            label: translate?.tabs_home ?? 'Accueil',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: translate?.tabs.search ?? 'Rechercher',
+            icon: const Icon(Icons.search),
+            label: translate?.tabs_search ?? 'Rechercher',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.qr_code),
-            label: translate?.tabs.join ?? 'Rejoindre',
+            icon: const Icon(Icons.qr_code),
+            label: translate?.tabs_join ?? 'Rejoindre',
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.person),
