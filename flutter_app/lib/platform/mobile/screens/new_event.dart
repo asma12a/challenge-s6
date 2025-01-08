@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:squad_go/main.dart';
 import 'package:squad_go/platform/mobile/screens/tabs.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NewEvent extends StatefulWidget {
   const NewEvent({super.key});
@@ -199,9 +200,9 @@ class _NewEventState extends State<NewEvent> {
                       style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface),
                       maxLength: 50,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        icon: Icon(Icons.title),
+                      decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
+                        icon: const Icon(Icons.title),
                         label: Text(translate?.event_name ?? 'Nom de l\'événement'),
                       ),
                       onSaved: (value) {
@@ -259,7 +260,7 @@ class _NewEventState extends State<NewEvent> {
                               });
                             },
                           ),
-                          Text("Ouvert au public"),
+                          Text(translate?.open_public ?? "Ouvert au public"),
                           SizedBox(width: 20),
                         ],
                       ),
@@ -415,7 +416,7 @@ class _NewEventState extends State<NewEvent> {
                       height: 60,
                     ),
                     ElevatedButton(
-                        onPressed: _saveEvent, child: Text("Enregistrer"))
+                        onPressed: _saveEvent, child: Text(translate?.save_event ?? "Enregistrer"))
                   ],
                 ),
               ),

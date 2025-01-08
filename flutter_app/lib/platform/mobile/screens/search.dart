@@ -5,6 +5,7 @@ import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/platform/mobile/widgets/event_card.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -101,7 +102,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     value: params["sport"],
                     iconEnabledColor: Colors.black,
                     dropdownColor: Theme.of(context).colorScheme.secondary,
-                    hint: Text(translate?.sport ??
+                    hint: Text(translate?.sport_select_label ??
                       "Sport",
                       style: TextStyle(
                           color: Theme.of(context).colorScheme.onSecondary),

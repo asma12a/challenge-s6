@@ -7,7 +7,6 @@ class ChatService {
 
   Function(String)? onMessageReceived;
 
-  // Connexion WebSocket
   Future<void> connect(String url) async {
     try {
       _channel = WebSocketChannel.connect(Uri.parse(url));
@@ -28,7 +27,7 @@ class ChatService {
 
   void sendMessage(String message) {
     if (isConnected) {
-      _channel.sink.add(message); // Envoi du message au serveur WebSocket
+      _channel.sink.add(message);
     } else {
       debugPrint('Erreur : Pas de connexion WebSocket');
     }

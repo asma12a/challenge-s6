@@ -46,7 +46,7 @@ func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Ev
 	app.Get("/:eventId", getEvent(ctx, serviceEvent))
 	app.Get("/code/:eventCode", getEventByCode(ctx, serviceEvent))
 	app.Post("/", createEvent(ctx, serviceEvent, serviceSport))
-	app.Put("/:eventId", updateEvent(ctx, serviceEvent, serviceSport))
+	app.Put("/:eventId", middleware.IsEventOrganizer(ctx, serviceEvent), updateEvent(ctx, serviceEvent, serviceSport))
 	app.Delete("/:eventId", middleware.IsEventOrganizer(ctx, serviceEvent), deleteEvent(ctx, serviceEvent))
 
 	// Admin routes

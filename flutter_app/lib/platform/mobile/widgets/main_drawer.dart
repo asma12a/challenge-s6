@@ -4,6 +4,7 @@ import 'package:squad_go/core/providers/auth_state_provider.dart';
 import 'package:squad_go/platform/mobile/widgets/logo.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({super.key, required this.onSelectScreen});
@@ -18,8 +19,6 @@ class MainDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = context.read<AuthState>().userInfo;
-
     final translate = AppLocalizations.of(context);
     return Drawer(
       child: Column(
@@ -53,7 +52,7 @@ class MainDrawer extends StatelessWidget {
               color: Theme.of(context).colorScheme.onSurface,
             ),
             title: Text(
-              translate?.my_profile ?? currentUser!.name,
+              translate?.my_profile ?? 'Mon compte',
               style: Theme.of(context).textTheme.titleSmall!.copyWith(
                     color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 24,

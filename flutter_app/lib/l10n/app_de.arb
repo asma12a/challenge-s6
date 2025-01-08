@@ -12,6 +12,8 @@
   "login_button": "Anmelden",
   "signup_button": "Registrieren",
   "forgot_password": "Passwort vergessen?",
+  "email_placeholder": "Geben Sie Ihre E-Mail-Adresse ein",
+  "password_placeholder": "Geben Sie Ihr Passwort ein",
   "search_placeholder": "Suchen...",
   "no_events": "Keine Veranstaltungen gefunden",
   "no_event_to_display": "Keine Veranstaltungen anzuzeigen",
@@ -21,6 +23,9 @@
   "my_events": "Meine aktuellen Veranstaltungen",
   "see_button": "Ansehen",
   "join_button": "Beitreten",
+  "join_event": "Nehmen Sie an einer Veranstaltung teil",
+  "input_code": "Geben Sie den Veranstaltungscode ein",
+  "search_code": "Suche nach Code",
   "my_profile": "Mein Profil",
   "sport_select_label": "Sport",
   "type_select_label": "Typ",
@@ -69,5 +74,12 @@
   "select_date": "Datum auswählen",
   "no_results": "Keine Ergebnisse gefunden",
   "event_name": "Veranstaltungsname",
-  "event_address": "Veranstaltungsadresse"
+  "event_address": "Veranstaltungsadresse",
+  "open_public": "Für die Öffentlichkeit zugänglich",
+  "save_event": "Speichern",
+  "my_events_profile": "Meine Veranstaltungen",
+  "performance": "Leistung",
+  "join_community": "Treten Sie noch heute Ihrer Community bei!",
+  "already_account": "Sie haben bereits ein Konto?"
+
 }

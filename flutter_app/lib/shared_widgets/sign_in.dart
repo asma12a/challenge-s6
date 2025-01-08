@@ -7,6 +7,7 @@ import 'package:squad_go/shared_widgets/sign_up.dart';
 import 'package:squad_go/platform/mobile/widgets/logo.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
@@ -139,11 +140,11 @@ class __FormContentState extends State<_FormContent> {
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: translate?.email_label ?? 'Email',
-                hintText: 'Entrez votre adresse email',
-                prefixIcon: Icon(Icons.email_outlined),
-                border: OutlineInputBorder(),
+                hintText: translate?.email_placeholder ?? 'Entrez votre adresse email',
+                prefixIcon: const Icon(Icons.email_outlined),
+                border: const OutlineInputBorder(),
               ),
               onSaved: (value) {
                 _enteredEmail = value!;
@@ -170,7 +171,7 @@ class __FormContentState extends State<_FormContent> {
               obscureText: !_isPasswordVisible,
               decoration: InputDecoration(
                   labelText: translate?.password ?? 'Mot de passe',
-                  hintText: 'Entrez votre mot de passe',
+                  hintText: translate?.password_placeholder ?? 'Entrez votre mot de passe',
                   prefixIcon: const Icon(Icons.lock_outline_rounded),
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
@@ -196,7 +197,7 @@ class __FormContentState extends State<_FormContent> {
                   _rememberMe = value;
                 });
               },
-              title: const Text(translate?.remember ?? 'Se souvenir de moi'),
+              title: Text(translate?.remember ?? 'Se souvenir de moi'),
               controlAffinity: ListTileControlAffinity.leading,
               dense: true,
               contentPadding: const EdgeInsets.all(0),
@@ -210,11 +211,11 @@ class __FormContentState extends State<_FormContent> {
                       borderRadius: BorderRadius.circular(4)),
                 ),
                 onPressed: () async => _signIn(context),
-                child: const Padding(
-                  padding: EdgeInsets.all(10.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
                   child: Text(translate?.login_button ??
                     'Se connecter',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -237,11 +238,11 @@ class __FormContentState extends State<_FormContent> {
                     ),
                   );
                 },
-                child: const Padding(
-                  padding: EdgeInsets.all(10.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
                   child: Text(translate?.signup_title ??
                     'Inscription',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),

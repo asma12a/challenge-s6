@@ -1,9 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/models/user_app.dart';
 import 'package:squad_go/main.dart';
+
+const apiBaseUrl = String.fromEnvironment('API_BASE_URL');
+const jwtStorageToken = String.fromEnvironment('JWT_STORAGE_KEY');
 
 class AuthService {
   final _storage = const FlutterSecureStorage();
@@ -12,11 +14,10 @@ class AuthService {
     print("before signIn");
 
     try {
-      final uri =
-          Uri.http(String.fromEnvironment('API_BASE_URL'), 'api/auth/login');
-      print("uri $uri");
+      final uri = '$apiBaseUrl/api/auth/login';
+
       final response = await dio.post(
-        uri.toString(),
+        uri,
         options: Options(
           headers: {
             'Content-Type': 'application/json',
@@ -27,9 +28,7 @@ class AuthService {
 
       final data = response.data;
 
-      await _storage.write(
-          key: String.fromEnvironment('JWT_STORAGE_KEY'), value: data['token']);
-
+      await _storage.write(key: jwtStorageToken, value: data['token']);
       return data;
     } catch (error) {
       log.severe('An error occurred while ', {error: error});
@@ -39,7 +38,8 @@ class AuthService {
 
   Future<Map<String, dynamic>?> signUp(body) async {
     try {
-      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/auth/signup');
+      final uri = '$apiBaseUrl/api/auth/signup';
+
       final response = await dio.post(
         uri.toString(),
         options: Options(
@@ -63,10 +63,10 @@ class AuthService {
 
   Future<UserApp?> getUserInfo() async {
     try {
-      final token = await _storage.read(key: 'squadgo-jwt');
+      final token = await _storage.read(key: jwtStorageToken);
       if (token == null) return null;
 
-      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/auth/me');
+      final uri = '$apiBaseUrl/api/auth/me';
       final response = await dio.get(
         uri.toString(),
         options: Options(
