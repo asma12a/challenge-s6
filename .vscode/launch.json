@@ -1,0 +1,35 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter",
+      "type": "dart",
+      "request": "launch",
+      "program": "flutter_app/lib/main.dart",
+      "toolArgs": ["--no-enable-impeller"]
+    },
+    {
+      "name": "flutter_app",
+      "cwd": "flutter_app",
+      "request": "launch",
+      "type": "dart",
+      "toolArgs": ["--no-enable-impeller"]
+    },
+    {
+      "name": "flutter_app (profile mode)",
+      "cwd": "flutter_app",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "toolArgs": ["--no-enable-impeller"]
+    },
+    {
+      "name": "flutter_app (release mode)",
+      "cwd": "flutter_app",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "toolArgs": ["--no-enable-impeller"]
+    }
+  ]
+}

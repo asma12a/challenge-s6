@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/services/event_service.dart';
+import 'package:squad_go/core/utils/geolocation.dart';
 import 'package:squad_go/main.dart';
 import 'package:squad_go/platform/mobile/widgets/carousel.dart';
 import 'package:squad_go/platform/mobile/widgets/event_card.dart';
@@ -17,17 +19,26 @@ class HomeRecommendedEvents extends StatefulWidget {
 class HomeRecommendedEventsState extends State<HomeRecommendedEvents> {
   final EventService eventService = EventService();
   List<Event> recommendedEvents = [];
+  Position? userPosition;
 
   @override
   void initState() {
     super.initState();
 
     fetchRecommendedEvents();
+    determinePosition().then((value) {
+      setState(() {
+        userPosition = value;
+      });
+    }).catchError((e) {
+      log.severe('Failed to determine position: $e');
+    });
   }
 
   Future<void> fetchRecommendedEvents() async {
     try {
-      List<Event> events = await eventService.getRecommendedEvents();
+      List<Event> events = await eventService.getRecommendedEvents(
+          latitude: userPosition?.latitude, longitude: userPosition?.longitude);
 
       setState(() {
         recommendedEvents = events;

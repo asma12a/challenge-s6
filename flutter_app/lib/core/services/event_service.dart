@@ -34,8 +34,7 @@ class EventService {
     }
   }
 
-  Future<List<Event>> getSearchResults(
-      Map<String, String> params) async {
+  Future<List<Event>> getSearchResults(Map<String, String> params) async {
     final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
 
     final Uri baseUrl =
@@ -61,7 +60,6 @@ class EventService {
 
       final List<dynamic> events = response.data;
       return events.map((event) => Event.fromJson(event)).toList();
-
     } catch (error) {
       throw AppException(
           message: 'Failed to retrieve events, please try again.');
@@ -210,6 +208,7 @@ class EventService {
       }
       final uri = Uri.http(
           dotenv.env['API_BASE_URL']!, 'api/events/recommended', queryParams);
+
       final response = await dio.get(uri.toString(),
           options: Options(headers: {
             'Content-Type': 'application/json',

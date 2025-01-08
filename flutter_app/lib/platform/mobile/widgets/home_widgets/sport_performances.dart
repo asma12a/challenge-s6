@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:squad_go/core/services/sport_stat_labels_service.dart';
 import 'package:squad_go/main.dart';
@@ -7,7 +6,8 @@ class SportPerformances extends StatefulWidget {
   final String sportId;
   final String userId;
 
-  const SportPerformances({super.key, required this.sportId, required this.userId});
+  const SportPerformances(
+      {super.key, required this.sportId, required this.userId});
 
   @override
   State<SportPerformances> createState() => _SportPerformancesState();
@@ -27,7 +27,8 @@ class _SportPerformancesState extends State<SportPerformances> {
 
   Future<void> _loadUserPerformance() async {
     try {
-      final userPerformances = await statLabelsService.getUserPerformanceBySport(widget.sportId, widget.userId);
+      final userPerformances = await statLabelsService
+          .getUserPerformanceBySport(widget.sportId, widget.userId);
       setState(() {
         nbEvents = userPerformances.nbEvents;
         stats = userPerformances.stats
@@ -81,7 +82,8 @@ class _SportPerformancesState extends State<SportPerformances> {
                 },
               )
             else
-              const Text('Aucune performance disponible.', style: TextStyle(fontSize: 16)),
+              const Text('Aucune performance disponible.',
+                  style: TextStyle(fontSize: 16)),
           ],
         ));
   }

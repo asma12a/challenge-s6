@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
 import 'package:squad_go/core/services/sport_service.dart';
-import 'package:squad_go/platform/mobile/widgets/home_widgets/my_events.dart';
 
 import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/main.dart';
-import 'package:squad_go/platform/mobile/widgets/performances.dart';
-
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -26,7 +21,6 @@ class _AccountScreenState extends State<AccountScreen> {
   int eventsCount = 0;
   List<Sport> userSports = [];
 
-
   @override
   void initState() {
     super.initState();
@@ -34,21 +28,16 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   Future<void> fetchUserSport() async {
-
     try {
       List<Sport> sports = await sportService.getUserSports();
       setState(() {
         userSports = sports;
       });
-
     } catch (e) {
       // Handle error
       log.severe('Failed to fetch user sports: $e');
     }
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +63,10 @@ class _AccountScreenState extends State<AccountScreen> {
                           right: 16,
                         ),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary.withOpacity(0.03),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withOpacity(0.03),
                           borderRadius: BorderRadius.all(
                             Radius.circular(16),
                           ),
@@ -98,7 +90,10 @@ class _AccountScreenState extends State<AccountScreen> {
                                   const SizedBox(height: 8),
                                   Text(
                                     userInfo?.name ?? "Utilisateur",
-                                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall
+                                        ?.copyWith(
                                           fontWeight: FontWeight.bold,
                                         ),
                                   ),
@@ -124,14 +119,20 @@ class _AccountScreenState extends State<AccountScreen> {
                               Container(
                                 height: 40,
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primary
+                                      .withOpacity(0.5),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: TabBar(
                                   indicatorSize: TabBarIndicatorSize.tab,
                                   dividerColor: Colors.transparent,
                                   indicator: BoxDecoration(
-                                    color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primary
+                                        .withOpacity(0.2),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   labelColor: Colors.white,
@@ -141,7 +142,8 @@ class _AccountScreenState extends State<AccountScreen> {
                                   tabs: [
                                     Tab(
                                       child: Text(
-                                        translate?.my_events_profile ?? 'Mes Events',
+                                        translate?.my_events_profile ??
+                                            'Mes Events',
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -166,31 +168,46 @@ class _AccountScreenState extends State<AccountScreen> {
                                     Container(
                                       margin: const EdgeInsets.only(top: 16),
                                       decoration: BoxDecoration(
-                                        color: Theme.of(context).colorScheme.primary.withOpacity(0.03),
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary
+                                            .withOpacity(0.03),
                                         borderRadius: BorderRadius.circular(16),
                                       ),
                                       padding: const EdgeInsets.all(16),
                                       child: Center(
-                                        child: Text(translate?.my_events_profile ?? 'Mes events'),
+                                        child: Text(
+                                            translate?.my_events_profile ??
+                                                'Mes events'),
                                       ),
                                     ),
                                     Container(
                                       margin: const EdgeInsets.only(top: 16),
                                       decoration: BoxDecoration(
-                                        color: Theme.of(context).colorScheme.primary.withOpacity(0.03),
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary
+                                            .withOpacity(0.03),
                                         borderRadius: BorderRadius.circular(16),
                                       ),
                                       padding: const EdgeInsets.all(16),
-                                      child: Center(child: Text(translate?.performance ?? 'Performances')),
+                                      child: Center(
+                                          child: Text(translate?.performance ??
+                                              'Performances')),
                                     ),
                                     Container(
                                       margin: const EdgeInsets.only(top: 16),
                                       decoration: BoxDecoration(
-                                        color: Theme.of(context).colorScheme.primary.withOpacity(0.03),
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary
+                                            .withOpacity(0.03),
                                         borderRadius: BorderRadius.circular(16),
                                       ),
                                       padding: const EdgeInsets.all(16),
-                                      child: Center(child: Text(translate?.settings ?? 'Paramètres')),
+                                      child: Center(
+                                          child: Text(translate?.settings ??
+                                              'Paramètres')),
                                     ),
                                   ],
                                 ),
