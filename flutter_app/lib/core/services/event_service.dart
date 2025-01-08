@@ -117,18 +117,26 @@ class EventService {
     final Uri url = Uri.http(dotenv.env['API_BASE_URL']!, 'api/events/$id');
 
     try {
-      if (ConnectivityHandler().isConnected) {
-        // dio.interceptors.clear();
-        // clear only cache for get event
-      }
+      final refreshCacheOptions = CacheOptions(
+        store: MemCacheStore(),
+        policy: CachePolicy.refresh,
+      );
 
+      // if connected then refresh cache, else use cache
       final response = await dio.get(url.toString(),
-          options: Options(
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': "Bearer $token",
-            },
-          ));
+          options: ConnectivityHandler().isConnected
+              ? refreshCacheOptions.toOptions().copyWith(
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': "Bearer $token",
+                  },
+                )
+              : Options(
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': "Bearer $token",
+                  },
+                ));
 
       final Map<String, dynamic> event =
           Map<String, dynamic>.from(response.data);
