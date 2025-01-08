@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:squad_go/core/providers/auth_state_provider.dart';
+import 'package:squad_go/core/services/sport_service.dart';
+import 'package:squad_go/platform/mobile/widgets/home_widgets/my_events.dart';
 
-import '../../../core/providers/auth_state_provider.dart';
+import 'package:squad_go/core/models/sport.dart';
+import 'package:squad_go/main.dart';
+import 'package:squad_go/platform/mobile/widgets/performances.dart';
+
+
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -12,12 +19,38 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
+  final SportService sportService = SportService();
   Future<void> onRefresh() async {}
+  int eventsCount = 0;
+  List<Sport> userSports = [];
+
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserSport();
+  }
+
+  Future<void> fetchUserSport() async {
+
+    try {
+      List<Sport> sports = await sportService.getUserSports();
+      setState(() {
+        userSports = sports;
+      });
+
+    } catch (e) {
+      // Handle error
+      log.severe('Failed to fetch user sports: $e');
+    }
+  }
+
+
+
 
   @override
   Widget build(BuildContext context) {
     final userInfo = context.read<AuthState>().userInfo;
-
     return SafeArea(
       child: Scaffold(
         body: RefreshIndicator(
@@ -29,7 +62,7 @@ class _AccountScreenState extends State<AccountScreen> {
               SliverFillRemaining(
                 child: Column(
                   children: [
-                    Expanded(
+                    Flexible(
                       flex: 1,
                       child: Container(
                         margin: const EdgeInsets.only(
@@ -67,7 +100,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                         ),
                                   ),
                                   const SizedBox(height: 8),
-                                  Text('A participer à X events')
+                                  Text('A participer à $eventsCount events')
                                 ]),
                           ),
                         ),
@@ -111,7 +144,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                     ),
                                     Tab(
                                       child: Text(
-                                        'Performance',
+                                        'Performances',
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -124,7 +157,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                   ],
                                 ),
                               ),
-                              Expanded(
+                              Flexible(
                                 child: TabBarView(
                                   children: [
                                     Container(
@@ -135,7 +168,25 @@ class _AccountScreenState extends State<AccountScreen> {
                                       ),
                                       padding: const EdgeInsets.all(16),
                                       child: Center(
-                                        child: Text('Mes events'),
+                                        child: Column(
+                                          children: [
+                                            HomeMyEvents(
+                                              onRefresh: onRefresh,
+                                              isHome: false,
+                                              onEventsCountChanged: (count){
+                                                setState(() {
+                                                  eventsCount = count;
+                                                });
+                                              },
+                                              onDistinctSportsFetched: (sports){
+                                                setState(() {
+                                                  userSports = sports;
+                                                });
+                                                //debugPrint("userSports $userSports");
+                                              },
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                     Container(
@@ -145,7 +196,9 @@ class _AccountScreenState extends State<AccountScreen> {
                                         borderRadius: BorderRadius.circular(16),
                                       ),
                                       padding: const EdgeInsets.all(16),
-                                      child: Center(child: Text('Performances')),
+                                      child: PerformancesHandle(
+                                        sports: userSports,
+                                      ),
                                     ),
                                     Container(
                                       margin: const EdgeInsets.only(top: 16),
