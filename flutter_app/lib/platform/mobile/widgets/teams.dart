@@ -116,7 +116,6 @@ class _TeamsHandleState extends State<TeamsHandle> {
   @override
   Widget build(BuildContext context) {
     final translate = AppLocalizations.of(context);
-    final translate = AppLocalizations.of(context);
     userHasTeam = widget.teams.any(
       (team) => team.players.any((player) => player.userID == currentUser!.id),
     );
@@ -349,7 +348,6 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                         player.role ==
                                                                 PlayerRole.coach
                                                             ? 'Coach'
-                                                            : translate?.organizer ?? 'Organisateur',
                                                             : translate?.organizer ?? 'Organisateur',
                                                         style: TextStyle(
                                                           color: roleColor,

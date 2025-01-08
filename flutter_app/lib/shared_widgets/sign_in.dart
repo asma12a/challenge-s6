@@ -105,7 +105,6 @@ class __FormContentState extends State<_FormContent> {
   @override
   Widget build(BuildContext context) {
     final translate = AppLocalizations.of(context);
-    final translate = AppLocalizations.of(context);
     return Container(
       constraints: const BoxConstraints(maxWidth: 300),
       child: Form(

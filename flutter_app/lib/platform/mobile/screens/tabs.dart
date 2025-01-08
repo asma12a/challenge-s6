@@ -40,7 +40,6 @@ class _TabsScreenState extends State<TabsScreen> {
   @override
   Widget build(BuildContext context) {
     final translate = AppLocalizations.of(context);
-    final translate = AppLocalizations.of(context);
     Widget activePage = HomeScreen();
 
     if (_selectPageIndex == 1) {
