@@ -15,7 +15,6 @@ dependencies:
   flutter:
     sdk: flutter
   fl_chart: ^0.70.0
-  flutter_dotenv: ^5.2.1
   flutter_launcher_icons: ^0.14.1
   flutter_localizations:
     sdk: flutter
