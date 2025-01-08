@@ -6,6 +6,9 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+const apiBaseUrl = String.fromEnvironment('API_BASE_URL');
+const jwtStorageToken = String.fromEnvironment('JWT_STORAGE_KEY');
+
 class ChatPage extends StatefulWidget {
   final String eventID; // On passe l'ID de l'événement à la page
 
@@ -44,7 +47,7 @@ class _ChatPageState extends State<ChatPage>
       });
     };
 
-    _chatService.connect('ws://localhost:3001/ws');
+    _chatService.connect('ws://$apiBaseUrl/ws');
 
     _loadMessages(widget.eventID);
   }
@@ -52,10 +55,10 @@ class _ChatPageState extends State<ChatPage>
   // Fonction pour récupérer l'user_id à partir du token
   Future<void> _loadCurrentUser() async {
     final storage = const FlutterSecureStorage();
-    final token = await storage.read(key: dotenv.env['JWT_STORAGE_KEY']!);
+    final token = await storage.read(key: jwtStorageToken);
 
     if (token != null) {
-      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/users/:userId');
+      final Uri uri = Uri.parse('$apiBaseUrl/api/users/:userId');
 
       try {
         final response = await dio.get(uri.toString(),
@@ -94,15 +97,15 @@ class _ChatPageState extends State<ChatPage>
     _animationController.dispose();
   }
 
-  // Fonction pour récupérer les messages de l'événement via l'API
   Future<void> _loadMessages(String eventID) async {
     if (_currentUserId.isEmpty) {
       debugPrint(
           'L\'ID utilisateur n\'est pas initialisé. Impossible de charger les messages.');
-      return; // Empêcher toute tentative d'appel si l'utilisateur n'est pas valide
+      return;
     }
-    final uri =
-        Uri.http(dotenv.env['API_BASE_URL']!, 'api/message/event/$eventID');
+
+    final Uri uri = Uri.parse('$apiBaseUrl/api/users/$eventID');
+
     try {
       final response = await dio.get(uri.toString(),
           options: Options(headers: {
@@ -149,7 +152,8 @@ class _ChatPageState extends State<ChatPage>
       // Envoi du message via WebSocket
       _chatService.sendMessage(message);
 
-      final uri = Uri.http(dotenv.env['API_BASE_URL']!, 'api/message');
+      final Uri uri = Uri.parse('$apiBaseUrl/api/message');
+
       try {
         final response = await dio.post(uri.toString(),
             options: Options(headers: {

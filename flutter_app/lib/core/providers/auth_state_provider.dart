@@ -1,11 +1,13 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/user_app.dart';
 import 'package:squad_go/core/services/auth_service.dart';
+
+const apiBaseUrl = String.fromEnvironment('API_BASE_URL');
+const jwtStorageToken = String.fromEnvironment('JWT_STORAGE_KEY');
 
 class AuthState with ChangeNotifier {
   final AuthService _authService = AuthService();
@@ -46,7 +48,7 @@ class AuthState with ChangeNotifier {
   Future<void> logout() async {
     try {
       _user = null;
-      await _storage.delete(key: dotenv.env['JWT_STORAGE_KEY']!);
+      await _storage.delete(key: jwtStorageToken);
       notifyListeners();
     } catch (e) {
       log('Logout failed: $e');
@@ -56,9 +58,7 @@ class AuthState with ChangeNotifier {
 
   Future<bool> tryLogin() async {
     try {
-      final token = dotenv.env['JWT_STORAGE_KEY'] != null
-          ? await _storage.read(key: dotenv.env['JWT_STORAGE_KEY']!)
-          : null;
+      final token = await _storage.read(key: jwtStorageToken);
 
       if (token == null) {
         return false;
