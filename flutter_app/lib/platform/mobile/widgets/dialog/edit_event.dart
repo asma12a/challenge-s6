@@ -270,7 +270,9 @@ class _EditEventDialogState extends State<EditEventDialog> {
                     Expanded(
                       child: DropdownButtonFormField<String>(
                         value: event.sport.id,
-                        decoration: InputDecoration(labelText: translate?.sport_select_label ?? 'Sport'),
+                        decoration: InputDecoration(
+                            labelText:
+                                translate?.sport_select_label ?? 'Sport'),
                         items: _sports
                             .map((sport) => DropdownMenuItem(
                                   value: sport.id,

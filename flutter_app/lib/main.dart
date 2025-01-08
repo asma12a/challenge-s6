@@ -18,8 +18,6 @@ final dio = Dio(BaseOptions(
 ));
 
 void main() async {
-  ConnectivityHandler().initialize();
-
   dio.interceptors.add(
     DioCacheInterceptor(
       options: CacheOptions(
@@ -43,6 +41,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ConnectivityHandler().initialize();
+
     if (kIsWeb) {
       return const MyAppWeb();
     } else {
