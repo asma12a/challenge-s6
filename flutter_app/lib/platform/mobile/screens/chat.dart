@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/providers/connectivity_provider.dart';
 import 'package:squad_go/main.dart';
 import '../../../core/services/chat_service.dart';
@@ -11,7 +12,7 @@ const apiBaseUrl = String.fromEnvironment('API_BASE_URL');
 const jwtStorageToken = String.fromEnvironment('JWT_STORAGE_KEY');
 
 class ChatPage extends StatefulWidget {
-  final String eventID; // On passe l'ID de l'événement à la page
+  final String eventID;
 
   const ChatPage({super.key, required this.eventID});
 
@@ -30,7 +31,7 @@ class _ChatPageState extends State<ChatPage>
   @override
   void initState() {
     super.initState();
-    _loadCurrentUser();
+    _initializeChat();
 
     _animationController = AnimationController(
       vsync: this,
@@ -48,9 +49,17 @@ class _ChatPageState extends State<ChatPage>
       });
     };
 
-    _chatService.connect('ws://$apiBaseUrl/ws');
+    const urlChat = 'ws://$apiBaseUrl/ws';
+    _chatService.connect(urlChat);
+  }
 
-    _loadMessages(widget.eventID);
+  Future<void> _initializeChat() async {
+    await _loadCurrentUser();
+    if (_currentUserId.isNotEmpty) {
+      await _loadMessages(widget.eventID);
+    } else {
+      debugPrint('Impossible d\'initialiser le chat sans ID utilisateur.');
+    }
   }
 
   // Fonction pour récupérer l'user_id à partir du token
@@ -59,17 +68,20 @@ class _ChatPageState extends State<ChatPage>
     final token = await storage.read(key: jwtStorageToken);
 
     if (token != null) {
-      final Uri uri = Uri.parse('$apiBaseUrl/api/users/:userId');
+      final uri = '$apiBaseUrl/api/auth/me';
 
       try {
-        final response = await dio.get(uri.toString(),
+        final response = await dio.get(uri,
             options: Options(headers: {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer $token',
             }));
 
-        if (response.statusCode == 200) {
+        final data = response.data;
+
+        if (data['id'] != null && data['id'].isNotEmpty) {
           final data = response.data;
+
           setState(() {
             _currentUserId = data['id'] ?? '';
           });
@@ -82,7 +94,7 @@ class _ChatPageState extends State<ChatPage>
           debugPrint(
               'Erreur inconnue (${response.statusCode}): ${response.data}');
         }
-      } catch (e) {
+      } on AppException catch (e) {
         debugPrint(
             'Erreur lors de la récupération des informations utilisateur : $e');
       }
@@ -99,18 +111,17 @@ class _ChatPageState extends State<ChatPage>
   }
 
   Future<void> _loadMessages(String eventID) async {
-    if (_currentUserId.isEmpty) {
-      debugPrint(
-          'L\'ID utilisateur n\'est pas initialisé. Impossible de charger les messages.');
-      return;
-    }
-
-    final Uri uri = Uri.parse('$apiBaseUrl/api/users/$eventID');
+    final uri = '$apiBaseUrl/api/message/event/$eventID';
 
     try {
-      final response = await dio.get(uri.toString(),
+      final storage = const FlutterSecureStorage();
+
+      final token = await storage.read(key: jwtStorageToken);
+
+      final response = await dio.get(uri,
           options: Options(headers: {
             'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
           }));
 
       if (response.statusCode == 200) {
@@ -140,7 +151,6 @@ class _ChatPageState extends State<ChatPage>
     }
   }
 
-  // Fonction pour envoyer un message via WebSocket et l'enregistrer dans la base de données
   void _sendMessage() async {
     final message = _controller.text;
     if (message.isNotEmpty) {
@@ -153,14 +163,19 @@ class _ChatPageState extends State<ChatPage>
       // Envoi du message via WebSocket
       _chatService.sendMessage(message);
 
-      final Uri uri = Uri.parse('$apiBaseUrl/api/message');
+      final uri = '$apiBaseUrl/api/message';
 
       try {
-        final response = await dio.post(uri.toString(),
+        final storage = const FlutterSecureStorage();
+        final token = await storage.read(key: jwtStorageToken);
+
+        final response = await dio.post(uri,
             options: Options(headers: {
               'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
             }),
             data: jsonEncode(messageData));
+
 
         if (response.statusCode == 201) {
           debugPrint('Message envoyé et enregistré');

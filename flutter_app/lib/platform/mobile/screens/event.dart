@@ -9,6 +9,7 @@ import 'package:squad_go/core/providers/connectivity_provider.dart';
 import 'package:squad_go/core/services/event_service.dart';
 import 'package:squad_go/core/utils/tools.dart';
 import 'package:squad_go/main.dart';
+import 'package:squad_go/platform/mobile/screens/chat.dart';
 import 'package:squad_go/platform/mobile/widgets/custom_label.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/edit_event.dart';
 import 'package:provider/provider.dart';
@@ -307,8 +308,8 @@ class _EventScreenState extends State<EventScreen> {
                                         ),
                                         tabs: [
                                           Tab(
-                                            child: Text(translate?.teams ??
-                                              'Équipes',
+                                            child: Text(
+                                              translate?.teams ?? 'Équipes',
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
@@ -324,6 +325,7 @@ class _EventScreenState extends State<EventScreen> {
                                     Expanded(
                                       child: TabBarView(
                                         children: [
+                                          // L'onglet Équipes
                                           Container(
                                             margin:
                                                 const EdgeInsets.only(top: 16),
@@ -360,15 +362,49 @@ class _EventScreenState extends State<EventScreen> {
                                                   )
                                                 : null,
                                           ),
-                                          Container(
-                                            margin:
-                                                const EdgeInsets.only(top: 16),
-                                            color: Colors.blue,
-                                            child: Center(child: Text('Chat')),
+
+                                          GestureDetector(
+                                            onTap: () {
+                                              if (event.id != null) {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => ChatPage(
+                                                        eventID: event
+                                                            .id!), 
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                            child: Container(
+                                              margin: const EdgeInsets.only(
+                                                  top: 16),
+                                              decoration: BoxDecoration(
+                                                color: event.sport.color
+                                                        ?.withOpacity(0.03) ??
+                                                    Theme.of(context)
+                                                        .colorScheme
+                                                        .primary
+                                                        .withOpacity(0.03),
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
+                                              ),
+                                              padding: const EdgeInsets.all(16),
+                                              child: Center(
+                                                child: Text(
+                                                  'Chat',
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Theme.of(context).primaryColor,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
                                           ),
                                         ],
                                       ),
-                                    ),
+                                    )
                                   ],
                                 ),
                               ),
