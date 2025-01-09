@@ -307,8 +307,8 @@ class _EventScreenState extends State<EventScreen> {
                                         ),
                                         tabs: [
                                           Tab(
-                                            child: Text(translate?.teams ??
-                                              'Équipes',
+                                            child: Text(
+                                              translate?.teams ?? 'Équipes',
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                           ),

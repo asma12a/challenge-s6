@@ -16,7 +16,7 @@ class MyAppWeb extends StatelessWidget {
       builder: (context, child) => MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        title: 'Application Web',
+        title: 'Squad GO',
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),

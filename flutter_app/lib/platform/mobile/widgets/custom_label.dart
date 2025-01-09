@@ -25,14 +25,23 @@ class CustomLabel extends StatelessWidget {
       ),
       padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null)
             Icon(
               icon,
               color: iconColor,
+              size: MediaQuery.of(context).size.width * 0.05,
             ),
-          if (icon != null) SizedBox(width: 8),
-          Text(label, style: TextStyle(color: color)),
+          if (icon != null)
+            SizedBox(width: MediaQuery.of(context).size.width * 0.02),
+          Flexible(
+            child: Text(
+              label,
+              style: TextStyle(color: color),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
     );
