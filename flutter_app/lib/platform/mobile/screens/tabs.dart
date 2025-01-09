@@ -59,10 +59,10 @@ class _TabsScreenState extends State<TabsScreen> {
     }
 
     var isOnline = context.watch<ConnectivityState>().isConnected;
+    ScaffoldMessenger.of(context).clearSnackBars();
 
     if (!isOnline) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -81,29 +81,6 @@ class _TabsScreenState extends State<TabsScreen> {
             backgroundColor: Colors.grey.shade700,
             duration: Duration(days: 5),
             dismissDirection: DismissDirection.none,
-          ),
-        );
-      });
-    } else if (isOnline) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.wifi,
-                    color: Theme.of(context).colorScheme.onPrimary),
-                const SizedBox(width: 10),
-                Text(
-                  "Vous êtes connecté à internet.",
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-                ),
-              ],
-            ),
-            backgroundColor: Colors.blue,
-            duration: Duration(seconds: 1),
           ),
         );
       });

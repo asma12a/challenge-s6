@@ -1,3 +1,4 @@
+import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/core/services/event_service.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -19,12 +20,14 @@ class _NewEventState extends State<NewEvent> {
   var _enteredName = '';
   String? _selectedDate;
   final TextEditingController _addressController = TextEditingController();
-  List<String> _suggestedAddresses = [];
+  List<dynamic> _suggestedAddresses = [];
   var _selectedType = '';
   var _selectedSport = '';
   List<Sport> _sports = [];
   final eventService = EventService();
   var _isPublic = true;
+  double _latitude = 46.603354;
+  double _longitude = 1.888334;
 
   @override
   void initState() {
@@ -57,30 +60,29 @@ class _NewEventState extends State<NewEvent> {
     if (query.isEmpty) {
       return [];
     }
-    final String apiUrl =
-        'https://api-adresse.data.gouv.fr/search/?q=$query&limit=5';
-    final response = await dio.get(apiUrl);
+    try {
+      final String apiUrl =
+          'https://api-adresse.data.gouv.fr/search/?q=$query&limit=5';
+      final response = await dio.get(apiUrl);
 
-    if (response.statusCode == 200) {
       final Map<String, dynamic> data = response.data;
 
       setState(() {
-        _suggestedAddresses = data['features']
-            .where((feature) => feature['properties']['label'] != null)
-            .map<String>((feature) => feature['properties']['label'] as String)
-            .toList();
+        _suggestedAddresses = data['features'] as List;
       });
-      return _suggestedAddresses;
-    } else {
-      throw Exception('Impossible de récupérer les suggestions');
+      final List<String> addresses = data['features']
+          .where((feature) => feature['properties']['label'] != null)
+          .map<String>((feature) => feature['properties']['label'] as String)
+          .toList();
+      return addresses;
+    } catch (e) {
+      return [];
     }
   }
 
   String? _validateAddress(String? value) {
     if (value == null || value.isEmpty) {
       return 'Le champ adresse ne peut pas être vide.';
-    } else if (!_suggestedAddresses.contains(value)) {
-      return 'Veuillez sélectionner une adresse correcte.';
     }
     return null;
   }
@@ -129,7 +131,9 @@ class _NewEventState extends State<NewEvent> {
           "date": _selectedDate!,
           "sport_id": _selectedSport,
           "event_type": _selectedType,
-          "is_public": _isPublic
+          "is_public": _isPublic,
+          "latitude": _latitude,
+          "longitude": _longitude,
         };
         await eventService.createEvent(newEvent);
         ScaffoldMessenger.of(context).clearSnackBars();
@@ -148,7 +152,8 @@ class _NewEventState extends State<NewEvent> {
             builder: (ctx) => TabsScreen(),
           ),
         );
-      } catch (error) {
+      } on AppException catch (error) {
+        debugPrint(error.message);
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -173,259 +178,279 @@ class _NewEventState extends State<NewEvent> {
   @override
   Widget build(BuildContext context) {
     final translate = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(translate?.create_event ?? "Créer un événement"),
       ),
       body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: EdgeInsets.all(20),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    TextFormField(
-                      validator: (value) {
-                        if (value == null ||
-                            value.isEmpty ||
-                            value.trim().length <= 1 ||
-                            value.trim().length > 50) {
-                          return 'Doit contenir entre 1 et 50 caractères.';
-                        }
-                        return null;
-                      },
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface),
-                      maxLength: 50,
-                      decoration: InputDecoration(
-                        border: const OutlineInputBorder(),
-                        icon: const Icon(Icons.title),
-                        label: Text(
-                            translate?.event_name ?? 'Nom de l\'événement'),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: EdgeInsets.all(20),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null ||
+                              value.isEmpty ||
+                              value.trim().length <= 1 ||
+                              value.trim().length > 50) {
+                            return 'Doit contenir entre 1 et 50 caractères.';
+                          }
+                          return null;
+                        },
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface),
+                        maxLength: 50,
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          icon: const Icon(Icons.title),
+                          label: Text(
+                              translate?.event_name ?? 'Nom de l\'événement'),
+                        ),
+                        onSaved: (value) {
+                          _enteredName = value!;
+                        },
+                        onTapOutside: (event) {
+                          FocusScope.of(context).unfocus();
+                        },
                       ),
-                      onSaved: (value) {
-                        _enteredName = value!;
-                      },
-                    ),
-                    SizedBox(height: 20),
-                    TypeAheadField<String>(
-                      controller: _addressController,
-                      // Utilisation du controller
-                      builder: (context, controller, focusNode) {
-                        return TextFormField(
-                          controller: controller,
-                          focusNode: focusNode,
-                          autofocus: true,
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface),
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            icon: Icon(Icons.place),
-                            labelText: translate?.event_address ??
-                                'Adresse de l\'événement',
-                          ),
-                          validator: _validateAddress,
-                          onSaved: (value) {
-                            _addressController.text = value!;
-                          },
-                        );
-                      },
-                      suggestionsCallback: (search) =>
-                          _getAddressSuggestions(search),
-                      itemBuilder: (context, suggestion) {
-                        return ListTile(
-                          title: Text(suggestion),
-                        );
-                      },
-                      onSelected: (suggestion) {
-                        // TODO: Récuperer latitute et longitude (comme dans edit_event.dart)
-                        _addressController.text =
-                            suggestion; // Mise à jour du champ de texte
-                      },
-                    ),
-                    SizedBox(height: 40),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 2),
-                      child: Row(
-                        children: [
-                          Icon(Icons.public),
-                          SizedBox(width: 15),
-                          Checkbox(
-                            value:
-                                _isPublic, // Utilise la valeur actuelle de _isPublic
-                            onChanged: (bool? value) {
-                              setState(() {
-                                _isPublic = value!;
-                              });
-                            },
-                          ),
-                          Text(translate?.open_public ?? "Ouvert au public"),
-                          SizedBox(width: 20),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 15),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 2),
-                      child: Row(
-                        children: [
-                          Icon(Icons.calendar_month),
-                          SizedBox(width: 15),
-                          ElevatedButton(
-                            onPressed: _presentDatePicker,
-                            child: Text(translate?.select_date ??
-                                "Sélectionner une date"),
-                          ),
-                          SizedBox(width: 20),
-                          Text(
+                      SizedBox(height: 20),
+                      TypeAheadField<String>(
+                        controller: _addressController,
+                        // Utilisation du controller
+                        builder: (context, controller, focusNode) {
+                          return TextFormField(
+                            controller: controller,
+                            focusNode: focusNode,
                             style: TextStyle(
                                 color: Theme.of(context).colorScheme.onSurface),
-                            _selectedDate == null ? '' : _selectedDate!,
-                          ),
-                        ],
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              icon: Icon(Icons.place),
+                              labelText: translate?.event_address ??
+                                  'Adresse de l\'événement',
+                            ),
+                            validator: _validateAddress,
+                            onSaved: (value) {
+                              _addressController.text = value!;
+                            },
+                            onTapOutside: (event) {
+                              FocusScope.of(context).unfocus();
+                            },
+                          );
+                        },
+                        suggestionsCallback: (search) =>
+                            _getAddressSuggestions(search),
+                        itemBuilder: (context, suggestion) {
+                          return ListTile(
+                            title: Text(suggestion),
+                          );
+                        },
+                        onSelected: (suggestion) {
+                          _addressController.text =
+                              suggestion; // Mise à jour du champ de texte
+                          final selectedFeature =
+                              _suggestedAddresses.firstWhere((feature) =>
+                                  feature['properties']['label'] == suggestion);
+                          final latitude =
+                              selectedFeature['geometry']['coordinates'][1];
+                          final longitude =
+                              selectedFeature['geometry']['coordinates'][0];
+
+                          setState(() {
+                            _latitude = latitude;
+                            _longitude = longitude;
+                          });
+                        },
                       ),
-                    ),
-                    SizedBox(height: 30),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 2),
-                      child: Row(
-                        children: [
-                          Icon(Icons.sports_sharp),
-                          SizedBox(width: 15),
-                          SizedBox(
-                            width: 200,
-                            child: DropdownButtonFormField(
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Veuillez sélectionner un type.';
-                                }
-                                return null;
-                              },
-                              hint: Text(
-                                translate?.type_select_label ?? "Type",
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface),
-                              ),
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                              ),
-                              items: [
-                                DropdownMenuItem(
-                                  value: null,
-                                  child: Text(
-                                    translate?.type_select_label ?? "Type",
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface),
-                                  ),
-                                ),
-                                DropdownMenuItem(
-                                  value: "match",
-                                  child: Text(
-                                    "Match",
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface),
-                                  ),
-                                ),
-                                DropdownMenuItem(
-                                  value: "training",
-                                  child: Text(
-                                    "Training",
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface),
-                                  ),
-                                )
-                              ],
-                              onChanged: (value) {
-                                _selectedType = value!;
+                      SizedBox(height: 40),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 2),
+                        child: Row(
+                          children: [
+                            Icon(Icons.public),
+                            SizedBox(width: 15),
+                            Checkbox(
+                              value:
+                                  _isPublic, // Utilise la valeur actuelle de _isPublic
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  _isPublic = value!;
+                                });
                               },
                             ),
-                          ),
-                        ],
+                            Text(translate?.open_public ?? "Ouvert au public"),
+                            SizedBox(width: 20),
+                          ],
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 30),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 2),
-                      child: Row(
-                        children: [
-                          Icon(Icons.sports_soccer),
-                          SizedBox(width: 15),
-                          SizedBox(
-                            width: 200,
-                            child: DropdownButtonFormField(
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Veuillez sélectionner un sport.';
-                                }
-                                return null;
-                              },
-                              hint: Text(
-                                translate?.sport_select_label ?? "Sport",
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface),
-                              ),
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                              ),
-                              items: [
-                                DropdownMenuItem<String>(
-                                  value: null,
-                                  child: Text(
-                                    translate?.sport_select_label ?? "Sport",
-                                    style: TextStyle(
+                      SizedBox(height: 15),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 2),
+                        child: Row(
+                          children: [
+                            Icon(Icons.calendar_month),
+                            SizedBox(width: 15),
+                            ElevatedButton(
+                              onPressed: _presentDatePicker,
+                              child: Text(translate?.select_date ??
+                                  "Sélectionner une date"),
+                            ),
+                            SizedBox(width: 20),
+                            Text(
+                              style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface),
+                              _selectedDate == null ? '' : _selectedDate!,
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 30),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 2),
+                        child: Row(
+                          children: [
+                            Icon(Icons.sports_sharp),
+                            SizedBox(width: 15),
+                            SizedBox(
+                              width: 200,
+                              child: DropdownButtonFormField(
+                                validator: (value) {
+                                  if (value == null) {
+                                    return 'Veuillez sélectionner un type.';
+                                  }
+                                  return null;
+                                },
+                                hint: Text(
+                                  translate?.type_select_label ?? "Type",
+                                  style: TextStyle(
                                       color: Theme.of(context)
                                           .colorScheme
-                                          .onSurface,
+                                          .onSurface),
+                                ),
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(),
+                                ),
+                                items: [
+                                  DropdownMenuItem(
+                                    value: null,
+                                    child: Text(
+                                      translate?.type_select_label ?? "Type",
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface),
                                     ),
                                   ),
-                                ),
-                                ..._sports.map((sport) {
-                                  return DropdownMenuItem<String>(
-                                    value: sport.id,
+                                  DropdownMenuItem(
+                                    value: "match",
                                     child: Text(
-                                      sport.name.name,
+                                      "Match",
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface),
+                                    ),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: "training",
+                                    child: Text(
+                                      "Training",
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface),
+                                    ),
+                                  )
+                                ],
+                                onChanged: (value) {
+                                  _selectedType = value!;
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 30),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 2),
+                        child: Row(
+                          children: [
+                            Icon(Icons.sports_soccer),
+                            SizedBox(width: 15),
+                            SizedBox(
+                              width: 200,
+                              child: DropdownButtonFormField(
+                                validator: (value) {
+                                  if (value == null) {
+                                    return 'Veuillez sélectionner un sport.';
+                                  }
+                                  return null;
+                                },
+                                hint: Text(
+                                  translate?.sport_select_label ?? "Sport",
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface),
+                                ),
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(),
+                                ),
+                                items: [
+                                  DropdownMenuItem<String>(
+                                    value: null,
+                                    child: Text(
+                                      translate?.sport_select_label ?? "Sport",
                                       style: TextStyle(
                                         color: Theme.of(context)
                                             .colorScheme
                                             .onSurface,
                                       ),
                                     ),
-                                  );
-                                }),
-                              ],
-                              onChanged: (value) {
-                                _selectedSport = value!;
-                              },
+                                  ),
+                                  ..._sports.map((sport) {
+                                    return DropdownMenuItem<String>(
+                                      value: sport.id,
+                                      child: Text(
+                                        sport.name.name,
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                ],
+                                onChanged: (value) {
+                                  _selectedSport = value!;
+                                },
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 30),
-                    SizedBox(
-                      height: 60,
-                    ),
-                    ElevatedButton(
-                        onPressed: _saveEvent,
-                        child: Text(translate?.save_event ?? "Enregistrer"))
-                  ],
+                      SizedBox(height: 30),
+                      SizedBox(
+                        height: 60,
+                      ),
+                      ElevatedButton(
+                          onPressed: _saveEvent,
+                          child: Text(translate?.save_event ?? "Enregistrer"))
+                    ],
+                  ),
                 ),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );

@@ -14,6 +14,10 @@ const jwtStorageToken = String.fromEnvironment('JWT_STORAGE_KEY');
 
 class EventService {
   final storage = const FlutterSecureStorage();
+  final refreshCacheOptions = CacheOptions(
+    store: MemCacheStore(),
+    policy: CachePolicy.refreshForceCache,
+  );
 
   // GET all events (backoffice)
   Future<List<Map<String, dynamic>>> getEvents() async {
@@ -40,8 +44,6 @@ class EventService {
   }
 
   Future<List<Event>> getSearchResults(Map<String, String> params) async {
-
-
     final token = await storage.read(key: jwtStorageToken);
 
     final Uri baseUrl = Uri.parse('$apiBaseUrl/api/events/search');
@@ -119,27 +121,24 @@ class EventService {
     final token = await storage.read(key: jwtStorageToken);
 
     try {
-      final refreshCacheOptions = CacheOptions(
-        store: MemCacheStore(),
-        policy: CachePolicy.refresh,
-      );
-
       final Uri url = Uri.parse('$apiBaseUrl/api/events/$id');
 
       final response = await dio.get(url.toString(),
-          options: ConnectivityHandler().isConnected
-              ? refreshCacheOptions.toOptions().copyWith(
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': "Bearer $token",
-                  },
-                )
-              : Options(
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': "Bearer $token",
-                  },
-                ));
+          options:
+              // ConnectivityHandler().isConnected
+              //     ? refreshCacheOptions.toOptions().copyWith(
+              //         headers: {
+              //           'Content-Type': 'application/json',
+              //           'Authorization': "Bearer $token",
+              //         },
+              //       )
+              //     :
+              Options(
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': "Bearer $token",
+            },
+          ));
 
       final Map<String, dynamic> event =
           Map<String, dynamic>.from(response.data);
@@ -209,10 +208,20 @@ class EventService {
       final Uri uri = Uri.parse('$apiBaseUrl/api/events/user');
 
       final response = await dio.get(uri.toString(),
-          options: Options(headers: {
-            'Content-Type': 'application/json',
-            "Authorization": "Bearer $token",
-          }));
+          options: ConnectivityHandler().isConnected
+              ? refreshCacheOptions.toOptions().copyWith(
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': "Bearer $token",
+                  },
+                )
+              : Options(
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': "Bearer $token",
+                  },
+                ));
+
       final List<dynamic> data = response.data;
       return data.map((event) => Event.fromJson(event)).toList();
     } catch (error) {
@@ -233,9 +242,7 @@ class EventService {
       }
 
       final Uri uri = Uri.https(
-        apiBaseUrl
-            .replaceAll('https://', '')
-            .replaceAll('http://', ''),
+        apiBaseUrl.replaceAll('https://', '').replaceAll('http://', ''),
         '/api/events/recommended',
         queryParams,
       );
