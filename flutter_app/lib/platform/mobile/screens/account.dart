@@ -1,9 +1,11 @@
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
+import 'package:squad_go/core/providers/connectivity_provider.dart';
 import 'package:squad_go/core/services/sport_service.dart';
+import 'package:squad_go/platform/mobile/widgets/dialog/edit_user.dart';
+import 'package:squad_go/platform/mobile/widgets/dialog/offline.dart';
 import 'package:squad_go/platform/mobile/widgets/home_widgets/my_events.dart';
 
 import 'package:squad_go/core/models/sport.dart';
@@ -44,8 +46,19 @@ class _AccountScreenState extends State<AccountScreen> {
     }
   }
 
+  Future<void> updateUserInfo(name, email) async {
+
+  }
+
+  Future<void> updateUserPassword(password) async {
+
+  }
+
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
+    var isOnline = context.watch<ConnectivityState>().isConnected;
+
     final userInfo = context.read<AuthState>().userInfo;
     return SafeArea(
       child: Scaffold(
@@ -72,23 +85,58 @@ class _AccountScreenState extends State<AccountScreen> {
                             Radius.circular(16),
                           ),
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(4),
-                          child: Center(
-                            child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    userInfo?.name ?? "Utilisateur",
-                                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text('A participer à $eventsCount events')
-                                ]),
-                          ),
+                        child: Stack(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(4),
+                              child: Center(
+                                child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        userInfo?.name ?? "Utilisateur",
+                                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text('A participer à $eventsCount events')
+                                    ]),
+                              ),
+                            ),
+                            Positioned(
+                                top: 8,
+                                right: 8,
+                                child: IconButton(
+                                  icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.primary),
+                                  onPressed: (){
+                                    if (!isOnline) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => const OfflineDialog(),
+                                      );
+                                      return;
+                                    }
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return EditUserDialog(
+                                          currentName: userInfo!.name,
+                                          currentEmail: userInfo.email,
+                                          onUpdateInfo: (name, email) async {
+                                            await updateUserInfo(name, email);
+                                          },
+                                          onUpdatePassword: (password) async {
+                                            await updateUserPassword(password);
+                                          },
+
+                                        );
+                                      },
+                                    );
+                                  },
+                                ))
+                          ],
                         ),
                       ),
                     ),
@@ -124,19 +172,19 @@ class _AccountScreenState extends State<AccountScreen> {
                                   tabs: [
                                     Tab(
                                       child: Text(
-                                        'Mes Events',
+                                        translate?.my_events_profile ?? 'Mes events',
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                     Tab(
                                       child: Text(
-                                        'Performances',
+                                        translate?.performance ?? 'Performances',
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                     Tab(
                                       child: Text(
-                                        'Paramètres',
+                                        translate?.settings ?? 'Paramètres',
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -159,12 +207,12 @@ class _AccountScreenState extends State<AccountScreen> {
                                             HomeMyEvents(
                                               onRefresh: onRefresh,
                                               isHome: false,
-                                              onEventsCountChanged: (count){
+                                              onEventsCountChanged: (count) {
                                                 setState(() {
                                                   eventsCount = count;
                                                 });
                                               },
-                                              onDistinctSportsFetched: (sports){
+                                              onDistinctSportsFetched: (sports) {
                                                 setState(() {
                                                   userSports = sports;
                                                 });
