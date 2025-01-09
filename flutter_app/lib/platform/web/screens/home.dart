@@ -7,6 +7,7 @@ import 'package:squad_go/platform/web/screens/events/admin_events_page.dart';
 import 'package:squad_go/platform/web/screens/sports/admin_sports_page.dart';
 import 'package:squad_go/platform/web/screens/admin_dashboard_page.dart';
 import 'package:squad_go/platform/web/screens/sports_stat_labels/admin_sport_stat_labels_page.dart';
+import 'package:squad_go/platform/web/screens/logs/admin_logs_page.dart';
 
 class WebHomeScreen extends StatefulWidget {
   const WebHomeScreen({super.key});
@@ -25,6 +26,8 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     const AdminEventsPage(),
     const AdminSportsPage(),
     const AdminSportStatLabelsPage(),
+        const AdminLogsPage(),
+
   ];
 
   @override
@@ -171,6 +174,15 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
             onTap: () {
               setState(() {
                 _selectedIndex = 4;
+              });
+            },
+          ),
+          _createDrawerItem(
+            icon: Icons.event,
+            text: 'Logs',
+            onTap: () {
+              setState(() {
+                _selectedIndex = 5;
               });
             },
           ),
