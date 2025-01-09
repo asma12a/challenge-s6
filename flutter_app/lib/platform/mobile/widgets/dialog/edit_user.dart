@@ -1,18 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:squad_go/core/models/user_app.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
+import 'package:squad_go/core/services/user_service.dart';
 
 class EditUserDialog extends StatefulWidget {
-  final String currentName;
-  final String currentEmail;
   final Future<void> Function(String name, String email)? onUpdateInfo;
   final Future<void> Function(String password)? onUpdatePassword;
 
   const EditUserDialog({
     super.key,
-    required this.currentName,
-    required this.currentEmail,
     this.onUpdateInfo,
     this.onUpdatePassword,
   });
@@ -32,8 +30,11 @@ class _EditUserDialogState extends State<EditUserDialog> {
   @override
   void initState() {
     super.initState();
-    nameController = TextEditingController(text: widget.currentName);
-    emailController = TextEditingController(text: widget.currentEmail);
+
+    final userInfo = context.read<AuthState>().userInfo;
+
+    nameController = TextEditingController(text: userInfo?.name ?? '');
+    emailController = TextEditingController(text: userInfo?.email ?? '');
   }
 
   @override
@@ -51,7 +52,20 @@ class _EditUserDialogState extends State<EditUserDialog> {
 
       if (widget.onUpdateInfo != null) {
         try {
+          // Appeler la fonction de mise à jour fournie
           await widget.onUpdateInfo!(name, email);
+
+          // Mettre à jour le contexte `AuthState`
+          final authState = context.read<AuthState>();
+          authState.setUser(UserApp(
+            id: authState.userInfo?.id ?? '',
+            name: name,
+            email: email,
+            roles: authState.userInfo?.roles ?? [],
+            apiToken: authState.userInfo!.apiToken,
+          ));
+          Navigator.of(context).pop();
+
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Informations utilisateur mises à jour !')),
           );
@@ -71,10 +85,13 @@ class _EditUserDialogState extends State<EditUserDialog> {
       if (widget.onUpdatePassword != null) {
         try {
           await widget.onUpdatePassword!(password);
+
+          // Afficher un message de succès
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Mot de passe mis à jour !')),
           );
         } catch (e) {
+          // Afficher un message d'erreur
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Erreur : ${e.toString()}')),
           );
