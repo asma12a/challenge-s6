@@ -145,5 +145,6 @@ func (repo *MessageService) ListByEvent(ctx context.Context, eventID ulid.ID) ([
 	for _, msg := range messages {
 		result = append(result, &entity.Message{Message: *msg})
 	}
+
 	return result, nil
 }

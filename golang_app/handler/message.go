@@ -249,7 +249,6 @@ func listMessages(ctx context.Context, serviceMessage service.MessageService) fi
 // listMessagesByEvent permet de lister les messages associés à un événement
 func listMessagesByEvent(ctx context.Context, serviceMessage service.MessageService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// Récupérer l'ID de l'événement depuis les paramètres d'URL
 		eventID, err := ulid.Parse(c.Params("eventID"))
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
@@ -258,8 +257,9 @@ func listMessagesByEvent(ctx context.Context, serviceMessage service.MessageServ
 			})
 		}
 
-		// Récupérer les messages pour cet événement
 		messages, err := serviceMessage.ListByEvent(c.UserContext(), eventID)
+		fmt.Println("messages %s", messages)
+
 		if err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
 				"status": "error",
@@ -267,25 +267,33 @@ func listMessagesByEvent(ctx context.Context, serviceMessage service.MessageServ
 			})
 		}
 
-		// Mapper les messages vers un format adapté pour la réponse
 		toJ := make([]presenter.Message, len(messages))
 		for i, message := range messages {
-			toJ[i] = presenter.Message{
-				ID:      message.ID,
-				EventID: message.EventID,
-				User: presenter.User{
-					ID:    message.Edges.User.ID,
-					Name:  message.Edges.User.Name,
-					Email: message.Edges.User.Email,
-					Roles: message.Edges.User.Roles,
-				},
-				UserName:  message.UserName,
-				Content:   message.Content,
-				CreatedAt: message.CreatedAt,
+			if message.Edges.User != nil {
+				toJ[i] = presenter.Message{
+					ID: message.ID,
+					User: presenter.User{
+						ID:    message.Edges.User.ID,
+						Name:  message.Edges.User.Name,
+						Email: message.Edges.User.Email,
+						Roles: message.Edges.User.Roles,
+					},
+					UserName:  message.UserName,
+					Content:   message.Content,
+					CreatedAt: message.CreatedAt,
+				}
+			} else {
+				toJ[i] = presenter.Message{
+					ID:        message.ID,
+					UserName:  message.UserName,
+					Content:   message.Content,
+					CreatedAt: message.CreatedAt,
+				}
 			}
 		}
 
 		c.Set("Cache-Control", "public, max-age=3600") // Cache for 1h
+
 		// Retourner les messages au format JSON
 		return c.JSON(toJ)
 	}
