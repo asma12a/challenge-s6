@@ -15,12 +15,15 @@ class SignUpScreen extends StatelessWidget {
     return Scaffold(
         body: Center(
             child: isSmallScreen
-                ? const Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _Title(),
-                      _FormContent(),
-                    ],
+                ? SingleChildScrollView(
+                    child: const Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _Title(),
+                        _FormContent(),
+                        SizedBox(height: 20),
+                      ],
+                    ),
                   )
                 : Container(
                     padding: const EdgeInsets.all(32.0),
@@ -42,7 +45,7 @@ class _Title extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-   // final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
+    // final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
     final translate = AppLocalizations.of(context);
     return Container(
       constraints: const BoxConstraints(
@@ -52,7 +55,9 @@ class _Title extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _Logo(),
-          Text(translate?.join_community ?? 'Rejoignez votre communauté dès aujourd’hui !',
+          Text(
+              translate?.join_community ??
+                  'Rejoignez votre communauté dès aujourd’hui !',
               style: Theme.of(context).textTheme.titleLarge!.copyWith(
                     color: Colors.black,
                     fontSize: 30,
@@ -133,12 +138,12 @@ class __FormContentState extends State<_FormContent> {
           children: [
             TextFormField(
               validator: (value) {
-                // add email validation
                 if (value == null || value.isEmpty) {
                   return 'Please enter some text';
                 }
                 return null;
               },
+              onTapOutside: (event) => FocusScope.of(context).unfocus(),
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
@@ -169,12 +174,15 @@ class __FormContentState extends State<_FormContent> {
 
                 return null;
               },
+              onTapOutside: (event) => FocusScope.of(context).unfocus(),
+              keyboardType: TextInputType.emailAddress,
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
               decoration: InputDecoration(
                 labelText: translate?.email_label ?? 'Email',
-                hintText: translate?.email_placeholder ?? 'Entrez votre adresse email',
+                hintText: translate?.email_placeholder ??
+                    'Entrez votre adresse email',
                 prefixIcon: const Icon(Icons.email_outlined),
                 border: const OutlineInputBorder(),
               ),
@@ -198,9 +206,11 @@ class __FormContentState extends State<_FormContent> {
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
               obscureText: !_isPasswordVisible,
+              onTapOutside: (event) => FocusScope.of(context).unfocus(),
               decoration: InputDecoration(
                   labelText: translate?.password ?? 'Mot de passe',
-                  hintText: translate?.password_placeholder ?? 'Entrez votre mot de passe',
+                  hintText: translate?.password_placeholder ??
+                      'Entrez votre mot de passe',
                   prefixIcon: const Icon(Icons.lock_outline_rounded),
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
@@ -228,9 +238,10 @@ class __FormContentState extends State<_FormContent> {
                 onPressed: _signUp,
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
-                  child: Text(translate?.signup_button ??
-                    'Créez votre compte',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  child: Text(
+                    translate?.signup_button ?? 'Créez votre compte',
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -242,16 +253,16 @@ class __FormContentState extends State<_FormContent> {
               alignment: Alignment.centerLeft,
               child: Row(
                 children: [
-                  Text(translate?.already_account ??
-                    'Vous avez déjà un compte ?',
+                  Text(
+                    translate?.already_account ?? 'Vous avez déjà un compte ?',
                     style: const TextStyle(color: Colors.black),
                   ),
                   const SizedBox(
                     width: 10,
                   ),
                   InkWell(
-                    child: Text(translate?.login_button ??
-                      'Connectez-vous',
+                    child: Text(
+                      translate?.login_button ?? 'Connectez-vous',
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.primary,
                       ),
