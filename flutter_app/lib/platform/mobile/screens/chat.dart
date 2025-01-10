@@ -2,13 +2,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:squad_go/core/providers/connectivity_provider.dart';
+import 'package:squad_go/core/utils/constants.dart';
 import 'package:squad_go/main.dart';
 import '../../../core/services/chat_service.dart';
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
-const apiBaseUrl = String.fromEnvironment('API_BASE_URL');
-const jwtStorageToken = String.fromEnvironment('JWT_STORAGE_KEY');
 
 class ChatPage extends StatefulWidget {
   final String eventID; // On passe l'ID de l'événement à la page
@@ -48,7 +46,7 @@ class _ChatPageState extends State<ChatPage>
       });
     };
 
-    _chatService.connect('ws://$apiBaseUrl/ws');
+    _chatService.connect('ws://${Constants.apiBaseUrl}/ws');
 
     _loadMessages(widget.eventID);
   }
@@ -56,10 +54,10 @@ class _ChatPageState extends State<ChatPage>
   // Fonction pour récupérer l'user_id à partir du token
   Future<void> _loadCurrentUser() async {
     final storage = const FlutterSecureStorage();
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
 
     if (token != null) {
-      final Uri uri = Uri.parse('$apiBaseUrl/api/users/:userId');
+      final Uri uri = Uri.parse('${Constants.apiBaseUrl}/api/users/:userId');
 
       try {
         final response = await dio.get(uri.toString(),
@@ -105,7 +103,7 @@ class _ChatPageState extends State<ChatPage>
       return;
     }
 
-    final Uri uri = Uri.parse('$apiBaseUrl/api/users/$eventID');
+    final Uri uri = Uri.parse('${Constants.apiBaseUrl}/api/users/$eventID');
 
     try {
       final response = await dio.get(uri.toString(),
@@ -153,7 +151,7 @@ class _ChatPageState extends State<ChatPage>
       // Envoi du message via WebSocket
       _chatService.sendMessage(message);
 
-      final Uri uri = Uri.parse('$apiBaseUrl/api/message');
+      final Uri uri = Uri.parse('${Constants.apiBaseUrl}/api/message');
 
       try {
         final response = await dio.post(uri.toString(),

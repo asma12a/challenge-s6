@@ -4,10 +4,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/team.dart';
 import 'package:squad_go/core/utils/connectivity_handler.dart';
+import 'package:squad_go/core/utils/constants.dart';
 import 'package:squad_go/main.dart';
-
-const apiBaseUrl = String.fromEnvironment('API_BASE_URL');
-const jwtStorageToken = String.fromEnvironment('JWT_STORAGE_KEY');
 
 class TeamService {
   final storage = const FlutterSecureStorage();
@@ -18,10 +16,10 @@ class TeamService {
   );
 
   Future<void> createTeam(String eventID, String name, int? maxPlayers) async {
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
 
     try {
-      final url = '$apiBaseUrl/api/events/$eventID/teams';
+      final url = '${Constants.apiBaseUrl}/api/events/$eventID/teams';
 
       await dio.post(url.toString(),
           data: {
@@ -45,10 +43,11 @@ class TeamService {
   }
 
   Future<void> updateTeam(String eventID, Team team) async {
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
 
     try {
-      final url = '$apiBaseUrl/api/events/$eventID/teams/${team.id}';
+      final url =
+          '${Constants.apiBaseUrl}/api/events/$eventID/teams/${team.id}';
 
       await dio.put(url.toString(),
           data: {
@@ -65,10 +64,11 @@ class TeamService {
   }
 
   Future<void> joinTeam(String eventID, String teamID) async {
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
 
     try {
-      final url = '$apiBaseUrl/api/events/$eventID/teams/$teamID/join';
+      final url =
+          '${Constants.apiBaseUrl}/api/events/$eventID/teams/$teamID/join';
 
       await dio.post(url.toString(),
           options: ConnectivityHandler().isConnected
@@ -90,10 +90,11 @@ class TeamService {
   }
 
   Future<void> switchTeam(String eventID, String teamID) async {
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
 
     try {
-      final url = '$apiBaseUrl/api/events/$eventID/teams/$teamID/switch';
+      final url =
+          '${Constants.apiBaseUrl}/api/events/$eventID/teams/$teamID/switch';
 
       await dio.post(url.toString(),
           options: Options(headers: {
@@ -107,9 +108,10 @@ class TeamService {
 
   Future<void> addPlayerToTeam(
       String eventID, String teamID, String email, PlayerRole? role) async {
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
     try {
-      final url = '$apiBaseUrl/api/events/$eventID/teams/$teamID/players';
+      final url =
+          '${Constants.apiBaseUrl}/api/events/$eventID/teams/$teamID/players';
 
       await dio.post(url.toString(),
           data: {
@@ -134,10 +136,11 @@ class TeamService {
   }
 
   Future<void> updatePlayer(String eventID, Player player) async {
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
 
     try {
-      final url = '$apiBaseUrl/api/events/$eventID/teams/players/${player.id}';
+      final url =
+          '${Constants.apiBaseUrl}/api/events/$eventID/teams/players/${player.id}';
 
       await dio.put(url.toString(),
           data: {
@@ -154,9 +157,10 @@ class TeamService {
   }
 
   Future<void> deletePlayer(String eventID, String playerID) async {
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
     try {
-      final url = '$apiBaseUrl/api/events/$eventID/teams/players/$playerID';
+      final url =
+          '${Constants.apiBaseUrl}/api/events/$eventID/teams/players/$playerID';
 
       await dio.delete(url.toString(),
           options: ConnectivityHandler().isConnected

@@ -1,9 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:squad_go/core/models/user_app.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
-import 'package:squad_go/core/services/user_service.dart';
 
 class EditUserDialog extends StatefulWidget {
   final Future<void> Function(String name, String email)? onUpdateInfo;
@@ -67,7 +65,8 @@ class _EditUserDialogState extends State<EditUserDialog> {
           Navigator.of(context).pop();
 
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Informations utilisateur mises à jour !')),
+            const SnackBar(
+                content: Text('Informations utilisateur mises à jour !')),
           );
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(

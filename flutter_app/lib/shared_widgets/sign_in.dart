@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
+import 'package:squad_go/core/utils/constants.dart';
 import 'package:squad_go/shared_widgets/sign_up.dart';
 import 'package:squad_go/platform/mobile/widgets/logo.dart';
 import 'package:provider/provider.dart';
@@ -138,7 +139,8 @@ class __FormContentState extends State<_FormContent> {
                   ),
               decoration: InputDecoration(
                 labelText: translate?.email_label ?? 'Email',
-                hintText: translate?.email_placeholder ?? 'Entrez votre adresse email',
+                hintText: translate?.email_placeholder ??
+                    'Entrez votre adresse email',
                 prefixIcon: const Icon(Icons.email_outlined),
                 border: const OutlineInputBorder(),
               ),
@@ -167,7 +169,8 @@ class __FormContentState extends State<_FormContent> {
               obscureText: !_isPasswordVisible,
               decoration: InputDecoration(
                   labelText: translate?.password ?? 'Mot de passe',
-                  hintText: translate?.password_placeholder ?? 'Entrez votre mot de passe',
+                  hintText: translate?.password_placeholder ??
+                      'Entrez votre mot de passe',
                   prefixIcon: const Icon(Icons.lock_outline_rounded),
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
@@ -209,9 +212,10 @@ class __FormContentState extends State<_FormContent> {
                 onPressed: () async => _signIn(context),
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
-                  child: Text(translate?.login_button ??
-                    'Se connecter',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  child: Text(
+                    translate?.login_button ?? 'Se connecter',
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -236,9 +240,10 @@ class __FormContentState extends State<_FormContent> {
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
-                  child: Text(translate?.signup_title ??
-                    'Inscription',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  child: Text(
+                    translate?.signup_title ?? 'Inscription',
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),

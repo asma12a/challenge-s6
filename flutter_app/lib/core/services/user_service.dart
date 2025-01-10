@@ -1,30 +1,34 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/models/user_app.dart';
-import 'package:http/http.dart' as http;
-
-const apiBaseUrl = String.fromEnvironment('API_BASE_URL');
-const jwtStorageToken = String.fromEnvironment('JWT_STORAGE_KEY');
+import 'package:squad_go/core/utils/constants.dart';
+import 'package:squad_go/main.dart';
 
 class UserService {
   // GET all users
   static Future<List<UserApp>> getUsers() async {
     final storage = const FlutterSecureStorage();
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
 
     try {
-      final Uri url = Uri.parse('$apiBaseUrl/api/users');
+      final Uri url = Uri.parse('${Constants.apiBaseUrl}/api/users');
 
-      final response = await http.get(url, headers: {
-        'Content-Type': 'application/json',
-        'Authorization': "Bearer $token",
-      });
+      final response = await dio.get(
+        url.toString(),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer $token",
+          },
+        ),
+      );
 
       if (response.statusCode != 200) {
         throw Exception('Erreur lors de la récupération des utilisateurs.');
       }
 
-      final List<dynamic> data = json.decode(response.body);
+      final List<dynamic> data = response.data;
       return data.map((user) => UserApp.fromJson(user)).toList();
     } catch (error) {
       throw Exception('Erreur: ${error.toString()}');
@@ -34,15 +38,20 @@ class UserService {
   // DELETE a specific user
   static Future<void> deleteUser(String id) async {
     final storage = const FlutterSecureStorage();
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
 
-    final Uri url = Uri.parse('$apiBaseUrl/api/users/$id');
+    final Uri url = Uri.parse('${Constants.apiBaseUrl}/api/users/$id');
 
     try {
-      final response = await http.delete(url, headers: {
-        'Content-Type': 'application/json',
-        'Authorization': "Bearer $token",
-      });
+      final response = await dio.delete(
+        url.toString(),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer $token",
+          },
+        ),
+      );
 
       if (response.statusCode != 200) {
         throw Exception('Erreur lors de la suppression de l\'utilisateur.');
@@ -55,18 +64,20 @@ class UserService {
   // CREATE a new user
   static Future<void> createUser(Map<String, dynamic> userData) async {
     final storage = const FlutterSecureStorage();
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
 
-    final Uri url = Uri.parse('$apiBaseUrl/api/users');
+    final Uri url = Uri.parse('${Constants.apiBaseUrl}/api/users');
 
     try {
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': "Bearer $token",
-        },
-        body: json.encode(userData),
+      final response = await dio.post(
+        url.toString(),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer $token",
+          },
+        ),
+        data: json.encode(userData),
       );
 
       if (response.statusCode != 201) {
@@ -81,23 +92,25 @@ class UserService {
   static Future<void> updateUser(
       String id, Map<String, dynamic> updates) async {
     final storage = const FlutterSecureStorage();
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
 
-    final Uri url = Uri.parse('$apiBaseUrl/api/users/$id');
+    final Uri url = Uri.parse('${Constants.apiBaseUrl}/api/users/$id');
 
     try {
-      final response = await http.put(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': "Bearer $token",
-        },
-        body: json.encode(updates),
+      final response = await dio.put(
+        url.toString(),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer $token",
+          },
+        ),
+        data: json.encode(updates),
       );
 
       if (response.statusCode != 200) {
         throw Exception(
-            'Erreur lors de la mise à jour de l\'utilisateur : ${response.body}');
+            'Erreur lors de la mise à jour de l\'utilisateur : ${response.data}');
       }
     } catch (error) {
       throw Exception('Erreur: ${error.toString()}');

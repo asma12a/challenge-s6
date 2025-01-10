@@ -5,9 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/user_app.dart';
 import 'package:squad_go/core/services/auth_service.dart';
-
-const apiBaseUrl = String.fromEnvironment('API_BASE_URL');
-const jwtStorageToken = String.fromEnvironment('JWT_STORAGE_KEY');
+import 'package:squad_go/core/utils/constants.dart';
 
 class AuthState with ChangeNotifier {
   final AuthService _authService = AuthService();
@@ -48,7 +46,7 @@ class AuthState with ChangeNotifier {
   Future<void> logout() async {
     try {
       _user = null;
-      await _storage.delete(key: jwtStorageToken);
+      await _storage.delete(key: Constants.jwtStorageToken);
       notifyListeners();
     } catch (e) {
       log('Logout failed: $e');
@@ -58,7 +56,7 @@ class AuthState with ChangeNotifier {
 
   Future<bool> tryLogin() async {
     try {
-      final token = await _storage.read(key: jwtStorageToken);
+      final token = await _storage.read(key: Constants.jwtStorageToken);
 
       if (token == null) {
         return false;
