@@ -1,22 +1,15 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/models/sport.dart';
-import 'package:squad_go/core/utils/connectivity_handler.dart';
 import 'package:squad_go/core/utils/constants.dart';
 import 'package:squad_go/main.dart';
 
 class EventService {
   final storage = const FlutterSecureStorage();
-  final refreshCacheOptions = CacheOptions(
-    store: MemCacheStore(),
-    policy: CachePolicy.refreshForceCache,
-  );
-
   // GET all events (backoffice)
   Future<List<Map<String, dynamic>>> getEvents() async {
     final token = await storage.read(key: Constants.jwtStorageToken);
@@ -123,16 +116,7 @@ class EventService {
       final Uri url = Uri.parse('${Constants.apiBaseUrl}/api/events/$id');
 
       final response = await dio.get(url.toString(),
-          options:
-              // ConnectivityHandler().isConnected
-              //     ? refreshCacheOptions.toOptions().copyWith(
-              //         headers: {
-              //           'Content-Type': 'application/json',
-              //           'Authorization': "Bearer $token",
-              //         },
-              //       )
-              //     :
-              Options(
+          options: Options(
             headers: {
               'Content-Type': 'application/json',
               'Authorization': "Bearer $token",
@@ -178,6 +162,9 @@ class EventService {
             "Authorization": "Bearer $token",
           }),
           data: jsonEncode(event));
+
+      await initialCacheOptions.store!
+          .delete('${Constants.apiBaseUrl}/api/events/user');
     } catch (error) {
       log.severe('An error occurred while ', {error: error});
       throw AppException(message: 'Failed to create event, please try again.');
@@ -195,6 +182,9 @@ class EventService {
             "Authorization": "Bearer $token",
           }),
           data: jsonEncode(event));
+
+      await initialCacheOptions.store!
+          .delete('${Constants.apiBaseUrl}/api/events/$id');
     } catch (error) {
       log.severe('An error occurred while ', {error: error});
       throw AppException(message: 'Failed to update event, please try again.');
@@ -207,19 +197,12 @@ class EventService {
       final Uri uri = Uri.parse('${Constants.apiBaseUrl}/api/events/user');
 
       final response = await dio.get(uri.toString(),
-          options: ConnectivityHandler().isConnected
-              ? refreshCacheOptions.toOptions().copyWith(
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': "Bearer $token",
-                  },
-                )
-              : Options(
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': "Bearer $token",
-                  },
-                ));
+          options: Options(
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': "Bearer $token",
+            },
+          ));
 
       final List<dynamic> data = response.data;
       return data.map((event) => Event.fromJson(event)).toList();

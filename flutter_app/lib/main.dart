@@ -10,22 +10,24 @@ import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 
 final log = Logger("AppLogger");
 final dio = Dio(BaseOptions(
-  connectTimeout: Duration(seconds: 5),
-  receiveTimeout: Duration(seconds: 5),
+  connectTimeout: Duration(seconds: 30),
+  receiveTimeout: Duration(seconds: 30),
   headers: {
     'Accept': 'application/json',
   },
 ));
 
+final initialCacheOptions = CacheOptions(
+  store: MemCacheStore(),
+  policy: CachePolicy.request,
+  priority: CachePriority.high,
+  maxStale: const Duration(hours: 1),
+  hitCacheOnErrorExcept: [401, 403],
+  keyBuilder: (req) => req.uri.toString(),
+);
+
 void main() async {
-  dio.interceptors.add(
-    DioCacheInterceptor(
-      options: CacheOptions(
-        store: MemCacheStore(),
-        policy: CachePolicy.request,
-      ),
-    ),
-  );
+  dio.interceptors.add(DioCacheInterceptor(options: initialCacheOptions));
 
   // Flutter Maps Tile Caching
   WidgetsFlutterBinding.ensureInitialized();

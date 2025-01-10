@@ -58,10 +58,14 @@ class _TabsScreenState extends State<TabsScreen> {
     }
 
     var isOnline = context.watch<ConnectivityState>().isConnected;
-    ScaffoldMessenger.of(context).clearSnackBars();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+    });
 
     if (!isOnline) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
