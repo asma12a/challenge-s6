@@ -49,13 +49,32 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.debug
+            signingConfig = signingConfigs.release
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+    }
+
+    applicationVariants.all {
+        variant ->
+            variant.outputs.each {
+                output->
+                    // on below line we are specifying our app name.
+                    project.ext { appName = 'squad-go' }
+                    // on below line we are adding the formatted date to our apk file name.
+                    def formattedDate = new Date().format('yyyy-MM-dd-HH-mm-ss')
+                    // on below line we are creating a new name for our apk.
+                    def newName = output.outputFile.name
+                    // on below line we are replacing our previous name with our app name.
+                    newName = newName.replace("app-", "$project.ext.appName-")
+                    // on below line we are replacing -release with our formatted date.
+                    newName = newName.replace("-release", "-" + formattedDate)
+                    // debug 
+                    newName = newName.replace("-debug", "-debug-" + formattedDate)
+                    // at last we are setting our apk name to it.
+                    output.outputFileName  = newName
+            }
     }
 }
 
