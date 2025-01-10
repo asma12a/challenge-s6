@@ -29,8 +29,9 @@ class HomeRecommendedEventsState extends State<HomeRecommendedEvents> {
     determinePosition().then((value) {
       setState(() {
         userPosition = value;
+        fetchRecommendedEvents();
       });
-    }).catchError((e) {
+    }).catchError((e) async {
       log.severe('Failed to determine position: $e');
     });
   }
