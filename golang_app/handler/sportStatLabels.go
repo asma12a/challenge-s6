@@ -515,7 +515,7 @@ func getUserPerformanceBySport(ctx context.Context, serviceSportStatLables servi
 			})
 		}
 
-		c.Set("Cache-Control", "public, max-age=3600") // Cache for 1h
+		c.Set("Cache-Control", "public, max-age=3600")
 		return c.JSON(toj)
 	}
 }
