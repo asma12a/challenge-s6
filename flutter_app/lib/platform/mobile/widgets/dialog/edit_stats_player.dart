@@ -151,7 +151,7 @@ class _EditStatsPlayerDialogState extends State<EditStatsPlayerDialog> {
                   fontWeight: FontWeight.bold,
                 )),
             const SizedBox(height: 16),
-            Text('Noter les performances du player ${_player.name}'),
+            Text('Noter les performances du joueur ${_player.name}'),
             const SizedBox(height: 16),
             ConstrainedBox(
               constraints: BoxConstraints(

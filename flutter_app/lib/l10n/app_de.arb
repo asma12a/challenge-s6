@@ -80,6 +80,9 @@
   "my_events_profile": "Meine Veranstaltungen",
   "performance": "Leistung",
   "join_community": "Treten Sie noch heute Ihrer Community bei!",
-  "already_account": "Sie haben bereits ein Konto?"
+  "already_account": "Sie haben bereits ein Konto?",
+  "events_participated": "{count, plural, one {Hat an {count} Veranstaltung teilgenommen} other {Hat an {count} Veranstaltungen teilgenommen}}",
+  "no_performance_available": "Keine Leistung verfügbar"
+
 
 }
