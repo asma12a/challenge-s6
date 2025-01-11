@@ -81,5 +81,9 @@
   "my_events_profile": "My events",
   "performance": "Performance",
   "join_community": "Join your community today!",
-  "already_account": "Already have an account ?"
+  "already_account": "Already have an account ?",
+  "events_participated": "{count, plural, one {Has participated in {count} event} other {Has participated in {count} events}}",
+  "no_performance_available": "No performance available"
+
+
 }

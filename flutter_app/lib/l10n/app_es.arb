@@ -80,5 +80,9 @@
   "my_events_profile": "Mis eventos",
   "performance": "Actuación",
   "join_community": "¡Únase a su comunidad hoy!",
-  "already_account": "¿Ya tienes una cuenta?"
+  "already_account": "¿Ya tienes una cuenta?",
+  "events_participated": "{count, plural, one {Ha participado en {count} evento} other {Ha participado en {count} eventos}}",
+  "no_performance_available": "No hay rendimiento disponible"
+
+
 }

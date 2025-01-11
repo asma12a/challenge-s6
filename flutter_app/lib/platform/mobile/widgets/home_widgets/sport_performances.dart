@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:squad_go/core/services/sport_stat_labels_service.dart';
 import 'package:squad_go/main.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 class SportPerformances extends StatefulWidget {
   final String sportId;
@@ -46,6 +48,8 @@ class _SportPerformancesState extends State<SportPerformances> {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
+
     return Container(
         margin: const EdgeInsets.only(top: 16),
         child: Column(
@@ -70,7 +74,7 @@ class _SportPerformancesState extends State<SportPerformances> {
                       color: Theme.of(context)
                           .colorScheme
                           .primary
-                          .withOpacity(0.1),
+                          .withAlpha(20),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: ListTile(
@@ -82,8 +86,8 @@ class _SportPerformancesState extends State<SportPerformances> {
                 },
               )
             else
-              const Text('Aucune performance disponible.',
-                  style: TextStyle(fontSize: 16)),
+              Text(translate?.no_performance_available ?? 'Aucune performance disponible'),
+
           ],
         ));
   }

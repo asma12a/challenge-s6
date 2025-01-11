@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/sport_stat_labels.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -25,10 +26,9 @@ class SportStatLabelsService {
           },
         ),
       );
-      final data = jsonDecode(utf8.decode(response.data));
-      return List<SportStatLabels>.from(
-        data.map((json) => SportStatLabels.fromJson(json)),
-      );
+
+      final List<dynamic> sportStatLabels = response.data;
+      return sportStatLabels.map((sportStat) => SportStatLabels.fromJson(sportStat)).toList();
     } catch (error) {
       throw AppException(
           message: 'Failed to retrieve sport stat labels, please try again.');
@@ -50,10 +50,9 @@ class SportStatLabelsService {
           },
         ),
       );
-      final data = jsonDecode(utf8.decode(response.data));
-      return List<UserStats>.from(
-        data.map((json) => UserStats.fromJson(json)),
-      );
+
+      final List<dynamic> userStats = response.data;
+      return userStats.map((userStat) => UserStats.fromJson(userStat)).toList();
     } catch (error) {
       throw AppException(
           message: 'Failed to retrieve sport stat labels, please try again.');
@@ -76,8 +75,10 @@ class SportStatLabelsService {
           },
         ),
       );
-      final data = jsonDecode(utf8.decode(response.data));
+
+      final Map<String, dynamic> data = response.data;
       return UserPerformance.fromJson(data);
+
     } catch (error) {
       throw AppException(
           message: 'Failed to retrieve user performance, please try again.');
