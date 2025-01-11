@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/team.dart';
+import 'package:squad_go/core/providers/connectivity_provider.dart';
 import 'package:squad_go/core/services/team_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:squad_go/platform/mobile/widgets/dialog/offline.dart';
 
 class EditTeamDialog extends StatefulWidget {
   final String eventId;
@@ -50,9 +53,54 @@ class _EditTeamDialogState extends State<EditTeamDialog> {
     }
   }
 
+  void _deleteTeam() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Supprimer l\'équipe'),
+          content: Text(
+              'Êtes-vous sûr de vouloir supprimer l\'équipe ${_team.name} ?'),
+          actions: [
+            TextButton(
+              child: Text("Annuler"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text("OK"),
+              onPressed: () async {
+                try {
+                  await teamService.deleteTeam(widget.eventId, _team.id);
+                  widget.onRefresh?.call();
+                } on AppException catch (e) {
+                  // Handle AppException error
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Erreur: ${e.message}')),
+                  );
+                } catch (e) {
+                  // Handle other errors
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Une erreur est survenue')),
+                  );
+                }
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final translate = AppLocalizations.of(context);
+
+    var isOnline = context.watch<ConnectivityState>().isConnected;
+
     return Dialog(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -88,7 +136,8 @@ class _EditTeamDialogState extends State<EditTeamDialog> {
               ),
               TextFormField(
                 initialValue: _team.maxPlayers.toString(),
-                decoration: InputDecoration(labelText: translate?.nb_players ?? 'Nombre de joueurs'),
+                decoration: InputDecoration(
+                    labelText: translate?.nb_players ?? 'Nombre de joueurs'),
                 keyboardType: TextInputType.number,
                 onChanged: (value) {
                   _team = _team.copyWith(maxPlayers: int.tryParse(value) ?? 0);
@@ -114,6 +163,27 @@ class _EditTeamDialogState extends State<EditTeamDialog> {
                   ),
                 ),
                 child: Text('Modifier'),
+              ),
+              TextButton(
+                onPressed: () {
+                  if (!isOnline) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const OfflineDialog(),
+                    );
+                    return;
+                  }
+                  _deleteTeam();
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.red.shade300,
+                  textStyle: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+                child: const Text('Supprimer l\'équipe'),
               ),
             ],
           ),

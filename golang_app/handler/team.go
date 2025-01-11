@@ -23,9 +23,9 @@ func TeamHandler(app fiber.Router, ctx context.Context, serviceEvent service.Eve
 	// "/:eventId/teams" scoped
 	app.Get("/", listEventTeams(ctx, serviceTeam))
 	app.Get("/:teamId", getTeam(ctx, serviceTeam))
-	app.Post("/", addTeam(ctx, serviceTeam))
-	app.Put("/:teamId", updateTeam(ctx, serviceTeam))
-	app.Delete("/:teamId", deleteTeam(ctx, serviceTeam))
+	app.Post("/", middleware.IsEventOrganizerOrCoach(ctx, serviceEvent), addTeam(ctx, serviceTeam))
+	app.Put("/:teamId", middleware.IsEventOrganizerOrCoach(ctx, serviceEvent), updateTeam(ctx, serviceTeam))
+	app.Delete("/:teamId", middleware.IsEventOrganizerOrCoach(ctx, serviceEvent), deleteTeam(ctx, serviceTeam))
 }
 
 func listEventTeams(ctx context.Context, serviceTeam service.Team) fiber.Handler {
@@ -178,15 +178,26 @@ func updateTeam(ctx context.Context, serviceTeam service.Team) fiber.Handler {
 
 func deleteTeam(ctx context.Context, serviceTeam service.Team) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		id, err := ulid.Parse(c.Params("teamId"))
+
+		eventIDStr := c.Params("eventId")
+		teamIDStr := c.Params("teamId")
+
+		eventID, err := ulid.Parse(eventIDStr)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
-				"error":  err.Error(),
+				"error":  "Invalid event ID format",
 			})
 		}
 
-		err = serviceTeam.Delete(ctx, id)
+		teamID, err := ulid.Parse(teamIDStr)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "Invalid team ID format",
+			})
+		}
+		err = serviceTeam.Delete(ctx, teamID, eventID)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",

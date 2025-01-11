@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:squad_go/core/utils/constants.dart';
+import 'package:squad_go/main.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChatService {
@@ -25,7 +27,7 @@ class ChatService {
     }
   }
 
-  void sendMessage(String message) {
+  void sendMessage(String message) async {
     if (isConnected) {
       _channel.sink.add(message);
     } else {

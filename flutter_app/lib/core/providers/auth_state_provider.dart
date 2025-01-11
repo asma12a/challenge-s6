@@ -1,11 +1,10 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/user_app.dart';
 import 'package:squad_go/core/services/auth_service.dart';
 import 'package:squad_go/core/utils/constants.dart';
+import 'package:squad_go/main.dart';
 
 class AuthState with ChangeNotifier {
   final AuthService _authService = AuthService();
@@ -38,7 +37,6 @@ class AuthState with ChangeNotifier {
 
       return loginData;
     } catch (e) {
-      log('Login failed: $e');
       throw AppException(message: 'Failed to log in. Please try again.');
     }
   }
@@ -47,9 +45,10 @@ class AuthState with ChangeNotifier {
     try {
       _user = null;
       await _storage.delete(key: Constants.jwtStorageToken);
+      await initialCacheOptions.store!.clean();
+
       notifyListeners();
     } catch (e) {
-      log('Logout failed: $e');
       throw AppException(message: 'Failed to log out. Please try again.');
     }
   }
@@ -69,7 +68,6 @@ class AuthState with ChangeNotifier {
       }
       return false;
     } catch (e) {
-      log('Failed to load user: $e');
       return false;
     }
   }

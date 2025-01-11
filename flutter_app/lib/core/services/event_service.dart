@@ -185,6 +185,8 @@ class EventService {
 
       await initialCacheOptions.store!
           .delete('${Constants.apiBaseUrl}/api/events/$id');
+      await initialCacheOptions.store!
+          .delete('${Constants.apiBaseUrl}/api/events/user');
     } catch (error) {
       log.severe('An error occurred while ', {error: error});
       throw AppException(message: 'Failed to update event, please try again.');

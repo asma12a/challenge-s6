@@ -6,6 +6,8 @@ import 'package:squad_go/platform/mobile/widgets/logo.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
@@ -77,6 +79,32 @@ class __FormContentState extends State<_FormContent> {
   var _enteredEmail = '';
   var _enteredPassword = '';
 
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  // Méthode de connexion avec Google
+  Future<void> _signInWithGoogle(BuildContext context) async {
+    try {
+      GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser != null) {
+        // Vous pouvez obtenir un token ou l'ID de l'utilisateur
+        final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+        final accessToken = googleAuth.accessToken;
+        final idToken = googleAuth.idToken;
+        
+        // Connectez-vous à votre backend avec l'accessToken/idToken si nécessaire
+        // Par exemple, vous pouvez les envoyer au backend pour validation
+        context.go('/home'); // Redirige vers la page d'accueil après la connexion
+      }
+    } catch (error) {
+      // Gérer les erreurs de connexion
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur lors de la connexion avec Google : $error'),
+        ),
+      );
+    }
+  }
+
   void _signIn(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -120,7 +148,6 @@ class __FormContentState extends State<_FormContent> {
                 FocusScope.of(context).unfocus();
               },
               validator: (value) {
-                // add email validation
                 if (value == null || value.isEmpty) {
                   return 'Please enter some text';
                 }
@@ -216,6 +243,41 @@ class __FormContentState extends State<_FormContent> {
                     translate?.login_button ?? 'Se connecter',
                     style: const TextStyle(
                         fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ),
+            _gap(),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4)),
+                ),
+                onPressed: () async {
+                  await _signInWithGoogle(context); // Authentification via Google
+                },
+                child: const Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.login,
+                        color: Colors.white,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        'Se connecter via Google',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
