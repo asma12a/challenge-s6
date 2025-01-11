@@ -94,6 +94,11 @@ func main() {
 	handler.MessageHandler(api.Group("/message", middleware.IsAuthMiddleware), context.Background(), *service.NewMessageService(dbClient), *service.NewEventService(dbClient), *service.NewUserService(dbClient))
 	handler.SportStatLabelsHandler(api.Group("/sportstatlabels", middleware.IsAuthMiddleware), context.Background(), *service.NewSportStatLabelsService(dbClient), *service.NewSportService(dbClient), *service.NewEventService(dbClient), *service.NewUserService(dbClient))
 	handler.ActionLogHandler(api.Group("/actionlogs", middleware.IsAuthMiddleware), context.Background(), *service.NewActionLogService(dbClient), *service.NewUserService(dbClient))
+	userService := service.NewUserService(dbClient)
+	oauthHandler := handler.NewOAuthHandler(userService)
+
+	app.Get("/auth/google/login", oauthHandler.OAuthLoginHandler)
+	app.Get("/auth/google/callback", oauthHandler.OAuthCallbackHandler)
 
 	// Route de gestion des erreurs (Not Found)
 	app.All("*", func(c *fiber.Ctx) error {

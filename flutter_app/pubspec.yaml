@@ -37,6 +37,9 @@ dependencies:
   go_router: ^14.6.2
   geolocator: ^13.0.2
   connectivity_plus: ^6.1.1
+  google_sign_in: ^5.0.7
+  url_launcher: ^6.1.5
+  flutter_webview_plugin: ^0.4.0
 
 dev_dependencies:
   flutter_test:
