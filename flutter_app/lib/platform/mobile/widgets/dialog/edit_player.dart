@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/team.dart';
 import 'package:squad_go/core/services/team_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class EditPlayerDialog extends StatefulWidget {
   final String eventId;
@@ -35,6 +36,7 @@ class _EditPlayerDialogState extends State<EditPlayerDialog> {
   }
 
   void _updatePlayer() async {
+    final translate = AppLocalizations.of(context);
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
@@ -45,12 +47,16 @@ class _EditPlayerDialogState extends State<EditPlayerDialog> {
       } on AppException catch (e) {
         // Handle AppException error
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur: ${e.message}')),
+          SnackBar(
+            content: Text(
+              '${translate?.error ?? "Erreur:"} ${e.message}',
+            ),
+          ),
         );
       } catch (e) {
         // Handle other errors
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Une erreur est survenue')),
+          SnackBar(content: Text(translate?.error_occurred ?? 'Une erreur est survenue')),
         );
       }
     }
@@ -58,6 +64,7 @@ class _EditPlayerDialogState extends State<EditPlayerDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     return Dialog(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -67,7 +74,7 @@ class _EditPlayerDialogState extends State<EditPlayerDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Modifier: ${_player.name}',
+                '${translate?.edit ?? "Modifier:"} ${_player.name}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -89,7 +96,7 @@ class _EditPlayerDialogState extends State<EditPlayerDialog> {
                           child: Text(team.name),
                         ))
                     .toList(),
-                decoration: const InputDecoration(labelText: 'Équipe'),
+                decoration: InputDecoration(labelText: translate?.team ?? 'Équipe'),
               ),
               DropdownButtonFormField<PlayerRole>(
                 value: _player.role,
@@ -105,7 +112,7 @@ class _EditPlayerDialogState extends State<EditPlayerDialog> {
                           child: Text(playerRoleLabel[role] ?? role.name),
                         ))
                     .toList(),
-                decoration: const InputDecoration(labelText: 'Rôle'),
+                decoration: InputDecoration(labelText: translate?.role ?? 'Rôle'),
               ),
               SizedBox(height: 8),
               ElevatedButton(
@@ -123,7 +130,7 @@ class _EditPlayerDialogState extends State<EditPlayerDialog> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                child: const Text('Modifier'),
+                child: Text(translate?.edit ?? 'Modifier'),
               ),
             ],
           ),

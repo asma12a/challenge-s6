@@ -29,6 +29,7 @@ class _AddPlayerDialogState extends State<AddPlayerDialog> {
   String? _email;
 
   void _addPlayer() async {
+    final translate = AppLocalizations.of(context);
     if (_email == null) return;
 
     try {
@@ -40,13 +41,16 @@ class _AddPlayerDialogState extends State<AddPlayerDialog> {
       // Handle AppException error
       log.severe('Failed to add player to team: ${e.message}');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur: ${e.message}')),
-      );
+        SnackBar(
+          content: Text(
+            '${translate?.error ?? "Erreur:"} ${e.message}',
+          ),
+        ),      );
     } catch (e) {
       // Handle other errors
       log.severe('Failed to add player to team: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Une erreur est survenue')),
+        SnackBar(content: Text(translate?.error_occurred ?? 'Une erreur est survenue')),
       );
     }
   }
@@ -73,19 +77,19 @@ class _AddPlayerDialogState extends State<AddPlayerDialog> {
               ),
               SizedBox(height: 16),
               TextFormField(
-                decoration: const InputDecoration(labelText: 'Email'),
+                decoration: InputDecoration(labelText: translate?.email_label ?? 'Email'),
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) {
                   // add email validation
                   if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer une adresse email';
+                    return translate?.empty_email ?? 'Veuillez entrer une adresse email';
                   }
 
                   bool emailValid = RegExp(
                           r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                       .hasMatch(value);
                   if (!emailValid) {
-                    return 'Veuillez entrer une adresse email valide';
+                    return translate?.valid_email ?? 'Veuillez entrer une adresse email valide';
                   }
 
                   return null;
@@ -114,7 +118,7 @@ class _AddPlayerDialogState extends State<AddPlayerDialog> {
                           child: Text(playerRoleLabel[role] ?? role.name),
                         ))
                     .toList(),
-                decoration: const InputDecoration(labelText: 'Role'),
+                decoration: InputDecoration(labelText: translate?.role ?? 'Role'),
               ),
               SizedBox(height: 16),
               ElevatedButton.icon(

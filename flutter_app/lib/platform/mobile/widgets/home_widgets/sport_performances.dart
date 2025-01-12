@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:squad_go/core/services/sport_stat_labels_service.dart';
 import 'package:squad_go/main.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 class SportPerformances extends StatefulWidget {
   final String sportId;
@@ -46,6 +48,8 @@ class _SportPerformancesState extends State<SportPerformances> {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
+
     return Container(
         margin: const EdgeInsets.only(top: 16),
         child: Column(
@@ -53,10 +57,10 @@ class _SportPerformancesState extends State<SportPerformances> {
           children: [
             if (nbEvents != 0) ...[
               Text(
-                'Nombre d\'événements : $nbEvents',
+                '${translate?.nb_events ?? "Nombre d\'événements :"} $nbEvents',
                 style: const TextStyle(fontSize: 16),
               ),
-              const SizedBox(height: 16)
+              const SizedBox(height: 16),
             ],
             if (stats.isNotEmpty)
               ListView.builder(
@@ -82,8 +86,8 @@ class _SportPerformancesState extends State<SportPerformances> {
                 },
               )
             else
-              const Text('Aucune performance disponible.',
-                  style: TextStyle(fontSize: 16)),
+              Text(translate?.no_perf ?? 'Aucune performance disponible.',
+                  style: const TextStyle(fontSize: 16)),
           ],
         ));
   }

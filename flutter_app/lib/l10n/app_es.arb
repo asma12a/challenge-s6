@@ -16,6 +16,8 @@
   "password_placeholder": "Introduce tu contraseña",
   "search_placeholder": "Buscar...",
   "no_events": "No se encontraron eventos",
+  "event_found_singular": "evento encontrado",
+  "event_found_plural": "eventos encontrados",
   "no_event_to_display": "No hay eventos para mostrar",
   "settings": "Ajustes",
   "logout": "Cerrar sesión",
@@ -60,7 +62,7 @@
       }
     }
   },
-  "edit": "Editar",
+  "edit": "Editar:",
   "team": "Equipo",
   "role": "Rol",
   "name": "Nombre",
@@ -71,14 +73,114 @@
   "running": "Correr",
   "tennis": "Tenis",
   "create_event": "Crear evento",
+  "create_team": "Crea el equipo",
   "select_date": "Seleccionar fecha",
   "no_results": "No se encontraron resultados",
   "event_name": "Nombre del evento",
+  "team_name": "Nombre del equipo",
   "event_address": "Dirección del evento",
+  "event_date": "Fecha del evento",
   "open_public": "Hacer públicos",
   "save_event": "Ahorrar",
   "my_events_profile": "Mis eventos",
   "performance": "Actuación",
   "join_community": "¡Únase a su comunidad hoy!",
-  "already_account": "¿Ya tienes una cuenta?"
+  "already_account": "¿Ya tienes una cuenta?",
+  "participated_to": "Participó en",
+  "event_plural": "eventos",
+  "event_singular": "evento",
+  "change_team": "Cambiar de equipo",
+  "join_team": "Únete al equipo",
+  "infos_player": "Información del jugador",
+  "no_perf": "No hay rendimiento disponible.",
+  "choose_team": "Elige tu equipo:",
+  "sporty": "deportistas",
+  "cancel": "Cancelar",
+  "error": "Error:",
+  "error_occurred": "Se ha producido un error.",
+  "empty_email": "Por favor, introduzca una dirección de correo electrónico",
+  "valid_email": "Por favor, introduce una dirección de correo electrónico válida",
+  "empty_team_name": "Por favor, introduzca un nombre de equipo",
+  "empty_address": "El campo de dirección no puede estar vacío.",
+  "public": "Audiencia",
+  "private": "Privado",
+  "fifty_char": "Debe tener entre 1 y 50 caracteres.",
+  "empty_date": "Por favor seleccione una fecha",
+  "empty_sport": "Por favor seleccione un deporte",
+  "event_type": "Tipo de evento",
+  "empty_type": "Por favor seleccione un tipo de concordancia",
+  "update": "Para actualizar",
+  "note_success": "Notas añadidas con éxito",
+  "event": "El evento",
+  "note_player": "Califica el rendimiento del jugador",
+  "user_infos_updated": "¡Información del usuario actualizada!",
+  "updated_password": "¡Contraseña actualizada!",
+  "edit_user_infos": "Editar información del usuario",
+  "empty_user_name": "Por favor, introduzca un nombre",
+  "change_password": "Cambiar la contraseña",
+  "new_password": "Nueva contraseña",
+  "empty_password": "Por favor, introduzca una contraseña.",
+  "six_char": "La contraseña debe contener al menos 6 caracteres.",
+  "no_internet": "Sin conexión a Internet",
+  "check_internet": "Por favor verifique su conexión a Internet y vuelva a intentarlo.",
+  "share_event": "Comparte el evento",
+  "event_code": "Código de evento",
+  "copy": "Copiado al portapapeles",
+  "del_player": "Eliminar jugador",
+  "confirm_del_player": "¿Estás seguro de que deseas eliminar el reproductor",
+  "leave_team": "Abandonar el equipo",
+  "leave_team_event": "¿Estás seguro de que deseas abandonar el equipo y el evento?",
+  "perf_for": "Actuaciones para el",
+  "nb_events": "Número de eventos",
+  "leave_team_and_event": "Abandonar el equipo (y el evento)",
+  "confirm_change_team": "¿De verdad quieres cambiar de equipo y unirte?",
+  "confirm_join_team": "¿Realmente quieres unirte a este equipo?",
+  "no_players_team": "Actualmente no hay jugadores en este equipo",
+  "updated_user": "¡Usuario actualizado exitosamente!",
+  "notifs": "Notificaciones",
+  "me": "A mí",
+  "other": "Otro",
+  "enter_message": "Introduzca un mensaje...",
+  "no_event_code": "No hay eventos que coincidan con este código.",
+  "six_char_code": "El código debe contener al menos 6 caracteres.",
+  "empty_val": "Por favor, introduzca un valor.",
+  "event_saved_success": "El evento ha sido grabado exitosamente.",
+  "server_error": "Servidor no disponible. Por favor, inténtelo de nuevo más tarde.",
+  "match": "Fósforo",
+  "training": "Capacitación"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

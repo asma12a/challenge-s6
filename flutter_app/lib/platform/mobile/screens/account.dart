@@ -27,8 +27,13 @@ class _AccountScreenState extends State<AccountScreen> {
 
   Future<void> onRefresh() async {}
   int eventsCount = 0;
+
   List<Sport> userSports = [];
-  List<String> labelNotifs = ["Évenements recommandés", "Évenement 1jour avant", "Personne invité inscrite"];
+  List<String> labelNotifs = [
+    "Évenements recommandés",
+    "Évenement 1jour avant",
+    "Personne invité inscrite"
+  ];
 
   @override
   void initState() {
@@ -50,9 +55,9 @@ class _AccountScreenState extends State<AccountScreen> {
 
   Future<void> _updateUserInfo(
       BuildContext context, String name, String email) async {
+    final translate = AppLocalizations.of(context);
     try {
       final authState = context.read<AuthState>();
-
       // Mettre à jour le backend avec UserService
       final userId = authState.userInfo?.id ?? '';
       if (userId.isEmpty) {
@@ -73,16 +78,21 @@ class _AccountScreenState extends State<AccountScreen> {
       ));
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Utilisateur mis à jour avec succès !')),
+        SnackBar(
+            content: Text(translate?.updated_user ??
+                'Utilisateur mis à jour avec succès !')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur : ${e.toString()}')),
+        SnackBar(
+            content: Text('${translate?.error ?? 'Erreur'} : ${e.toString()}')),
       );
     }
   }
 
-  Future<void> _updateUserPassword(BuildContext context, String password) async {
+  Future<void> _updateUserPassword(
+      BuildContext context, String password) async {
+    final translate = AppLocalizations.of(context);
     try {
       final authState = context.read<AuthState>();
 
@@ -95,11 +105,14 @@ class _AccountScreenState extends State<AccountScreen> {
       await UserService.updateUser(userId, {'password': password});
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Mot de passe mis à jour avec succès !')),
+        SnackBar(
+            content: Text(translate?.updated_password ??
+                'Mot de passe mis à jour avec succès !')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur : ${e.toString()}')),
+        SnackBar(
+            content: Text('${translate?.error ?? 'Erreur'} : ${e.toString()}')),
       );
     }
   }
@@ -109,278 +122,298 @@ class _AccountScreenState extends State<AccountScreen> {
     final translate = AppLocalizations.of(context);
     var isOnline = context.watch<ConnectivityState>().isConnected;
 
-   return  Consumer<AuthState>(
-        builder: (context, authState, child)
-    {
-      final userInfo = authState.userInfo;
-      return SafeArea(
-        child: Scaffold(
-          body: RefreshIndicator(
-            edgeOffset: 40,
-            onRefresh: onRefresh,
-            child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                SliverFillRemaining(
-                  child: Column(
-                    children: [
-                      Flexible(
-                        flex: 1,
-                        child: Container(
-                          margin: const EdgeInsets.only(
-                            bottom: 16,
-                            left: 16,
-                            right: 16,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Theme
-                                .of(context)
-                                .colorScheme
-                                .primary
-                                .withOpacity(0.03),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(16),
+    return Consumer<AuthState>(
+      builder: (context, authState, child) {
+        final userInfo = authState.userInfo;
+        return SafeArea(
+          child: Scaffold(
+            body: RefreshIndicator(
+              edgeOffset: 40,
+              onRefresh: onRefresh,
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  SliverFillRemaining(
+                    child: Column(
+                      children: [
+                        Flexible(
+                          flex: 1,
+                          child: Container(
+                            margin: const EdgeInsets.only(
+                              bottom: 16,
+                              left: 16,
+                              right: 16,
                             ),
-                          ),
-                          child: Stack(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(4),
-                                child: Center(
-                                  child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          userInfo?.name ?? "Utilisateur",
-                                          style: Theme
-                                              .of(context)
-                                              .textTheme
-                                              .headlineSmall
-                                              ?.copyWith(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Text('A participer à $eventsCount events')
-                                      ]),
-                                ),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primary
+                                  .withOpacity(0.03),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(16),
                               ),
-                              Positioned(
-                                  top: 8,
-                                  right: 8,
-                                  child: IconButton(
-                                    icon: Icon(Icons.edit, color: Theme
-                                        .of(context)
-                                        .colorScheme
-                                        .primary),
-                                    onPressed: () {
-                                      if (!isOnline) {
+                            ),
+                            child: Stack(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(4),
+                                  child: Center(
+                                    child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            userInfo?.name ?? "Utilisateur",
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headlineSmall
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                              '${translate?.participated_to ?? 'A participé à'} $eventsCount '
+                                              '${eventsCount == 1 ? translate?.event_singular ?? 'événement' : translate?.event_plural ?? 'événements'}')
+                                        ]),
+                                  ),
+                                ),
+                                Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: IconButton(
+                                      icon: Icon(Icons.edit,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary),
+                                      onPressed: () {
+                                        if (!isOnline) {
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) =>
+                                                const OfflineDialog(),
+                                          );
+                                          return;
+                                        }
                                         showDialog(
                                           context: context,
-                                          builder: (context) => const OfflineDialog(),
+                                          builder: (context) {
+                                            return EditUserDialog(
+                                              onUpdateInfo: (name, email) =>
+                                                  _updateUserInfo(
+                                                      context, name, email),
+                                              onUpdatePassword: (password) =>
+                                                  _updateUserPassword(
+                                                      context, password),
+                                            );
+                                          },
                                         );
-                                        return;
-                                      }
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return EditUserDialog(
-                                            onUpdateInfo: (name, email) => _updateUserInfo(context, name, email),
-                                            onUpdatePassword: (password) =>
-                                                _updateUserPassword(context, password),
-                                          );
-                                        },
-                                      );
-                                    },
-                                  ))
-                            ],
-                          ),
-                        ),
-                      ),
-                      Flexible(
-                        flex: 4,
-                        child: Container(
-                          margin: const EdgeInsets.only(
-                            bottom: 16,
-                            left: 16,
-                            right: 16,
-                          ),
-                          child: DefaultTabController(
-                            length: 3,
-                            child: Column(
-                              children: [
-                                Container(
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: Theme
-                                        .of(context)
-                                        .colorScheme
-                                        .primary
-                                        .withOpacity(0.5),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: TabBar(
-                                    indicatorSize: TabBarIndicatorSize.tab,
-                                    dividerColor: Colors.transparent,
-                                    indicator: BoxDecoration(
-                                      color: Theme
-                                          .of(context)
-                                          .colorScheme
-                                          .primary
-                                          .withOpacity(0.2),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    labelColor: Colors.white,
-                                    labelStyle: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    tabs: [
-                                      Tab(
-                                        child: Text(
-                                          translate?.my_events_profile ?? 'Mes events',
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      Tab(
-                                        child: Text(
-                                          translate?.performance ?? 'Performances',
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      Tab(
-                                        child: Text(
-                                          translate?.settings ?? 'Paramètres',
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Flexible(
-                                  child: TabBarView(
-                                    children: [
-                                      Container(
-                                        margin: const EdgeInsets.only(top: 16),
-                                        decoration: BoxDecoration(
-                                          color: Theme
-                                              .of(context)
-                                              .colorScheme
-                                              .primary
-                                              .withOpacity(0.03),
-                                          borderRadius: BorderRadius.circular(16),
-                                        ),
-                                        padding: const EdgeInsets.all(16),
-                                        child: Center(
-                                          child: Column(
-                                            children: [
-                                              HomeMyEvents(
-                                                onRefresh: onRefresh,
-                                                isHome: false,
-                                                onEventsCountChanged: (count) {
-                                                  setState(() {
-                                                    eventsCount = count;
-                                                  });
-                                                },
-                                                onDistinctSportsFetched: (sports) {
-                                                  setState(() {
-                                                    userSports = sports;
-                                                  });
-                                                  //debugPrint("userSports $userSports");
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        margin: const EdgeInsets.only(top: 16),
-                                        decoration: BoxDecoration(
-                                          color: Theme
-                                              .of(context)
-                                              .colorScheme
-                                              .primary
-                                              .withOpacity(0.03),
-                                          borderRadius: BorderRadius.circular(16),
-                                        ),
-                                        padding: const EdgeInsets.all(16),
-                                        child: PerformancesHandle(
-                                          sports: userSports,
-                                        ),
-                                      ),
-                                      Container(
-                                        margin: const EdgeInsets.only(top: 16),
-                                        decoration: BoxDecoration(
-                                          color: Theme
-                                              .of(context)
-                                              .colorScheme
-                                              .primary
-                                              .withOpacity(0.03),
-                                          borderRadius: BorderRadius.circular(16),
-                                        ),
-                                        padding: const EdgeInsets.all(16),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Notifications',
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 16),
-                                            ListView.builder(
-                                              shrinkWrap: true,
-                                              itemCount: labelNotifs.length,
-                                              itemBuilder: (context, index) {
-                                                final stat = labelNotifs[index];
-                                                return ListTile(
-                                                  dense: true,
-                                                  title: Text(stat),
-                                                  trailing: AnimatedToggleSwitch.dual(
-                                                    first: false,
-                                                    second: true,
-                                                    current: true,
-                                                    onChanged: (value) => setState(() {}),
-                                                    iconBuilder: (value) =>
-                                                    value
-                                                        ? const Icon(
-                                                      Icons.public,
-                                                      color: Colors.white,
-                                                    )
-                                                        : const Icon(
-                                                      Icons.lock,
-                                                      color: Colors.white,
-                                                    ),
-                                                    height: 40,
-                                                    style: ToggleStyle(
-                                                      indicatorColor: Colors.blue,
-                                                      borderColor: Colors.blue,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                      },
+                                    ))
                               ],
                             ),
                           ),
                         ),
-                      )
-                    ],
-                  ),
-                )
-              ],
+                        Flexible(
+                          flex: 4,
+                          child: Container(
+                            margin: const EdgeInsets.only(
+                              bottom: 16,
+                              left: 16,
+                              right: 16,
+                            ),
+                            child: DefaultTabController(
+                              length: 3,
+                              child: Column(
+                                children: [
+                                  Container(
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary
+                                          .withOpacity(0.5),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: TabBar(
+                                      indicatorSize: TabBarIndicatorSize.tab,
+                                      dividerColor: Colors.transparent,
+                                      indicator: BoxDecoration(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary
+                                            .withOpacity(0.2),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      labelColor: Colors.white,
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      tabs: [
+                                        Tab(
+                                          child: Text(
+                                            translate?.my_events_profile ??
+                                                'Mes events',
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        Tab(
+                                          child: Text(
+                                            translate?.performance ??
+                                                'Performances',
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        Tab(
+                                          child: Text(
+                                            translate?.settings ?? 'Paramètres',
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Flexible(
+                                    child: TabBarView(
+                                      children: [
+                                        Container(
+                                          margin:
+                                              const EdgeInsets.only(top: 16),
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary
+                                                .withOpacity(0.03),
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                          ),
+                                          padding: const EdgeInsets.all(16),
+                                          child: Center(
+                                            child: Column(
+                                              children: [
+                                                HomeMyEvents(
+                                                  onRefresh: onRefresh,
+                                                  isHome: false,
+                                                  onEventsCountChanged:
+                                                      (count) {
+                                                    setState(() {
+                                                      eventsCount = count;
+                                                    });
+                                                  },
+                                                  onDistinctSportsFetched:
+                                                      (sports) {
+                                                    setState(() {
+                                                      userSports = sports;
+                                                    });
+                                                    //debugPrint("userSports $userSports");
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          margin:
+                                              const EdgeInsets.only(top: 16),
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary
+                                                .withOpacity(0.03),
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                          ),
+                                          padding: const EdgeInsets.all(16),
+                                          child: PerformancesHandle(
+                                            sports: userSports,
+                                          ),
+                                        ),
+                                        Container(
+                                          margin:
+                                              const EdgeInsets.only(top: 16),
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary
+                                                .withOpacity(0.03),
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                          ),
+                                          padding: const EdgeInsets.all(16),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                translate?.notifs ??
+                                                    'Notifications',
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 16),
+                                              ListView.builder(
+                                                shrinkWrap: true,
+                                                itemCount: labelNotifs.length,
+                                                itemBuilder: (context, index) {
+                                                  final stat =
+                                                      labelNotifs[index];
+                                                  return ListTile(
+                                                    dense: true,
+                                                    title: Text(stat),
+                                                    trailing:
+                                                        AnimatedToggleSwitch
+                                                            .dual(
+                                                      first: false,
+                                                      second: true,
+                                                      current: true,
+                                                      onChanged: (value) =>
+                                                          setState(() {}),
+                                                      iconBuilder: (value) =>
+                                                          value
+                                                              ? const Icon(
+                                                                  Icons.public,
+                                                                  color: Colors
+                                                                      .white,
+                                                                )
+                                                              : const Icon(
+                                                                  Icons.lock,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                      height: 40,
+                                                      style: ToggleStyle(
+                                                        indicatorColor:
+                                                            Colors.blue,
+                                                        borderColor:
+                                                            Colors.blue,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
-        ),
-      );
-    },
+        );
+      },
     );
   }
 }
