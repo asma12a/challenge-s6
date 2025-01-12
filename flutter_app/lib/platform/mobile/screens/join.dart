@@ -5,7 +5,6 @@ import 'package:squad_go/core/services/event_service.dart';
 import 'package:squad_go/platform/mobile/widgets/event_card.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-
 class UpperCaseTextFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
@@ -32,6 +31,7 @@ class _JoinEventScreenState extends State<JoinEventScreen> {
   bool hasSearched = false;
 
   void _joinEvent() async {
+    final translate = AppLocalizations.of(context);
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       try {
@@ -49,7 +49,8 @@ class _JoinEventScreenState extends State<JoinEventScreen> {
           SnackBar(
             content: Text(
               textAlign: TextAlign.center,
-              "Aucun événement ne correspond à ce code.",
+              translate?.no_event_code ??
+                  "Aucun événement ne correspond à ce code.",
               style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
             ),
             backgroundColor: Theme.of(context).colorScheme.primary,
@@ -79,17 +80,18 @@ class _JoinEventScreenState extends State<JoinEventScreen> {
             child: TextFormField(
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Veuillez saisir une valeur.';
+                  return translate?.empty_val ?? 'Veuillez saisir une valeur.';
                 }
                 if (value.length < 6) {
-                  return 'Le code doit contenir 6 caractères.';
+                  return translate?.six_char_code ?? 'Le code doit contenir 6 caractères.';
                 }
                 return null;
               },
               decoration: InputDecoration(
                 border: const OutlineInputBorder(),
                 icon: const Icon(Icons.qr_code),
-                label: Text(translate?.input_code ?? 'Saisir le code de l\'événement'),
+                label: Text(
+                    translate?.input_code ?? 'Saisir le code de l\'événement'),
               ),
               onSaved: (value) {
                 _enteredCode = value!.toUpperCase();
@@ -123,7 +125,8 @@ class _JoinEventScreenState extends State<JoinEventScreen> {
           if (hasSearched && _event != null)
             EventCard(event: _event!, hasJoinedEvent: _event!.hasJoined),
           if (hasSearched && _event == null)
-            Text(translate?.no_events ?? "Aucun événement ne correspond à ce code."),
+            Text(translate?.no_events ??
+                "Aucun événement ne correspond à ce code."),
         ],
       ),
     );

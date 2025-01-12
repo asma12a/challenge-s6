@@ -147,10 +147,11 @@ class _SearchScreenState extends State<SearchScreen> {
                     items: [
                       DropdownMenuItem(
                         value: "match",
-                        child: Text("Match"),
+                        child: Text(translate?.match ?? "Match"),
                       ),
                       DropdownMenuItem(
-                          value: "training", child: Text("Training"))
+                          value: "training",
+                          child: Text(translate?.training ?? "Training"))
                     ],
                     onChanged: (String? value) {
                       params["type"] = value!;
@@ -166,8 +167,8 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
           Text(
             _searchResults.isNotEmpty
-                ? "${_searchResults.length} événements trouvés."
-                : translate?.no_events ?? "Aucun événement trouvé.",
+                ? "${_searchResults.length} ${_searchResults.length > 1 ? (translate?.event_found_plural ?? 'événements trouvés') : (translate?.event_found_singular ?? 'événement trouvé')}"
+                : translate?.no_events ?? "Aucun événement trouvé",
           ),
           SizedBox(
             height: 5,

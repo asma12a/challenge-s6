@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:squad_go/core/models/user_app.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class EditUserDialog extends StatefulWidget {
   final Future<void> Function(String name, String email)? onUpdateInfo;
@@ -44,6 +45,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
   }
 
   void _updateUserInfo() async {
+    final translate = AppLocalizations.of(context);
     if (_formKeyInfo.currentState!.validate()) {
       final name = nameController.text.trim();
       final email = emailController.text.trim();
@@ -65,12 +67,17 @@ class _EditUserDialogState extends State<EditUserDialog> {
           Navigator.of(context).pop();
 
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Informations utilisateur mises à jour !')),
+            SnackBar(
+                content: Text(translate?.user_infos_updated ??
+                    'Informations utilisateur mises à jour !')),
           );
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erreur : ${e.toString()}')),
+            SnackBar(
+              content: Text(
+                '${translate?.error ?? "Erreur:"} ${e.toString()}',
+              ),
+            ),
           );
         }
       }
@@ -78,6 +85,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
   }
 
   void _updateUserPassword() async {
+    final translate = AppLocalizations.of(context);
     if (_formKeyPassword.currentState!.validate()) {
       final password = passwordController.text.trim();
 
@@ -87,12 +95,16 @@ class _EditUserDialogState extends State<EditUserDialog> {
 
           // Afficher un message de succès
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Mot de passe mis à jour !')),
+            SnackBar(content: Text(translate?.updated_password ?? 'Mot de passe mis à jour !')),
           );
         } catch (e) {
           // Afficher un message d'erreur
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erreur : ${e.toString()}')),
+            SnackBar(
+              content: Text(
+                '${translate?.error ?? "Erreur:"} ${e.toString()}',
+              ),
+            ),
           );
         }
       }
@@ -101,6 +113,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     return Dialog(
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -109,7 +122,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              Text(translate?.edit_user_infos ??
                 'Modifier les informations utilisateur',
                 style: const TextStyle(
                   fontSize: 20,
@@ -125,13 +138,13 @@ class _EditUserDialogState extends State<EditUserDialog> {
                   children: [
                     TextFormField(
                       controller: nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Nom',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: translate?.name ?? 'Nom',
+                        border: const OutlineInputBorder(),
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return 'Veuillez entrer un nom.';
+                          return translate?.empty_user_name ?? 'Veuillez entrer un nom.';
                         }
                         return null;
                       },
@@ -139,16 +152,16 @@ class _EditUserDialogState extends State<EditUserDialog> {
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: emailController,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: translate?.email_label ?? 'Email',
+                        border: const OutlineInputBorder(),
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return 'Veuillez entrer une adresse email.';
+                          return translate?.empty_email ?? 'Veuillez entrer une adresse email.';
                         }
                         if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                          return 'Veuillez entrer une adresse email valide.';
+                          return translate?.valid_email ?? 'Veuillez entrer une adresse email valide.';
                         }
                         return null;
                       },
@@ -157,7 +170,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
                     ElevatedButton.icon(
                       onPressed: _updateUserInfo,
                       icon: const Icon(Icons.save),
-                      label: const Text('Sauvegarder'),
+                      label: Text(translate?.save_event ?? 'Sauvegarder'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         foregroundColor: Colors.white,
@@ -169,7 +182,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
 
               const SizedBox(height: 32),
 
-              Text(
+              Text(translate?.change_password ??
                 'Changer le mot de passe',
                 style: const TextStyle(
                   fontSize: 20,
@@ -186,16 +199,16 @@ class _EditUserDialogState extends State<EditUserDialog> {
                     TextFormField(
                       controller: passwordController,
                       obscureText: true,
-                      decoration: const InputDecoration(
-                        labelText: 'Nouveau mot de passe',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: translate?.new_password ?? 'Nouveau mot de passe',
+                        border: const OutlineInputBorder(),
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return 'Veuillez entrer un mot de passe.';
+                          return translate?.empty_password ?? 'Veuillez entrer un mot de passe.';
                         }
                         if (value.length < 6) {
-                          return 'Le mot de passe doit contenir au moins 6 caractères.';
+                          return translate?.six_char ?? 'Le mot de passe doit contenir au moins 6 caractères.';
                         }
                         return null;
                       },
@@ -204,7 +217,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
                     ElevatedButton.icon(
                       onPressed: _updateUserPassword,
                       icon: const Icon(Icons.lock),
-                      label: const Text('Changer mot de passe'),
+                      label: Text(translate?.change_password ?? 'Changer mot de passe'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         foregroundColor: Colors.white,

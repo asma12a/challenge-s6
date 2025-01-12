@@ -35,6 +35,8 @@ class _EditTeamDialogState extends State<EditTeamDialog> {
   }
 
   void _updateTeam() async {
+    final translate = AppLocalizations.of(context);
+
     if (!_formKey.currentState!.validate()) return;
     try {
       await teamService.updateTeam(widget.eventId, _team);
@@ -43,12 +45,16 @@ class _EditTeamDialogState extends State<EditTeamDialog> {
     } on AppException catch (e) {
       // Handle AppException error
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur: ${e.message}')),
+        SnackBar(
+          content: Text(
+            '${translate?.error ?? "Erreur:"} ${e.message}',
+          ),
+        ),
       );
     } catch (e) {
       // Handle other errors
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Une erreur est survenue')),
+        SnackBar(content: Text(translate?.error_occurred ?? 'Une erreur est survenue')),
       );
     }
   }
@@ -110,7 +116,7 @@ class _EditTeamDialogState extends State<EditTeamDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Modifier: ${_team.name}',
+                '${translate?.edit ?? "Modifier:"} ${_team.name}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -120,10 +126,10 @@ class _EditTeamDialogState extends State<EditTeamDialog> {
               ),
               TextFormField(
                 initialValue: _team.name,
-                decoration: InputDecoration(labelText: 'Nom'),
+                decoration: InputDecoration(labelText: translate?.name ?? 'Nom'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer un nom';
+                    return translate?.empty_team_name ?? 'Veuillez entrer un nom';
                   }
                   return null;
                 },
@@ -162,7 +168,7 @@ class _EditTeamDialogState extends State<EditTeamDialog> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                child: Text('Modifier'),
+                child: Text(translate?.edit ?? 'Modifier'),
               ),
               TextButton(
                 onPressed: () {
