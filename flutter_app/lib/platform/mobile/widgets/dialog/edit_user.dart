@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:squad_go/core/models/user_app.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
@@ -24,6 +25,8 @@ class _EditUserDialogState extends State<EditUserDialog> {
   late TextEditingController nameController;
   late TextEditingController emailController;
   final TextEditingController passwordController = TextEditingController();
+  bool _isPasswordVisible = false;
+  String? passwordErrorMessage;
 
   @override
   void initState() {
@@ -50,24 +53,9 @@ class _EditUserDialogState extends State<EditUserDialog> {
 
       if (widget.onUpdateInfo != null) {
         try {
-          // Appeler la fonction de mise à jour fournie
           await widget.onUpdateInfo!(name, email);
-
-          // Mettre à jour le contexte `AuthState`
-          final authState = context.read<AuthState>();
-          authState.setUser(UserApp(
-            id: authState.userInfo?.id ?? '',
-            name: name,
-            email: email,
-            roles: authState.userInfo?.roles ?? [],
-            apiToken: authState.userInfo!.apiToken,
-          ));
           Navigator.of(context).pop();
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Informations utilisateur mises à jour !')),
-          );
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Erreur : ${e.toString()}')),
@@ -84,16 +72,16 @@ class _EditUserDialogState extends State<EditUserDialog> {
       if (widget.onUpdatePassword != null) {
         try {
           await widget.onUpdatePassword!(password);
+          setState(() {
+            passwordErrorMessage = null;
+          });
+          await context.read<AuthState>().logout();
+          context.go('/sign-in');
 
-          // Afficher un message de succès
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Mot de passe mis à jour !')),
-          );
         } catch (e) {
-          // Afficher un message d'erreur
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erreur : ${e.toString()}')),
-          );
+          setState(() {
+            passwordErrorMessage = e.toString();
+          });
         }
       }
     }
@@ -185,10 +173,19 @@ class _EditUserDialogState extends State<EditUserDialog> {
                   children: [
                     TextFormField(
                       controller: passwordController,
-                      obscureText: true,
-                      decoration: const InputDecoration(
+                      obscureText: !_isPasswordVisible,
+                      onTapOutside: (event) => FocusScope.of(context).unfocus(),
+                      decoration: InputDecoration(
                         labelText: 'Nouveau mot de passe',
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                          icon: Icon(_isPasswordVisible ? Icons.visibility_off : Icons.visibility),
+                          onPressed: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
+                          },
+                        ),
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
@@ -200,6 +197,17 @@ class _EditUserDialogState extends State<EditUserDialog> {
                         return null;
                       },
                     ),
+                    if (passwordErrorMessage != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          passwordErrorMessage!,
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
                     const SizedBox(height: 16),
                     ElevatedButton.icon(
                       onPressed: _updateUserPassword,

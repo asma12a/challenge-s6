@@ -58,7 +58,7 @@ class _AccountScreenState extends State<AccountScreen> {
         throw Exception('ID utilisateur introuvable.');
       }
 
-      final response = await UserService.updateUser(userId, {
+      await UserService.updateSelfUser(userId, {
         'name': name,
         'email': email,
       });
@@ -85,21 +85,23 @@ class _AccountScreenState extends State<AccountScreen> {
     try {
       final authState = context.read<AuthState>();
 
-      // Mettre à jour le backend avec UserService
       final userId = authState.userInfo?.id ?? '';
       if (userId.isEmpty) {
         throw Exception('ID utilisateur introuvable.');
       }
 
-      await UserService.updateUser(userId, {'password': password});
-
+      await UserService.updateUserPassword(userId, {'password': password});
+      Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Mot de passe mis à jour avec succès !')),
       );
+
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur : ${e.toString()}')),
-      );
+      var errorMessage = e.toString();
+      if (e is Exception) {
+        errorMessage = e.toString().replaceFirst('Exception: ', '');
+      }
+      throw errorMessage;
     }
   }
 

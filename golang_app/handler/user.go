@@ -24,7 +24,8 @@ func UserHandler(app fiber.Router, ctx context.Context, service service.User) {
 	app.Get("/:userId", middleware.IsAdminOrSelfAuthMiddleware, getUser(ctx, service))
 	app.Post("/", middleware.IsAdminMiddleware, createUser(ctx, service))
 	app.Put("/:userId/password", middleware.IsAdminOrSelfAuthMiddleware, updateUserPassword(ctx, service))
-	app.Put("/:userId", middleware.IsAdminOrSelfAuthMiddleware, updateUser(ctx, service))
+	app.Put("/:userId", middleware.IsAdminMiddleware, updateUserForAdmin(ctx, service))
+	app.Put("/:userId/user", middleware.IsSelfAuthMiddleware, updateUser(ctx, service))
 	app.Delete("/:userId", middleware.IsAdminMiddleware, deleteUser(ctx, service))
 }
 
@@ -131,7 +132,7 @@ func getUser(ctx context.Context, service service.User) fiber.Handler {
 	}
 }
 
-func updateUser(ctx context.Context, service service.User) fiber.Handler {
+func updateUserForAdmin(ctx context.Context, service service.User) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		id, err := ulid.Parse(c.Params("userId"))
 		if err != nil {
@@ -173,27 +174,27 @@ func updateUser(ctx context.Context, service service.User) fiber.Handler {
 		user.Name = userInput.Name
 		user.Email = userInput.Email
 
-		if userInput.Password != "" {
-			if err := passwordValidator.Validate(userInput.Password, 60); err != nil {
-				return c.Status(fiber.StatusUnprocessableEntity).JSON(&fiber.Map{
-					"status": "error",
-					"error":  entity.ErrPasswordNotStrong.Error(),
-				})
+			if userInput.Password != "" {
+				if err := passwordValidator.Validate(userInput.Password, 60); err != nil {
+					return c.Status(fiber.StatusUnprocessableEntity).JSON(&fiber.Map{
+						"status": "error",
+						"error":  entity.ErrPasswordNotStrong.Error(),
+					})
+				}
+	
+				hashedPassword, err := user.GeneratePassword(userInput.Password)
+				if err != nil {
+					return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+						"status": "error",
+						"error":  err.Error(),
+					})
+				}
+				user.Password = hashedPassword
 			}
-
-			hashedPassword, err := user.GeneratePassword(userInput.Password)
-			if err != nil {
-				return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-					"status": "error",
-					"error":  err.Error(),
-				})
+	
+			if slices.Contains(user.Roles, "admin") && userInput.Roles != nil {
+				user.Roles = userInput.Roles
 			}
-			user.Password = hashedPassword
-		}
-
-		if slices.Contains(user.Roles, "admin") && userInput.Roles != nil {
-			user.Roles = userInput.Roles
-		}
 
 		updatedUser, err := service.Update(c.UserContext(), user)
 		if err != nil {
@@ -246,6 +247,63 @@ func updateUser(ctx context.Context, service service.User) fiber.Handler {
 	}
 }
 
+func updateUser(ctx context.Context, service service.User) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id, err := ulid.Parse(c.Params("userId"))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  entity.ErrInvalidID.Error(),
+			})
+		}
+
+		var userInput *entity.User
+
+		if err := c.BodyParser(&userInput); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+
+		if err := validate.Struct(userInput); err != nil {
+			return c.Status(fiber.StatusUnprocessableEntity).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+
+		user, err := service.FindOne(ctx, id)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+
+		user.Name = userInput.Name
+		user.Email = userInput.Email
+
+
+
+		updatedUser, err := service.Update(c.UserContext(), user)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+
+		return c.JSON(fiber.Map{
+			"status":  "success",
+			"message": "User updated",
+			"data":    updatedUser,
+		})
+	}
+}
+
+
+
 func updateUserPassword(ctx context.Context, service service.User) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		id, err := ulid.Parse(c.Params("userId"))
@@ -257,7 +315,7 @@ func updateUserPassword(ctx context.Context, service service.User) fiber.Handler
 		}
 
 		var userInput struct {
-			Password string `json:"password" validate:"required"`
+			Password string `json:"password,omitempty"`
 		}
 
 		if err := c.BodyParser(&userInput); err != nil {

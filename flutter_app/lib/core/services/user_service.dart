@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/models/user_app.dart';
 import 'package:squad_go/core/utils/constants.dart';
@@ -114,6 +115,79 @@ class UserService {
       }
     } catch (error) {
       throw Exception('Erreur: ${error.toString()}');
+    }
+  }
+
+  static Future<void> updateSelfUser(
+      String id, Map<String, dynamic> updates) async {
+    final storage = const FlutterSecureStorage();
+    final token = await storage.read(key: Constants.jwtStorageToken);
+
+    final Uri url = Uri.parse('${Constants.apiBaseUrl}/api/users/$id/user');
+
+    try {
+      final response = await dio.put(
+        url.toString(),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer $token",
+          },
+        ),
+        data: json.encode(updates),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception(
+            'Erreur lors de la mise à jour de l\'utilisateur : ${response.data}');
+      }
+    } catch (error) {
+      throw Exception('Erreur: ${error.toString()}');
+    }
+  }
+
+  static Future<void> updateUserPassword(
+      String id, Map<String, dynamic> updates) async {
+    final storage = const FlutterSecureStorage();
+    final token = await storage.read(key: Constants.jwtStorageToken);
+
+    final Uri url = Uri.parse('${Constants.apiBaseUrl}/api/users/$id/password');
+
+    try {
+      final response = await dio.put(
+        url.toString(),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer $token",
+          },
+        ),
+        data: json.encode(updates),
+      );
+
+
+      if (response.statusCode != 200) {
+        throw Exception(
+            'Erreur lors de la mise à jour de l\'utilisateur : ${response.data}');
+      }
+    } catch (error) {
+      debugPrint("Erreur service error ");
+      if (error is DioError) {
+        if (error.response != null && error.response!.data is Map<String, dynamic>) {
+          final errorResponse = error.response!.data as Map<String, dynamic>;
+
+          String errorMessage = errorResponse['error'] ?? 'Erreur inconnue';
+          debugPrint("DioError: $errorMessage");
+          throw Exception(errorMessage);
+        } else {
+          debugPrint("DioError Message: ${error.message}");
+          throw Exception("Erreur lors de la requête : ${error.message}");
+        }
+      } else {
+        debugPrint("Autre erreur: ${error.toString()}");
+        throw Exception('Erreur: ${error.toString()}');
+      }
+
     }
   }
 }
