@@ -37,8 +37,6 @@ class _EditTeamDialogState extends State<EditTeamDialog> {
   void _updateTeam() async {
     final translate = AppLocalizations.of(context);
 
-    final translate = AppLocalizations.of(context);
-
     if (!_formKey.currentState!.validate()) return;
     try {
       await teamService.updateTeam(widget.eventId, _team);
