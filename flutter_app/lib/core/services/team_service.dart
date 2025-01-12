@@ -62,6 +62,27 @@ class TeamService {
     }
   }
 
+  Future<void> deleteTeam(String eventID, String teamID) async {
+    final token = await storage.read(key: Constants.jwtStorageToken);
+
+    try {
+      final url = '${Constants.apiBaseUrl}/api/events/$eventID/teams/$teamID';
+
+      await dio.delete(url.toString(),
+          options: Options(
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': "Bearer $token",
+            },
+          ));
+
+      await initialCacheOptions.store!
+          .delete('${Constants.apiBaseUrl}/api/events/$eventID');
+    } catch (error) {
+      throw AppException(message: 'Failed to delete team, please try again.');
+    }
+  }
+
   Future<void> joinTeam(String eventID, String teamID) async {
     final token = await storage.read(key: Constants.jwtStorageToken);
 

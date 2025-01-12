@@ -18,7 +18,9 @@ require (
 )
 
 require (
+	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 // indirect
 	github.com/fasthttp/websocket v1.5.10 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
@@ -31,6 +33,7 @@ require (
 	github.com/savsgio/gotils v0.0.0-20240704082632-aef3928b8a38 // indirect
 	github.com/swaggo/files v1.0.1 // indirect
 	github.com/ziutek/mymysql v1.5.4 // indirect
+	golang.org/x/oauth2 v0.25.0 // indirect
 	golang.org/x/tools v0.28.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

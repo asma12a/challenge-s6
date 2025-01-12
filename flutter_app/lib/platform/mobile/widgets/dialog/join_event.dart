@@ -4,6 +4,8 @@ import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/services/event_service.dart';
 import 'package:squad_go/core/services/team_service.dart';
 import 'package:squad_go/main.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 class JoinEventDialog extends StatefulWidget {
   final String eventId;
@@ -61,21 +63,24 @@ class _JoinEventDialogState extends State<JoinEventDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
     return Dialog(
       child: Container(
         padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Rejoindre: ${event?.name}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                )),
+            Text(
+              '${translate?.join_button ?? "Rejoindre"}: ${event?.name ?? ""}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 16),
-            Text('Choisissez votre équipe:'),
+            Text(translate?.choose_team ?? 'Choisissez votre équipe:'),
             const SizedBox(height: 16),
             SizedBox(
               height: 75 * MediaQuery.of(context).devicePixelRatio,
@@ -85,8 +90,7 @@ class _JoinEventDialogState extends State<JoinEventDialog> {
                           ?.map((team) => RadioListTile<String>(
                                 title: Text(team.name),
                                 subtitle: Text(
-                                  '${team.players.length}${team.maxPlayers > 0 ? '/${team.maxPlayers}' : ''} sportifs',
-                                ),
+                                  '${team.players.length}${team.maxPlayers > 0 ? '/${team.maxPlayers}' : ''} ${translate?.sporty ?? "sportifs"}',                                ),
                                 value: team.id,
                                 groupValue: _selectedTeamId,
                                 onChanged: (String? newValue) {
@@ -112,7 +116,7 @@ class _JoinEventDialogState extends State<JoinEventDialog> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 24, vertical: 12),
                   ),
-                  child: const Text('Annuler'),
+                  child: Text(translate?.cancel ?? 'Annuler'),
                 ),
                 const SizedBox(width: 16),
                 ElevatedButton(
@@ -126,7 +130,7 @@ class _JoinEventDialogState extends State<JoinEventDialog> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 24, vertical: 12),
                   ),
-                  child: const Text('Rejoindre'),
+                  child: Text(translate?.join_button ?? 'Rejoindre'),
                 ),
               ],
             ),

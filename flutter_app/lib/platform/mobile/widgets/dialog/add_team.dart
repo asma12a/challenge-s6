@@ -21,6 +21,7 @@ class _AddTeamDialogState extends State<AddTeamDialog> {
   int? _maxPlayers;
 
   void _createTeam() async {
+    final translate = AppLocalizations.of(context);
     if (_teamName == null || !_formKey.currentState!.validate()) return;
     try {
       await teamService.createTeam(widget.eventId, _teamName!, _maxPlayers);
@@ -29,12 +30,20 @@ class _AddTeamDialogState extends State<AddTeamDialog> {
     } on AppException catch (e) {
       // Handle AppException error
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur: ${e.message}')),
+        SnackBar(
+          content: Text(
+            '${translate?.error ?? "Erreur:"} ${e.message}',
+          ),
+        ),
       );
     } catch (e) {
       // Handle other errors
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Une erreur est survenue')),
+        SnackBar(
+          content: Text(
+            translate?.error ?? "Erreur:",
+          ),
+        ),
       );
     }
   }
@@ -50,8 +59,8 @@ class _AddTeamDialogState extends State<AddTeamDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(translate?.new_team ??
-                'Nouvelle équipe',
+              Text(
+                translate?.new_team ?? 'Nouvelle équipe',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -61,10 +70,10 @@ class _AddTeamDialogState extends State<AddTeamDialog> {
               ),
               SizedBox(height: 16),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Nom de l\'équipe'),
+                decoration: InputDecoration(labelText: translate?.team_name ?? 'Nom de l\'équipe'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer un nom d\'équipe';
+                    return translate?.empty_team_name ?? 'Veuillez entrer un nom d\'équipe';
                   }
                   return null;
                 },
@@ -74,7 +83,8 @@ class _AddTeamDialogState extends State<AddTeamDialog> {
                 },
               ),
               TextFormField(
-                decoration: InputDecoration(labelText: translate?.nb_players ?? 'Nombre de joueurs'),
+                decoration: InputDecoration(
+                    labelText: translate?.nb_players ?? 'Nombre de joueurs'),
                 keyboardType: TextInputType.number,
                 onChanged: (value) => _maxPlayers = int.tryParse(value),
                 onTapOutside: (event) {
@@ -96,7 +106,7 @@ class _AddTeamDialogState extends State<AddTeamDialog> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                child: Text('Créer l\'équipe'),
+                child: Text(translate?.create_team ?? 'Créer l\'équipe'),
               ),
             ],
           ),

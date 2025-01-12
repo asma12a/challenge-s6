@@ -142,8 +142,19 @@ func (repo *Team) Update(ctx context.Context, t *entity.Team) (*entity.Team, err
 // @Success 200 {object} map[string]interface{} "Team deleted"
 // @Failure 404 {object} map[string]interface{} "Team Not Found"
 // @Router /teams/{id} [delete]
-func (t *Team) Delete(ctx context.Context, id ulid.ID) error {
-	err := t.db.Team.DeleteOneID(id).Exec(ctx)
+func (t *Team) Delete(ctx context.Context, teamID, eventID ulid.ID) error {
+	// Check if there are other teams in the event
+	teams, err := t.db.Team.Query().Where(team.HasEventWith(event.IDEQ(eventID))).All(ctx)
+	if err != nil {
+		return err
+	}
+
+	if len(teams) <= 1 {
+		return entity.ErrCannotBeDeleted
+	}
+
+	// Proceed to delete the team
+	err = t.db.Team.DeleteOneID(teamID).Exec(ctx)
 	if err != nil {
 		return entity.ErrCannotBeDeleted
 	}

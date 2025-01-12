@@ -34,7 +34,7 @@ class _PerformancesHandleState extends State<PerformancesHandle> {
       // Si l'utilisateur n'a aucun sport, afficher un message avec le translate.
       return Center(
         child: Text(
-          translate?.no_performance_available ?? 'Aucune performance disponible',
+          translate?.no_perf ?? 'Aucune performance disponible',
         ),
       );
     }

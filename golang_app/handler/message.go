@@ -285,7 +285,7 @@ func listMessagesByEvent(ctx context.Context, serviceMessage service.MessageServ
 			}
 		}
 
-		c.Set("Cache-Control", "public, max-age=3600") // Cache for 1h
+		c.Set("Cache-Control", "public, max-age=3600")
 		// Retourner les messages au format JSON
 		return c.JSON(toJ)
 	}

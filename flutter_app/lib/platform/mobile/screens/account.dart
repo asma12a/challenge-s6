@@ -27,6 +27,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
   Future<void> onRefresh() async {}
   int eventsCount = 0;
+
   List<Sport> userSports = [];
   List<String> labelNotifs = ["Évenements recommandés", "Évenement 1jour avant", "Personne invité inscrite"];
 
@@ -49,9 +50,9 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   Future<void> _updateUserInfo(BuildContext context, String name, String email) async {
+    final translate = AppLocalizations.of(context);
     try {
       final authState = context.read<AuthState>();
-
       // Mettre à jour le backend avec UserService
       final userId = authState.userInfo?.id ?? '';
       if (userId.isEmpty) {
@@ -70,13 +71,9 @@ class _AccountScreenState extends State<AccountScreen> {
         roles: authState.userInfo?.roles ?? [],
         apiToken: authState.userInfo!.apiToken,
       ));
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Utilisateur mis à jour avec succès !')),
-      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur : ${e.toString()}')),
+        SnackBar(content: Text('${translate?.error ?? 'Erreur'} : ${e.toString()}')),
       );
     }
   }
@@ -92,10 +89,6 @@ class _AccountScreenState extends State<AccountScreen> {
 
       await UserService.updateUserPassword(userId, {'password': password});
       Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Mot de passe mis à jour avec succès !')),
-      );
-
     } catch (e) {
       var errorMessage = e.toString();
       if (e is Exception) {
@@ -154,12 +147,8 @@ class _AccountScreenState extends State<AccountScreen> {
                                                 ),
                                           ),
                                           const SizedBox(height: 8),
-                                          if (eventsCount > 0) // Vérification si eventsCount est supérieur à 0
-                                            Text(
-                                              translate?.events_participated(eventsCount) ??
-                                                  "A participé à $eventsCount événement${eventsCount > 1 ? 's' : ''}",
-                                              style: Theme.of(context).textTheme.bodyMedium,
-                                            ),
+                                          Text('${translate?.participated_to ?? 'A participé à'} $eventsCount '
+                                              '${eventsCount == 1 ? translate?.event_singular ?? 'événement' : translate?.event_plural ?? 'événements'}')
                                         ]),
                                   ),
                                 ),
@@ -305,7 +294,8 @@ class _AccountScreenState extends State<AccountScreen> {
                                                   ),
                                                   const SizedBox(width: 8),
                                                   Text(
-                                                    'Notifications',
+                                                    translate?.notifs ??
+                                                        'Notifications',
                                                     style: TextStyle(
                                                       fontSize: 18,
                                                       fontWeight: FontWeight.bold,
@@ -327,10 +317,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                                     margin: const EdgeInsets.symmetric(vertical: 8),
                                                     padding: const EdgeInsets.symmetric(horizontal: 8),
                                                     decoration: BoxDecoration(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .primary
-                                                          .withAlpha(20),
+                                                      color: Theme.of(context).colorScheme.primary.withAlpha(20),
                                                       borderRadius: BorderRadius.circular(16),
                                                     ),
                                                     child: ListTile(

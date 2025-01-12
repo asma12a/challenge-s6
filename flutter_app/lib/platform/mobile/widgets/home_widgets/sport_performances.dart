@@ -57,10 +57,10 @@ class _SportPerformancesState extends State<SportPerformances> {
           children: [
             if (nbEvents != 0) ...[
               Text(
-                'Nombre d\'événements : $nbEvents',
+                '${translate?.nb_events ?? "Nombre d\'événements :"} $nbEvents',
                 style: const TextStyle(fontSize: 16),
               ),
-              const SizedBox(height: 16)
+              const SizedBox(height: 16),
             ],
             if (stats.isNotEmpty)
               ListView.builder(
@@ -86,8 +86,8 @@ class _SportPerformancesState extends State<SportPerformances> {
                 },
               )
             else
-              Text(translate?.no_performance_available ?? 'Aucune performance disponible'),
-
+              Text(translate?.no_perf ?? 'Aucune performance disponible.',
+                  style: const TextStyle(fontSize: 16)),
           ],
         ));
   }

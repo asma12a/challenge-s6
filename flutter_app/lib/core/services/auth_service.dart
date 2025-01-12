@@ -11,6 +11,7 @@ class AuthService {
   Future<Map<String, dynamic>> signIn(body) async {
     try {
       final uri = '${Constants.apiBaseUrl}/api/auth/login';
+      print(uri);
 
       final response = await dio.post(
         uri,

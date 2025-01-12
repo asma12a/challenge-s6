@@ -7,6 +7,7 @@ import 'package:squad_go/main.dart';
 import '../../../core/services/chat_service.dart';
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ChatPage extends StatefulWidget {
   final String eventID; // On passe l'ID de l'événement à la page
@@ -27,6 +28,7 @@ class _ChatPageState extends State<ChatPage>
 
   @override
   void initState() {
+    final translate = AppLocalizations.of(context);
     super.initState();
     _loadCurrentUser();
 
@@ -42,7 +44,9 @@ class _ChatPageState extends State<ChatPage>
       final content = data['content'] as String;
 
       setState(() {
-        _messages.add(isSelf ? 'Moi: $content' : 'Autre: $content');
+        _messages.add(isSelf
+            ? '${translate?.me ?? 'Moi'}: $content'
+            : '${translate?.other ?? 'Autre'}: $content');
       });
     };
 
@@ -97,6 +101,7 @@ class _ChatPageState extends State<ChatPage>
   }
 
   Future<void> _loadMessages(String eventID) async {
+    final translate = AppLocalizations.of(context);
     if (_currentUserId.isEmpty) {
       debugPrint(
           'L\'ID utilisateur n\'est pas initialisé. Impossible de charger les messages.');
@@ -126,7 +131,9 @@ class _ChatPageState extends State<ChatPage>
           final isSelf = userId == _currentUserId;
 
           setState(() {
-            _messages.add(isSelf ? 'Moi: $content' : '$userName: $content');
+            _messages.add(isSelf
+                ? '${translate?.me ?? 'Moi'}: $content'
+                : '$userName: $content');
           });
         }
       } else {
@@ -177,7 +184,7 @@ class _ChatPageState extends State<ChatPage>
   @override
   Widget build(BuildContext context) {
     var isOnline = context.watch<ConnectivityState>().isConnected;
-
+    final translate = AppLocalizations.of(context);
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) => SlideTransition(
@@ -209,10 +216,10 @@ class _ChatPageState extends State<ChatPage>
                     final isSelf = message.startsWith('Moi:');
                     // Récupérer le nom de l'utilisateur qui a envoyé le message
                     final userName = isSelf
-                        ? 'Moi' // Si c'est l'utilisateur actuel, afficher "Moi"
-                        : message.split(':')[
-                            0]; // Sinon, afficher le nom de l'utilisateur récupéré
-
+                        ? translate?.me ??
+                            'Moi' // Utilise la traduction pour "Moi"
+                        : message.split(
+                            ':')[0]; // Sinon, récupère le nom de l'utilisateur
                     return Align(
                       alignment:
                           isSelf ? Alignment.centerRight : Alignment.centerLeft,
@@ -244,11 +251,15 @@ class _ChatPageState extends State<ChatPage>
                             ),
                             child: Text(
                               isSelf
-                                  ? message.replaceFirst('Moi: ', '')
-                                  : message.replaceFirst('$userName: ',
-                                      ''), // Afficher le message sans le nom
+                                  ? message.replaceFirst(
+                                      '${translate?.me ?? 'Moi'}: ',
+                                      '') // Remplace "Moi" par la traduction
+                                  : message.replaceFirst('$userName: ', ''),
+                              // Sinon, retire le nom de l'utilisateur
                               style: const TextStyle(
-                                  fontSize: 16, color: Colors.black),
+                                fontSize: 16,
+                                color: Colors.black,
+                              ),
                             ),
                           ),
                         ],
@@ -268,7 +279,8 @@ class _ChatPageState extends State<ChatPage>
                       controller: _controller,
                       style: const TextStyle(color: Colors.black),
                       decoration: InputDecoration(
-                        hintText: 'Entrez un message...',
+                        hintText:
+                            translate?.enter_message ?? 'Entrez un message...',
                         hintStyle: const TextStyle(color: Colors.grey),
                         filled: true,
                         fillColor: Colors.white,

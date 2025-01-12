@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/models/sport.dart';
 import 'package:intl/intl.dart';
+import 'package:squad_go/core/providers/connectivity_provider.dart';
 import 'package:squad_go/core/utils/tools.dart';
 import 'package:squad_go/platform/mobile/widgets/custom_label.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/join_event.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:squad_go/platform/mobile/widgets/dialog/offline.dart';
 
 class EventCard extends StatelessWidget {
   final Event event;
@@ -21,6 +24,7 @@ class EventCard extends StatelessWidget {
   });
 
   void onCardClick(BuildContext context) {
+    final isOnline = context.read<ConnectivityState>().isConnected;
     if (hasJoinedEvent) {
       if (event.id == null) return;
 
@@ -28,6 +32,14 @@ class EventCard extends StatelessWidget {
     } else {
       // Show the join event dialog/modal
       if (event.id == null) return;
+
+      if (!isOnline) {
+        showDialog(
+          context: context,
+          builder: (context) => const OfflineDialog(),
+        );
+        return;
+      }
 
       showDialog(
         context: context,

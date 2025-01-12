@@ -81,8 +81,11 @@ class _NewEventState extends State<NewEvent> {
   }
 
   String? _validateAddress(String? value) {
+    final translate = AppLocalizations.of(context);
+
     if (value == null || value.isEmpty) {
-      return 'Le champ adresse ne peut pas être vide.';
+      return translate?.empty_address ??
+          'Le champ adresse ne peut pas être vide.';
     }
     return null;
   }
@@ -108,6 +111,7 @@ class _NewEventState extends State<NewEvent> {
   }
 
   void _saveEvent() async {
+    final translate = AppLocalizations.of(context);
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       if (_selectedDate == null || _selectedDate!.isEmpty) {
@@ -116,7 +120,7 @@ class _NewEventState extends State<NewEvent> {
           SnackBar(
             content: Text(
               textAlign: TextAlign.center,
-              "Veuillez renseigner une date.",
+              translate?.empty_date ?? "Veuillez renseigner une date.",
               style: TextStyle(color: Theme.of(context).colorScheme.onError),
             ),
             backgroundColor: Theme.of(context).colorScheme.error,
@@ -141,7 +145,8 @@ class _NewEventState extends State<NewEvent> {
           SnackBar(
             content: Text(
               textAlign: TextAlign.center,
-              "L'événement a bien été enregistré.",
+              translate?.event_saved_success ??
+                  "L'événement a bien été enregistré.",
               style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
             ),
             backgroundColor: Theme.of(context).colorScheme.primary,
@@ -159,7 +164,8 @@ class _NewEventState extends State<NewEvent> {
           SnackBar(
             content: Text(
               textAlign: TextAlign.center,
-              "Serveur indisponible. Veuillez réessayer plus tard.",
+              translate?.server_error ??
+                  "Serveur indisponible. Veuillez réessayer plus tard.",
               style: TextStyle(color: Theme.of(context).colorScheme.onError),
             ),
             backgroundColor: Theme.of(context).colorScheme.error,
@@ -200,7 +206,8 @@ class _NewEventState extends State<NewEvent> {
                               value.isEmpty ||
                               value.trim().length <= 1 ||
                               value.trim().length > 50) {
-                            return 'Doit contenir entre 1 et 50 caractères.';
+                            return translate?.fifty_char ??
+                                'Doit contenir entre 1 et 50 caractères.';
                           }
                           return null;
                         },
@@ -277,8 +284,8 @@ class _NewEventState extends State<NewEvent> {
                             Icon(Icons.public),
                             SizedBox(width: 15),
                             Checkbox(
-                              value:
-                                  _isPublic, // Utilise la valeur actuelle de _isPublic
+                              value: _isPublic,
+                              // Utilise la valeur actuelle de _isPublic
                               onChanged: (bool? value) {
                                 setState(() {
                                   _isPublic = value!;
@@ -324,7 +331,8 @@ class _NewEventState extends State<NewEvent> {
                               child: DropdownButtonFormField(
                                 validator: (value) {
                                   if (value == null) {
-                                    return 'Veuillez sélectionner un type.';
+                                    return translate?.empty_type ??
+                                        'Veuillez sélectionner un type.';
                                   }
                                   return null;
                                 },
@@ -352,7 +360,7 @@ class _NewEventState extends State<NewEvent> {
                                   DropdownMenuItem(
                                     value: "match",
                                     child: Text(
-                                      "Match",
+                                      translate?.match ?? "Match",
                                       style: TextStyle(
                                           color: Theme.of(context)
                                               .colorScheme
@@ -362,7 +370,7 @@ class _NewEventState extends State<NewEvent> {
                                   DropdownMenuItem(
                                     value: "training",
                                     child: Text(
-                                      "Training",
+                                      translate?.training ?? "Training",
                                       style: TextStyle(
                                           color: Theme.of(context)
                                               .colorScheme
@@ -390,7 +398,8 @@ class _NewEventState extends State<NewEvent> {
                               child: DropdownButtonFormField(
                                 validator: (value) {
                                   if (value == null) {
-                                    return 'Veuillez sélectionner un sport.';
+                                    return translate?.empty_sport ??
+                                        'Veuillez sélectionner un sport.';
                                   }
                                   return null;
                                 },

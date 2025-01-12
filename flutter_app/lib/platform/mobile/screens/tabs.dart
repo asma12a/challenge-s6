@@ -13,6 +13,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class TabsScreen extends StatefulWidget {
   final int? initialPageIndex;
   final bool? shouldRefresh;
+
   const TabsScreen({super.key, this.initialPageIndex, this.shouldRefresh});
 
   @override
@@ -75,7 +76,8 @@ class _TabsScreenState extends State<TabsScreen> {
                     color: Theme.of(context).colorScheme.onPrimary),
                 const SizedBox(width: 10),
                 Text(
-                  "Vous n'êtes pas connecté à internet.",
+                  translate?.no_internet ??
+                      "Vous n'êtes pas connecté à internet.",
                   style:
                       TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                 ),
@@ -132,9 +134,9 @@ class _TabsScreenState extends State<TabsScreen> {
             icon: const Icon(Icons.qr_code),
             label: translate?.tabs_join ?? 'Rejoindre',
           ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.person),
+            label: translate?.tabs_profile ?? 'Profile',
           ),
         ],
       ),
