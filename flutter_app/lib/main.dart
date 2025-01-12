@@ -10,6 +10,9 @@ import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 
 final log = Logger("AppLogger");
 final dio = Dio(BaseOptions(
+  validateStatus: (status) {
+    return status! < 500; // Permet de recevoir les réponses 4xx sans exception.
+  },
   connectTimeout: Duration(seconds: 30),
   receiveTimeout: Duration(seconds: 30),
   headers: {

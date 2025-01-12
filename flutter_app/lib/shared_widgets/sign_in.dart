@@ -87,13 +87,15 @@ class __FormContentState extends State<_FormContent> {
       GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser != null) {
         // Vous pouvez obtenir un token ou l'ID de l'utilisateur
-        final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+        final GoogleSignInAuthentication googleAuth =
+            await googleUser.authentication;
         final accessToken = googleAuth.accessToken;
         final idToken = googleAuth.idToken;
-        
+
         // Connectez-vous à votre backend avec l'accessToken/idToken si nécessaire
         // Par exemple, vous pouvez les envoyer au backend pour validation
-        context.go('/home'); // Redirige vers la page d'accueil après la connexion
+        context
+            .go('/home'); // Redirige vers la page d'accueil après la connexion
       }
     } catch (error) {
       // Gérer les erreurs de connexion
@@ -106,28 +108,46 @@ class __FormContentState extends State<_FormContent> {
   }
 
   void _signIn(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
+    final translate = AppLocalizations.of(context);
+    try {
+      if (_formKey.currentState!.validate()) {
+        _formKey.currentState!.save();
 
-      final loginData = await context
-          .read<AuthState>()
-          .login(_enteredEmail, _enteredPassword);
-      if (loginData['status'] == 'error') {
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            content: Text(
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.onErrorContainer),
-              loginData['error'],
-              textAlign: TextAlign.center,
+        final loginData = await context
+            .read<AuthState>()
+            .login(_enteredEmail, _enteredPassword);
+
+        if (loginData['status'] == 'error') {
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Theme.of(context).colorScheme.errorContainer,
+              content: Text(
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onErrorContainer),
+                loginData['error'],
+                textAlign: TextAlign.center,
+              ),
             ),
-          ),
-        );
-      } else {
-        context.go('/home');
+          );
+        } else {
+          context.go('/home');
+        }
       }
+    } catch (e) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Theme.of(context).colorScheme.errorContainer,
+          content: Text(
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onErrorContainer),
+            translate?.error_occurred ??
+                'Une erreur est survenue, veuillez réessayer.',
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
     }
   }
 
@@ -257,7 +277,8 @@ class __FormContentState extends State<_FormContent> {
                       borderRadius: BorderRadius.circular(4)),
                 ),
                 onPressed: () async {
-                  await _signInWithGoogle(context); // Authentification via Google
+                  await _signInWithGoogle(
+                      context); // Authentification via Google
                 },
                 child: const Padding(
                   padding: EdgeInsets.all(10.0),

@@ -147,7 +147,9 @@
   "event_saved_success": "Die Veranstaltung wurde erfolgreich aufgezeichnet.",
   "server_error": "Server nicht verfügbar. Bitte versuchen Sie es später erneut.",
   "match": "Übereinstimmen",
-  "training": "Ausbildung"
+  "training": "Ausbildung",
+  "email_sent": "Eine Bestätigungs-E-Mail wurde Ihnen gesendet."
+
 
 
 

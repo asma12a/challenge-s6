@@ -147,7 +147,8 @@
   "event_saved_success": "L'événement a bien été enregistré.",
   "server_error": "Serveur indisponible. Veuillez réessayer plus tard.",
   "match": "Match",
-  "training": "Training"
+  "training": "Training",
+  "email_sent": "Un email de vérification vous a été envoyé."
 
 
 }

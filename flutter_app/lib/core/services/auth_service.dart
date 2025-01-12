@@ -8,6 +8,7 @@ import 'package:squad_go/main.dart';
 class AuthService {
   final _storage = const FlutterSecureStorage();
 
+
   Future<Map<String, dynamic>> signIn(body) async {
     try {
       final uri = '${Constants.apiBaseUrl}/api/auth/login';
@@ -51,7 +52,6 @@ class AuthService {
       if (response.statusCode == 201) {
         return null;
       }
-
       return response.data;
     } catch (error) {
       log.severe('An error occurred while ', {error: error});

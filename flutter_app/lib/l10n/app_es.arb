@@ -147,7 +147,9 @@
   "event_saved_success": "El evento ha sido grabado exitosamente.",
   "server_error": "Servidor no disponible. Por favor, inténtelo de nuevo más tarde.",
   "match": "Fósforo",
-  "training": "Capacitación"
+  "training": "Capacitación",
+  "email_sent": "Se le ha enviado un correo electrónico de verificación."
+
 
 
 

@@ -83,6 +83,7 @@ class __FormContentState extends State<_FormContent> {
   var _enteredPassword = '';
 
   void _signUp() async {
+<<<<<<< Updated upstream
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       final result = await authService.signUp(
@@ -103,21 +104,63 @@ class __FormContentState extends State<_FormContent> {
               textAlign: TextAlign.center,
             ),
           ),
+=======
+    final translate = AppLocalizations.of(context);
+    try {
+      if (_formKey.currentState!.validate()) {
+        _formKey.currentState!.save();
+        final result = await authService.signUp(
+          {
+            "name": _enteredPseudo,
+            "email": _enteredEmail,
+            "password": _enteredPassword,
+          },
+>>>>>>> Stashed changes
         );
-      } else {
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            duration: const Duration(milliseconds: 5000),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            content: const Text(
-              'Un email de vérification vous a été envoyé.',
-              textAlign: TextAlign.center,
+
+        if (result?['status'] == 'error') {
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Theme.of(context).colorScheme.errorContainer,
+              content: Text(
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onErrorContainer),
+                result?['error'],
+                textAlign: TextAlign.center,
+              ),
             ),
-          ),
-        );
-        Navigator.of(context).pop();
+          );
+        } else {
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              duration: const Duration(milliseconds: 5000),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              content: Text(
+                translate?.email_sent ??
+                    'Un email de vérification vous a été envoyé.',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+          Navigator.of(context).pop();
+        }
       }
+    } catch (e) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Theme.of(context).colorScheme.errorContainer,
+          content: Text(
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onErrorContainer),
+            translate?.error_occurred ??
+                'Une erreur est survenue, veuillez réessayer.',
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
     }
   }
 

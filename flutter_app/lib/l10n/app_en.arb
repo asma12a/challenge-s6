@@ -147,7 +147,9 @@
   "event_saved_success": "The event has been successfully saved.",
   "server_error": "Server unavailable. Please try again later.",
   "match": "Match",
-  "training": "Training"
+  "training": "Training",
+  "email_sent": "A verification email has been sent to you."
+
 
 
 
