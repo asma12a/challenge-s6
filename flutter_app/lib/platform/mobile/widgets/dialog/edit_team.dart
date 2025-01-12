@@ -37,6 +37,8 @@ class _EditTeamDialogState extends State<EditTeamDialog> {
   void _updateTeam() async {
     final translate = AppLocalizations.of(context);
 
+    final translate = AppLocalizations.of(context);
+
     if (!_formKey.currentState!.validate()) return;
     try {
       await teamService.updateTeam(widget.eventId, _team);
@@ -169,27 +171,6 @@ class _EditTeamDialogState extends State<EditTeamDialog> {
                   ),
                 ),
                 child: Text(translate?.edit ?? 'Modifier'),
-              ),
-              TextButton(
-                onPressed: () {
-                  if (!isOnline) {
-                    showDialog(
-                      context: context,
-                      builder: (context) => const OfflineDialog(),
-                    );
-                    return;
-                  }
-                  _deleteTeam();
-                },
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.red.shade300,
-                  textStyle: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-                child: const Text('Supprimer l\'équipe'),
               ),
             ],
           ),
