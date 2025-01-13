@@ -84,7 +84,7 @@ EMAIL_PORT=587
 EMAIL_USER=your_email@example.com
 EMAIL_PASSWORD=email_password
 Étape 2 : Lancer les services Docker
-
+```
 
 Assurez-vous que Docker est installé. Lancez les containers nécessaires avec :
 bash
