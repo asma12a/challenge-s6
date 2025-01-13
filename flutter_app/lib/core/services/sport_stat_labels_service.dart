@@ -145,10 +145,10 @@ class SportStatLabelsService {
         ),
       );
 
-      final data = jsonDecode(utf8.decode(response.data));
-      return List<SportStatLabels>.from(
-        data.map((json) => SportStatLabels.fromJson(json)),
-      );
+      final List<dynamic> sportStatLabels = response.data;
+      return sportStatLabels.map((sportStat) => SportStatLabels.fromJson(sportStat)).toList();
+
+
     } catch (error) {
       throw AppException(
         message:
