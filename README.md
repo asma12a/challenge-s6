@@ -87,9 +87,11 @@ EMAIL_PASSWORD=email_password
 ```
 
 Assurez-vous que Docker est installé. Lancez les containers nécessaires avec :
-bash
-Copier le code
+
+     ```
 docker compose up -d
+     ```
+
 Cela démarre :
 
 PostgreSQL pour la base de données.
@@ -97,38 +99,46 @@ Redis pour le cache.
 Étape 3 : Lancer le serveur
 Utilisez air pour démarrer le serveur en mode développement :
 
-bash
-Copier le code
+     ```
 air
 Étape 4 : Migration de la base de données
+     ```
+
 Appliquez les migrations de la base de données pour initialiser les tables :
 
-bash
-Copier le code
+     ```
 go run database/migrate/main.go
+     ```
+
 Étape 5 : Créer un modèle
+
 Pour ajouter de nouvelles entités au projet, utilisez la commande suivante :
 
-bash
-Copier le code
+     ```
 go run entgo.io/ent/cmd/ent new <nom-du-modele>
+     ```
+
 Après avoir édité le modèle, générez le code avec :
 
-bash
-Copier le code
+     ```
 go generate ./ent
+     ```
+
 📜 Exemples d'utilisation
 Swagger UI
 Une fois le serveur backend lancé, accédez à la documentation interactive à :
 
-bash
-Copier le code
-http://localhost:3001/swagger/index.html
+     ```
+<http://localhost:3001/swagger/index.html>
+     ```
+
 WebSocket Chat
 Connectez-vous au WebSocket pour un événement spécifique :
-ruby
-Copier le code
+     ```
+
 ws://localhost:3001/ws/chat/:eventID
+     ```
+
 Exemple de message envoyé au serveur (format JSON) :
 json
 Copier le code
@@ -137,11 +147,14 @@ Copier le code
   "message": "Hello, team!"
 }
 Les autres utilisateurs dans la salle recevront le message en temps réel.
+
 🧪 Tests
 Tests unitaires :
 Testez les règles de gestion via :
-bash
-Copier le code
+     ```
+
 go test ./...
+     ```
+
 Tests d'intégration :
 Vérifiez les routes API et les fonctionnalités principales avec des mocks.
