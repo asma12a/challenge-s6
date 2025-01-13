@@ -89,7 +89,7 @@ EMAIL_PASSWORD=email_password
 Assurez-vous que Docker est installé. Lancez les containers nécessaires avec :
 
      ```
-docker compose up -d
+      docker compose up -d
      ```
 
 Cela démarre :
@@ -100,14 +100,15 @@ Redis pour le cache.
 Utilisez air pour démarrer le serveur en mode développement :
 
      ```
-air
-Étape 4 : Migration de la base de données
+     air
      ```
+
+Étape 4 : Migration de la base de données
 
 Appliquez les migrations de la base de données pour initialiser les tables :
 
      ```
-go run database/migrate/main.go
+      go run database/migrate/main.go
      ```
 
 Étape 5 : Créer un modèle
@@ -115,13 +116,13 @@ go run database/migrate/main.go
 Pour ajouter de nouvelles entités au projet, utilisez la commande suivante :
 
      ```
-go run entgo.io/ent/cmd/ent new <nom-du-modele>
+      go run entgo.io/ent/cmd/ent new <nom-du-modele>
      ```
 
 Après avoir édité le modèle, générez le code avec :
 
      ```
-go generate ./ent
+      go generate ./ent
      ```
 
 📜 Exemples d'utilisation
@@ -129,31 +130,30 @@ Swagger UI
 Une fois le serveur backend lancé, accédez à la documentation interactive à :
 
      ```
-<http://localhost:3001/swagger/index.html>
+      http://localhost:3001/swagger/index.html>
      ```
 
 WebSocket Chat
 Connectez-vous au WebSocket pour un événement spécifique :
      ```
-
-ws://localhost:3001/ws/chat/:eventID
+      ws://localhost:3001/ws/chat/:eventID
      ```
 
 Exemple de message envoyé au serveur (format JSON) :
-json
-Copier le code
+```
 {
   "username": "JohnDoe",
   "message": "Hello, team!"
 }
+```
+
 Les autres utilisateurs dans la salle recevront le message en temps réel.
 
 🧪 Tests
 Tests unitaires :
 Testez les règles de gestion via :
      ```
-
-go test ./...
+      go test ./...
      ```
 
 Tests d'intégration :
