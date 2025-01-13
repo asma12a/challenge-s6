@@ -41,8 +41,10 @@ class _EditEventDialogState extends State<EditEventDialog> {
   }
 
   String? _validateAddress(String? value) {
+    final translate = AppLocalizations.of(context);
     if (value == null || value.isEmpty) {
-      return 'Le champ adresse ne peut pas être vide.';
+      return translate?.empty_address ??
+          'Le champ adresse ne peut pas être vide.';
     }
     return null;
   }
@@ -137,7 +139,7 @@ class _EditEventDialogState extends State<EditEventDialog> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Modifier: ${event.name}',
+                  '${translate?.edit ?? "Modifier:"} ${event.name ?? ""}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -169,11 +171,11 @@ class _EditEventDialogState extends State<EditEventDialog> {
                   ),
                   textBuilder: (value) => value
                       ? Text(
-                          'Public',
+                          translate?.public ?? 'Public',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         )
                       : Text(
-                          'Privé',
+                          translate?.private ?? 'Privé',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                 ),
@@ -188,13 +190,15 @@ class _EditEventDialogState extends State<EditEventDialog> {
                         value.isEmpty ||
                         value.trim().length <= 1 ||
                         value.trim().length > 50) {
-                      return 'Doit contenir entre 1 et 50 caractères.';
+                      return translate?.fifty_char ??
+                          'Doit contenir entre 1 et 50 caractères.';
                     }
                     return null;
                   },
                   maxLength: 50,
-                  decoration:
-                      const InputDecoration(labelText: 'Nom de l\'événement'),
+                  decoration: InputDecoration(
+                      labelText:
+                          translate?.event_name ?? 'Nom de l\'événement'),
                   onSaved: (value) {
                     event = event.copyWith(name: value);
                   },
@@ -205,8 +209,9 @@ class _EditEventDialogState extends State<EditEventDialog> {
                     return TextFormField(
                       controller: controller,
                       focusNode: focusNode,
-                      decoration: const InputDecoration(
-                          labelText: 'Adresse de l\'événement'),
+                      decoration: InputDecoration(
+                          labelText: translate?.event_address ??
+                              'Adresse de l\'événement'),
                       validator: _validateAddress,
                       onSaved: (value) {
                         _addressController.text = value!;
@@ -253,12 +258,14 @@ class _EditEventDialogState extends State<EditEventDialog> {
                   },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Veuillez sélectionner une date';
+                      return translate?.empty_date ??
+                          'Veuillez sélectionner une date';
                     }
                     return null;
                   },
-                  decoration:
-                      const InputDecoration(labelText: 'Date de l\'événement'),
+                  decoration: InputDecoration(
+                      labelText:
+                          translate?.event_date ?? 'Date de l\'événement'),
                   onSaved: (value) {
                     event = event.copyWith(
                         date: DateFormat('yyyy-MM-dd')
@@ -302,7 +309,8 @@ class _EditEventDialogState extends State<EditEventDialog> {
                         },
                         validator: (value) {
                           if (value == null) {
-                            return 'Veuillez sélectionner un sport';
+                            return translate?.empty_sport ??
+                                'Veuillez sélectionner un sport';
                           }
                           return null;
                         },
@@ -317,8 +325,9 @@ class _EditEventDialogState extends State<EditEventDialog> {
                     Expanded(
                       child: DropdownButtonFormField<EventType>(
                         value: event.type,
-                        decoration: const InputDecoration(
-                            labelText: 'Type d\'événement'),
+                        decoration: InputDecoration(
+                            labelText:
+                                translate?.event_type ?? 'Type d\'événement'),
                         items: EventType.values
                             .map((type) => DropdownMenuItem(
                                   value: type,
@@ -346,7 +355,8 @@ class _EditEventDialogState extends State<EditEventDialog> {
                         },
                         validator: (value) {
                           if (value == null) {
-                            return 'Veuillez sélectionner un type de match';
+                            return translate?.empty_type ??
+                                'Veuillez sélectionner un type de match';
                           }
                           return null;
                         },
@@ -366,7 +376,7 @@ class _EditEventDialogState extends State<EditEventDialog> {
                     Icons.update,
                     color: Colors.white,
                   ),
-                  label: const Text('Metre à jour'),
+                  label: Text(translate?.update ?? 'Mettre à jour'),
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.blue,

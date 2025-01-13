@@ -16,6 +16,8 @@
   "password_placeholder": "Enter your password",
   "search_placeholder": "Search...",
   "no_events": "No events found",
+  "event_found_singular": "event found",
+  "event_found_plural": "events found",
   "no_items": "No items to display",
   "no_event_to_display": "No events to display",
   "settings": "Settings",
@@ -61,7 +63,7 @@
       }
     }
   },
-  "edit": "Edit",
+  "edit": "Edit:",
   "team": "Team",
   "role": "Role",
   "name": "Name",
@@ -72,14 +74,124 @@
   "running": "Running",
   "tennis": "Tennis",
   "create_event": "Create event",
+  "create_team": "Create the team",
   "select_date": "Select date",
   "no_results": "No results found",
   "event_name": "Event name",
+  "team_name": "Team name",
   "event_address": "Event address",
+  "event_date": "Date of the event",
   "open_public": "Open to the public",
   "save_event": "Save",
   "my_events_profile": "My events",
   "performance": "Performance",
   "join_community": "Join your community today!",
-  "already_account": "Already have an account ?"
+  "already_account": "Already have an account ?",
+  "participated_to": "Participated in",
+  "event_plural": "events",
+  "event_singular": "event",
+  "change_team": "Change team",
+  "join_team": "Join the team",
+  "infos_player": "Player info",
+  "no_perf": "No performance available.",
+  "choose_team": "Choose your team:",
+  "sporty": "sportsmen",
+  "cancel": "Cancel",
+  "error": "Error:",
+  "error_occurred": "An error has occurred.",
+  "empty_email": "Please enter an email address",
+  "valid_email": "Please enter a valid email address",
+  "empty_team_name": "Please enter a team name",
+  "empty_address": "The address field cannot be empty.",
+  "public": "Public",
+  "private": "Private",
+  "fifty_char": "Must be between 1 and 50 characters.",
+  "empty_date": "Please select a date",
+  "empty_sport": "Please select a sport",
+  "event_type": "Event type",
+  "empty_type": "Please select a match type",
+  "update": "To update",
+  "note_success": "Added notes successfully",
+  "event": "The event",
+  "note_player": "Rate the player's performance",
+  "user_infos_updated": "User information updated!",
+  "updated_password": "Password updated!",
+  "edit_user_infos": "Edit user information",
+  "empty_user_name": "Please enter a name",
+  "change_password": "Change password",
+  "new_password": "New password",
+  "empty_password": "Please enter a password.",
+  "six_char": "Password must contain at least 6 characters.",
+  "no_internet": "No internet connection",
+  "check_internet": "Please check your internet connection and try again.",
+  "share_event": "Share the event",
+  "event_code": "Event code",
+  "copy": "Copied to clipboard",
+  "del_player": "Delete player",
+  "confirm_del_player": "Are you sure you want to delete the player",
+  "leave_team": "Leave the team",
+  "leave_team_event": "Are you sure you want to leave the team and the event?",
+  "perf_for": "Performances for the",
+  "nb_events": "Number of events",
+  "leave_team_and_event": "Leave the team (and the event)",
+  "confirm_join_team": "Do you really want to join this team?",
+  "no_players_team": "Currently no players in this team",
+  "updated_user": "User updated successfully!",
+  "notifs": "Notifications",
+  "me": "Me",
+  "other": "Other",
+  "enter_message": "Enter a message...",
+  "no_event_code": "No events match this code.",
+  "six_char_code": "The code must contain at least 6 characters.",
+  "empty_val": "Please enter a value.",
+  "event_saved_success": "The event has been successfully saved.",
+  "server_error": "Server unavailable. Please try again later.",
+  "match": "Match",
+  "training": "Training",
+  "email_sent": "A verification email has been sent to you."
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

@@ -16,6 +16,8 @@
   "password_placeholder": "Geben Sie Ihr Passwort ein",
   "search_placeholder": "Suchen...",
   "no_events": "Keine Veranstaltungen gefunden",
+  "event_found_singular": "veranstaltung gefunden",
+  "event_found_plural": "gefundene veranstaltungen",
   "no_event_to_display": "Keine Veranstaltungen anzuzeigen",
   "settings": "Einstellungen",
   "logout": "Abmelden",
@@ -60,7 +62,7 @@
       }
     }
   },
-  "edit": "Bearbeiten",
+  "edit": "Bearbeiten:",
   "team": "Team",
   "role": "Rolle",
   "name": "Name",
@@ -71,15 +73,120 @@
   "running": "Laufen",
   "tennis": "Tennis",
   "create_event": "Veranstaltung erstellen",
+  "create_team": "Erstellen Sie das Team",
   "select_date": "Datum auswählen",
   "no_results": "Keine Ergebnisse gefunden",
   "event_name": "Veranstaltungsname",
+  "team_name": "Teamname",
   "event_address": "Veranstaltungsadresse",
+  "event_date": "Datum der Veranstaltung",
   "open_public": "Für die Öffentlichkeit zugänglich",
   "save_event": "Speichern",
   "my_events_profile": "Meine Veranstaltungen",
   "performance": "Leistung",
   "join_community": "Treten Sie noch heute Ihrer Community bei!",
-  "already_account": "Sie haben bereits ein Konto?"
+  "already_account": "Sie haben bereits ein Konto?",
+  "participated_to": "Mitgemacht bei",
+  "event_plural": "ereignisse",
+  "event_singular": "ereignis",
+  "change_team": "Team ändern",
+  "join_team": "Treten Sie dem Team bei",
+  "infos_player": "Spielerinfo",
+  "no_perf": "Keine leistung vorhanden.",
+  "choose_team": "Wähle dein Team:",
+  "sporty": "sportler",
+  "cancel": "Stornieren",
+  "error": "Fehler:",
+  "error_occurred": "Es ist ein Fehler aufgetreten.",
+  "empty_email": "Bitte geben Sie eine E-Mail-Adresse ein",
+  "valid_email": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+  "empty_team_name": "Bitte geben Sie einen Teamnamen ein",
+  "empty_address": "Das Adressfeld darf nicht leer sein.",
+  "public": "Publikum",
+  "private": "Privat",
+  "fifty_char": "Muss zwischen 1 und 50 Zeichen lang sein.",
+  "empty_date": "Bitte wählen Sie ein Datum",
+  "empty_sport": "Bitte wähle eine Sportart",
+  "event_type": "Art der Veranstaltung",
+  "empty_type": "Bitte wählen Sie einen Übereinstimmungstyp aus",
+  "update": "So aktualisieren Sie",
+  "note_success": "Notizen erfolgreich hinzugefügt",
+  "event": "Die Veranstaltung",
+  "note_player": "Bewerten Sie die Leistung des Spielers",
+  "user_infos_updated": "Benutzerinformationen aktualisiert!",
+  "updated_password": "Passwort aktualisiert!",
+  "edit_user_infos": "Benutzerinformationen bearbeiten",
+  "empty_user_name": "Bitte geben Sie einen Namen ein",
+  "change_password": "Kennwort ändern",
+  "new_password": "Neues Passwort",
+  "empty_password": "Bitte gib ein Passwort ein.",
+  "six_char": "Das Passwort muss mindestens 6 Zeichen enthalten.",
+  "no_internet": "Keine Internetverbindung",
+  "check_internet": "Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
+  "share_event": "Teilen Sie die Veranstaltung",
+  "event_code": "Ereigniscode",
+  "copy": "In die Zwischenablage kopiert",
+  "del_player": "Spieler löschen",
+  "confirm_del_player": "Möchten Sie den Player wirklich löschen",
+  "leave_team": "Das Team verlassen",
+  "leave_team_event": "Möchten Sie das Team und die Veranstaltung wirklich verlassen?",
+  "perf_for": "Aufführungen für die",
+  "nb_events": "Anzahl der Ereignisse",
+  "leave_team_and_event": "Das Team (und die Veranstaltung) verlassen",
+  "confirm_change_team": "Do you really want to change teams and join",
+  "confirm_join_team": "Möchten Sie diesem Team wirklich beitreten?",
+  "no_players_team": "Derzeit keine Spieler in diesem Team",
+  "updated_user": "Benutzer erfolgreich aktualisiert!",
+  "notifs": "Benachrichtigungen",
+  "me": "Mich",
+  "other": "Andere",
+  "enter_message": "Geben Sie eine Nachricht ein...",
+  "no_event_code": "Keine Ereignisse entsprechen diesem Code.",
+  "six_char_code": "Der Code muss mindestens 6 Zeichen enthalten.",
+  "empty_val": "Bitte geben Sie einen Wert ein.",
+  "event_saved_success": "Die Veranstaltung wurde erfolgreich aufgezeichnet.",
+  "server_error": "Server nicht verfügbar. Bitte versuchen Sie es später erneut.",
+  "match": "Übereinstimmen",
+  "training": "Ausbildung",
+  "email_sent": "Eine Bestätigungs-E-Mail wurde Ihnen gesendet."
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

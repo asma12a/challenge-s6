@@ -3,11 +3,13 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
+import 'package:squad_go/core/utils/constants.dart';
 import 'package:squad_go/shared_widgets/sign_up.dart';
 import 'package:squad_go/platform/mobile/widgets/logo.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
@@ -79,30 +81,72 @@ class __FormContentState extends State<_FormContent> {
   var _enteredEmail = '';
   var _enteredPassword = '';
 
-  void _signIn(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-      final loginData = await context
-          .read<AuthState>()
-          .login(_enteredEmail, _enteredPassword);
+  // Méthode de connexion avec Google
+  Future<void> _signInWithGoogle(BuildContext context) async {
+    try {
+      GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser != null) {
+        // Vous pouvez obtenir un token ou l'ID de l'utilisateur
+        final GoogleSignInAuthentication googleAuth =
+            await googleUser.authentication;
+        final accessToken = googleAuth.accessToken;
+        final idToken = googleAuth.idToken;
 
-      if (loginData['status'] == 'error') {
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            content: Text(
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.onErrorContainer),
-              loginData['error'],
-              textAlign: TextAlign.center,
-            ),
-          ),
-        );
-      } else {
-        context.go('/home');
+        context
+            .go('/home'); 
       }
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur lors de la connexion avec Google : $error'),
+        ),
+      );
+    }
+  }
+
+  void _signIn(BuildContext context) async {
+    final translate = AppLocalizations.of(context);
+    try {
+      if (_formKey.currentState!.validate()) {
+        _formKey.currentState!.save();
+
+        final loginData = await context
+            .read<AuthState>()
+            .login(_enteredEmail, _enteredPassword);
+
+        if (loginData['status'] == 'error') {
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Theme.of(context).colorScheme.errorContainer,
+              content: Text(
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onErrorContainer),
+                loginData['error'],
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+        } else {
+          context.go('/home');
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Theme.of(context).colorScheme.errorContainer,
+          content: Text(
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onErrorContainer),
+            translate?.error_occurred ??
+                'Une erreur est survenue, veuillez réessayer.',
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
     }
   }
 
@@ -123,7 +167,6 @@ class __FormContentState extends State<_FormContent> {
                 FocusScope.of(context).unfocus();
               },
               validator: (value) {
-                // add email validation
                 if (value == null || value.isEmpty) {
                   return 'Please enter some text';
                 }
@@ -142,7 +185,8 @@ class __FormContentState extends State<_FormContent> {
                   ),
               decoration: InputDecoration(
                 labelText: translate?.email_label ?? 'Email',
-                hintText: translate?.email_placeholder ?? 'Entrez votre adresse email',
+                hintText: translate?.email_placeholder ??
+                    'Entrez votre adresse email',
                 prefixIcon: const Icon(Icons.email_outlined),
                 border: const OutlineInputBorder(),
               ),
@@ -171,7 +215,8 @@ class __FormContentState extends State<_FormContent> {
               obscureText: !_isPasswordVisible,
               decoration: InputDecoration(
                   labelText: translate?.password ?? 'Mot de passe',
-                  hintText: translate?.password_placeholder ?? 'Entrez votre mot de passe',
+                  hintText: translate?.password_placeholder ??
+                      'Entrez votre mot de passe',
                   prefixIcon: const Icon(Icons.lock_outline_rounded),
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
@@ -213,9 +258,46 @@ class __FormContentState extends State<_FormContent> {
                 onPressed: () async => _signIn(context),
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
-                  child: Text(translate?.login_button ??
-                    'Se connecter',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  child: Text(
+                    translate?.login_button ?? 'Se connecter',
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ),
+            _gap(),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4)),
+                ),
+                onPressed: () async {
+                  await _signInWithGoogle(
+                      context); // Authentification via Google
+                },
+                child: const Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.login,
+                        color: Colors.white,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        'Se connecter via Google',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -240,9 +322,10 @@ class __FormContentState extends State<_FormContent> {
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
-                  child: Text(translate?.signup_title ??
-                    'Inscription',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  child: Text(
+                    translate?.signup_title ?? 'Inscription',
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),

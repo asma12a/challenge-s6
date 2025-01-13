@@ -48,8 +48,8 @@ class _Title extends StatelessWidget {
     // final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
     final translate = AppLocalizations.of(context);
     return Container(
-      constraints: const BoxConstraints(
-          maxWidth: 300), // Largeur maximale pour alignement avec le formulaire
+      constraints: const BoxConstraints(maxWidth: 300),
+      // Largeur maximale pour alignement avec le formulaire
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -86,42 +86,61 @@ class __FormContentState extends State<_FormContent> {
   var _enteredPassword = '';
 
   void _signUp() async {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      final result = await authService.signUp(
-        {
-          "name": _enteredPseudo,
-          "email": _enteredEmail,
-          "password": _enteredPassword,
-        },
-      );
-      if (result?['status'] == 'error') {
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            content: Text(
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.onErrorContainer),
-              result?['error'],
-              textAlign: TextAlign.center,
-            ),
-          ),
+    final translate = AppLocalizations.of(context);
+    try {
+      if (_formKey.currentState!.validate()) {
+        _formKey.currentState!.save();
+        final result = await authService.signUp(
+          {
+            "name": _enteredPseudo,
+            "email": _enteredEmail,
+            "password": _enteredPassword,
+          },
         );
-      } else {
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            duration: const Duration(milliseconds: 5000),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            content: const Text(
-              'Un email de vérification vous a été envoyé.',
-              textAlign: TextAlign.center,
+
+        if (result?['status'] == 'error') {
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Theme.of(context).colorScheme.errorContainer,
+              content: Text(
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onErrorContainer),
+                result?['error'],
+                textAlign: TextAlign.center,
+              ),
             ),
-          ),
-        );
-        Navigator.of(context).pop();
+          );
+        } else {
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              duration: const Duration(milliseconds: 5000),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              content: Text(
+                translate?.email_sent ??
+                    'Un email de vérification vous a été envoyé.',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+          Navigator.of(context).pop();
+        }
       }
+    } catch (e) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Theme.of(context).colorScheme.errorContainer,
+          content: Text(
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onErrorContainer),
+            translate?.error_occurred ??
+                'Une erreur est survenue, veuillez réessayer.',
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
     }
   }
 
@@ -208,21 +227,22 @@ class __FormContentState extends State<_FormContent> {
               obscureText: !_isPasswordVisible,
               onTapOutside: (event) => FocusScope.of(context).unfocus(),
               decoration: InputDecoration(
-                  labelText: translate?.password ?? 'Mot de passe',
-                  hintText: translate?.password_placeholder ??
-                      'Entrez votre mot de passe',
-                  prefixIcon: const Icon(Icons.lock_outline_rounded),
-                  border: const OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                    icon: Icon(_isPasswordVisible
-                        ? Icons.visibility_off
-                        : Icons.visibility),
-                    onPressed: () {
-                      setState(() {
-                        _isPasswordVisible = !_isPasswordVisible;
-                      });
-                    },
-                  )),
+                labelText: translate?.password ?? 'Mot de passe',
+                hintText: translate?.password_placeholder ??
+                    'Entrez votre mot de passe',
+                prefixIcon: const Icon(Icons.lock_outline_rounded),
+                border: const OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: Icon(_isPasswordVisible
+                      ? Icons.visibility_off
+                      : Icons.visibility),
+                  onPressed: () {
+                    setState(() {
+                      _isPasswordVisible = !_isPasswordVisible;
+                    });
+                  },
+                ),
+              ),
               onSaved: (value) {
                 _enteredPassword = value!;
               },

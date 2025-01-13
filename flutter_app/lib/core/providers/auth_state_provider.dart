@@ -1,13 +1,10 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/user_app.dart';
 import 'package:squad_go/core/services/auth_service.dart';
-
-const apiBaseUrl = String.fromEnvironment('API_BASE_URL');
-const jwtStorageToken = String.fromEnvironment('JWT_STORAGE_KEY');
+import 'package:squad_go/core/utils/constants.dart';
+import 'package:squad_go/main.dart';
 
 class AuthState with ChangeNotifier {
   final AuthService _authService = AuthService();
@@ -42,7 +39,6 @@ class AuthState with ChangeNotifier {
 
       return loginData;
     } catch (e) {
-      log('Login failed: $e');
       throw AppException(message: 'Failed to log in. Please try again.');
     }
   }
@@ -50,17 +46,18 @@ class AuthState with ChangeNotifier {
   Future<void> logout() async {
     try {
       _user = null;
-      await _storage.delete(key: jwtStorageToken);
+      await _storage.delete(key: Constants.jwtStorageToken);
+      await initialCacheOptions.store!.clean();
+
       notifyListeners();
     } catch (e) {
-      log('Logout failed: $e');
       throw AppException(message: 'Failed to log out. Please try again.');
     }
   }
 
   Future<bool> tryLogin() async {
     try {
-      final token = await _storage.read(key: jwtStorageToken);
+      final token = await _storage.read(key: Constants.jwtStorageToken);
 
       if (token == null) {
         return false;
@@ -73,7 +70,6 @@ class AuthState with ChangeNotifier {
       }
       return false;
     } catch (e) {
-      log('Failed to load user: $e');
       return false;
     }
   }

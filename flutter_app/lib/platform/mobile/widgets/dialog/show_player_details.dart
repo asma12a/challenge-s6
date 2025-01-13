@@ -9,6 +9,7 @@ import 'package:squad_go/core/services/event_service.dart';
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/services/team_service.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/offline.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../../main.dart';
 
@@ -83,16 +84,17 @@ class _ShowPlayerDetailsDialogState extends State<ShowPlayerDetailsDialog> {
   }
 
   void _deletePlayer() async {
+    final translate = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Supprimer le joueur'),
+          title: Text(translate?.del_player ?? 'Supprimer le joueur'),
           content: Text(
-              'Êtes-vous sûr de vouloir supprimer le joueur ${_player.name} ?'),
+              '${translate?.confirm_del_player ?? "Êtes-vous sûr de vouloir supprimer le joueur"} ${_player.name ?? ""} ?'),
           actions: [
             TextButton(
-              child: Text("Annuler"),
+              child: Text(translate?.cancel ?? "Annuler"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -106,12 +108,18 @@ class _ShowPlayerDetailsDialogState extends State<ShowPlayerDetailsDialog> {
                 } on AppException catch (e) {
                   // Handle AppException error
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Erreur: ${e.message}')),
+                    SnackBar(
+                      content: Text(
+                        '${translate?.error ?? "Erreur:"} ${e.message}',
+                      ),
+                    ),
                   );
                 } catch (e) {
                   // Handle other errors
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Une erreur est survenue')),
+                    SnackBar(
+                        content: Text(translate?.error_occurred ??
+                            'Une erreur est survenue')),
                   );
                 }
                 Navigator.of(context).pop();
@@ -125,16 +133,18 @@ class _ShowPlayerDetailsDialogState extends State<ShowPlayerDetailsDialog> {
   }
 
   void _leaveTeam() async {
+    final translate = AppLocalizations.of(context);
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Quitter l\'équipe'),
-          content: Text(
+          title: Text(translate?.leave_team ?? 'Quitter l\'équipe'),
+          content: Text(translate?.leave_team_event ??
               'Êtes-vous sûr de vouloir quitter l\'équipe et l\'événement ?'),
           actions: [
             TextButton(
-              child: Text("Annuler"),
+              child: Text(translate?.cancel ?? "Annuler"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -148,12 +158,18 @@ class _ShowPlayerDetailsDialogState extends State<ShowPlayerDetailsDialog> {
                 } on AppException catch (e) {
                   // Handle AppException error
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Erreur: ${e.message}')),
+                    SnackBar(
+                      content: Text(
+                        '${translate?.error ?? "Erreur:"} ${e.message}',
+                      ),
+                    ),
                   );
                 } catch (e) {
                   // Handle other errors
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Une erreur est survenue')),
+                    SnackBar(
+                        content: Text(translate?.error_occurred ??
+                            'Une erreur est survenue')),
                   );
                 }
                 context.go('/home', extra: true);
@@ -168,7 +184,7 @@ class _ShowPlayerDetailsDialogState extends State<ShowPlayerDetailsDialog> {
   @override
   Widget build(BuildContext context) {
     var isOnline = context.watch<ConnectivityState>().isConnected;
-
+    final translate = AppLocalizations.of(context);
     return Dialog(
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -176,7 +192,7 @@ class _ShowPlayerDetailsDialogState extends State<ShowPlayerDetailsDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Infos joueur',
+              translate?.infos_player ?? 'Infos joueur',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -190,18 +206,20 @@ class _ShowPlayerDetailsDialogState extends State<ShowPlayerDetailsDialog> {
             const SizedBox(height: 16),
             if (_player.userID != null) ...[
               if (nbEvents != 0) ...[
-                Text('Performances pour le ${event?.sport.name.name}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    )),
+                Text(
+                  '${translate?.perf_for ?? "Performances pour le"} ${event?.sport.name.name}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 16),
               ],
               if (nbEvents != 0) ...[
                 Text(
-                  'Nombre d\'événements : $nbEvents',
+                  '${translate?.nb_events ?? "Nombre d\'événements :"} $nbEvents',
                   style: const TextStyle(fontSize: 16),
                 ),
                 const SizedBox(height: 16)
@@ -220,8 +238,8 @@ class _ShowPlayerDetailsDialogState extends State<ShowPlayerDetailsDialog> {
                   },
                 )
               else
-                const Text('Aucune performance disponible.',
-                    style: TextStyle(fontSize: 16)),
+                Text(translate?.no_perf ?? 'Aucune performance disponible.',
+                    style: const TextStyle(fontSize: 16)),
               const SizedBox(height: 16)
             ],
             if (widget.canEdit)
@@ -244,7 +262,7 @@ class _ShowPlayerDetailsDialogState extends State<ShowPlayerDetailsDialog> {
                     decoration: TextDecoration.underline,
                   ),
                 ),
-                child: const Text('Supprimer le joueur'),
+                child: Text(translate?.del_player ?? 'Supprimer le joueur'),
               ),
             if (!widget.canEdit && widget.isCurrentUser)
               TextButton(
@@ -266,7 +284,7 @@ class _ShowPlayerDetailsDialogState extends State<ShowPlayerDetailsDialog> {
                     decoration: TextDecoration.underline,
                   ),
                 ),
-                child: const Text('Quitter l\'équipe (et l\'évent)'),
+                child: Text(translate?.leave_team_and_event ?? 'Quitter l\'équipe (et l\'évent)'),
               ),
           ],
         ),

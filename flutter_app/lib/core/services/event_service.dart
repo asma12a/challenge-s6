@@ -1,30 +1,21 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/models/sport.dart';
-import 'package:squad_go/core/utils/connectivity_handler.dart';
+import 'package:squad_go/core/utils/constants.dart';
 import 'package:squad_go/main.dart';
-
-const apiBaseUrl = String.fromEnvironment('API_BASE_URL');
-const jwtStorageToken = String.fromEnvironment('JWT_STORAGE_KEY');
 
 class EventService {
   final storage = const FlutterSecureStorage();
-  final refreshCacheOptions = CacheOptions(
-    store: MemCacheStore(),
-    policy: CachePolicy.refreshForceCache,
-  );
-
   // GET all events (backoffice)
   Future<List<Map<String, dynamic>>> getEvents() async {
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
 
     try {
-      final Uri url = Uri.parse('$apiBaseUrl/api/events');
+      final Uri url = Uri.parse('${Constants.apiBaseUrl}/api/events');
 
       final response = await dio.get(url.toString(),
           options: Options(headers: {
@@ -44,9 +35,9 @@ class EventService {
   }
 
   Future<List<Event>> getSearchResults(Map<String, String> params) async {
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
 
-    final Uri baseUrl = Uri.parse('$apiBaseUrl/api/events/search');
+    final Uri baseUrl = Uri.parse('${Constants.apiBaseUrl}/api/events/search');
 
     final Map<String, String> queryParams = {};
     if (params.isNotEmpty) {
@@ -76,9 +67,10 @@ class EventService {
 
   // GET event By CODE
   Future<Event> getEventByCode(String code) async {
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
     try {
-      final Uri uri = Uri.parse('$apiBaseUrl/api/events/code/$code');
+      final Uri uri =
+          Uri.parse('${Constants.apiBaseUrl}/api/events/code/$code');
 
       final response = await dio.get(
         uri.toString(),
@@ -98,10 +90,10 @@ class EventService {
 
   // DELETE an event
   Future<void> deleteEvent(String id) async {
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
 
     try {
-      final Uri url = Uri.parse('$apiBaseUrl/api/events/$id');
+      final Uri url = Uri.parse('${Constants.apiBaseUrl}/api/events/$id');
 
       final response = await dio.delete(url.toString(),
           options: Options(headers: {
@@ -118,22 +110,13 @@ class EventService {
   }
 
   Future<Event> getEventById(String id) async {
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
 
     try {
-      final Uri url = Uri.parse('$apiBaseUrl/api/events/$id');
+      final Uri url = Uri.parse('${Constants.apiBaseUrl}/api/events/$id');
 
       final response = await dio.get(url.toString(),
-          options:
-              // ConnectivityHandler().isConnected
-              //     ? refreshCacheOptions.toOptions().copyWith(
-              //         headers: {
-              //           'Content-Type': 'application/json',
-              //           'Authorization': "Bearer $token",
-              //         },
-              //       )
-              //     :
-              Options(
+          options: Options(
             headers: {
               'Content-Type': 'application/json',
               'Authorization': "Bearer $token",
@@ -150,9 +133,9 @@ class EventService {
   }
 
   Future<List<Sport>> getSports() async {
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
     try {
-      final Uri uri = Uri.parse('$apiBaseUrl/api/sports');
+      final Uri uri = Uri.parse('${Constants.apiBaseUrl}/api/sports');
 
       final response = await dio.get(uri.toString(),
           options: Options(headers: {
@@ -169,9 +152,9 @@ class EventService {
   }
 
   Future<void> createEvent(Map<String, dynamic> event) async {
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
     try {
-      final Uri uri = Uri.parse('$apiBaseUrl/api/events');
+      final Uri uri = Uri.parse('${Constants.apiBaseUrl}/api/events');
 
       await dio.post(uri.toString(),
           options: Options(headers: {
@@ -179,6 +162,9 @@ class EventService {
             "Authorization": "Bearer $token",
           }),
           data: jsonEncode(event));
+
+      await initialCacheOptions.store!
+          .delete('${Constants.apiBaseUrl}/api/events/user');
     } catch (error) {
       log.severe('An error occurred while ', {error: error});
       throw AppException(message: 'Failed to create event, please try again.');
@@ -186,9 +172,9 @@ class EventService {
   }
 
   Future<void> updateEvent(String id, Map<String, dynamic> event) async {
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
     try {
-      final Uri uri = Uri.parse('$apiBaseUrl/api/events/$id');
+      final Uri uri = Uri.parse('${Constants.apiBaseUrl}/api/events/$id');
 
       await dio.put(uri.toString(),
           options: Options(headers: {
@@ -196,6 +182,11 @@ class EventService {
             "Authorization": "Bearer $token",
           }),
           data: jsonEncode(event));
+
+      await initialCacheOptions.store!
+          .delete('${Constants.apiBaseUrl}/api/events/$id');
+      await initialCacheOptions.store!
+          .delete('${Constants.apiBaseUrl}/api/events/user');
     } catch (error) {
       log.severe('An error occurred while ', {error: error});
       throw AppException(message: 'Failed to update event, please try again.');
@@ -203,24 +194,17 @@ class EventService {
   }
 
   Future<List<Event>> getMyEvents() async {
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
     try {
-      final Uri uri = Uri.parse('$apiBaseUrl/api/events/user');
+      final Uri uri = Uri.parse('${Constants.apiBaseUrl}/api/events/user');
 
       final response = await dio.get(uri.toString(),
-          options: ConnectivityHandler().isConnected
-              ? refreshCacheOptions.toOptions().copyWith(
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': "Bearer $token",
-                  },
-                )
-              : Options(
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': "Bearer $token",
-                  },
-                ));
+          options: Options(
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': "Bearer $token",
+            },
+          ));
 
       final List<dynamic> data = response.data;
       return data.map((event) => Event.fromJson(event)).toList();
@@ -233,7 +217,7 @@ class EventService {
 
   Future<List<Event>> getRecommendedEvents(
       {double? latitude, double? longitude}) async {
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
     try {
       final Map<String, String> queryParams = {};
       if (latitude != null && longitude != null) {
@@ -242,7 +226,9 @@ class EventService {
       }
 
       final Uri uri = Uri.https(
-        apiBaseUrl.replaceAll('https://', '').replaceAll('http://', ''),
+        Constants.apiBaseUrl
+            .replaceAll('https://', '')
+            .replaceAll('http://', ''),
         '/api/events/recommended',
         queryParams,
       );

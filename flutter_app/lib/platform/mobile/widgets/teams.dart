@@ -57,9 +57,10 @@ class _TeamsHandleState extends State<TeamsHandle> {
   }
 
   void _joinTeam(String teamId, String teamName) async {
+    final translate = AppLocalizations.of(context);
     _showAlertDialog(
-      "Rejoindre $teamName",
-      "Voulez-vous vraiment rejoindre cette équipe?",
+      '${translate?.join_button ?? "Rejoindre"} $teamName',
+      translate?.confirm_join_team ?? "Voulez-vous vraiment rejoindre cette équipe?",
       () async {
         try {
           await teamService.joinTeam(widget.eventId, teamId);
@@ -73,9 +74,10 @@ class _TeamsHandleState extends State<TeamsHandle> {
   }
 
   void _switchTeam(String teamId, String teamName) async {
+    final translate = AppLocalizations.of(context);
     _showAlertDialog(
-      "Changer d'équipe",
-      "Voulez-vous vraiment changer d'équipe et rejoindre $teamName ?",
+      translate?.change_team ?? "Changer d'équipe",
+      '${translate?.confirm_change_team ?? "Voulez-vous vraiment changer d\'équipe et rejoindre"} $teamName ?',
       () async {
         try {
           await teamService.switchTeam(widget.eventId, teamId);
@@ -89,6 +91,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
   }
 
   void _showAlertDialog(String title, String content, void Function() onOk) {
+    final translate = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -97,7 +100,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
           content: Text(content),
           actions: [
             TextButton(
-              child: Text("Annuler"),
+              child: Text(translate?.cancel ?? "Annuler"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -283,8 +286,10 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                       SizedBox(width: 6),
                                       Text(
                                         userHasTeam
-                                            ? "Changer d'équipe"
-                                            : "Rejoindre l'équipe",
+                                            ? translate?.change_team ??
+                                                "Changer d'équipe"
+                                            : translate?.join_team ??
+                                                "Rejoindre l'équipe",
                                       ),
                                     ],
                                   ),
@@ -540,7 +545,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                             : Expanded(
                                 child: Container(
                                   margin: EdgeInsets.only(top: 16),
-                                  child: Text(
+                                  child: Text(translate?.no_players_team ??
                                       "Actuellement aucun joueur dans cette équipe"),
                                 ),
                               ),

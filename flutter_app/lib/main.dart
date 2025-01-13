@@ -12,22 +12,27 @@ import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 
 final log = Logger("AppLogger");
 final dio = Dio(BaseOptions(
-  connectTimeout: Duration(seconds: 5),
-  receiveTimeout: Duration(seconds: 5),
+  validateStatus: (status) {
+    return status! < 500; // Permet de recevoir les réponses 4xx sans exception.
+  },
+  connectTimeout: Duration(seconds: 30),
+  receiveTimeout: Duration(seconds: 30),
   headers: {
     'Accept': 'application/json',
   },
 ));
 
+final initialCacheOptions = CacheOptions(
+  store: MemCacheStore(),
+  policy: CachePolicy.request,
+  priority: CachePriority.high,
+  maxStale: const Duration(hours: 1),
+  hitCacheOnErrorExcept: [401, 403],
+  keyBuilder: (req) => req.uri.toString(),
+);
+
 void main() async {
-  dio.interceptors.add(
-    DioCacheInterceptor(
-      options: CacheOptions(
-        store: MemCacheStore(),
-        policy: CachePolicy.request,
-      ),
-    ),
-  );
+  dio.interceptors.add(DioCacheInterceptor(options: initialCacheOptions));
 
   // Flutter Maps Tile Caching
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,13 +43,29 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    ConnectivityHandler().initialize();
+  State<MyApp> createState() => _MyAppState();
+}
 
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+
+    ConnectivityHandler().initialize();
+  }
+
+  @override
+  void dispose() {
+    ConnectivityHandler().dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     if (kIsWeb) {
       return const MyAppWeb();
     } else {

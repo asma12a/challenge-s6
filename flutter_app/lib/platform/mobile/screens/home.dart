@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:squad_go/core/providers/connectivity_provider.dart';
 import 'package:squad_go/platform/mobile/widgets/home_widgets/my_events.dart';
 import 'package:squad_go/platform/mobile/widgets/home_widgets/recommended_events.dart';
 

@@ -16,9 +16,12 @@ type Environment struct {
 	DBName        string
 	APIPort       string
 	DragonFlyPort string
+	RedisURL      string
 	BrevoAPIKey   string
 	JWTSecret     string
 	Environment   string
+	ClientID      string
+	ClientSecret  string
 }
 
 var Env *Environment
@@ -46,6 +49,9 @@ func LoadEnvironment() {
 	Env.DragonFlyPort = getEnv("DRAGONFLY_PORT", true)
 	Env.JWTSecret = getEnv("JWT_SECRET", true)
 	Env.Environment = getEnv("ENV", true)
+	Env.ClientID = getEnv("GOOGLE_CLIENT_ID", true)
+	Env.ClientSecret = getEnv("GOOGLE_CLIENT_SECRET", true)
+	Env.RedisURL = getEnv("REDIS_URL", true)
 }
 
 func LoadEnvironmentFile() {

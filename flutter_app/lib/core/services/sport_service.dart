@@ -1,13 +1,10 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/sport.dart';
+import 'package:squad_go/core/utils/constants.dart';
 import 'package:squad_go/main.dart';
-
-const apiBaseUrl = String.fromEnvironment('API_BASE_URL');
-const jwtStorageToken = String.fromEnvironment('JWT_STORAGE_KEY');
 
 class SportService {
   final storage = const FlutterSecureStorage();
@@ -15,21 +12,24 @@ class SportService {
   // GET all sports
   static Future<List<Map<String, dynamic>>> getSports() async {
     final storage = const FlutterSecureStorage();
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
 
     try {
-      final Uri url = Uri.parse('$apiBaseUrl/api/sports');
+      final Uri url = Uri.parse('${Constants.apiBaseUrl}/api/sports');
 
-      final response = await http.get(url, headers: {
-        'Content-Type': 'application/json',
-        'Authorization': "Bearer $token",
-      });
+      final response = await dio.get(
+        url.toString(),
+        options: Options(headers: {
+          'Content-Type': 'application/json',
+          'Authorization': "Bearer $token",
+        }),
+      );
 
       if (response.statusCode != 200) {
         throw Exception('Erreur lors de la récupération des sports.');
       }
 
-      final List<dynamic> data = json.decode(response.body);
+      final List<dynamic> data = response.data;
       return List<Map<String, dynamic>>.from(data);
     } catch (error) {
       throw Exception('Erreur: ${error.toString()}');
@@ -39,15 +39,18 @@ class SportService {
   // DELETE a specific sport
   static Future<void> deleteSport(String id) async {
     final storage = const FlutterSecureStorage();
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
 
     try {
-      final Uri url = Uri.parse('$apiBaseUrl/api/sports/$id');
+      final Uri url = Uri.parse('${Constants.apiBaseUrl}/api/sports/$id');
 
-      final response = await http.delete(url, headers: {
-        'Content-Type': 'application/json',
-        'Authorization': "Bearer $token",
-      });
+      final response = await dio.delete(
+        url.toString(),
+        options: Options(headers: {
+          'Content-Type': 'application/json',
+          'Authorization': "Bearer $token",
+        }),
+      );
 
       if (response.statusCode != 204) {
         throw Exception('Erreur lors de la suppression du sport.');
@@ -60,18 +63,18 @@ class SportService {
   // CREATE a new sport
   static Future<void> createSport(Map<String, dynamic> sportData) async {
     final storage = const FlutterSecureStorage();
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
 
     try {
-      final Uri url = Uri.parse('$apiBaseUrl/api/sports');
+      final Uri url = Uri.parse('${Constants.apiBaseUrl}/api/sports');
 
-      final response = await http.post(
-        url,
-        headers: {
+      final response = await dio.post(
+        url.toString(),
+        options: Options(headers: {
           'Content-Type': 'application/json',
           'Authorization': "Bearer $token",
-        },
-        body: json.encode(sportData),
+        }),
+        data: json.encode(sportData),
       );
 
       if (response.statusCode != 201) {
@@ -86,23 +89,23 @@ class SportService {
   static Future<void> updateSport(
       String id, Map<String, dynamic> updates) async {
     final storage = const FlutterSecureStorage();
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
 
     try {
-      final Uri url = Uri.parse('$apiBaseUrl/api/sports/$id');
+      final Uri url = Uri.parse('${Constants.apiBaseUrl}/api/sports/$id');
 
-      final response = await http.put(
-        url,
-        headers: {
+      final response = await dio.put(
+        url.toString(),
+        options: Options(headers: {
           'Content-Type': 'application/json',
           'Authorization': "Bearer $token",
-        },
-        body: json.encode(updates),
+        }),
+        data: json.encode(updates),
       );
 
       if (response.statusCode != 200) {
         throw Exception(
-            'Erreur lors de la mise à jour du sport : ${response.body}');
+            'Erreur lors de la mise à jour du sport : ${response.data}');
       }
     } catch (error) {
       throw Exception('Erreur: ${error.toString()}');
@@ -110,9 +113,9 @@ class SportService {
   }
 
   Future<List<Sport>> getUserSports() async {
-    final token = await storage.read(key: jwtStorageToken);
+    final token = await storage.read(key: Constants.jwtStorageToken);
     try {
-      final Uri uri = Uri.parse('$apiBaseUrl/api/sports/user');
+      final Uri uri = Uri.parse('${Constants.apiBaseUrl}/api/sports/user');
 
       final response = await dio.get(uri.toString(),
           options: Options(headers: {

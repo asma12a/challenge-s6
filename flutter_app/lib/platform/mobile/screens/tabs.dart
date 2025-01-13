@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:squad_go/core/providers/connectivity_provider.dart';
-import 'package:squad_go/core/utils/connectivity_handler.dart';
 import 'package:squad_go/platform/mobile/screens/account.dart';
 import 'package:squad_go/platform/mobile/screens/join.dart';
 import 'package:squad_go/platform/mobile/screens/home.dart';
@@ -14,6 +13,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class TabsScreen extends StatefulWidget {
   final int? initialPageIndex;
   final bool? shouldRefresh;
+
   const TabsScreen({super.key, this.initialPageIndex, this.shouldRefresh});
 
   @override
@@ -59,10 +59,14 @@ class _TabsScreenState extends State<TabsScreen> {
     }
 
     var isOnline = context.watch<ConnectivityState>().isConnected;
-    ScaffoldMessenger.of(context).clearSnackBars();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+    });
 
     if (!isOnline) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -72,7 +76,8 @@ class _TabsScreenState extends State<TabsScreen> {
                     color: Theme.of(context).colorScheme.onPrimary),
                 const SizedBox(width: 10),
                 Text(
-                  "Vous n'êtes pas connecté à internet.",
+                  translate?.no_internet ??
+                      "Vous n'êtes pas connecté à internet.",
                   style:
                       TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                 ),
@@ -129,9 +134,9 @@ class _TabsScreenState extends State<TabsScreen> {
             icon: const Icon(Icons.qr_code),
             label: translate?.tabs_join ?? 'Rejoindre',
           ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.person),
+            label: translate?.tabs_profile ?? 'Profile',
           ),
         ],
       ),

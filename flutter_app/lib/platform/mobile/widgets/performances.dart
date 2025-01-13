@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:squad_go/platform/mobile/widgets/home_widgets/sport_performances.dart';
 
-import '../../../core/models/sport.dart';
-import '../../../core/providers/auth_state_provider.dart';
+import 'package:squad_go/core/models/sport.dart';
+import 'package:squad_go/core/providers/auth_state_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 class PerformancesHandle extends StatefulWidget {
   final List<Sport> sports;
@@ -25,7 +27,17 @@ class _PerformancesHandleState extends State<PerformancesHandle> {
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
+
     final currentUser = context.read<AuthState>().userInfo;
+    if (!userHasSport) {
+      // Si l'utilisateur n'a aucun sport, afficher un message avec le translate.
+      return Center(
+        child: Text(
+          translate?.no_perf ?? 'Aucune performance disponible',
+        ),
+      );
+    }
     return DefaultTabController(
         length: widget.sports.length,
         child: Column(

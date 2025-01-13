@@ -58,29 +58,30 @@ class HomeMyEventsState extends State<HomeMyEvents> {
   @override
   Widget build(BuildContext context) {
     final translate = AppLocalizations.of(context);
-    return
-      widget.isHome! ?
-      Carousel(
-        text: translate?.my_events ?? "Mes événements en cours",
-        items: myEvents
-            .map((event) =>
-            EventCard(
-              event: event,
-              hasJoinedEvent: true,
-              onRefresh: widget.onRefresh,
-            ))
-            .toList(),
-      )
-          :
-      Flexible(
-        child: ListView.builder(
-          itemCount: myEvents.length,
-          itemBuilder: (ctx, index) => EventCard(
-            event: myEvents[index],
-            hasJoinedEvent: true,
-            onRefresh: widget.onRefresh,
-          ),
-        ),
-      );
+    return widget.isHome!
+        ? Carousel(
+            text: translate?.my_events ?? "Mes événements en cours",
+            items: myEvents
+                .map((event) => EventCard(
+                      event: event,
+                      hasJoinedEvent: true,
+                      onRefresh: widget.onRefresh,
+                    ))
+                .toList(),
+          )
+        : Flexible(
+            child: myEvents.isEmpty
+                ? Center(
+                    child: Text(translate?.no_event_to_display ?? 'Aucun événement à afficher'),
+                  )
+                : ListView.builder(
+                    itemCount: myEvents.length,
+                    itemBuilder: (ctx, index) => EventCard(
+                      event: myEvents[index],
+                      hasJoinedEvent: true,
+                      onRefresh: widget.onRefresh,
+                    ),
+                  ),
+          );
   }
 }
