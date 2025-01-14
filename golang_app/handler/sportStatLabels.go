@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
@@ -10,7 +11,6 @@ import (
 	"github.com/asma12a/challenge-s6/service"
 	"github.com/gofiber/fiber/v2"
 	"github.com/redis/go-redis/v9"
-
 )
 
 func SportStatLabelsHandler(app fiber.Router, ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceSport service.Sport, serviceEvent service.Event, serviceUser service.User, serviceNotification service.NotificationService, rdb *redis.Client) {
@@ -285,7 +285,7 @@ func listSportStatLabelsBySport(ctx context.Context, serviceSportStatLables serv
 	}
 }
 
-func addUserStat(ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceEvent service.Event, serviceUser service.User, serviceNotification service.NotificationService, rdb *redis.Client ) fiber.Handler {
+func addUserStat(ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceEvent service.Event, serviceUser service.User, serviceNotification service.NotificationService, rdb *redis.Client) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
 		eventIDStr := c.Params("eventId")
@@ -343,8 +343,7 @@ func addUserStat(ctx context.Context, serviceSportStatLables service.SportStatLa
 			})
 		}
 
-
-		fcmToken, err := serviceNotification.GetTokenFromRedis(ctx,rdb, string(user.ID)+"_FCM") 
+		fcmToken, err := serviceNotification.GetTokenFromRedis(ctx, rdb, string(user.ID)+"_FCM")
 		if err == nil {
 			err = serviceNotification.SendPushNotification(
 				fcmToken,
@@ -403,7 +402,7 @@ func updateUserStats(ctx context.Context, serviceSportStatLables service.SportSt
 			})
 		}
 
-		fcmToken, err := serviceNotification.GetTokenFromRedis(ctx,rdb, string(user.ID)+"_FCM")
+		fcmToken, err := serviceNotification.GetTokenFromRedis(ctx, rdb, string(user.ID)+"_FCM")
 		if err == nil {
 			err = serviceNotification.SendPushNotification(
 				fcmToken,
@@ -417,7 +416,6 @@ func updateUserStats(ctx context.Context, serviceSportStatLables service.SportSt
 				})
 			}
 		}
-
 
 		return c.SendStatus(fiber.StatusOK)
 	}

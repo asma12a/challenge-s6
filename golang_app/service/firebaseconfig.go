@@ -5,9 +5,8 @@ import (
 	"log"
 
 	firebase "firebase.google.com/go"
-	"google.golang.org/api/option"
 	"github.com/asma12a/challenge-s6/config"
-
+	"google.golang.org/api/option"
 )
 
 var app *firebase.App
