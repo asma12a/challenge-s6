@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "471748746827",
+    "project_id": "squadgo-64368",
+    "storage_bucket": "squadgo-64368.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:471748746827:android:19d1d12e763c490e18f7ce",
+        "android_client_info": {
+          "package_name": "com.example.squad_go"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxLbqLZ4bAI4FAPHmLTQFMlqsctXo2NRc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

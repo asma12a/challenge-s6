@@ -86,15 +86,20 @@ func main() {
 
 	// Route WebSocket
 	app.Get("/ws", websocket.New(ws.WebSocketHandler(hub)))
-
+	
+	notificationService, err := service.NewNotificationService()
+	if err != nil {
+		log.Fatalf("Erreur lors de l'initialisation du service de notification : %v", err)
+	}
 	// Routes API (sans authentification middleware)
 	api := app.Group("/api")
+	handler.NotificationHandler(api.Group("/notifications"), context.Background(), *notificationService)
 	handler.EventHandler(api.Group("/events", middleware.IsAuthMiddleware), context.Background(), *service.NewEventService(dbClient), *service.NewSportService(dbClient), *service.NewTeamService(dbClient), *service.NewTeamUserService(dbClient))
 	handler.SportHandler(api.Group("/sports", middleware.IsAuthMiddleware), context.Background(), *service.NewSportService(dbClient))
 	handler.UserHandler(api.Group("/users", middleware.IsAuthMiddleware), context.Background(), *service.NewUserService(dbClient))
 	handler.AuthHandler(api.Group("/auth"), context.Background(), *service.NewUserService(dbClient), *service.NewTeamUserService(dbClient), rdb)
 	handler.MessageHandler(api.Group("/message", middleware.IsAuthMiddleware), context.Background(), *service.NewMessageService(dbClient), *service.NewEventService(dbClient), *service.NewUserService(dbClient))
-	handler.SportStatLabelsHandler(api.Group("/sportstatlabels", middleware.IsAuthMiddleware), context.Background(), *service.NewSportStatLabelsService(dbClient), *service.NewSportService(dbClient), *service.NewEventService(dbClient), *service.NewUserService(dbClient))
+	handler.SportStatLabelsHandler(api.Group("/sportstatlabels", middleware.IsAuthMiddleware), context.Background(), *service.NewSportStatLabelsService(dbClient), *service.NewSportService(dbClient), *service.NewEventService(dbClient), *service.NewUserService(dbClient), *notificationService)
 	handler.ActionLogHandler(api.Group("/actionlogs", middleware.IsAuthMiddleware), context.Background(), *service.NewActionLogService(dbClient), *service.NewUserService(dbClient))
 	userService := service.NewUserService(dbClient)
 	oauthHandler := handler.NewOAuthHandler(userService)
