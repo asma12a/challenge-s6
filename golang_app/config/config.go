@@ -22,6 +22,7 @@ type Environment struct {
 	Environment   string
 	ClientID      string
 	ClientSecret  string
+	ServerURL     string
 }
 
 var Env *Environment
@@ -52,6 +53,7 @@ func LoadEnvironment() {
 	Env.ClientID = getEnv("GOOGLE_CLIENT_ID", true)
 	Env.ClientSecret = getEnv("GOOGLE_CLIENT_SECRET", true)
 	Env.RedisURL = getEnv("REDIS_URL", true)
+	Env.ServerURL = getEnv("SERVER_URL", true)
 }
 
 func LoadEnvironmentFile() {

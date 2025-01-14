@@ -51,6 +51,8 @@ func main() {
 
 	app := fiber.New()
 
+	app.Static("/images", "./images")
+
 	// Middleware
 	app.Use(cors.New())
 	app.Use(compress.New())
