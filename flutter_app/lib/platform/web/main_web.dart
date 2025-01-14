@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
+import 'package:squad_go/core/services/auth_service.dart';
 import 'package:squad_go/platform/web/screens/home.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -12,6 +13,7 @@ class MyAppWeb extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthState()),
+        Provider<AuthService>(create: (_) => AuthService()),
       ],
       builder: (context, child) => MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/asma12a/challenge-s6/ent"
@@ -132,10 +133,11 @@ func (repo *MessageService) List(ctx context.Context) ([]*ent.Message, error) {
 // @Failure 404 {object} map[string]interface{} "Event Not Found"
 // @Router /messages/event/{eventID} [get]
 func (repo *MessageService) ListByEvent(ctx context.Context, eventID ulid.ID) ([]*entity.Message, error) {
-	// Récupère tous les messages associés à un événement spécifique
+	fmt.Println("EventId dans  ListByEvent:", eventID)
 	messages, err := repo.db.Message.Query().
 		Where(message.HasEventWith(event.IDEQ(eventID))).
 		All(ctx)
+
 	if err != nil {
 		return nil, entity.ErrNotFound
 	}
@@ -145,5 +147,6 @@ func (repo *MessageService) ListByEvent(ctx context.Context, eventID ulid.ID) ([
 	for _, msg := range messages {
 		result = append(result, &entity.Message{Message: *msg})
 	}
+
 	return result, nil
 }

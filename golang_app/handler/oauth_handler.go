@@ -18,17 +18,14 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// Clé secrète pour signer les JWT (à stocker de manière sécurisée)
 var jwtSecret = []byte("secret")
 
-// Structure pour la génération du token JWT
 type JWTClaims struct {
 	Email string `json:"email"`
 	Name  string `json:"name"`
 	jwt.StandardClaims
 }
 
-// Fonction pour générer un token aléatoire pour `state`
 func generateState() string {
 	b := make([]byte, 32)
 	_, err := rand.Read(b)
@@ -63,13 +60,21 @@ func (h *OAuthHandler) OAuthLoginHandler(c *fiber.Ctx) error {
 		Value:    state,
 		Expires:  time.Now().Add(10 * time.Minute),
 		HTTPOnly: true,
-		Secure:   true,
+		Secure:   false,
+		SameSite: "Strict",
 	})
+
 	url := oauth.GoogleOAuthConfig.AuthCodeURL(state, oauth2.AccessTypeOffline)
-	return c.Redirect(url)
+	log.Printf("url %v", url)
+
+	return c.JSON(fiber.Map{
+		"auth_url": url,
+	})
 }
 
 func (h *OAuthHandler) OAuthCallbackHandler(c *fiber.Ctx) error {
+	log.Printf("OAuthCallbackHandler début")
+
 	code := c.Query("code")
 	if code == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Code not found"})
@@ -81,68 +86,87 @@ func (h *OAuthHandler) OAuthCallbackHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Token exchange failed"})
 	}
 
+	userInfo, err := fetchGoogleUserInfo(token)
+	if err != nil {
+		log.Printf("Erreur de récupération des informations utilisateur: %v", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to get user info"})
+	}
+
+	user, err := h.handleUserInDatabase(c, userInfo)
+	if err != nil {
+		log.Printf("Erreur lors de la gestion de l'utilisateur: %v", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error handling user"})
+	}
+
+	jwtToken, err := generateJWT(user.Email, user.Name)
+	if err != nil {
+		log.Printf("Erreur lors de la génération du JWT: %v", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error generating JWT"})
+	}
+
+	return c.JSON(fiber.Map{
+		"jwt": jwtToken,
+		"user_info": fiber.Map{
+			"email": user.Email,
+			"name":  user.Name,
+		},
+	})
+}
+
+func fetchGoogleUserInfo(token *oauth2.Token) (map[string]interface{}, error) {
 	client := oauth.GoogleOAuthConfig.Client(context.Background(), token)
 	resp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
 	if err != nil {
-		log.Printf("Erreur de requête utilisateur: %v", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to get user info"})
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	var userInfo map[string]interface{}
 	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
-		log.Printf("Erreur de décodage des données utilisateur: %v", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to decode user info"})
+		return nil, err
 	}
+	return userInfo, nil
+}
 
+func (h *OAuthHandler) handleUserInDatabase(ctx *fiber.Ctx, userInfo map[string]interface{}) (*entity.User, error) {
 	email, _ := userInfo["email"].(string)
 	name, _ := userInfo["name"].(string)
 
-	// Vérifier si l'utilisateur existe déjà dans la base de données
-	existingUser, err := h.UserService.FindByEmail(c.Context(), email)
+	existingUser, err := h.UserService.FindByEmail(ctx.Context(), email)
 	if err != nil && err != entity.ErrNotFound {
-		log.Printf("Erreur lors de la vérification de l'utilisateur: %v", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error checking user"})
+		return nil, err
 	}
 
-	// Si l'utilisateur n'existe pas, créer un nouvel utilisateur
 	if existingUser == nil {
-		// Créer un mot de passe temporaire sécurisé
 		tempPassword, err := generateSecurePassword()
 		if err != nil {
 			log.Printf("Erreur lors de la génération du mot de passe: %v", err)
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error generating password"})
+			return nil, err
 		}
 
-		// Hacher le mot de passe temporaire
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(tempPassword), bcrypt.DefaultCost)
 		if err != nil {
 			log.Printf("Erreur lors du hachage du mot de passe: %v", err)
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error hashing password"})
+			return nil, err
 		}
 
-		// Créer l'utilisateur avec un mot de passe haché
 		newUser := &entity.User{
 			User: ent.User{
 				Email:    email,
 				Name:     name,
 				Roles:    []string{"user"},
-				Password: string(hashedPassword), // Stocker le mot de passe haché
+				Password: string(hashedPassword),
 			},
 		}
 
-		createdUser, err := h.UserService.Create(c.Context(), newUser)
-		if err != nil {
-			log.Printf("Erreur lors de la création de l'utilisateur: %v", err)
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error creating user"})
-		}
-		log.Printf("Nouvel utilisateur créé: %v", createdUser)
-	} else {
-		log.Printf("Utilisateur existant connecté: %v", existingUser)
+		return h.UserService.Create(ctx.Context(), newUser)
 	}
 
-	// Générer un JWT pour l'utilisateur
-	expirationTime := time.Now().Add(24 * time.Hour)
+	return existingUser, nil
+}
+
+func generateJWT(email, name string) (string, error) {
+	expirationTime := time.Now().Add(15 * time.Minute)
 	claims := &JWTClaims{
 		Email: email,
 		Name:  name,
@@ -152,22 +176,6 @@ func (h *OAuthHandler) OAuthCallbackHandler(c *fiber.Ctx) error {
 		},
 	}
 
-	// Créer un token JWT signé
-	tokenJWT := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := tokenJWT.SignedString(jwtSecret)
-	log.Printf("TokenString: %s", tokenString)
-
-	if err != nil {
-		log.Printf("Erreur lors de la création du JWT: %v", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error generating JWT"})
-	}
-
-	// Retourner le JWT et les informations utilisateur
-	return c.JSON(fiber.Map{
-		"access_token": token.AccessToken,
-		"user_info": fiber.Map{
-			"email": email,
-			"name":  name,
-		},
-	})
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(jwtSecret)
 }

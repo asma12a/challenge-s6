@@ -41,7 +41,6 @@ import (
 )
 
 func main() {
-	config.LoadEnvironmentFile()
 
 	dbClient := database.GetClient()
 	rdb := redis.GetClient()
@@ -54,6 +53,7 @@ func main() {
 	app.Static("/images", "./images")
 
 	// Middleware
+	// Middleware CORS
 	app.Use(cors.New())
 	app.Use(compress.New())
 	app.Use(etag.New())
@@ -105,7 +105,7 @@ func main() {
 	oauthHandler := handler.NewOAuthHandler(userService)
 
 	app.Get("/auth/google/login", oauthHandler.OAuthLoginHandler)
-	app.Get("/auth/google/callback", oauthHandler.OAuthCallbackHandler)
+	app.Post("/auth/google/callback", oauthHandler.OAuthCallbackHandler)
 
 	// Route de gestion des erreurs (Not Found)
 	app.All("*", func(c *fiber.Ctx) error {

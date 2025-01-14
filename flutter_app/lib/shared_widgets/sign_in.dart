@@ -1,15 +1,12 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:logging/logging.dart';
+import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
-import 'package:squad_go/core/utils/constants.dart';
+import 'package:squad_go/core/services/auth_service.dart';
 import 'package:squad_go/shared_widgets/sign_up.dart';
 import 'package:squad_go/platform/mobile/widgets/logo.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
@@ -81,25 +78,40 @@ class __FormContentState extends State<_FormContent> {
   var _enteredEmail = '';
   var _enteredPassword = '';
 
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
-
   // Méthode de connexion avec Google
   Future<void> _signInWithGoogle(BuildContext context) async {
-    try {
-      GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser != null) {
-        // Vous pouvez obtenir un token ou l'ID de l'utilisateur
-        final GoogleSignInAuthentication googleAuth =
-            await googleUser.authentication;
-        final accessToken = googleAuth.accessToken;
-        final idToken = googleAuth.idToken;
 
+    try {
+      final data = await context.read<AuthService>().signInWithGoogle();
+
+      if (data['status'] == 'error') {
+        // Gestion des erreurs Google
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Theme.of(context).colorScheme.errorContainer,
+            content: Text(
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onErrorContainer),
+              'Google sign-in failed, please try again.',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      } else {
+        // Connexion réussie, redirection vers la page d'accueil
         context.go('/home');
       }
-    } catch (error) {
+    } on AppException catch (e) {
+      print('message ${e.message}');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Erreur lors de la connexion avec Google : $error'),
+          backgroundColor: Theme.of(context).colorScheme.errorContainer,
+          content: Text(
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onErrorContainer),
+            'An error occurred during Google sign-in.',
+            textAlign: TextAlign.center,
+          ),
         ),
       );
     }
@@ -166,7 +178,6 @@ class __FormContentState extends State<_FormContent> {
         }
       }
     } catch (e) {
-      print(e);
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
