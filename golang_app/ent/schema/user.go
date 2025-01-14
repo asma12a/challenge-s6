@@ -26,6 +26,7 @@ func (User) Fields() []ent.Field {
 		field.String("email").NotEmpty().Unique().StructTag(`validate:"required,email"`).Match(regexp.MustCompile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")),
 		field.String("password").NotEmpty(),
 		field.Strings("roles").Default([]string{"user"}),
+		field.Bool("is_active").Default(false),
 	}
 }
 

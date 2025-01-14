@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Confirmation de l'activation</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        background-color: #f4f7fc;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .container {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 600px;
+        padding: 30px;
+        text-align: center;
+      }
+
+      .header {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      .message {
+        font-size: 16px;
+        color: #555;
+        line-height: 1.5;
+        margin-bottom: 20px;
+      }
+
+      .cta-button:hover {
+        background-color: #45a049;
+      }
+
+      footer {
+        margin-top: 30px;
+        font-size: 12px;
+        color: #888;
+      }
+
+      footer a {
+        color: #4caf50;
+        text-decoration: none;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 20px;
+        }
+
+        .header {
+          font-size: 20px;
+        }
+
+        .message {
+          font-size: 14px;
+        }
+
+        .cta-button {
+          padding: 10px 20px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header">Félicitations, {{.Name}} !</div>
+      <div class="message">{{.Message}}</div>
+      <img src="/images/logo.png" alt="Logo" width="150" height="150" />
+      <footer>
+        <p>
+          Vous avez reçu cet e-mail car vous avez créé un compte sur notre
+          plateforme. Si vous n'êtes pas à l'origine de cette demande, veuillez
+          ignorer cet e-mail.
+        </p>
+        <p>
+          © 2025 Notre Application. Tous droits réservés.
+          <a href="#">Conditions d'utilisation</a> |
+          <a href="#">Politique de confidentialité</a>
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>

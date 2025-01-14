@@ -112,6 +112,8 @@ func (repo *User) Update(ctx context.Context, user *entity.User) (*entity.User, 
 		SetName(user.Name).
 		SetEmail(user.Email).
 		SetPassword(user.Password).
+		SetUpdatedAt(user.UpdatedAt).
+		SetIsActive(user.IsActive).
 		SetRoles(user.Roles).Save(ctx)
 
 	if err != nil {

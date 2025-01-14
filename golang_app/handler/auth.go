@@ -3,6 +3,7 @@ package handler
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"html/template"
 	"log"
 	"strings"
@@ -32,6 +33,7 @@ func AuthHandler(app fiber.Router, ctx context.Context, serviceUser service.User
 	app.Post("/signup", signUp(ctx, serviceUser, serviceTeamUser, rdb))
 	app.Post("/login", login(ctx, serviceUser))
 	app.Get("/me", middleware.IsAuthMiddleware, me(ctx, serviceUser))
+	app.Get("/verify/:token", verify(ctx, serviceUser, rdb))
 }
 
 type SignUpRequestInput struct {
@@ -94,11 +96,13 @@ func signUp(ctx context.Context, serviceUser service.User, serviceTeamUser servi
 
 		token := ulid.MustNew("")
 
-		err = rdb.Set(ctx, "token:"+string(createdUser.ID), string(token), 30*time.Minute).Err()
+		redisKey := fmt.Sprintf("token:%s", token)
+
+		err = rdb.Set(ctx, redisKey, string(createdUser.ID), 30*time.Minute).Err()
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
 				"status": "error",
-				"error":  "Erreur lors du stockage du token",
+				"error":  err.Error(),
 			})
 		}
 
@@ -110,12 +114,16 @@ func signUp(ctx context.Context, serviceUser service.User, serviceTeamUser servi
 			})
 		}
 
+		fmt.Println("Serveur: ", config.Env.ServerURL)
+
+		link := fmt.Sprintf("%s/api/auth/verify/%s", config.Env.ServerURL, token)
+
 		data := struct {
 			Name    string
 			Message string
 			Link    string
 		}{
-			Link: "http://localhost:3001/verify/" + string(token),
+			Link: link,
 		}
 
 		var body string
@@ -137,6 +145,124 @@ func signUp(ctx context.Context, serviceUser service.User, serviceTeamUser servi
 		}
 
 		return c.SendStatus(fiber.StatusCreated)
+	}
+}
+
+func verify(ctx context.Context, serviceUser service.User, rdb *redis.Client) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		// Récupérer le token de l'URL (en paramètre)
+		token := c.Params("token")
+		if token == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "Token manquant",
+			})
+		}
+
+		// Chercher le token dans Redis
+		storedToken, err := rdb.Get(ctx, "token:"+token).Result()
+		if err != nil {
+			if err == redis.Nil {
+				t, err := template.ParseFiles("template/token_invalid.html")
+				if err != nil {
+					return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+						"status": "error",
+						"error":  "Erreur lors du chargement du template",
+					})
+				}
+				data := struct {
+					Message string
+				}{
+					Message: "Le lien de vérification que vous avez utilisé est invalide ou a expiré. Veuillez demander un nouveau lien de vérification.",
+				}
+
+				var buf bytes.Buffer
+				err = t.Execute(&buf, data)
+				if err != nil {
+					return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+						"status": "error",
+						"error":  "Erreur lors de l'exécution du template.",
+					})
+				}
+				c.Set("Content-Type", "text/html")
+				return c.SendString(buf.String())
+			}
+			// Autre erreur Redis
+			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "Erreur lors de la récupération du token",
+			})
+		}
+
+		// Si le token est valide, récupérer l'utilisateur associé
+		userID, err := ulid.Parse(storedToken)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "Problème lors de la récupération de l'ID de l'utilisateur",
+			})
+		}
+
+		// Récupérer l'utilisateur par ID
+		updatedUser, err := serviceUser.FindOne(c.UserContext(), userID)
+		if err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "Utilisateur non trouvé",
+			})
+		}
+
+		updatedUser.IsActive = true
+		updatedUser.UpdatedAt = time.Now()
+
+		_, err = serviceUser.Update(c.UserContext(), updatedUser)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "Erreur lors de la mise à jour de l'utilisateur",
+			})
+		}
+
+		// Supprimer le token de Redis après validation
+		err = rdb.Del(ctx, "token:"+token).Err()
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "Erreur lors de la suppression du token",
+			})
+		}
+
+		// Charger et remplir le template HTML
+		t, err := template.ParseFiles("template/verification_success.html")
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "Erreur lors du chargement du template",
+			})
+		}
+
+		// Données à passer au template
+		data := struct {
+			Name    string
+			Message string
+		}{
+			Name:    updatedUser.Name,
+			Message: "Votre compte a été activé avec succès !",
+		}
+
+		// Exécution du template avec les données et envoi de la réponse HTML.
+		var buf bytes.Buffer
+		err = t.Execute(&buf, data)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "Erreur lors de l'exécution du template.",
+			})
+		}
+
+		// Définir le type de réponse comme HTML et envoyer le contenu.
+		c.Set("Content-Type", "text/html")
+		return c.SendString(buf.String())
 	}
 }
 
@@ -190,6 +316,13 @@ func login(ctx context.Context, serviceUser service.User) fiber.Handler {
 			return c.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
 				"status": "error",
 				"error":  entity.ErrInvalidPassword.Error(),
+			})
+		}
+
+		if !user.IsActive {
+			return c.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
+				"status": "error",
+				"error":  entity.ErrUserNotActive.Error(),
 			})
 		}
 
