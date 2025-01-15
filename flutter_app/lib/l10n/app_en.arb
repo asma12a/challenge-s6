@@ -148,7 +148,17 @@
   "server_error": "Server unavailable. Please try again later.",
   "match": "Match",
   "training": "Training",
-  "email_sent": "A verification email has been sent to you."
+  "email_sent": "A verification email has been sent to you.",
+  "google_oauth": "Log in via Google",
+  "error_password": "Incorrect credentials. Please check your information and try again.",
+  "error_active": "The user is not active. Please check your account.",
+  "not_strong": "The password is not strong enough. Please choose a stronger password.",
+  "error_conflict": "The email address is already in use."
+
+
+
+
+
 
 
 

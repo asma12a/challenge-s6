@@ -148,7 +148,18 @@
   "server_error": "Servidor no disponible. Por favor, inténtelo de nuevo más tarde.",
   "match": "Fósforo",
   "training": "Capacitación",
-  "email_sent": "Se le ha enviado un correo electrónico de verificación."
+  "email_sent": "Se le ha enviado un correo electrónico de verificación.",
+  "google_oauth": "Iniciar sesión a través de Google",
+  "error_password": "Credenciales incorrectas. Por favor verifique su información y vuelva a intentarlo.",
+  "error_active": "El usuario no está activo. Por favor verifique su cuenta.",
+  "not_strong": "La contraseña no es lo suficientemente fuerte. Elija una contraseña más segura.",
+  "error_conflict": "La dirección de correo electrónico ya está en uso."
+
+
+
+
+
+
 
 
 

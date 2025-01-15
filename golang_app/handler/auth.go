@@ -63,7 +63,7 @@ func signUp(ctx context.Context, serviceUser service.User, serviceTeamUser servi
 
 		if err := passwordValidator.Validate(userInput.Password, 60); err != nil {
 			return c.Status(fiber.StatusUnprocessableEntity).JSON(&fiber.Map{
-				"status": "error",
+				"status": "error_not_strong_password",
 				"error":  entity.ErrPasswordNotStrong.Error(),
 			})
 		}
@@ -83,7 +83,7 @@ func signUp(ctx context.Context, serviceUser service.User, serviceTeamUser servi
 		createdUser, err := serviceUser.Create(c.UserContext(), newUser)
 		if err != nil {
 			return c.Status(fiber.StatusConflict).JSON(&fiber.Map{
-				"status": "error",
+				"status": "error_conflict",
 				"error":  err.Error(),
 			})
 		}
@@ -305,7 +305,7 @@ func login(ctx context.Context, serviceUser service.User) fiber.Handler {
 			log.Printf("User not found: %v", err)
 
 			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-				"status": "error",
+				"status": "error_not_found",
 				"error":  entity.ErrEntityNotFound("User").Error(),
 			})
 		}
@@ -314,14 +314,14 @@ func login(ctx context.Context, serviceUser service.User) fiber.Handler {
 		err = entity.ValidatePassword(user, password)
 		if err != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
-				"status": "error",
+				"status": "error_password",
 				"error":  entity.ErrInvalidPassword.Error(),
 			})
 		}
 
 		if !user.IsActive {
 			return c.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
-				"status": "error",
+				"status": "error_not_active",
 				"error":  entity.ErrUserNotActive.Error(),
 			})
 		}

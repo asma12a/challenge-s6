@@ -148,7 +148,18 @@
   "server_error": "Server nicht verfügbar. Bitte versuchen Sie es später erneut.",
   "match": "Übereinstimmen",
   "training": "Ausbildung",
-  "email_sent": "Eine Bestätigungs-E-Mail wurde Ihnen gesendet."
+  "email_sent": "Eine Bestätigungs-E-Mail wurde Ihnen gesendet.",
+  "google_oauth": "Über Google anmelden",
+  "error_password": "Falsche Anmeldeinformationen. Bitte überprüfen Sie Ihre Angaben und versuchen Sie es erneut.",
+  "error_active": "Der Benutzer ist nicht aktiv. Bitte bestätigen Sie Ihr Konto.",
+  "not_strong": "Das Passwort ist nicht stark genug. Bitte wählen Sie ein sichereres Passwort.",
+  "error_conflict": "Die E-Mail-Adresse wird bereits verwendet."
+
+
+
+
+
+
 
 
 

@@ -2,42 +2,40 @@ package entity
 
 import "errors"
 
-var ErrNotFound = errors.New("Not found")
+var ErrNotFound = errors.New("not found")
 
 func ErrEntityNotFound(entity string) error {
 	return errors.New(entity + " not found")
 }
 
-var ErrEmailAlreadyRegistred = errors.New("L'adresse email est déjà utilisée.")
+var ErrEmailAlreadyRegistred = errors.New("the email address is already in use")
 
-var ErrInvalidEntity = errors.New("Invalid entity")
+var ErrInvalidEntity = errors.New("invalid entity")
 
 func ErrInvalidRelation(relation string) error {
-	return errors.New("Invalid " + relation + ": relation not found")
+	return errors.New("invalid " + relation + ": relation not found")
 }
 
-var ErrInvalidInput = errors.New("Invalid input")
+var ErrInvalidInput = errors.New("invalid input")
 
-var ErrInvalidID = errors.New("Invalid ID")
+var ErrInvalidID = errors.New("invalid ID")
 
-var ErrCannotBeCreated = errors.New("Cannot be created")
+var ErrCannotBeCreated = errors.New("cannot be created")
 
-var ErrCannotBeDeleted = errors.New("Cannot be deleted")
+var ErrCannotBeDeleted = errors.New("cannot be deleted")
 
-var ErrCannotBeUpdated = errors.New("Cannot be updated")
+var ErrCannotBeUpdated = errors.New("cannot be updated")
 
-var ErrPasswordGenaration = errors.New("Password cannot be generated")
+var ErrPasswordNotStrong = errors.New("the password is not strong enough. Please choose a stronger password")
 
-var ErrPasswordNotStrong = errors.New("Le mot de passe n'est pas assez fort. Veuillez choisir un mot de passe plus fort.")
+var ErrInvalidPassword = errors.New("incorrect credentials. Please check your information and try again")
 
-var ErrInvalidPassword = errors.New("Identifiants incorrects. Veuillez vérifier vos informations et réessayer.")
+var ErrUserNotActive = errors.New("the user is not active. Please verify your account")
 
-var ErrUserNotActive = errors.New("L'utilisateur n'est pas actif. Veuillez vérifier votre compte.")
+var ErrCannotParseJSON = errors.New("cannot parse JSON")
 
-var ErrCannotParseJSON = errors.New("Cannot parse JSON")
+var ErrTeamFull = errors.New("team is full")
 
-var ErrTeamFull = errors.New("Team is full")
+var ErrUserAlreadyInATeam = errors.New("user is already in a team")
 
-var ErrUserAlreadyInATeam = errors.New("User is already in a team")
-
-var ErrUserAlreadyInThisTeam = errors.New("User is already in this team")
+var ErrUserAlreadyInThisTeam = errors.New("user is already in this team")

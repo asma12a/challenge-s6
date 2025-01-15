@@ -94,8 +94,7 @@ class __FormContentState extends State<_FormContent> {
         final accessToken = googleAuth.accessToken;
         final idToken = googleAuth.idToken;
 
-        context
-            .go('/home'); 
+        context.go('/home');
       }
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -116,21 +115,54 @@ class __FormContentState extends State<_FormContent> {
             .read<AuthState>()
             .login(_enteredEmail, _enteredPassword);
 
-        if (loginData['status'] == 'error') {
-          ScaffoldMessenger.of(context).clearSnackBars();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              content: Text(
-                style: TextStyle(
-                    color: Theme.of(context).colorScheme.onErrorContainer),
-                loginData['error'],
-                textAlign: TextAlign.center,
+        switch (loginData['status']) {
+          case 'error':
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: Theme.of(context).colorScheme.errorContainer,
+                content: Text(
+                  loginData['error'],
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onErrorContainer,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
-            ),
-          );
-        } else {
-          context.go('/home');
+            );
+            break;
+
+          case 'error_password':
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: Theme.of(context).colorScheme.errorContainer,
+                content: Text(
+                  translate?.error_password ?? loginData['error'],
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onErrorContainer,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+            break;
+
+          case 'error_active':
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: Theme.of(context).colorScheme.errorContainer,
+                content: Text(
+                  translate?.error_active ?? loginData['error'],
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onErrorContainer,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+            break;
+
+          default:
+            context.go('/home');
         }
       }
     } catch (e) {
@@ -279,19 +311,19 @@ class __FormContentState extends State<_FormContent> {
                   await _signInWithGoogle(
                       context); // Authentification via Google
                 },
-                child: const Padding(
-                  padding: EdgeInsets.all(10.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.login,
                         color: Colors.white,
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Text(
-                        'Se connecter via Google',
-                        style: TextStyle(
+                        translate?.google_oauth ?? 'Se connecter via Google',
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,

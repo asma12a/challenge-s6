@@ -98,33 +98,55 @@ class __FormContentState extends State<_FormContent> {
           },
         );
 
-        if (result?['status'] == 'error') {
+        if (result?['status'] != null) {
           ScaffoldMessenger.of(context).clearSnackBars();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              content: Text(
-                style: TextStyle(
-                    color: Theme.of(context).colorScheme.onErrorContainer),
-                result?['error'],
-                textAlign: TextAlign.center,
-              ),
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).clearSnackBars();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              duration: const Duration(milliseconds: 5000),
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              content: Text(
-                translate?.email_sent ??
-                    'Un email de vérification vous a été envoyé.',
-                textAlign: TextAlign.center,
-              ),
-            ),
-          );
-          Navigator.of(context).pop();
+
+          switch (result?['status']) {
+            case 'error_not_strong_password':
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: Theme.of(context).colorScheme.errorContainer,
+                  content: Text(
+                    translate?.not_strong ?? result?['error'],
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onErrorContainer,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
+              break;
+
+            case 'error_conflict':
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: Theme.of(context).colorScheme.errorContainer,
+                  content: Text(
+                    translate?.error_conflict ?? result?['error'],
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onErrorContainer,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
+              break;
+
+            default:
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  duration: const Duration(milliseconds: 5000),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  content: Text(
+                    translate?.email_sent ??
+                        'Un email de vérification vous a été envoyé.',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
+              Navigator.of(context).pop();
+              break;
+          }
         }
       }
     } catch (e) {
