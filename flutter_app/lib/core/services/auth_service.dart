@@ -28,6 +28,8 @@ class AuthService {
 
       final data = response.data;
 
+      print(data);
+
       await _storage.write(
           key: Constants.jwtStorageToken, value: data['token']);
       return data;

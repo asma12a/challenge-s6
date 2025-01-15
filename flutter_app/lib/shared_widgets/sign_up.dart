@@ -131,22 +131,20 @@ class __FormContentState extends State<_FormContent> {
                 ),
               );
               break;
-
-            default:
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  duration: const Duration(milliseconds: 5000),
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  content: Text(
-                    translate?.email_sent ??
-                        'Un email de vérification vous a été envoyé.',
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              );
-              Navigator.of(context).pop();
-              break;
           }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              duration: const Duration(milliseconds: 5000),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              content: Text(
+                translate?.email_sent ??
+                    'Un email de vérification vous a été envoyé.',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+          Navigator.of(context).pop();
         }
       }
     } catch (e) {

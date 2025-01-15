@@ -146,7 +146,7 @@ class __FormContentState extends State<_FormContent> {
             );
             break;
 
-          case 'error_active':
+          case 'error_not_active':
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 backgroundColor: Theme.of(context).colorScheme.errorContainer,
@@ -166,6 +166,7 @@ class __FormContentState extends State<_FormContent> {
         }
       }
     } catch (e) {
+      print(e);
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

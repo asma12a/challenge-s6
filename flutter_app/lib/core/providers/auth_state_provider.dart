@@ -25,7 +25,7 @@ class AuthState with ChangeNotifier {
       final loginData =
           await _authService.signIn({'email': email, 'password': password});
 
-      if (loginData['status'] == 'error') {
+      if (loginData['status'].startsWith('error')) {
         return loginData;
       }
 
