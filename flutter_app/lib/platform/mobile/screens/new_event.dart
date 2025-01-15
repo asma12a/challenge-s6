@@ -95,6 +95,7 @@ class _NewEventState extends State<NewEvent> {
     final firstDate = DateTime(now.year, now.month, now.day);
     final lastDate = DateTime(now.year + 4);
 
+    // Sélectionner la date
     final pickedDate = await showDatePicker(
       context: context,
       initialDate: now,
@@ -102,10 +103,29 @@ class _NewEventState extends State<NewEvent> {
       lastDate: lastDate,
     );
 
-    if (pickedDate != null) {
-      final formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+    // Sélectionner l'heure
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (pickedDate != null && pickedTime != null) {
+      // Convertir l'heure en DateTime
+      final pickedDateTime = DateTime(
+        pickedDate.year,
+        pickedDate.month,
+        pickedDate.day,
+        pickedTime.hour,
+        pickedTime.minute,
+      );
+
+      // Formater la date et l'heure en ISO 8601
+      final iso8601FormattedDateTime =
+          DateFormat("yyyy-MM-ddTHH:mm:ssZ").format(pickedDateTime.toUtc());
+
       setState(() {
-        _selectedDate = formattedDate; // _selectedDate devient une chaîne
+        _selectedDate =
+            iso8601FormattedDateTime; // Assurez-vous d'utiliser le bon champ dans votre code
       });
     }
   }

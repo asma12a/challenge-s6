@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"strconv"
+	"time"
 
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
@@ -45,7 +46,7 @@ func EventHandler(app fiber.Router, ctx context.Context, serviceEvent service.Ev
 	app.Get("/recommended", listRecommendedEvents(ctx, serviceEvent))
 	app.Get("/:eventId", getEvent(ctx, serviceEvent))
 	app.Get("/code/:eventCode", getEventByCode(ctx, serviceEvent))
-	app.Post("/", createEvent(ctx, serviceEvent, serviceSport))
+	app.Post("/", middleware.IsAuthMiddleware, createEvent(ctx, serviceEvent, serviceSport))
 	app.Put("/:eventId", middleware.IsEventOrganizer(ctx, serviceEvent), updateEvent(ctx, serviceEvent, serviceSport))
 	app.Delete("/:eventId", middleware.IsEventOrganizer(ctx, serviceEvent), deleteEvent(ctx, serviceEvent))
 
@@ -141,7 +142,7 @@ func getEvent(ctx context.Context, service service.Event) fiber.Handler {
 			Latitude:  event.Latitude,
 			Longitude: event.Longitude,
 			EventCode: event.EventCode,
-			Date:      event.Date,
+			Date:      event.Date.Format(time.RFC3339),
 			CreatedAt: event.CreatedAt,
 			CreatedBy: event.CreatedBy,
 			IsPublic:  event.IsPublic,
@@ -346,7 +347,7 @@ func getEventByCode(ctx context.Context, service service.Event) fiber.Handler {
 			Latitude:  event.Latitude,
 			Longitude: event.Longitude,
 			EventCode: event.EventCode,
-			Date:      event.Date,
+			Date:      event.Date.Format(time.RFC3339),
 			CreatedAt: event.CreatedAt,
 			CreatedBy: event.CreatedBy,
 			IsPublic:  event.IsPublic,
@@ -426,7 +427,7 @@ func listEvents(ctx context.Context, service service.Event) fiber.Handler {
 				Latitude:  event.Latitude,
 				Longitude: event.Longitude,
 				EventCode: event.EventCode,
-				Date:      event.Date,
+				Date:      event.Date.Format(time.RFC3339),
 				CreatedAt: event.CreatedAt,
 				CreatedBy: event.CreatedBy,
 				IsPublic:  event.IsPublic,
@@ -490,7 +491,7 @@ func searchEvent(ctx context.Context, service service.Event) fiber.Handler {
 				Latitude:  event.Latitude,
 				Longitude: event.Longitude,
 				EventCode: event.EventCode,
-				Date:      event.Date,
+				Date:      event.Date.Format(time.RFC3339),
 				CreatedAt: event.CreatedAt,
 				CreatedBy: event.CreatedBy,
 				IsPublic:  event.IsPublic,
@@ -541,7 +542,7 @@ func listUserEvents(ctx context.Context, serviceEvent service.Event) fiber.Handl
 				Latitude:  event.Latitude,
 				Longitude: event.Longitude,
 				EventCode: event.EventCode,
-				Date:      event.Date,
+				Date:      event.Date.Format(time.RFC3339),
 				CreatedAt: event.CreatedAt,
 				CreatedBy: event.CreatedBy,
 				IsPublic:  event.IsPublic,
@@ -605,7 +606,7 @@ func listRecommendedEvents(ctx context.Context, serviceEvent service.Event) fibe
 				Latitude:  event.Latitude,
 				Longitude: event.Longitude,
 				EventCode: event.EventCode,
-				Date:      event.Date,
+				Date:      event.Date.Format(time.RFC3339),
 				CreatedAt: event.CreatedAt,
 				CreatedBy: event.CreatedBy,
 				IsPublic:  event.IsPublic,

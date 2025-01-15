@@ -2,6 +2,7 @@ package entity
 
 import (
 	"math/rand"
+	"time"
 
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/event"
@@ -14,7 +15,7 @@ type Event struct {
 	SportID ulid.ID `json:"sport_id"`
 }
 
-func NewEvent(name string, address string, latitude, longitude float64, date string, sportId ulid.ID, eventType *event.EventType) *Event {
+func NewEvent(name string, address string, latitude, longitude float64, date time.Time, sportId ulid.ID, eventType *event.EventType) *Event {
 	event := &Event{
 		Event: ent.Event{
 			Name:      name,

@@ -75,7 +75,7 @@ func seedEvents(ctx context.Context, db_client *ent.Client) {
 			SetLongitude(gofakeit.Longitude()).
 			SetSport(sport).
 			SetEventCode(eventCode).
-			SetDate(time.Now().Format(time.DateOnly)).
+			SetDate(time.Now()).
 			Save(ctx)
 		if err != nil {
 			log.Fatalf("Failed creating event: %v", err)
