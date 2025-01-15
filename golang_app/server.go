@@ -86,7 +86,7 @@ func main() {
 
 	// Route WebSocket
 	app.Get("/ws", websocket.New(ws.WebSocketHandler(hub)))
-	
+
 	notificationService, err := service.NewNotificationService()
 	if err != nil {
 		log.Fatalf("Erreur lors de l'initialisation du service de notification : %v", err)

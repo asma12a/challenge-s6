@@ -8,4 +8,7 @@ abstract class Constants {
     'JWT_STORAGE_KEY',
     defaultValue: 'squadgo-jwt',
   );
+
+
+  
 }
