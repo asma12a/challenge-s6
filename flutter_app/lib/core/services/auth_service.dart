@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/models/user_app.dart';
+import 'package:squad_go/core/services/notification_service.dart';
 import 'package:squad_go/core/utils/constants.dart';
 import 'package:squad_go/main.dart';
 
@@ -32,6 +33,7 @@ class AuthService {
 
       await _storage.write(
           key: Constants.jwtStorageToken, value: data['token']);
+      await NotificationService().initNotifications();
       return data;
     } catch (error) {
       log.severe('An error occurred while ', {error: error});

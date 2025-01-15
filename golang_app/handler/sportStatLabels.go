@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
@@ -10,10 +9,12 @@ import (
 	"github.com/asma12a/challenge-s6/presenter"
 	"github.com/asma12a/challenge-s6/service"
 	"github.com/gofiber/fiber/v2"
+	"github.com/redis/go-redis/v9"
+
 )
 
-func SportStatLabelsHandler(app fiber.Router, ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceSport service.Sport, serviceEvent service.Event, serviceUser service.User, serviceNotification service.NotificationService) {
-	app.Post("/:eventId/addUserStat", middleware.IsEventOrganizerOrCoach(ctx, serviceEvent), addUserStat(ctx, serviceSportStatLables, serviceEvent, serviceUser))
+func SportStatLabelsHandler(app fiber.Router, ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceSport service.Sport, serviceEvent service.Event, serviceUser service.User, serviceNotification service.NotificationService, rdb *redis.Client) {
+	app.Post("/:eventId/addUserStat", middleware.IsEventOrganizerOrCoach(ctx, serviceEvent), addUserStat(ctx, serviceSportStatLables, serviceEvent, serviceUser, serviceNotification, rdb))
 	app.Post("/", middleware.IsAdminMiddleware, createSportStatLables(ctx, serviceSportStatLables, serviceSport))
 	app.Get("/:eventId/:userId/stats", middleware.IsAuthMiddleware, getUserStatsByEvent(ctx, serviceSportStatLables, serviceEvent, serviceUser))
 	app.Get("/:sportId/:userId/performance", middleware.IsAuthMiddleware, getUserPerformanceBySport(ctx, serviceSportStatLables, serviceUser))
@@ -21,7 +22,7 @@ func SportStatLabelsHandler(app fiber.Router, ctx context.Context, serviceSportS
 	app.Get("/:sportStatLabelId", middleware.IsAdminMiddleware, getSportStatLabel(ctx, serviceSportStatLables))
 	app.Get("/", middleware.IsAdminMiddleware, listSportStatLabels(ctx, serviceSportStatLables))
 	app.Delete("/:sportStatLabelId", middleware.IsAdminMiddleware, deleteSportStatLabel(ctx, serviceSportStatLables))
-	app.Put("/:eventId/updateUserStats", middleware.IsEventOrganizerOrCoach(ctx, serviceEvent), updateUserStats(ctx, serviceSportStatLables, serviceNotification))
+	app.Put("/:eventId/updateUserStats", middleware.IsEventOrganizerOrCoach(ctx, serviceEvent), updateUserStats(ctx, serviceSportStatLables, serviceNotification, rdb))
 	app.Put("/:sportStatLabelId", middleware.IsAdminMiddleware, updateSportStatLabel(ctx, serviceSportStatLables, serviceSport))
 
 }
@@ -284,7 +285,7 @@ func listSportStatLabelsBySport(ctx context.Context, serviceSportStatLables serv
 	}
 }
 
-func addUserStat(ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceEvent service.Event, serviceUser service.User) fiber.Handler {
+func addUserStat(ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceEvent service.Event, serviceUser service.User, serviceNotification service.NotificationService, rdb *redis.Client ) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
 		eventIDStr := c.Params("eventId")
@@ -341,13 +342,29 @@ func addUserStat(ctx context.Context, serviceSportStatLables service.SportStatLa
 				"error":  err.Error(),
 			})
 		}
+
+
+		fcmToken, err := serviceNotification.GetTokenFromRedis(ctx,rdb, string(user.ID)+"_FCM") 
+		if err == nil {
+			err = serviceNotification.SendPushNotification(
+				fcmToken,
+				"Performance",
+				"Nouvelles performances ajoutées",
+			)
+			if err != nil {
+				return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+					"status": "error send notification",
+					"error":  err.Error(),
+				})
+			}
+		}
 		return c.SendStatus(fiber.StatusOK)
 
 	}
 
 }
 
-func updateUserStats(ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceNotification service.NotificationService) fiber.Handler {
+func updateUserStats(ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceNotification service.NotificationService, rdb *redis.Client) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var userStatInput struct {
 			Stats []struct {
@@ -378,17 +395,29 @@ func updateUserStats(ctx context.Context, serviceSportStatLables service.SportSt
 			})
 		}
 
-		err = serviceNotification.SendPushNotification(
-			"c2M3FgtQQQKH2bAfbiOvjw:APA91bG1uQqcQcD0J5gy0FtMDhe7HNoTpPnvbtVNIIjyV4qLZqZ8v9kAVlZ-iPSG73hn3AI3elU78x7_aQ81hR67eu1moEkkHD5wB2eXorCezDV8EiuJcSg",
-			 "title",
-			  "body",
-			)
+		user, err := serviceSportStatLables.GetUserByUserStatID(ctx, userStatInput.Stats[0].UserStatID)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status": "error send notification",
+				"status": "error get user",
 				"error":  err.Error(),
 			})
 		}
+
+		fcmToken, err := serviceNotification.GetTokenFromRedis(ctx,rdb, string(user.ID)+"_FCM")
+		if err == nil {
+			err = serviceNotification.SendPushNotification(
+				fcmToken,
+				"Performance",
+				"Vos performances ont été mises à jour",
+			)
+			if err != nil {
+				return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+					"status": "error send notification",
+					"error":  err.Error(),
+				})
+			}
+		}
+
 
 		return c.SendStatus(fiber.StatusOK)
 	}

@@ -5,14 +5,13 @@ import (
 	"log"
 	"time"
 
-	"github.com/asma12a/challenge-s6/ent/team"
-	"github.com/asma12a/challenge-s6/ent/user"
-
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/event"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/ent/sport"
+	"github.com/asma12a/challenge-s6/ent/team"
 	"github.com/asma12a/challenge-s6/ent/teamuser"
+	"github.com/asma12a/challenge-s6/ent/user"
 	"github.com/asma12a/challenge-s6/entity"
 )
 
@@ -323,4 +322,24 @@ func (repo *Event) IsUserInEvent(ctx context.Context, eventID, userID ulid.ID) (
 		return false, err
 	}
 	return len(teamUsers) > 0, nil
+}
+
+func (n *Event) GetPlayersBeforeEvent(ctx context.Context) ([]*ent.Event, error) {
+	tomorrow := time.Now().AddDate(0, 0, 1)
+
+	events, err := n.db.Event.Query().
+		Where(event.DateEQ(tomorrow.Format("2006-01-02"))).
+		WithTeams(func(tq *ent.TeamQuery) {
+			tq.WithTeamUsers(func(tuq *ent.TeamUserQuery) {
+				tuq.WithUser()
+			})
+		}).
+		All(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return events, nil
+
 }

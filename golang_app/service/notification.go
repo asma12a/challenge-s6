@@ -1,21 +1,22 @@
 package service
 
-
 import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/messaging"
+	"github.com/redis/go-redis/v9"
 )
 
 type NotificationService struct {
-	app          *firebase.App
-	client       *messaging.Client
+	app    *firebase.App
+	client *messaging.Client
 }
 
-func NewNotificationService() (*NotificationService, error ) {
+func NewNotificationService() (*NotificationService, error) {
 	app := GetFirebaseApp()
 	if app == nil {
 		return nil, fmt.Errorf("firebase app non initialisée")
@@ -28,8 +29,8 @@ func NewNotificationService() (*NotificationService, error ) {
 	}
 
 	return &NotificationService{
-		app:          app,
-		client:       client,
+		app:    app,
+		client: client,
 	}, nil
 }
 
@@ -42,15 +43,33 @@ func (ns *NotificationService) SendPushNotification(token, title, body string) e
 		},
 	}
 
-	response, err := ns.client.Send(context.Background(), message)
+	_, err := ns.client.Send(context.Background(), message)
 	if err != nil {
 		return fmt.Errorf("échec de l'envoi de la notification: %w", err)
 	}
 
-	log.Printf("Notification envoyée avec succès: %s", response)
 	return nil
 }
 
+func (ns *NotificationService) StoreTokenInRedis(ctx context.Context, rdb *redis.Client, key, value string, expiration ...int) error {
+	exp := 60
+	if len(expiration) > 0 {
+		exp = expiration[0]
+	}
+	key = fmt.Sprintf("%s:token", key)
+	err := rdb.Set(ctx, key, value, time.Duration(exp)*time.Minute).Err()
 
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
-
+func (ns *NotificationService) GetTokenFromRedis(ctx context.Context, rdb *redis.Client, key string) (string, error) {
+	key = fmt.Sprintf("%s:token", key)
+	token, err := rdb.Get(ctx, key).Result()
+	if err != nil {
+		return "", err
+	}
+	return token, nil
+}
