@@ -98,7 +98,7 @@ func signUp(ctx context.Context, serviceUser service.User, serviceTeamUser servi
 
 		redisKey := fmt.Sprintf("token:%s", token)
 
-		err = rdb.Set(ctx, redisKey, string(createdUser.ID), 30*time.Minute).Err()
+		err = rdb.Set(ctx, redisKey, string(createdUser.ID), 24*time.Hour).Err()
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
 				"status": "error",
