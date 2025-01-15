@@ -22,7 +22,6 @@ func InitializeFirebase() (*firebase.App, error) {
 	if err != nil {
 		log.Fatalf("erreur lors de l'initialisation de l'application: %v", err)
 	}
-	log.Println("Firebase initialisé avec succès")
 
 	return app, nil
 }

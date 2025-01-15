@@ -41,7 +41,9 @@ void main() async {
     await FMTCObjectBoxBackend().initialise();
     await FMTCStore('mapStore').manage.create();
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-    await NotificationService().initNotifications();
+    //NotificationService().initNotifications();
+
+
 
   }
   runApp(const MyApp());

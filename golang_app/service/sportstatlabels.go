@@ -148,6 +148,10 @@ func (repo *SportStatLabels) UpdateUserStat(ctx context.Context, stats []struct 
 	return nil
 }
 
+func (repo *SportStatLabels) GetUserByUserStatID(ctx context.Context, userStatID ulid.ID) (*ent.User, error) {
+	return repo.db.UserStats.Query().Where(userstats.IDEQ(userStatID)).QueryUser().Only(ctx)
+}
+
 
 
 func (repo *SportStatLabels) Update(ctx context.Context, sportStatLabel *entity.SportStatLabels) error {
