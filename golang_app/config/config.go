@@ -9,21 +9,21 @@ import (
 )
 
 type Environment struct {
-	DBHost        string
-	DBPort        string
-	DBUser        string
-	DBPass        string
-	DBName        string
-	APIPort       string
-	DragonFlyPort string
-	RedisURL      string
-	BrevoAPIKey   string
-	JWTSecret     string
-	Environment   string
-	ClientID      string
-	ClientSecret  string
-	ServerURL     string
-	ProjectID     string
+	DBHost                  string
+	DBPort                  string
+	DBUser                  string
+	DBPass                  string
+	DBName                  string
+	APIPort                 string
+	DragonFlyPort           string
+	RedisURL                string
+	BrevoAPIKey             string
+	JWTSecret               string
+	Environment             string
+	ClientID                string
+	ClientSecret            string
+	ServerURL               string
+	ProjectID               string
 	FirebaseCredentialsFile string
 }
 
