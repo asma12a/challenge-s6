@@ -13,7 +13,7 @@ import (
 var app *firebase.App
 
 func InitializeFirebase() (*firebase.App, error) {
-	credentialsFile := ""
+	credentialsFile := config.Env.FirebaseCredentialsFile
 
 	opt := option.WithCredentialsFile(credentialsFile)
 	var err error

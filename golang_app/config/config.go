@@ -23,6 +23,7 @@ type Environment struct {
 	ClientID      string
 	ClientSecret  string
 	ProjectID     string
+	FirebaseCredentialsFile string
 }
 
 var Env *Environment
@@ -54,6 +55,7 @@ func LoadEnvironment() {
 	Env.ClientSecret = getEnv("GOOGLE_CLIENT_SECRET", true)
 	Env.RedisURL = getEnv("REDIS_URL", true)
 	Env.ProjectID = getEnv("PROJECT_ID", true)
+	Env.FirebaseCredentialsFile = getEnv("FIREBASE_CREDENTIALS_FILE", true)
 }
 
 func LoadEnvironmentFile() {
