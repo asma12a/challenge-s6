@@ -2,7 +2,6 @@ package redis
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/asma12a/challenge-s6/config"
@@ -25,9 +24,9 @@ func GetClient() *redis.Client {
 	// Vérification de la connexion avec Redis
 	_, err = rdb.Ping(ctx).Result()
 	if err != nil {
-		log.Fatalf("Erreur de connexion à Redis: %v", err)
+		log.Fatalf("Error connecting to redis: %v", err)
 	} else {
-		fmt.Println("Connexion à Redis réussie!")
+		log.Print("✅ Successfully connected to redis!")
 	}
 
 	return rdb

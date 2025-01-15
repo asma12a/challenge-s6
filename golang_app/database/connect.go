@@ -36,7 +36,6 @@ func GetClient() *ent.Client {
 	if err != nil {
 		log.Fatalf("Error connecting to database: %v", err)
 	}
-	log.Println("Connected to database")
-
+	log.Printf("✅ Successfully connected to the database!")
 	return db_client
 }
