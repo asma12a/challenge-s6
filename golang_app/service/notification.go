@@ -52,7 +52,7 @@ func (ns *NotificationService) SendPushNotification(token, title, body string) e
 }
 
 func (ns *NotificationService) StoreTokenInRedis(ctx context.Context, rdb *redis.Client, key, value string, expiration ...int) error {
-	exp := 60
+	exp := 1440
 	if len(expiration) > 0 {
 		exp = expiration[0]
 	}
