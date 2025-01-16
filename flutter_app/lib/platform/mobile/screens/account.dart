@@ -87,13 +87,16 @@ class _AccountScreenState extends State<AccountScreen> {
         throw Exception('ID utilisateur introuvable.');
       }
 
-      await UserService.updateUserPassword(userId, {'password': password});
-      Navigator.of(context).pop();
+      final result = await UserService.updateUserPassword(userId, {'password': password});
+      if (result?['status'] != null) {
+        throw Exception(result?['error']);
+      }
     } catch (e) {
       var errorMessage = e.toString();
       if (e is Exception) {
         errorMessage = e.toString().replaceFirst('Exception: ', '');
       }
+      debugPrint(errorMessage);
       throw errorMessage;
     }
   }
