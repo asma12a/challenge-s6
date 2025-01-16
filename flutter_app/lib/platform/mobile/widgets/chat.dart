@@ -65,13 +65,6 @@ class _ChatPageState extends State<ChatPage>
     });
   }
 
-  Future<void> _checkEventStatus() async {
-    final isFinished = await isEventFinished();
-    setState(() {
-      _isEventFinished = isFinished;
-    });
-  }
-
   Future<void> _initializeChat() async {
     await _loadCurrentUser();
     if (_currentUserId.isNotEmpty) {
