@@ -37,6 +37,6 @@ func (Message) Edges() []ent.Edge {
 // Indexes of the Message.
 func (Message) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Edges("user", "event").Unique(),
+		index.Edges("user", "event"),
 	}
 }
