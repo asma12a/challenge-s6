@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/asma12a/challenge-s6/ent"
@@ -33,7 +34,7 @@ func NewMessageService(client *ent.Client) *MessageService {
 // @Failure 500 {object} map[string]interface{} "Internal Server Error"
 // @Router /messages [post]
 func (repo *MessageService) Create(ctx context.Context, message *entity.Message) error {
-
+	// Tente de créer un message dans la base de données
 	_, err := repo.db.Message.Create().
 		SetEventID(message.EventID).
 		SetUserID(message.UserID).
@@ -42,8 +43,11 @@ func (repo *MessageService) Create(ctx context.Context, message *entity.Message)
 		SetCreatedAt(time.Now()).
 		Save(ctx)
 
+		// Si une erreur survient, l'afficher avec des détails supplémentaires
 	if err != nil {
-		return entity.ErrCannotBeCreated
+		// Log l'erreur avant de la renvoyer
+		fmt.Printf("Error during message creation: %v\n", err)
+		return fmt.Errorf("cannot be created: %w", err)
 	}
 
 	return nil

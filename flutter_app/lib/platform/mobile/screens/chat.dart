@@ -63,7 +63,6 @@ class _ChatPageState extends State<ChatPage>
     }
   }
 
-  // Fonction pour récupérer l'user_id à partir du token
   Future<void> _loadCurrentUser() async {
     final storage = const FlutterSecureStorage();
     final token = await storage.read(key: jwtStorageToken);
@@ -107,24 +106,18 @@ class _ChatPageState extends State<ChatPage>
   }
 
   Future<void> _loadMessages(String eventID) async {
-    print('eventID $eventID');
-
     final uri = '${Constants.apiBaseUrl}/api/message/event/$eventID';
-
-    print('_loadMessages $uri');
 
     try {
       final storage = const FlutterSecureStorage();
 
       final token = await storage.read(key: jwtStorageToken);
-      print('token $token');
 
       final response = await dio.get(uri,
           options: Options(headers: {
             'Authorization': 'Bearer $token',
+            'Cache-Control': 'no-cache',
           }));
-
-      print('response de msgs $response');
 
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
@@ -135,7 +128,7 @@ class _ChatPageState extends State<ChatPage>
 
         for (var message in data) {
           final content = message['content'];
-          final userId = message['user_id'];
+          final userId = message['created_by'];
           final userName = message['user_name'];
 
           final isSelf = userId == _currentUserId;
@@ -177,6 +170,14 @@ class _ChatPageState extends State<ChatPage>
 
         if (response.statusCode == 201) {
           debugPrint('Message envoyé et enregistré');
+
+          setState(() {
+            _messages.add('Moi: $message');
+          });
+
+          if (_chatService.isConnected) {
+            _chatService.sendMessage(message);
+          }
         } else {
           debugPrint(
               'Erreur lors de l\'enregistrement du message : ${response.statusCode}');
@@ -225,11 +226,7 @@ class _ChatPageState extends State<ChatPage>
                   itemBuilder: (context, index) {
                     final message = _messages[index];
                     final isSelf = message.startsWith('Moi:');
-                    // Récupérer le nom de l'utilisateur qui a envoyé le message
-                    final userName = isSelf
-                        ? 'Moi' // Si c'est l'utilisateur actuel, afficher "Moi"
-                        : message.split(':')[
-                            0]; // Sinon, afficher le nom de l'utilisateur récupéré
+                    final userName = isSelf ? 'Moi' : message.split(':')[0];
 
                     return Align(
                       alignment:
