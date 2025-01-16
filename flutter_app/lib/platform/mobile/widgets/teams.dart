@@ -20,7 +20,10 @@ class TeamsHandle extends StatefulWidget {
   final String? eventCreatorId;
   final List<Team> teams;
   final int maxTeams;
-  final bool canEdit;
+  final bool userIsOrganizer;
+  final bool userIsCoach;
+  // final bool canEdit;
+  // final bool canEditStats;
   final Color color;
   final bool isEventFinished;
   final bool isEventNowPlaying;
@@ -30,11 +33,12 @@ class TeamsHandle extends StatefulWidget {
     super.key,
     required this.teams,
     required this.eventId,
-    required this.canEdit,
     required this.maxTeams,
     required this.color,
     this.isEventFinished = false,
     this.isEventNowPlaying = false,
+    this.userIsOrganizer = false,
+    this.userIsCoach = false,
     this.onRefresh,
     this.eventCreatorId,
   });
@@ -78,7 +82,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
     final translate = AppLocalizations.of(context);
     _showAlertDialog(
       translate?.change_team ?? "Changer d'équipe",
-      '${translate?.confirm_change_team ?? "Voulez-vous vraiment changer d\'équipe et rejoindre"} $teamName ?',
+      '${translate?.confirm_change_team ?? "Voulez-vous vraiment changer d'équipe et rejoindre"} $teamName ?',
       () async {
         try {
           await teamService.switchTeam(widget.eventId, teamId);
@@ -128,6 +132,8 @@ class _TeamsHandleState extends State<TeamsHandle> {
 
     var isOnline = context.watch<ConnectivityState>().isConnected;
 
+    final canEdit = widget.userIsOrganizer || widget.userIsCoach;
+
     return DefaultTabController(
       length: widget.teams.length,
       child: Column(
@@ -155,8 +161,8 @@ class _TeamsHandleState extends State<TeamsHandle> {
                         child: Row(
                           children: [
                             Text(team.name),
-                            SizedBox(width: widget.canEdit ? 8 : 16),
-                            if (widget.canEdit && !widget.isEventFinished) ...[
+                            SizedBox(width: canEdit ? 8 : 16),
+                            if (canEdit && !widget.isEventFinished) ...[
                               Container(
                                 width: 30,
                                 height: 30,
@@ -202,7 +208,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                   ).toList(),
                 ),
               ),
-              if (widget.canEdit &&
+              if (canEdit &&
                   !widget.isEventFinished &&
                   (widget.maxTeams == 0 ||
                       widget.teams.length < widget.maxTeams))
@@ -361,7 +367,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                               return ShowPlayerDetailsDialog(
                                                 eventId: widget.eventId,
                                                 player: player,
-                                                canEdit: widget.canEdit,
+                                                canEdit: canEdit,
                                                 isCurrentUser: isCurrentUser,
                                                 onRefresh: widget.onRefresh,
                                               );
@@ -396,34 +402,43 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                             ],
                                           ),
                                           subtitle: player.role !=
-                                                  PlayerRole.player
-                                              ? Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  children: [
-                                                    Badge(
-                                                      label: Text(
-                                                        player.role ==
-                                                                PlayerRole.coach
-                                                            ? translate?.coach ?? 'Coach'
-                                                            : translate
-                                                                    ?.organizer ??
-                                                                'Organisateur',
-                                                        style: TextStyle(
-                                                          color: roleColor,
-                                                          fontWeight:
-                                                              FontWeight.bold,
+                                                      PlayerRole.player ||
+                                                  isEventCreator
+                                              ? Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                    top: 4.0,
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    children: [
+                                                      Badge(
+                                                        label: Text(
+                                                          player.role ==
+                                                                  PlayerRole
+                                                                      .coach
+                                                              ? 'Coach'
+                                                              : translate
+                                                                      ?.organizer ??
+                                                                  'Organisateur',
+                                                          style: TextStyle(
+                                                            color: roleColor,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                        backgroundColor:
+                                                            roleColor
+                                                                .withAlpha(40),
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                          horizontal: 5,
+                                                          vertical: 2,
                                                         ),
                                                       ),
-                                                      backgroundColor: roleColor
-                                                          .withAlpha(40),
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                        horizontal: 5,
-                                                        vertical: 2,
-                                                      ),
-                                                    ),
-                                                  ],
+                                                    ],
+                                                  ),
                                                 )
                                               : null,
                                           trailing: player.status ==
@@ -432,7 +447,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                   mainAxisSize:
                                                       MainAxisSize.min,
                                                   children: [
-                                                    if (widget.canEdit &&
+                                                    if (canEdit &&
                                                         !widget
                                                             .isEventFinished) ...[
                                                       IconButton(
@@ -466,7 +481,11 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                         },
                                                       ),
                                                       if (widget
-                                                          .isEventNowPlaying)
+                                                              .isEventNowPlaying &&
+                                                          player.role !=
+                                                              PlayerRole
+                                                                  .coach &&
+                                                          widget.userIsCoach)
                                                         IconButton(
                                                           icon: Icon(
                                                               Icons.bar_chart),
@@ -491,7 +510,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                           },
                                                         ),
                                                     ],
-                                                    if (!widget.canEdit ||
+                                                    if (!canEdit ||
                                                         widget.isEventFinished)
                                                       IconButton(
                                                         icon: Icon(
@@ -508,8 +527,8 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                                 eventId: widget
                                                                     .eventId,
                                                                 player: player,
-                                                                canEdit: widget
-                                                                    .canEdit,
+                                                                canEdit:
+                                                                    canEdit,
                                                                 isCurrentUser:
                                                                     isCurrentUser,
                                                                 onRefresh: widget
@@ -550,7 +569,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                       "Actuellement aucun joueur dans cette équipe"),
                                 ),
                               ),
-                        if (widget.canEdit &&
+                        if (canEdit &&
                             !widget.isEventFinished &&
                             (team.maxPlayers == 0 ||
                                 team.players.length < team.maxPlayers)) ...[

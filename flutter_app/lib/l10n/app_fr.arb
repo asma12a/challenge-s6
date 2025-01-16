@@ -91,7 +91,7 @@
   "event_singular": "événements",
   "change_team": "Changer d'équipe",
   "join_team": "Rejoindre l'équipe",
-  "infos_player": "Infos joueur",
+  "infos_player": "Infos participant",
   "no_perf": "Aucune performance disponible.",
   "choose_team": "Choissisez votre équipe:",
   "sporty": "sportifs",
@@ -156,8 +156,4 @@
   "error_conflict": "L'adresse email est déjà utilisée.",
   "event_updated_success": "L'événement a bien été mis à jour.",
   "event_link": "Lien de l'événement"
-
-
-
-
 }

@@ -244,6 +244,7 @@ class __FormContentState extends State<_FormContent> {
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
+              autofillHints: const [AutofillHints.newPassword],
               obscureText: !_isPasswordVisible,
               onTapOutside: (event) => FocusScope.of(context).unfocus(),
               decoration: InputDecoration(

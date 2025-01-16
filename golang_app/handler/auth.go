@@ -133,7 +133,7 @@ func signUp(ctx context.Context, serviceUser service.User, serviceTeamUser servi
 		if err := passwordValidator.Validate(userInput.Password, 60); err != nil {
 			return c.Status(fiber.StatusUnprocessableEntity).JSON(&fiber.Map{
 				"status": "error_not_strong_password",
-				"error":  entity.ErrPasswordNotStrong.Error(),
+				"error":  err.Error(),
 			})
 		}
 
