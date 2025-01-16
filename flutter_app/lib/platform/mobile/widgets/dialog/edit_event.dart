@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'dart:convert';
+
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -28,6 +30,7 @@ class _EditEventDialogState extends State<EditEventDialog> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   String iso8601FormattedDateTime = "";
+  String iso8601FormattedDateTime = "";
   List<dynamic> _suggestedAddresses = [];
   List<Sport> _sports = [];
 
@@ -35,6 +38,8 @@ class _EditEventDialogState extends State<EditEventDialog> {
   void initState() {
     super.initState();
     event = widget.event;
+    iso8601FormattedDateTime = event.date;
+    debugPrint("Date ISO : $iso8601FormattedDateTime");
     iso8601FormattedDateTime = event.date;
     debugPrint("Date ISO : $iso8601FormattedDateTime");
     _addressController.text = event.address;
@@ -121,7 +126,33 @@ class _EditEventDialogState extends State<EditEventDialog> {
         pickedTime.hour,
         pickedTime.minute,
       );
+    );
 
+    // Sélectionner l'heure
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (pickedDate != null && pickedTime != null) {
+      // Convertir l'heure en DateTime
+      final pickedDateTime = DateTime(
+        pickedDate.year,
+        pickedDate.month,
+        pickedDate.day,
+        pickedTime.hour,
+        pickedTime.minute,
+      );
+
+      if (pickedDate != null) {
+        setState(() {
+          iso8601FormattedDateTime =
+              "${DateFormat("yyyy-MM-ddTHH:mm:ss").format(pickedDateTime.toUtc())}Z";
+          // Met à jour le champ de texte avec la date et l'heure formatée
+          _dateController.text =
+              DateFormat('dd/MM/yyyy HH:mm').format(pickedDateTime);
+        });
+      }
       if (pickedDate != null) {
         setState(() {
           iso8601FormattedDateTime =
@@ -136,11 +167,14 @@ class _EditEventDialogState extends State<EditEventDialog> {
 
   void _updateEvent() async {
     final translate = AppLocalizations.of(context);
+    final translate = AppLocalizations.of(context);
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       try {
         debugPrint("Event to update : ${event.toJson()}");
+        debugPrint("Event to update : ${event.toJson()}");
         await eventService.updateEvent(event.id!, event.toJson());
+        ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).clearSnackBars();
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -159,6 +193,7 @@ class _EditEventDialogState extends State<EditEventDialog> {
         widget.onRefresh
             ?.call(); // Cette ligne doit être en dehors de `Future.delayed`
       } catch (e) {
+        // Gestion des erreurs
         // Gestion des erreurs
         log.severe('Failed to update event: $e');
       }
@@ -306,6 +341,7 @@ class _EditEventDialogState extends State<EditEventDialog> {
                       labelText:
                           translate?.event_date ?? 'Date de l\'événement'),
                   onSaved: (value) {
+                    event = event.copyWith(date: iso8601FormattedDateTime);
                     event = event.copyWith(date: iso8601FormattedDateTime);
                   },
                 ),
