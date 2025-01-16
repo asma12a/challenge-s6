@@ -85,7 +85,20 @@ func main() {
 	go hub.Run()
 
 	// Route WebSocket
-	app.Get("/ws", websocket.New(ws.WebSocketHandler(hub)))
+	app.Get("/ws", func(c *fiber.Ctx) error {
+		eventID := c.Query("event_id")
+		userID := c.Query("user_id")
+
+		if eventID == "" || userID == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Missing event_id or user_id",
+			})
+		}
+
+		log.Printf("Connexion WebSocket avec event_id: %s, user_id: %s", eventID, userID)
+
+		return websocket.New(ws.WebSocketHandler(hub, eventID, userID))(c)
+	})
 
 	notificationService, err := service.NewNotificationService()
 	if err != nil {

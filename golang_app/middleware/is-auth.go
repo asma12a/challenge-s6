@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/viewer"
@@ -11,7 +10,6 @@ import (
 
 func IsAuthMiddleware(c *fiber.Ctx) error {
 	token, err := CheckToken(c)
-	fmt.Println(token, err)
 	if err != nil {
 		return err
 	}

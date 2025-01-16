@@ -43,10 +43,7 @@ func (repo *MessageService) Create(ctx context.Context, message *entity.Message)
 		SetCreatedAt(time.Now()).
 		Save(ctx)
 
-		// Si une erreur survient, l'afficher avec des détails supplémentaires
 	if err != nil {
-		// Log l'erreur avant de la renvoyer
-		fmt.Printf("Error during message creation: %v\n", err)
 		return fmt.Errorf("cannot be created: %w", err)
 	}
 

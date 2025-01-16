@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"strings"
 	"time"
 
@@ -18,7 +17,6 @@ type TokenCheck struct {
 func CheckToken(c *fiber.Ctx) (TokenCheck, error) {
 	// Récupérer le token depuis l'en-tête Authorization
 	token := c.Get("Authorization")
-	fmt.Println("token", token)
 	if token == "" {
 		// Token manquant, renvoyer une erreur avec un code 401
 		return TokenCheck{}, fiber.NewError(fiber.StatusUnauthorized, "No token provided")
@@ -60,8 +58,6 @@ func CheckToken(c *fiber.Ctx) (TokenCheck, error) {
 		return TokenCheck{}, fiber.NewError(fiber.StatusUnauthorized, "Invalid has expired")
 
 	}
-
-	fmt.Println("user_id", user_id)
 
 	return TokenCheck{UserID: user_id, Roles: roles}, nil
 }
