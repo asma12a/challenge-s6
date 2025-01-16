@@ -9,7 +9,7 @@ import 'package:squad_go/core/providers/connectivity_provider.dart';
 import 'package:squad_go/core/services/event_service.dart';
 import 'package:squad_go/core/utils/tools.dart';
 import 'package:squad_go/main.dart';
-import 'package:squad_go/platform/mobile/screens/chat.dart';
+import 'package:squad_go/platform/mobile/widgets/chat.dart';
 import 'package:squad_go/platform/mobile/widgets/custom_label.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/edit_event.dart';
 import 'package:provider/provider.dart';
@@ -383,13 +383,8 @@ class _EventScreenState extends State<EventScreen>
                                                   )
                                                 : null,
                                           ),
-                                          // Onglet Chat
-                                          Container(
-                                            margin:
-                                                const EdgeInsets.only(top: 16),
-                                            child: ChatPage(
-                                              eventID: event.id ?? '',
-                                            ),
+                                          ChatPage(
+                                            eventID: event.id ?? '',
                                           ),
                                         ],
                                       ),
