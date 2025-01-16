@@ -30,7 +30,6 @@ class _EditEventDialogState extends State<EditEventDialog> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   String iso8601FormattedDateTime = "";
-  String iso8601FormattedDateTime = "";
   List<dynamic> _suggestedAddresses = [];
   List<Sport> _sports = [];
 
@@ -38,8 +37,6 @@ class _EditEventDialogState extends State<EditEventDialog> {
   void initState() {
     super.initState();
     event = widget.event;
-    iso8601FormattedDateTime = event.date;
-    debugPrint("Date ISO : $iso8601FormattedDateTime");
     iso8601FormattedDateTime = event.date;
     debugPrint("Date ISO : $iso8601FormattedDateTime");
     _addressController.text = event.address;
@@ -110,24 +107,6 @@ class _EditEventDialogState extends State<EditEventDialog> {
       firstDate: firstDate,
       lastDate: lastDate,
     );
-
-    // Sélectionner l'heure
-    final TimeOfDay? pickedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-
-    if (pickedDate != null && pickedTime != null) {
-      // Convertir l'heure en DateTime
-      final pickedDateTime = DateTime(
-        pickedDate.year,
-        pickedDate.month,
-        pickedDate.day,
-        pickedTime.hour,
-        pickedTime.minute,
-      );
-    );
-
     // Sélectionner l'heure
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
@@ -167,14 +146,11 @@ class _EditEventDialogState extends State<EditEventDialog> {
 
   void _updateEvent() async {
     final translate = AppLocalizations.of(context);
-    final translate = AppLocalizations.of(context);
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       try {
         debugPrint("Event to update : ${event.toJson()}");
-        debugPrint("Event to update : ${event.toJson()}");
         await eventService.updateEvent(event.id!, event.toJson());
-        ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).clearSnackBars();
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -341,7 +317,6 @@ class _EditEventDialogState extends State<EditEventDialog> {
                       labelText:
                           translate?.event_date ?? 'Date de l\'événement'),
                   onSaved: (value) {
-                    event = event.copyWith(date: iso8601FormattedDateTime);
                     event = event.copyWith(date: iso8601FormattedDateTime);
                   },
                 ),
