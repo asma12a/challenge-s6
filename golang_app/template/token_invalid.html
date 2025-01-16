@@ -71,6 +71,40 @@
         .cta-button {
           padding: 10px 20px;
         }
+
+        .form-container {
+          background: white;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          text-align: center;
+          width: 350px;
+        }
+
+        .form-container input {
+          width: 100%;
+          padding: 10px;
+          margin: 10px 0;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          font-size: 16px;
+        }
+
+        .form-container button {
+          width: 100%;
+          padding: 10px;
+          background-color: #007bff;
+          border: none;
+          color: white;
+          font-size: 16px;
+          border-radius: 5px;
+          cursor: pointer;
+          transition: background 0.3s ease;
+        }
+
+        .form-container button:hover {
+          background-color: #0056b3;
+        }
       }
     </style>
   </head>
@@ -78,8 +112,18 @@
   <body>
     <div class="container">
       <div class="header">Oops !</div>
-      <div class="message">{{.Message}}</div>
+      <div class="message" style="color: red">{{.Message}}</div>
+      <!-- Affichage du message d'erreur -->
+
+      <div class="form-container">
+        <form action="/api/auth/resend-confirmation" method="POST">
+          <input type="email" name="email" placeholder="Votre email" required />
+          <button type="submit">Recevoir un nouveau lien par e-mail</button>
+        </form>
+      </div>
+
       <img src="/images/logo.png" alt="Logo" width="150" height="150" />
+
       <footer>
         <p>
           Vous avez reçu cet e-mail car vous avez créé un compte sur notre

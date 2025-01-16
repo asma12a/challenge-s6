@@ -34,12 +34,81 @@ func AuthHandler(app fiber.Router, ctx context.Context, serviceUser service.User
 	app.Post("/login", login(ctx, serviceUser))
 	app.Get("/me", middleware.IsAuthMiddleware, me(ctx, serviceUser))
 	app.Get("/verify/:token", verify(ctx, serviceUser, rdb))
+	app.Post("/resend-confirmation", resendConfirmation(ctx, serviceUser, rdb))
+
 }
 
 type SignUpRequestInput struct {
 	Email    string `json:"email" validate:"required,email"`
 	Name     string `json:"name" validate:"required"`
 	Password string `json:"password" validate:"required"`
+}
+
+func resendConfirmation(ctx context.Context, serviceUser service.User, rdb *redis.Client) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		email := c.FormValue("email")
+		user, err := serviceUser.FindByEmail(ctx, email)
+		if err != nil {
+			log.Printf("User not found: %v", err)
+			return c.Render("template/token_invalid.html", fiber.Map{
+				"Message": "Utilisateur introuvable.",
+			})
+		}
+
+		if user.IsActive {
+			return c.Render("template/token_invalid.html", fiber.Map{
+				"Message": "Ce compte est déjà activé.",
+			})
+		}
+
+		token := ulid.MustNew("")
+		redisKey := fmt.Sprintf("token:%s", token)
+
+		err = rdb.Set(ctx, redisKey, string(user.ID), 24*time.Hour).Err()
+		if err != nil {
+			return c.Render("template/token_invalid.html", fiber.Map{
+				"Message": "Erreur interne. Veuillez réessayer plus tard.",
+			})
+		}
+
+		t, err := template.ParseFiles("template/signup_confirmation.html")
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+				"status": "error",
+				"error":  "Erreur lors du chargement du template",
+			})
+		}
+
+		link := fmt.Sprintf("%s/api/auth/verify/%s", config.Env.ServerURL, token)
+
+		data := struct {
+			Name    string
+			Message string
+			Link    string
+		}{
+			Link: link,
+		}
+
+		var body string
+		buf := new(bytes.Buffer)
+		err = t.Execute(buf, data)
+		if err != nil {
+			return c.Render("signup_confirmation", fiber.Map{
+				"Message": "Erreur lors de l'exécution du template.",
+			})
+		}
+		body = buf.String()
+
+		if err := mailer.SendEmail(user.Email, "Confirmation d'inscription", body); err != nil {
+			return c.Render("template/token_invalid.html", fiber.Map{
+				"Message": "Erreur lors de l'envoi de l'email de confirmation. veuillez réessayer plus tard.",
+			})
+		}
+
+		return c.Render("template/token_invalid.html", fiber.Map{
+			"Message": "Un nouvel e-mail de confirmation a été envoyé.",
+		})
+	}
 }
 
 func signUp(ctx context.Context, serviceUser service.User, serviceTeamUser service.TeamUser, rdb *redis.Client) fiber.Handler {
@@ -114,8 +183,6 @@ func signUp(ctx context.Context, serviceUser service.User, serviceTeamUser servi
 			})
 		}
 
-		fmt.Println("Serveur: ", config.Env.ServerURL)
-
 		link := fmt.Sprintf("%s/api/auth/verify/%s", config.Env.ServerURL, token)
 
 		data := struct {
@@ -173,7 +240,7 @@ func verify(ctx context.Context, serviceUser service.User, rdb *redis.Client) fi
 				data := struct {
 					Message string
 				}{
-					Message: "Le lien de vérification que vous avez utilisé est invalide ou a expiré. Veuillez demander un nouveau lien de vérification.",
+					Message: "Le lien de vérification que vous avez utilisé est invalide ou a expiré. Renseignez votre email afin de recevoir un nouveau lien de confirmation de compte.",
 				}
 
 				var buf bytes.Buffer
@@ -386,4 +453,5 @@ func me(ctx context.Context, serviceUser service.User) fiber.Handler {
 
 		return c.Status(fiber.StatusOK).JSON(data)
 	}
+
 }
