@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:squad_go/core/utils/constants.dart';
-import 'package:squad_go/main.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChatService {
@@ -10,7 +9,7 @@ class ChatService {
   Function(String)? onMessageReceived;
   Future<void> connect(String eventID, String userID) async {
     try {
-      final url = 'ws://localhost:3001/ws?event_id=$eventID&user_id=$userID';
+      final url = 'ws://${Constants.apiBaseUrl}/ws?event_id=$eventID&user_id=$userID';
 
       _channel = WebSocketChannel.connect(Uri.parse(url));
       isConnected = true;
