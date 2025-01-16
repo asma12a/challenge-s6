@@ -22,11 +22,12 @@ class UserService {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': "Bearer $token",
+            'Cache-Control': "no-cache",
           },
         ),
       );
 
-      if (response.statusCode != 200) {
+      if (response.statusCode != 200 || response.statusCode != 304) {
         throw Exception('Erreur lors de la récupération des utilisateurs.');
       }
 
@@ -171,7 +172,8 @@ class UserService {
       return response.data;
     } catch (error) {
       log.severe('An error occurred while ', {error: error});
-      throw AppException(message: 'Failed to update password, please try again.');
+      throw AppException(
+          message: 'Failed to update password, please try again.');
     }
   }
 }
