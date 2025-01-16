@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:squad_go/main.dart';
 import 'package:squad_go/platform/mobile/screens/tabs.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 
 class NewEvent extends StatefulWidget {
   const NewEvent({super.key});
@@ -161,18 +162,21 @@ class _NewEventState extends State<NewEvent> {
         };
       await eventService.createEvent(newEvent);
         ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              textAlign: TextAlign.center,
-              translate?.event_saved_success ??
-                  "L'événement a bien été enregistré.",
-              style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+        context.go('/home');
+        Future.delayed(Duration(milliseconds: 300), () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                textAlign: TextAlign.center,
+                translate?.event_saved_success ??
+                    "L'événement a bien été enregistré.",
+                style:
+                    TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+              ),
+              backgroundColor: Theme.of(context).colorScheme.primary,
             ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-          ),
-        );
-
+          );
+        });
       } on AppException catch (error) {
         debugPrint(error.message);
         ScaffoldMessenger.of(context).clearSnackBars();
