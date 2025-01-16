@@ -1,16 +1,19 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/providers/connectivity_provider.dart';
-import 'package:squad_go/core/utils/constants.dart';
 import 'package:squad_go/main.dart';
 import '../../../core/services/chat_service.dart';
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:squad_go/core/utils/constants.dart';
+
+const apiBaseUrl = String.fromEnvironment('API_BASE_URL');
+const jwtStorageToken = String.fromEnvironment('JWT_STORAGE_KEY');
 
 class ChatPage extends StatefulWidget {
-  final String eventID; // On passe l'ID de l'événement à la page
+  final String eventID;
 
   const ChatPage({super.key, required this.eventID});
 
@@ -28,9 +31,8 @@ class _ChatPageState extends State<ChatPage>
 
   @override
   void initState() {
-    final translate = AppLocalizations.of(context);
     super.initState();
-    _loadCurrentUser();
+    _initializeChat();
 
     _animationController = AnimationController(
       vsync: this,
@@ -44,36 +46,50 @@ class _ChatPageState extends State<ChatPage>
       final content = data['content'] as String;
 
       setState(() {
-        _messages.add(isSelf
-            ? '${translate?.me ?? 'Moi'}: $content'
-            : '${translate?.other ?? 'Autre'}: $content');
+        _messages.add(isSelf ? 'Moi: $content' : 'Autre: $content');
       });
     };
 
-    _chatService.connect('ws://${Constants.apiBaseUrl}/ws');
+    const urlChat = 'ws://${Constants.apiBaseUrl}/ws';
+    _chatService.connect(urlChat);
+  }
 
-    _loadMessages(widget.eventID);
+  Future<void> _initializeChat() async {
+
+    await _loadCurrentUser();
+    if (_currentUserId.isNotEmpty) {
+      await _loadMessages(widget.eventID);
+    } else {
+      debugPrint('Impossible d\'initialiser le chat sans ID utilisateur.');
+    }
   }
 
   // Fonction pour récupérer l'user_id à partir du token
   Future<void> _loadCurrentUser() async {
+
     final storage = const FlutterSecureStorage();
-    final token = await storage.read(key: Constants.jwtStorageToken);
+    final token = await storage.read(key: jwtStorageToken);
 
     if (token != null) {
-      final Uri uri = Uri.parse('${Constants.apiBaseUrl}/api/users/:userId');
 
+
+           final uri = '${Constants.apiBaseUrl}/api/auth/me';
       try {
-        final response = await dio.get(uri.toString(),
-            options: Options(headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer $token',
-            }));
 
-        if (response.statusCode == 200) {
-          final data = response.data;
+      final response = await dio.get(
+        uri.toString(),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          }));
+        
+
+
+        if (response.data['id'] != null &&response. data['id'].isNotEmpty) {
+
           setState(() {
-            _currentUserId = data['id'] ?? '';
+            _currentUserId = response.data['id'] ?? '';
           });
         } else if (response.statusCode == 403) {
           debugPrint('Accès refusé : ${response.data}');
@@ -84,7 +100,7 @@ class _ChatPageState extends State<ChatPage>
           debugPrint(
               'Erreur inconnue (${response.statusCode}): ${response.data}');
         }
-      } catch (e) {
+      } on AppException catch (e) {
         debugPrint(
             'Erreur lors de la récupération des informations utilisateur : $e');
       }
@@ -101,20 +117,24 @@ class _ChatPageState extends State<ChatPage>
   }
 
   Future<void> _loadMessages(String eventID) async {
-    final translate = AppLocalizations.of(context);
-    if (_currentUserId.isEmpty) {
-      debugPrint(
-          'L\'ID utilisateur n\'est pas initialisé. Impossible de charger les messages.');
-      return;
-    }
+    print('eventID $eventID');
 
-    final Uri uri = Uri.parse('${Constants.apiBaseUrl}/api/users/$eventID');
+    final uri = '${Constants.apiBaseUrl}/api/message/event/$eventID';
+
+    print('_loadMessages $uri');
 
     try {
-      final response = await dio.get(uri.toString(),
+      final storage = const FlutterSecureStorage();
+
+      final token = await storage.read(key: jwtStorageToken);
+      print('token $token');
+
+      final response = await dio.get(uri,
           options: Options(headers: {
-            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
           }));
+
+      print('response de msgs $response');
 
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
@@ -131,9 +151,7 @@ class _ChatPageState extends State<ChatPage>
           final isSelf = userId == _currentUserId;
 
           setState(() {
-            _messages.add(isSelf
-                ? '${translate?.me ?? 'Moi'}: $content'
-                : '$userName: $content');
+            _messages.add(isSelf ? 'Moi: $content' : '$userName: $content');
           });
         }
       } else {
@@ -145,7 +163,6 @@ class _ChatPageState extends State<ChatPage>
     }
   }
 
-  // Fonction pour envoyer un message via WebSocket et l'enregistrer dans la base de données
   void _sendMessage() async {
     final message = _controller.text;
     if (message.isNotEmpty) {
@@ -155,15 +172,17 @@ class _ChatPageState extends State<ChatPage>
         'content': message,
       };
 
-      // Envoi du message via WebSocket
-      _chatService.sendMessage(message);
 
-      final Uri uri = Uri.parse('${Constants.apiBaseUrl}/api/message');
+      final uri = '${Constants.apiBaseUrl}/api/message';
 
       try {
-        final response = await dio.post(uri.toString(),
+        final storage = const FlutterSecureStorage();
+        final token = await storage.read(key: jwtStorageToken);
+
+        final response = await dio.post(uri,
             options: Options(headers: {
               'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
             }),
             data: jsonEncode(messageData));
 
@@ -184,7 +203,7 @@ class _ChatPageState extends State<ChatPage>
   @override
   Widget build(BuildContext context) {
     var isOnline = context.watch<ConnectivityState>().isConnected;
-    final translate = AppLocalizations.of(context);
+
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) => SlideTransition(
@@ -216,10 +235,10 @@ class _ChatPageState extends State<ChatPage>
                     final isSelf = message.startsWith('Moi:');
                     // Récupérer le nom de l'utilisateur qui a envoyé le message
                     final userName = isSelf
-                        ? translate?.me ??
-                            'Moi' // Utilise la traduction pour "Moi"
-                        : message.split(
-                            ':')[0]; // Sinon, récupère le nom de l'utilisateur
+                        ? 'Moi' // Si c'est l'utilisateur actuel, afficher "Moi"
+                        : message.split(':')[
+                            0]; // Sinon, afficher le nom de l'utilisateur récupéré
+
                     return Align(
                       alignment:
                           isSelf ? Alignment.centerRight : Alignment.centerLeft,
@@ -251,15 +270,11 @@ class _ChatPageState extends State<ChatPage>
                             ),
                             child: Text(
                               isSelf
-                                  ? message.replaceFirst(
-                                      '${translate?.me ?? 'Moi'}: ',
-                                      '') // Remplace "Moi" par la traduction
-                                  : message.replaceFirst('$userName: ', ''),
-                              // Sinon, retire le nom de l'utilisateur
+                                  ? message.replaceFirst('Moi: ', '')
+                                  : message.replaceFirst('$userName: ',
+                                      ''), // Afficher le message sans le nom
                               style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.black,
-                              ),
+                                  fontSize: 16, color: Colors.black),
                             ),
                           ),
                         ],
@@ -279,8 +294,7 @@ class _ChatPageState extends State<ChatPage>
                       controller: _controller,
                       style: const TextStyle(color: Colors.black),
                       decoration: InputDecoration(
-                        hintText:
-                            translate?.enter_message ?? 'Entrez un message...',
+                        hintText: 'Entrez un message...',
                         hintStyle: const TextStyle(color: Colors.grey),
                         filled: true,
                         fillColor: Colors.white,

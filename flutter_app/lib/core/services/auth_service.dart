@@ -11,11 +11,9 @@ class AuthService {
 
 
   Future<Map<String, dynamic>> signIn(body) async {
-    print("before signIn");
 
     try {
       final uri = '${Constants.apiBaseUrl}/api/auth/login';
-      print(uri);
 
       final response = await dio.post(
         uri,
@@ -29,7 +27,6 @@ class AuthService {
 
       final data = response.data;
 
-      print(data);
 
       await _storage.write(
           key: Constants.jwtStorageToken, value: data['token']);
