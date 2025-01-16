@@ -91,13 +91,20 @@ func main() {
 	if err != nil {
 		log.Fatalf("Erreur lors de l'initialisation du service de notification : %v", err)
 	}
+
+	eventService := service.NewEventService(dbClient)
+
+	// Lancer le cron pour les notifications dans une goroutine
+	ctx := context.Background() // Contexte global
+	go handler.NotifyPlayersBeforeEventCron(ctx, *notificationService, *eventService, rdb)
+
 	// Routes API (sans authentification middleware)
 	api := app.Group("/api")
 	handler.NotificationHandler(api.Group("/notifications", middleware.IsAuthMiddleware), context.Background(), *notificationService, *service.NewEventService(dbClient), rdb)
 	handler.EventHandler(api.Group("/events", middleware.IsAuthMiddleware), context.Background(), *service.NewEventService(dbClient), *service.NewSportService(dbClient), *service.NewTeamService(dbClient), *service.NewTeamUserService(dbClient))
 	handler.SportHandler(api.Group("/sports", middleware.IsAuthMiddleware), context.Background(), *service.NewSportService(dbClient))
 	handler.UserHandler(api.Group("/users", middleware.IsAuthMiddleware), context.Background(), *service.NewUserService(dbClient))
-	handler.AuthHandler(api.Group("/auth"), context.Background(), *service.NewUserService(dbClient), *service.NewTeamUserService(dbClient), rdb)
+	handler.AuthHandler(api.Group("/auth"), context.Background(), *service.NewUserService(dbClient), *service.NewTeamUserService(dbClient), rdb, *notificationService)
 	handler.MessageHandler(api.Group("/message", middleware.IsAuthMiddleware), context.Background(), *service.NewMessageService(dbClient), *service.NewEventService(dbClient), *service.NewUserService(dbClient))
 	handler.SportStatLabelsHandler(api.Group("/sportstatlabels", middleware.IsAuthMiddleware), context.Background(), *service.NewSportStatLabelsService(dbClient), *service.NewSportService(dbClient), *service.NewEventService(dbClient), *service.NewUserService(dbClient), *notificationService, rdb)
 	handler.ActionLogHandler(api.Group("/actionlogs", middleware.IsAuthMiddleware), context.Background(), *service.NewActionLogService(dbClient), *service.NewUserService(dbClient))

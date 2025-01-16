@@ -11,6 +11,8 @@ import (
 	"github.com/asma12a/challenge-s6/ent/teamuser"
 	"github.com/asma12a/challenge-s6/ent/user"
 	"github.com/asma12a/challenge-s6/entity"
+	"github.com/redis/go-redis/v9"
+
 )
 
 type TeamUser struct {
@@ -188,8 +190,13 @@ func (repo *TeamUser) List(ctx context.Context) ([]*entity.TeamUser, error) {
 	return result, nil
 }
 
-func (repo *TeamUser) UpdateTeamUserWithUser(ctx context.Context, existingUser entity.User) error {
-	teamUsers, err := repo.db.TeamUser.Query().Where(teamuser.EmailEQ(existingUser.Email)).All(ctx)
+func (repo *TeamUser) UpdateTeamUserWithUser(ctx context.Context, existingUser entity.User, serviceNotification NotificationService, rdb *redis.Client) error {
+	teamUsers, err := repo.db.TeamUser.Query().Where(teamuser.EmailEQ(existingUser.Email)).
+	WithTeam(func(q *ent.TeamQuery) { 
+        q.WithEvent() 
+    }).
+	All(ctx)
+	log.Println("teamUsers", teamUsers)
 	if err != nil {
 		return err
 	}
@@ -201,6 +208,16 @@ func (repo *TeamUser) UpdateTeamUserWithUser(ctx context.Context, existingUser e
 			Save(ctx)
 		if err != nil {
 			return err
+		}
+		createdBy := teamUser.Edges.Team.Edges.Event.CreatedBy
+		createdByUser, err := repo.db.User.Query().Where(user.IDEQ(createdBy)).Only(ctx)
+		if err != nil {
+			return err
+		}
+		fcmToken, err := serviceNotification.GetTokenFromRedis(ctx,rdb, string(createdByUser.ID)+"_FCM") 
+		if err == nil {
+			serviceNotification.SendPushNotification(fcmToken,"Information", "Votre invité "+ existingUser.Email +" nous a rejoint")
+
 		}
 	}
 
