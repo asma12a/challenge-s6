@@ -192,7 +192,7 @@ class _AccountScreenState extends State<AccountScreen> {
                               right: 16,
                             ),
                             child: DefaultTabController(
-                              length: 3,
+                              length: 2,
                               child: Column(
                                 children: [
                                   Container(
@@ -225,12 +225,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
-                                        Tab(
-                                          child: Text(
-                                            translate?.settings ?? 'Paramètres',
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
+
                                       ],
                                     ),
                                   ),
@@ -275,78 +270,6 @@ class _AccountScreenState extends State<AccountScreen> {
                                           padding: const EdgeInsets.all(16),
                                           child: PerformancesHandle(
                                             sports: userSports,
-                                          ),
-                                        ),
-                                        Container(
-                                          margin: const EdgeInsets.only(top: 16),
-                                          decoration: BoxDecoration(
-                                            color: Theme.of(context).colorScheme.primary.withOpacity(0.03),
-                                            borderRadius: BorderRadius.circular(16),
-                                          ),
-                                          padding: const EdgeInsets.all(16),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              // Header
-                                              Row(
-                                                children: [
-                                                  const Icon(
-                                                    Icons.notifications_active_outlined,
-                                                    size: 24,
-                                                    color: Colors.blue,
-                                                  ),
-                                                  const SizedBox(width: 8),
-                                                  Text(
-                                                    translate?.notifs ??
-                                                        'Notifications',
-                                                    style: TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: Theme.of(context).colorScheme.primary,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 16),
-
-                                              // Notification items
-                                              ListView.builder(
-                                                shrinkWrap: true,
-                                                physics: const NeverScrollableScrollPhysics(),
-                                                itemCount: labelNotifs.length,
-                                                itemBuilder: (context, index) {
-                                                  final stat = labelNotifs[index];
-                                                  return Container(
-                                                    margin: const EdgeInsets.symmetric(vertical: 8),
-                                                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                                                    decoration: BoxDecoration(
-                                                      color: Theme.of(context).colorScheme.primary.withAlpha(20),
-                                                      borderRadius: BorderRadius.circular(16),
-                                                    ),
-                                                    child: ListTile(
-                                                      title: Text(
-                                                        stat,
-                                                        style: const TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight: FontWeight.w500,
-                                                        ),
-                                                      ),
-                                                      trailing: AnimatedToggleSwitch<bool>.dual(
-                                                        current: true,
-                                                        first: false,
-                                                        second: true,
-                                                        onChanged: (value) => {},
-                                                        iconBuilder: (value) => value
-                                                            ? const Icon(Icons.check_circle, color: Colors.white)
-                                                            : const Icon(Icons.cancel, color: Colors.white),
-                                                        height: 30,
-                                                        indicatorSize: const Size(40, 25),
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                            ],
                                           ),
                                         ),
                                       ],
