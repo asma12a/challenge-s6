@@ -143,23 +143,19 @@ class _EditEventDialogState extends State<EditEventDialog> {
         await eventService.updateEvent(event.id!, event.toJson());
         ScaffoldMessenger.of(context).clearSnackBars();
         Navigator.of(context).pop();
-
-        Future.delayed(Duration(milliseconds: 300), () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                translate?.event_updated_success ??
-                    "L'événement a bien été mis à jour.",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimary,
-                ),
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              translate?.event_updated_success ??
+                  "L'événement a bien été mis à jour.",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onPrimary,
               ),
-              backgroundColor: Theme.of(context).colorScheme.primary,
             ),
-          );
-        });
-
+            backgroundColor: Theme.of(context).colorScheme.primary,
+          ),
+        );
         widget.onRefresh
             ?.call(); // Cette ligne doit être en dehors de `Future.delayed`
       } catch (e) {

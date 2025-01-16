@@ -122,7 +122,8 @@ class _NewEventState extends State<NewEvent> {
 
       // Formater la date et l'heure en ISO 8601
       final iso8601FormattedDateTime =
-          DateFormat("yyyy-MM-ddTHH:mm:ss").format(pickedDateTime.toUtc()) + "Z";
+          DateFormat("yyyy-MM-ddTHH:mm:ss").format(pickedDateTime.toUtc()) +
+              "Z";
 
       setState(() {
         _selectedDate =
@@ -160,23 +161,20 @@ class _NewEventState extends State<NewEvent> {
           "latitude": _latitude,
           "longitude": _longitude,
         };
-      await eventService.createEvent(newEvent);
+        await eventService.createEvent(newEvent);
         ScaffoldMessenger.of(context).clearSnackBars();
-        context.go('/home');
-        Future.delayed(Duration(milliseconds: 300), () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                textAlign: TextAlign.center,
-                translate?.event_saved_success ??
-                    "L'événement a bien été enregistré.",
-                style:
-                    TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-              ),
-              backgroundColor: Theme.of(context).colorScheme.primary,
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              textAlign: TextAlign.center,
+              translate?.event_saved_success ??
+                  "L'événement a bien été enregistré.",
+              style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
             ),
-          );
-        });
+            backgroundColor: Theme.of(context).colorScheme.primary,
+          ),
+        );
       } on AppException catch (error) {
         debugPrint(error.message);
         ScaffoldMessenger.of(context).clearSnackBars();
