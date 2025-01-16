@@ -121,7 +121,7 @@ class _NewEventState extends State<NewEvent> {
 
       // Formater la date et l'heure en ISO 8601
       final iso8601FormattedDateTime =
-          DateFormat("yyyy-MM-ddTHH:mm:ssZ").format(pickedDateTime.toUtc());
+          "${DateFormat("yyyy-MM-ddTHH:mm:ss").format(pickedDateTime.toUtc())}Z";
 
       setState(() {
         _selectedDate =
@@ -159,7 +159,7 @@ class _NewEventState extends State<NewEvent> {
           "latitude": _latitude,
           "longitude": _longitude,
         };
-        await eventService.createEvent(newEvent);
+      await eventService.createEvent(newEvent);
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -172,11 +172,7 @@ class _NewEventState extends State<NewEvent> {
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (ctx) => TabsScreen(),
-          ),
-        );
+
       } on AppException catch (error) {
         debugPrint(error.message);
         ScaffoldMessenger.of(context).clearSnackBars();

@@ -64,7 +64,7 @@ class Event {
       'address': address,
       'latitude': latitude,
       'longitude': longitude,
-      'date': DateFormat('yyyy-MM-dd').format(DateTime.parse(date)),
+      'date': date,
       'sport_id': sport.id,
       'event_type': type == EventType.match ? 'match' : 'training',
       'is_public': isPublic,

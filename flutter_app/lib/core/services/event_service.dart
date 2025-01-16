@@ -172,9 +172,12 @@ class EventService {
   }
 
   Future<void> updateEvent(String id, Map<String, dynamic> event) async {
+    debugPrint("$event");
     final token = await storage.read(key: Constants.jwtStorageToken);
     try {
       final Uri uri = Uri.parse('${Constants.apiBaseUrl}/api/events/$id');
+
+      debugPrint(jsonEncode(event));
 
       await dio.put(uri.toString(),
           options: Options(headers: {
