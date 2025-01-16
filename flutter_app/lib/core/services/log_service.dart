@@ -25,7 +25,6 @@ class LogService {
       ),
     );
     if (response.statusCode == 200) {
-      print('response.data === ${response.data}');
       List<dynamic> data =
           response.data is List ? response.data : json.decode(response.data);
       return data.map((log) => ActionLog.fromJson(log)).toList();

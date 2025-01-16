@@ -44,6 +44,18 @@ class _ChatPageState extends State<ChatPage>
       duration: const Duration(milliseconds: 500),
     );
     _animationController.forward();
+
+    _chatService.onMessageReceived = (message) {
+      final data = jsonDecode(message);
+      final isSelf = data['self'] as bool;
+      final content = data['content'] as String;
+
+      setState(() {
+        _messages.add(isSelf ? 'Moi: $content' : 'Autre: $content');
+      });
+    };
+
+    _chatService.connect(widget.eventID, _currentUserId);
   }
 
   Future<void> _checkEventStatus() async {
@@ -112,34 +124,47 @@ class _ChatPageState extends State<ChatPage>
   }
 
   void _sendMessage() async {
-    final message = _controller.text.trim();
-    if (message.isEmpty) return;
+    final message = _controller.text;
+    if (message.isNotEmpty) {
+      final messageData = {
+        'event_id': widget.eventID,
+        'user_id': _currentUserId,
+        'content': message,
+      };
 
-    final uri = '${Constants.apiBaseUrl}/api/message';
-    final messageData = {
-      'event_id': widget.eventID,
-      'user_id': _currentUserId,
-      'content': message
-    };
+      final uri = '${Constants.apiBaseUrl}/api/message';
 
-    try {
-      final storage = const FlutterSecureStorage();
-      final token = await storage.read(key: jwtStorageToken);
-      final response = await Dio().post(uri,
-          options: Options(headers: {'Authorization': 'Bearer $token'}),
-          data: messageData);
+      try {
+        final storage = const FlutterSecureStorage();
+        final token = await storage.read(key: jwtStorageToken);
 
-      if (response.statusCode == 201) {
+        await dio.post(uri,
+            options: Options(headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            }),
+            data: jsonEncode(messageData));
+
+        debugPrint('Message envoyé et enregistré');
+
         setState(() {
           _messages.add('Moi: $message');
         });
-        _chatService.sendMessage(jsonEncode(messageData));
-      }
-    } catch (e) {
-      debugPrint("Erreur lors de l'envoi du message : $e");
-    }
 
-    _controller.clear();
+        if (_chatService.isConnected) {
+          final webSocketMessage = jsonEncode({
+            'event_id': widget.eventID,
+            'user_id': _currentUserId,
+            'content': message,
+          });
+          _chatService.sendMessage(webSocketMessage);
+        }
+      } catch (e) {
+        debugPrint('Erreur lors de l\'enregistrement du message : $e');
+      }
+
+      _controller.clear();
+    }
   }
 
   @override

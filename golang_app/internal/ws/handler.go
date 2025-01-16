@@ -7,48 +7,47 @@ import (
 	"github.com/gofiber/contrib/websocket"
 )
 
-// Message struct pour vérifier les données reçues
 type Message struct {
 	EventID string `json:"event_id"`
 	UserID  string `json:"user_id"`
 	Content string `json:"content"`
 }
 
-// WebSocketHandler handles incoming WebSocket connections
-func WebSocketHandler(hub *Hub) func(*websocket.Conn) {
+func WebSocketHandler(hub *Hub, eventID, userID string) func(*websocket.Conn) {
 	return func(conn *websocket.Conn) {
 		hub.register <- conn
 		defer func() {
 			hub.unregister <- conn
 		}()
 
+		log.Printf("Connexion WebSocket avec event_id: %s, user_id: %s", eventID, userID)
+
 		for {
 			_, message, err := conn.ReadMessage()
 			if err != nil {
-				log.Println("Read error:", err)
+				log.Println("Erreur de lecture:", err)
 				break
 			}
 
-			// Décoder le message JSON sans validation de parsing
 			var msg Message
 			err = json.Unmarshal(message, &msg)
+			if err != nil {
+				log.Printf("Erreur de décodage JSON: %v. Message reçu: %s", err, string(message))
+				continue
+			}
 
-			// Vérifier si toutes les informations sont présentes
 			if msg.EventID == "" || msg.UserID == "" || msg.Content == "" {
-				// Envoi d'une erreur si l'une des informations est manquante
 				errMessage := `{"error":"Missing event_id, user_id, or content"}`
 				conn.WriteMessage(websocket.TextMessage, []byte(errMessage))
 				continue
 			}
 
-			// Envoi immédiat à l'expéditeur (self: true)
 			err = conn.WriteMessage(websocket.TextMessage, []byte(`{"self":true,"content":"`+msg.Content+`"}`))
 			if err != nil {
-				log.Println("Error sending message to sender:", err)
+				log.Println("Erreur d'envoi du message à l'expéditeur:", err)
 				break
 			}
 
-			// Diffusion aux autres clients (self: false)
 			hub.BroadcastToOthers(conn, []byte(`{"self":false,"content":"`+msg.Content+`"}`))
 		}
 	}

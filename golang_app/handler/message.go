@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/asma12a/challenge-s6/ent"
@@ -45,8 +44,6 @@ func createMessage(ctx context.Context, serviceMessage service.MessageService, s
 			})
 		}
 
-		fmt.Println("Event -----------------", event)
-
 		user, err := serviceUser.FindOne(ctx, messageInput.UserID)
 		if err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
@@ -54,9 +51,7 @@ func createMessage(ctx context.Context, serviceMessage service.MessageService, s
 				"error":  "User not found",
 			})
 		}
-		fmt.Println("User -----------------", user)
 
-		// Validation du champ Name
 		if user.Name == "" {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
@@ -75,14 +70,8 @@ func createMessage(ctx context.Context, serviceMessage service.MessageService, s
 			},
 		}
 
-		// Logs pour débogage
-		fmt.Printf("New Message Object: ----------------- %+v\n", newMessage)
-
-		// Insérer dans le service
-		// Essayer d'insérer le message avec gestion des erreurs
 		defer func() {
 			if r := recover(); r != nil {
-				fmt.Println("Recovered in createMessage:", r)
 				c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
 					"status": "error",
 					"error":  "An internal server error occurred",
@@ -92,8 +81,6 @@ func createMessage(ctx context.Context, serviceMessage service.MessageService, s
 
 		err = serviceMessage.Create(c.UserContext(), newMessage)
 		if err != nil {
-			// Log et retourne une erreur spécifique si nécessaire
-			fmt.Println("Error during message creation:", err)
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
 				"error":  err.Error(),

@@ -166,7 +166,6 @@ class __FormContentState extends State<_FormContent> {
         }
       }
     } catch (e) {
-      print(e);
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
