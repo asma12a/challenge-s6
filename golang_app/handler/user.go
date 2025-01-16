@@ -358,7 +358,7 @@ func updateUserPassword(ctx context.Context, service service.User) fiber.Handler
 			user.Password = hashedPassword
 		}
 
-		updatedUser, err := service.Update(c.UserContext(), user)
+		_, err = service.Update(c.UserContext(), user)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
@@ -366,11 +366,7 @@ func updateUserPassword(ctx context.Context, service service.User) fiber.Handler
 			})
 		}
 
-		return c.JSON(fiber.Map{
-			"status":  "success",
-			"message": "User updated",
-			"data":    updatedUser,
-		})
+		return c.SendStatus(fiber.StatusOK)
 	}
 }
 

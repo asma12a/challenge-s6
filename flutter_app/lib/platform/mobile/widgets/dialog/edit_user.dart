@@ -86,6 +86,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
             SnackBar(content: Text(translate?.updated_password ?? 'Mot de passe mis à jour !')),
           );
         } catch (e) {
+          debugPrint("exception $e");
           setState(() {
             passwordErrorMessage = e.toString();
           });

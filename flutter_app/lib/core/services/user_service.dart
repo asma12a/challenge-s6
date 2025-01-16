@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/user_app.dart';
 import 'package:squad_go/core/utils/constants.dart';
 import 'package:squad_go/main.dart';
@@ -146,7 +147,7 @@ class UserService {
     }
   }
 
-  static Future<void> updateUserPassword(
+  static Future<Map<String, dynamic>?> updateUserPassword(
       String id, Map<String, dynamic> updates) async {
     final storage = const FlutterSecureStorage();
     final token = await storage.read(key: Constants.jwtStorageToken);
@@ -164,30 +165,13 @@ class UserService {
         ),
         data: json.encode(updates),
       );
-
-
-      if (response.statusCode != 200) {
-        throw Exception(
-            'Erreur lors de la mise à jour de l\'utilisateur : ${response.data}');
+      if (response.statusCode == 200) {
+        return null;
       }
+      return response.data;
     } catch (error) {
-      debugPrint("Erreur service error ");
-      if (error is DioError) {
-        if (error.response != null && error.response!.data is Map<String, dynamic>) {
-          final errorResponse = error.response!.data as Map<String, dynamic>;
-
-          String errorMessage = errorResponse['error'] ?? 'Erreur inconnue';
-          debugPrint("DioError: $errorMessage");
-          throw Exception(errorMessage);
-        } else {
-          debugPrint("DioError Message: ${error.message}");
-          throw Exception("Erreur lors de la requête : ${error.message}");
-        }
-      } else {
-        debugPrint("Autre erreur: ${error.toString()}");
-        throw Exception('Erreur: ${error.toString()}');
-      }
-
+      log.severe('An error occurred while ', {error: error});
+      throw AppException(message: 'Failed to update password, please try again.');
     }
   }
 }
