@@ -17,6 +17,7 @@ class CustomDataTable extends StatelessWidget {
   });
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(16.0),
@@ -57,24 +58,27 @@ class CustomDataTable extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Tableau adaptable
-          LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: SizedBox(
-                  width:
-                      constraints.maxWidth, // Prend toute la largeur disponible
-                  child: DataTable(
-                    headingRowColor: WidgetStateColor.resolveWith(
-                        (states) => Colors.grey[200]!),
-                    columns: columns,
-                    rows: rows,
-                    columnSpacing: 16,
-                  ),
-                ),
-              );
-            },
+          // ✅ Correction : Ajout d'un défilement vertical
+          Expanded(
+            child: SingleChildScrollView(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SizedBox(
+                      width: constraints.maxWidth,
+                      child: DataTable(
+                        headingRowColor: WidgetStateColor.resolveWith(
+                            (states) => Colors.grey[200]!),
+                        columns: columns,
+                        rows: rows,
+                        columnSpacing: 16,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
         ],
       ),

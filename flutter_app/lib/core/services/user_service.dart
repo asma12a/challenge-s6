@@ -26,11 +26,6 @@ class UserService {
           },
         ),
       );
-
-      if (response.statusCode != 200 || response.statusCode != 304) {
-        throw Exception('Erreur lors de la récupération des utilisateurs.');
-      }
-
       final List<dynamic> data = response.data;
       return data.map((user) => UserApp.fromJson(user)).toList();
     } catch (error) {
