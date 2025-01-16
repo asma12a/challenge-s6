@@ -92,7 +92,7 @@
   "event_singular": "event",
   "change_team": "Change team",
   "join_team": "Join the team",
-  "infos_player": "Player info",
+  "infos_player": "Infos participant",
   "no_perf": "No performance available.",
   "choose_team": "Choose your team:",
   "sporty": "sportsmen",
@@ -156,50 +156,4 @@
   "error_conflict": "The email address is already in use.",
   "event_updated_success": "The event has been successfully updated.",
   "event_link": "Event link"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

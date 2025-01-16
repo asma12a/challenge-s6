@@ -91,7 +91,7 @@
   "event_singular": "ereignis",
   "change_team": "Team ändern",
   "join_team": "Treten Sie dem Team bei",
-  "infos_player": "Spielerinfo",
+  "participant_info": "Teilnehmerinfo",
   "no_perf": "Keine leistung vorhanden.",
   "choose_team": "Wähle dein Team:",
   "sporty": "sportler",
@@ -156,52 +156,4 @@
   "error_conflict": "Die E-Mail-Adresse wird bereits verwendet.",
   "event_updated_success": "Die Veranstaltung wurde erfolgreich aktualisiert.",
   "event_link": "Veranstaltungslink"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

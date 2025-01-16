@@ -232,6 +232,7 @@ class __FormContentState extends State<_FormContent> {
               onTapOutside: (event) {
                 FocusScope.of(context).unfocus();
               },
+              autofillHints: const [AutofillHints.password],
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter some text';

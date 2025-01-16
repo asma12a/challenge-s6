@@ -9,7 +9,6 @@ import 'package:squad_go/main.dart';
 class AuthService {
   final _storage = const FlutterSecureStorage();
 
-
   Future<Map<String, dynamic>> signIn(body) async {
 
     try {
@@ -31,6 +30,8 @@ class AuthService {
       await _storage.write(
           key: Constants.jwtStorageToken, value: data['token']);
       await NotificationService().initNotifications();
+      await initialCacheOptions.store!
+          .delete('${Constants.apiBaseUrl}/api/events/user');
       return data;
     } catch (error) {
       log.severe('An error occurred while ', {error: error});
@@ -51,6 +52,9 @@ class AuthService {
         ),
         data: body,
       );
+
+      await initialCacheOptions.store!
+          .delete('${Constants.apiBaseUrl}/api/events/user');
 
       if (response.statusCode == 201) {
         return null;

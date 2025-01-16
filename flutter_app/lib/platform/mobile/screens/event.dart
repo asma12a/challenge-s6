@@ -366,8 +366,9 @@ class _EventScreenState extends State<EventScreen>
                                                     maxTeams:
                                                         event.sport.maxTeams,
                                                     teams: event.teams ?? [],
-                                                    canEdit:
-                                                        isOrganizer || isCoach,
+                                                    userIsCoach: isCoach,
+                                                    userIsOrganizer:
+                                                        isOrganizer,
                                                     color: event.sport.color ??
                                                         Theme.of(context)
                                                             .colorScheme
