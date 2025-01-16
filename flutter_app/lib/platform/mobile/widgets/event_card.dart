@@ -140,8 +140,11 @@ class EventCard extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 CustomLabel(
-                                  label: DateFormat('dd/MM/yyyy')
-                                      .format(DateTime.parse(event.date)),
+                                  label: DateFormat('yyyy/MM/dd HH:mm').format(
+                                    DateTime.parse(event.date).add(
+                                      Duration(hours: 1),
+                                    ),
+                                  ),
                                   icon: Icons.date_range,
                                   color: getColorBasedOnDate(event.date),
                                   iconColor: getColorBasedOnDate(event.date),
@@ -169,15 +172,15 @@ class EventCard extends StatelessWidget {
                 ],
               ),
               Positioned(
-                right: 10,
-                top: 10,
-                child: Icon(
-                  event.type == EventType.match
-                      ? Icons.sports
-                      : Icons.fitness_center,
-                  size: 32,
-                ),
-              ),
+                  right: 10,
+                  top: 10,
+                  child: Icon(
+                    event.type == EventType.match
+                        ? Icons.sports
+                        : Icons.fitness_center,
+                    size: 32,
+                    color: event.type == EventType.match ? Colors.white : null,
+                  )),
             ]),
           ),
         ),

@@ -24,6 +24,7 @@ class _NewEventState extends State<NewEvent> {
   List<dynamic> _suggestedAddresses = [];
   var _selectedType = '';
   var _selectedSport = '';
+  String? showedDate;
   List<Sport> _sports = [];
   final eventService = EventService();
   var _isPublic = true;
@@ -122,12 +123,11 @@ class _NewEventState extends State<NewEvent> {
 
       // Formater la date et l'heure en ISO 8601
       final iso8601FormattedDateTime =
-          DateFormat("yyyy-MM-ddTHH:mm:ss").format(pickedDateTime.toUtc()) +
-              "Z";
+          '${DateFormat("yyyy-MM-ddTHH:mm:ss").format(pickedDateTime.toUtc())}Z';
 
       setState(() {
-        _selectedDate =
-            iso8601FormattedDateTime; // Assurez-vous d'utiliser le bon champ dans votre code
+        _selectedDate = iso8601FormattedDateTime;
+        showedDate = DateFormat("yyyy-MM-dd HH:mm").format(pickedDateTime);
       });
     }
   }
@@ -332,7 +332,7 @@ class _NewEventState extends State<NewEvent> {
                               style: TextStyle(
                                   color:
                                       Theme.of(context).colorScheme.onSurface),
-                              _selectedDate == null ? '' : _selectedDate!,
+                              _selectedDate == null ? '' : showedDate!,
                             ),
                           ],
                         ),

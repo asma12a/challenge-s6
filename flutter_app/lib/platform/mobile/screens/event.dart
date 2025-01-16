@@ -195,7 +195,8 @@ class _EventScreenState extends State<EventScreen>
                                 right: 16,
                               ),
                               decoration: BoxDecoration(
-                                color: event.sport.color?.withValues(alpha: 0.03) ??
+                                color: event.sport.color
+                                        ?.withValues(alpha: 0.03) ??
                                     Theme.of(context)
                                         .colorScheme
                                         .primary
@@ -265,9 +266,12 @@ class _EventScreenState extends State<EventScreen>
                                                   ?.withAlpha(20),
                                         ),
                                         CustomLabel(
-                                          label: DateFormat('dd/MM/yyyy')
+                                          label: DateFormat('yyyy/MM/dd HH:mm')
                                               .format(
-                                                  DateTime.parse(event.date)),
+                                            DateTime.parse(event.date).add(
+                                              Duration(hours: 1),
+                                            ),
+                                          ),
                                           icon: Icons.date_range,
                                           color:
                                               getColorBasedOnDate(event.date),
@@ -351,7 +355,8 @@ class _EventScreenState extends State<EventScreen>
                                                 const EdgeInsets.only(top: 16),
                                             decoration: BoxDecoration(
                                               color: event.sport.color
-                                                      ?.withValues(alpha: 0.03) ??
+                                                      ?.withValues(
+                                                          alpha: 0.03) ??
                                                   Theme.of(context)
                                                       .colorScheme
                                                       .primary
