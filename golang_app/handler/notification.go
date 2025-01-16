@@ -14,7 +14,6 @@ import (
 
 func NotificationHandler(app fiber.Router, ctx context.Context, serviceNotification service.NotificationService, serviceEvent service.Event, rdb *redis.Client) {
 	app.Post("/", sendNotification(serviceNotification))
-	app.Get("/event/notify", notifyPlayerBeforeEvent(ctx, serviceNotification, serviceEvent, rdb))
 	app.Post("/fcm_token/:fcm_token", middleware.IsAuthMiddleware, storeFcmToken(ctx, serviceNotification, rdb))
 
 }
@@ -47,40 +46,51 @@ func sendNotification(serviceSNotification service.NotificationService) fiber.Ha
 	}
 }
 
-func notifyPlayerBeforeEvent(ctx context.Context, serviceSNotification service.NotificationService, serviceEvent service.Event, rdb *redis.Client) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		events, err := serviceEvent.GetPlayersBeforeEvent(ctx)
-		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-				"status": "error",
-				"error":  err.Error(),
-			})
-		}
 
-		for _, event := range events {
-			for _, team := range event.Edges.Teams {
-				for _, teamUser := range team.Edges.TeamUsers {
-					log.Println("Envoi de la notification à", teamUser.Edges.User.Email, event.Name)
-					fcm_token, err := serviceSNotification.GetTokenFromRedis(ctx, rdb, string(teamUser.Edges.User.ID)+"_FCM")
-					if err == nil {
-						err = serviceSNotification.SendPushNotification(
-							fcm_token,
-							"Rappel",
-							"L'événement "+event.Name+" commence bientôt",
-						)
-						if err != nil {
-							return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-								"status": "error",
-								"error":  err.Error(),
-							})
+
+func NotifyPlayersBeforeEventCron(ctx context.Context, serviceSNotification service.NotificationService, serviceEvent service.Event, rdb *redis.Client) {
+	ticker := time.NewTicker(1 * time.Hour) 
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ctx.Done(): 
+			log.Println("Arrêt du cron")
+			return
+		case <-ticker.C: 
+			log.Println("Exécution de la tâche cron...")
+
+			events, err := serviceEvent.GetPlayersBeforeEvent(ctx)
+			if err != nil {
+				log.Printf("Erreur lors de la récupération des événements : %v\n", err)
+				continue
+			}
+
+			for _, event := range events {
+				for _, team := range event.Edges.Teams {
+					for _, teamUser := range team.Edges.TeamUsers {
+						if(teamUser.Edges.User == nil) {
+							continue
 						}
-						time.Sleep(5 * time.Second)
+						log.Println("Envoi de la notification à", teamUser.Edges.User.Email, event.Name)
+						fcm_token, err := serviceSNotification.GetTokenFromRedis(ctx, rdb, string(teamUser.Edges.User.ID)+"_FCM")
+						if err == nil {
+							err = serviceSNotification.SendPushNotification(
+								fcm_token,
+								"Rappel",
+								"L'événement "+event.Name+" commence bientôt",
+							)
+							if err != nil {
+								log.Printf("Erreur lors de l'envoi de la notification : %v\n", err)
+							}
+							time.Sleep(5 * time.Second)
+						} else {
+							log.Printf("Erreur lors de la récupération du token FCM : %v\n", err)
+						}
 					}
-
 				}
 			}
 		}
-		return c.SendStatus(fiber.StatusOK)
 	}
 }
 

@@ -325,14 +325,14 @@ func (repo *Event) IsUserInEvent(ctx context.Context, eventID, userID ulid.ID) (
 }
 
 func (n *Event) GetPlayersBeforeEvent(ctx context.Context) ([]*ent.Event, error) {
-	now := time.Now()
-	oneDayLater := now.Add(24 * time.Hour)
+	now := time.Now().Truncate(time.Hour)
+	exactlyIn24Hours := now.Add(24 * time.Hour) // Dans 24 heures, toujours à la minute près
+	
 
-	// Requête pour récupérer les événements dont la date est comprise entre 'now' et 'oneDayLater'
 	events, err := n.db.Event.Query().
 		Where(
-			event.DateGTE(now),        // Date supérieure ou égale à 'now'
-			event.DateLT(oneDayLater), // Date inférieure à 'oneDayLater'
+			event.DateGTE(exactlyIn24Hours),           
+			event.DateLT(exactlyIn24Hours.Add(time.Hour)), 
 		).
 		WithTeams(func(tq *ent.TeamQuery) {
 			tq.WithTeamUsers(func(tuq *ent.TeamUserQuery) {
