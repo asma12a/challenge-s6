@@ -7,6 +7,7 @@ import 'package:squad_go/core/services/chat_service.dart';
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/utils/constants.dart';
+import 'package:squad_go/main.dart';
 
 const apiBaseUrl = String.fromEnvironment('API_BASE_URL');
 const jwtStorageToken = String.fromEnvironment('JWT_STORAGE_KEY');
@@ -27,10 +28,15 @@ class _ChatPageState extends State<ChatPage>
   final List<String> _messages = [];
   late AnimationController _animationController;
   String _currentUserId = '';
+  bool? _isEventFinished;
+
+  final storage = const FlutterSecureStorage();
 
   @override
   void initState() {
     super.initState();
+    _checkEventStatus();
+
     _initializeChat();
 
     _animationController = AnimationController(
@@ -38,6 +44,13 @@ class _ChatPageState extends State<ChatPage>
       duration: const Duration(milliseconds: 500),
     );
     _animationController.forward();
+  }
+
+  Future<void> _checkEventStatus() async {
+    final isFinished = await isEventFinished();
+    setState(() {
+      _isEventFinished = isFinished;
+    });
   }
 
   Future<void> _initializeChat() async {
@@ -137,9 +150,53 @@ class _ChatPageState extends State<ChatPage>
     super.dispose();
   }
 
+  Future<bool> isEventFinished() async {
+    try {
+      final token = await storage.read(key: Constants.jwtStorageToken);
+
+      final uri = '${Constants.apiBaseUrl}/api/events/${widget.eventID}';
+      final response = await dio.get(
+        uri,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      final eventData = response.data;
+      final eventDate = DateTime.parse(eventData['date']);
+      return DateTime.now().isAfter(eventDate);
+    } catch (e) {
+      debugPrint('Erreur lors de la vérification de l\'événement : $e');
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var isOnline = context.watch<ConnectivityState>().isConnected;
+
+    if (_isEventFinished == true) {
+      return Center(
+        child: Text(
+          'Les messages sont désactivés car l’événement est terminé.',
+          style: TextStyle(color: Colors.grey, fontSize: 16),
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
+
+    if (!isOnline) {
+      return Center(
+        child: Text(
+          'Vous êtes hors ligne. Connectez-vous à Internet pour accéder au chat.',
+          style: TextStyle(color: Colors.grey, fontSize: 16),
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
 
     return Column(
       children: [
