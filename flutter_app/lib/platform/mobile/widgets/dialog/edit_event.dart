@@ -34,8 +34,9 @@ class _EditEventDialogState extends State<EditEventDialog> {
   @override
   void initState() {
     super.initState();
-
     event = widget.event;
+    iso8601FormattedDateTime = event.date;
+    debugPrint("Date ISO : $iso8601FormattedDateTime");
     _addressController.text = event.address;
     _dateController.text =
         DateFormat('dd/MM/yyyy').format(DateTime.parse(event.date));
@@ -134,14 +135,35 @@ class _EditEventDialogState extends State<EditEventDialog> {
   }
 
   void _updateEvent() async {
+    final translate = AppLocalizations.of(context);
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       try {
+        debugPrint("Event to update : ${event.toJson()}");
         await eventService.updateEvent(event.id!, event.toJson());
-        widget.onRefresh?.call();
+        ScaffoldMessenger.of(context).clearSnackBars();
         Navigator.of(context).pop();
+
+        Future.delayed(Duration(milliseconds: 300), () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                translate?.event_updated_success ??
+                    "L'événement a bien été mis à jour.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
+              ),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+            ),
+          );
+        });
+
+        widget.onRefresh
+            ?.call(); // Cette ligne doit être en dehors de `Future.delayed`
       } catch (e) {
-        // Handle error
+        // Gestion des erreurs
         log.severe('Failed to update event: $e');
       }
     }

@@ -122,7 +122,7 @@ class _NewEventState extends State<NewEvent> {
 
       // Formater la date et l'heure en ISO 8601
       final iso8601FormattedDateTime =
-          DateFormat("yyyy-MM-ddTHH:mm:ssZ").format(pickedDateTime.toUtc());
+          DateFormat("yyyy-MM-ddTHH:mm:ss").format(pickedDateTime.toUtc()) + "Z";
 
       setState(() {
         _selectedDate =

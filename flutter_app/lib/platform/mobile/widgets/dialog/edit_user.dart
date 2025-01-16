@@ -82,13 +82,14 @@ class _EditUserDialogState extends State<EditUserDialog> {
           setState(() {
             passwordErrorMessage = null;
           });
+          Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(translate?.updated_password ?? 'Mot de passe mis à jour !')),
           );
         } catch (e) {
           debugPrint("exception $e");
           setState(() {
-            passwordErrorMessage = e.toString();
+            passwordErrorMessage = translate?.not_strong ?? e.toString();
           });
         }
       }

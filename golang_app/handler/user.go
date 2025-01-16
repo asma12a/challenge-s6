@@ -174,27 +174,27 @@ func updateUserForAdmin(ctx context.Context, service service.User) fiber.Handler
 		user.Name = userInput.Name
 		user.Email = userInput.Email
 
-			if userInput.Password != "" {
-				if err := passwordValidator.Validate(userInput.Password, 60); err != nil {
-					return c.Status(fiber.StatusUnprocessableEntity).JSON(&fiber.Map{
-						"status": "error",
-						"error":  entity.ErrPasswordNotStrong.Error(),
-					})
-				}
-	
-				hashedPassword, err := user.GeneratePassword(userInput.Password)
-				if err != nil {
-					return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-						"status": "error",
-						"error":  err.Error(),
-					})
-				}
-				user.Password = hashedPassword
+		if userInput.Password != "" {
+			if err := passwordValidator.Validate(userInput.Password, 60); err != nil {
+				return c.Status(fiber.StatusUnprocessableEntity).JSON(&fiber.Map{
+					"status": "error",
+					"error":  entity.ErrPasswordNotStrong.Error(),
+				})
 			}
-	
-			if slices.Contains(user.Roles, "admin") && userInput.Roles != nil {
-				user.Roles = userInput.Roles
+
+			hashedPassword, err := user.GeneratePassword(userInput.Password)
+			if err != nil {
+				return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+					"status": "error",
+					"error":  err.Error(),
+				})
 			}
+			user.Password = hashedPassword
+		}
+
+		if slices.Contains(user.Roles, "admin") && userInput.Roles != nil {
+			user.Roles = userInput.Roles
+		}
 
 		updatedUser, err := service.Update(c.UserContext(), user)
 		if err != nil {
@@ -284,8 +284,6 @@ func updateUser(ctx context.Context, service service.User) fiber.Handler {
 		user.Name = userInput.Name
 		user.Email = userInput.Email
 
-
-
 		updatedUser, err := service.Update(c.UserContext(), user)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
@@ -301,8 +299,6 @@ func updateUser(ctx context.Context, service service.User) fiber.Handler {
 		})
 	}
 }
-
-
 
 func updateUserPassword(ctx context.Context, service service.User) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -350,7 +346,7 @@ func updateUserPassword(ctx context.Context, service service.User) fiber.Handler
 
 			hashedPassword, err := user.GeneratePassword(userInput.Password)
 			if err != nil {
-				return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
 					"status": "error",
 					"error":  err.Error(),
 				})

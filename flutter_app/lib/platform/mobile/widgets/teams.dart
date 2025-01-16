@@ -60,7 +60,8 @@ class _TeamsHandleState extends State<TeamsHandle> {
     final translate = AppLocalizations.of(context);
     _showAlertDialog(
       '${translate?.join_button ?? "Rejoindre"} $teamName',
-      translate?.confirm_join_team ?? "Voulez-vous vraiment rejoindre cette équipe?",
+      translate?.confirm_join_team ??
+          "Voulez-vous vraiment rejoindre cette équipe?",
       () async {
         try {
           await teamService.joinTeam(widget.eventId, teamId);
@@ -465,7 +466,9 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                         },
                                                       ),
                                                       if (widget
-                                                          .isEventNowPlaying)
+                                                              .isEventNowPlaying &&
+                                                          player.role !=
+                                                              PlayerRole.coach)
                                                         IconButton(
                                                           icon: Icon(
                                                               Icons.bar_chart),
