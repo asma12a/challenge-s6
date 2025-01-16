@@ -57,7 +57,6 @@ class _EditUserDialogState extends State<EditUserDialog> {
         try {
           await widget.onUpdateInfo!(name, email);
           Navigator.of(context).pop();
-
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -84,7 +83,9 @@ class _EditUserDialogState extends State<EditUserDialog> {
           });
           Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(translate?.updated_password ?? 'Mot de passe mis à jour !')),
+            SnackBar(
+                content: Text(translate?.updated_password ??
+                    'Mot de passe mis à jour !')),
           );
         } catch (e) {
           debugPrint("exception $e");
@@ -107,8 +108,9 @@ class _EditUserDialogState extends State<EditUserDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(translate?.edit_user_infos ??
-                'Modifier les informations utilisateur',
+              Text(
+                translate?.edit_user_infos ??
+                    'Modifier les informations utilisateur',
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -129,7 +131,8 @@ class _EditUserDialogState extends State<EditUserDialog> {
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return translate?.empty_user_name ?? 'Veuillez entrer un nom.';
+                          return translate?.empty_user_name ??
+                              'Veuillez entrer un nom.';
                         }
                         return null;
                       },
@@ -143,10 +146,12 @@ class _EditUserDialogState extends State<EditUserDialog> {
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return translate?.empty_email ?? 'Veuillez entrer une adresse email.';
+                          return translate?.empty_email ??
+                              'Veuillez entrer une adresse email.';
                         }
                         if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                          return translate?.valid_email ?? 'Veuillez entrer une adresse email valide.';
+                          return translate?.valid_email ??
+                              'Veuillez entrer une adresse email valide.';
                         }
                         return null;
                       },
@@ -167,8 +172,8 @@ class _EditUserDialogState extends State<EditUserDialog> {
 
               const SizedBox(height: 32),
 
-              Text(translate?.change_password ??
-                'Changer le mot de passe',
+              Text(
+                translate?.change_password ?? 'Changer le mot de passe',
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -185,11 +190,15 @@ class _EditUserDialogState extends State<EditUserDialog> {
                       controller: passwordController,
                       obscureText: !_isPasswordVisible,
                       onTapOutside: (event) => FocusScope.of(context).unfocus(),
+                      autofillHints: const [AutofillHints.newPassword],
                       decoration: InputDecoration(
-                        labelText: translate?.new_password ?? 'Nouveau mot de passe',
+                        labelText:
+                            translate?.new_password ?? 'Nouveau mot de passe',
                         border: const OutlineInputBorder(),
                         suffixIcon: IconButton(
-                          icon: Icon(_isPasswordVisible ? Icons.visibility_off : Icons.visibility),
+                          icon: Icon(_isPasswordVisible
+                              ? Icons.visibility_off
+                              : Icons.visibility),
                           onPressed: () {
                             setState(() {
                               _isPasswordVisible = !_isPasswordVisible;
@@ -199,10 +208,12 @@ class _EditUserDialogState extends State<EditUserDialog> {
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return translate?.empty_password ?? 'Veuillez entrer un mot de passe.';
+                          return translate?.empty_password ??
+                              'Veuillez entrer un mot de passe.';
                         }
                         if (value.length < 6) {
-                          return translate?.six_char ?? 'Le mot de passe doit contenir au moins 6 caractères.';
+                          return translate?.six_char ??
+                              'Le mot de passe doit contenir au moins 6 caractères.';
                         }
                         return null;
                       },
@@ -222,7 +233,8 @@ class _EditUserDialogState extends State<EditUserDialog> {
                     ElevatedButton.icon(
                       onPressed: _updateUserPassword,
                       icon: const Icon(Icons.lock),
-                      label: Text(translate?.change_password ?? 'Changer mot de passe'),
+                      label: Text(
+                          translate?.change_password ?? 'Changer mot de passe'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         foregroundColor: Colors.white,

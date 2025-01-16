@@ -185,6 +185,12 @@ class _ShowPlayerDetailsDialogState extends State<ShowPlayerDetailsDialog> {
   Widget build(BuildContext context) {
     var isOnline = context.watch<ConnectivityState>().isConnected;
     final translate = AppLocalizations.of(context);
+    final Color roleColor = widget.player.role == PlayerRole.coach
+        ? Colors.blue
+        : widget.player.role == PlayerRole.org ||
+                event?.createdBy == _player.userID
+            ? Colors.deepOrange
+            : Colors.green;
     return Dialog(
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -192,7 +198,7 @@ class _ShowPlayerDetailsDialogState extends State<ShowPlayerDetailsDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              translate?.infos_player ?? 'Infos joueur',
+              translate?.infos_player ?? 'Infos participant',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -202,6 +208,26 @@ class _ShowPlayerDetailsDialogState extends State<ShowPlayerDetailsDialog> {
             Text(
               _player.name ?? _player.email,
               style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            Badge(
+              label: Text(
+                widget.player.role == PlayerRole.coach
+                    ? 'Coach'
+                    : widget.player.role == PlayerRole.org ||
+                            event?.createdBy == _player.userID
+                        ? translate?.organizer ?? 'Organisateur'
+                        : translate?.player ?? 'Joueur',
+                style: TextStyle(
+                  color: roleColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              backgroundColor: roleColor.withAlpha(40),
+              padding: EdgeInsets.symmetric(
+                horizontal: 5,
+                vertical: 2,
+              ),
             ),
             const SizedBox(height: 16),
             if (_player.userID != null) ...[
@@ -219,7 +245,7 @@ class _ShowPlayerDetailsDialogState extends State<ShowPlayerDetailsDialog> {
               ],
               if (nbEvents != 0) ...[
                 Text(
-                  '${translate?.nb_events ?? "Nombre d\'événements :"} $nbEvents',
+                  '${translate?.nb_events ?? "Nombre d'événements :"} $nbEvents',
                   style: const TextStyle(fontSize: 16),
                 ),
                 const SizedBox(height: 16)
@@ -284,7 +310,8 @@ class _ShowPlayerDetailsDialogState extends State<ShowPlayerDetailsDialog> {
                     decoration: TextDecoration.underline,
                   ),
                 ),
-                child: Text(translate?.leave_team_and_event ?? 'Quitter l\'équipe (et l\'évent)'),
+                child: Text(translate?.leave_team_and_event ??
+                    'Quitter l\'équipe (et l\'évent)'),
               ),
           ],
         ),

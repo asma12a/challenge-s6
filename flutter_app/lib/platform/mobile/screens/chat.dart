@@ -80,16 +80,8 @@ class _ChatPageState extends State<ChatPage>
           setState(() {
             _currentUserId = response.data['id'] ?? '';
           });
-        } else if (response.statusCode == 403) {
-          debugPrint('Accès refusé : ${response.data}');
-          setState(() {
-            _currentUserId = '';
-          });
-        } else {
-          debugPrint(
-              'Erreur inconnue (${response.statusCode}): ${response.data}');
         }
-      } on AppException catch (e) {
+      } catch (e) {
         debugPrint(
             'Erreur lors de la récupération des informations utilisateur : $e');
       }
@@ -119,27 +111,22 @@ class _ChatPageState extends State<ChatPage>
             'Cache-Control': 'no-cache',
           }));
 
-      if (response.statusCode == 200) {
-        final List<dynamic> data = response.data;
+      final List<dynamic> data = response.data;
+
+      setState(() {
+        _messages.clear();
+      });
+
+      for (var message in data) {
+        final content = message['content'];
+        final userId = message['created_by'];
+        final userName = message['user_name'];
+
+        final isSelf = userId == _currentUserId;
 
         setState(() {
-          _messages.clear();
+          _messages.add(isSelf ? 'Moi: $content' : '$userName: $content');
         });
-
-        for (var message in data) {
-          final content = message['content'];
-          final userId = message['created_by'];
-          final userName = message['user_name'];
-
-          final isSelf = userId == _currentUserId;
-
-          setState(() {
-            _messages.add(isSelf ? 'Moi: $content' : '$userName: $content');
-          });
-        }
-      } else {
-        debugPrint(
-            'Erreur lors de la récupération des messages : ${response.statusCode}');
       }
     } catch (e) {
       debugPrint('Erreur lors de la récupération des messages : $e');
@@ -161,26 +148,21 @@ class _ChatPageState extends State<ChatPage>
         final storage = const FlutterSecureStorage();
         final token = await storage.read(key: jwtStorageToken);
 
-        final response = await dio.post(uri,
+        await dio.post(uri,
             options: Options(headers: {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer $token',
             }),
             data: jsonEncode(messageData));
 
-        if (response.statusCode == 201) {
-          debugPrint('Message envoyé et enregistré');
+        debugPrint('Message envoyé et enregistré');
 
-          setState(() {
-            _messages.add('Moi: $message');
-          });
+        setState(() {
+          _messages.add('Moi: $message');
+        });
 
-          if (_chatService.isConnected) {
-            _chatService.sendMessage(message);
-          }
-        } else {
-          debugPrint(
-              'Erreur lors de l\'enregistrement du message : ${response.statusCode}');
+        if (_chatService.isConnected) {
+          _chatService.sendMessage(message);
         }
       } catch (e) {
         debugPrint('Erreur lors de l\'enregistrement du message : $e');

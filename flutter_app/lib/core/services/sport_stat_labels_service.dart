@@ -28,7 +28,9 @@ class SportStatLabelsService {
       );
 
       final List<dynamic> sportStatLabels = response.data;
-      return sportStatLabels.map((sportStat) => SportStatLabels.fromJson(sportStat)).toList();
+      return sportStatLabels
+          .map((sportStat) => SportStatLabels.fromJson(sportStat))
+          .toList();
     } catch (error) {
       throw AppException(
           message: 'Failed to retrieve sport stat labels, please try again.');
@@ -78,7 +80,6 @@ class SportStatLabelsService {
 
       final Map<String, dynamic> data = response.data;
       return UserPerformance.fromJson(data);
-
     } catch (error) {
       throw AppException(
           message: 'Failed to retrieve user performance, please try again.');
@@ -101,6 +102,9 @@ class SportStatLabelsService {
         ),
         data: jsonEncode(stats),
       );
+
+      await initialCacheOptions.store!
+          .delete('${Constants.apiBaseUrl}/api/events/$eventId');
     } catch (error) {
       throw AppException(
           message: 'Failed to add user stats, please try again.');
@@ -124,6 +128,8 @@ class SportStatLabelsService {
         ),
         data: jsonEncode(stats),
       );
+      await initialCacheOptions.store!
+          .delete('${Constants.apiBaseUrl}/api/events/$eventId');
     } catch (error) {
       throw AppException(
           message: 'Failed to update user stat, please try again.');
@@ -146,9 +152,9 @@ class SportStatLabelsService {
       );
 
       final List<dynamic> sportStatLabels = response.data;
-      return sportStatLabels.map((sportStat) => SportStatLabels.fromJson(sportStat)).toList();
-
-
+      return sportStatLabels
+          .map((sportStat) => SportStatLabels.fromJson(sportStat))
+          .toList();
     } catch (error) {
       throw AppException(
         message:
