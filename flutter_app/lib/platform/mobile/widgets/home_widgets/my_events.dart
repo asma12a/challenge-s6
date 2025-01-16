@@ -36,7 +36,7 @@ class HomeMyEventsState extends State<HomeMyEvents> {
       DateTime now = DateTime.now();
       final filteredEvents = events.where((event) {
         DateTime eventDate = DateTime.parse(event.date);
-        return eventDate.isAfter(now.subtract(Duration(days: 1)));
+        return eventDate.isAfter(now);
       }).toList();
 
       setState(() {
