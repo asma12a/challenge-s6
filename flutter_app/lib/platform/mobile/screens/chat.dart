@@ -209,6 +209,7 @@ class _ChatPageState extends State<ChatPage>
       ),
       child: Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: const Text('Chat'),
         ),
         body: Column(
