@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'dart:convert';
+
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -105,7 +107,6 @@ class _EditEventDialogState extends State<EditEventDialog> {
       firstDate: firstDate,
       lastDate: lastDate,
     );
-
     // Sélectionner l'heure
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
@@ -122,6 +123,15 @@ class _EditEventDialogState extends State<EditEventDialog> {
         pickedTime.minute,
       );
 
+      if (pickedDate != null) {
+        setState(() {
+          iso8601FormattedDateTime =
+              "${DateFormat("yyyy-MM-ddTHH:mm:ss").format(pickedDateTime.toUtc())}Z";
+          // Met à jour le champ de texte avec la date et l'heure formatée
+          _dateController.text =
+              DateFormat('dd/MM/yyyy HH:mm').format(pickedDateTime);
+        });
+      }
       if (pickedDate != null) {
         setState(() {
           iso8601FormattedDateTime =
@@ -159,6 +169,7 @@ class _EditEventDialogState extends State<EditEventDialog> {
         widget.onRefresh
             ?.call(); // Cette ligne doit être en dehors de `Future.delayed`
       } catch (e) {
+        // Gestion des erreurs
         // Gestion des erreurs
         log.severe('Failed to update event: $e');
       }
