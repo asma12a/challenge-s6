@@ -55,6 +55,17 @@ class _AddPlayerDialogState extends State<AddPlayerDialog> {
     }
   }
 
+  String _getTranslatedRole(PlayerRole role, AppLocalizations? translate) {
+    switch (role) {
+      case PlayerRole.player:
+        return translate?.player ?? 'Joueur';
+      case PlayerRole.coach:
+        return translate?.coach ?? 'Entraîneur';
+      case PlayerRole.org:
+        return translate?.organizer ?? 'Organisateur';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final translate = AppLocalizations.of(context);
@@ -114,9 +125,9 @@ class _AddPlayerDialogState extends State<AddPlayerDialog> {
                 },
                 items: PlayerRole.values
                     .map((role) => DropdownMenuItem<PlayerRole>(
-                          value: role,
-                          child: Text(playerRoleLabel[role] ?? role.name),
-                        ))
+                  value: role,
+                  child: Text(_getTranslatedRole(role, translate)),
+                ))
                     .toList(),
                 decoration: InputDecoration(labelText: translate?.role ?? 'Role'),
               ),

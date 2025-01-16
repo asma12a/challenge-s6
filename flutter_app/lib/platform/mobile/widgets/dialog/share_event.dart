@@ -52,7 +52,7 @@ class _ShareEventDialogState extends State<ShareEventDialog> {
             TextField(
               readOnly: true,
               decoration: InputDecoration(
-                labelText: 'Lien de l\'évent',
+                labelText: translate?.event_link ?? 'Lien de l\'évent',
                 border: OutlineInputBorder(),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.copy),

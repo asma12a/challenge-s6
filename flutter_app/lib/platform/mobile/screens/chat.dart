@@ -55,7 +55,6 @@ class _ChatPageState extends State<ChatPage>
   }
 
   Future<void> _initializeChat() async {
-
     await _loadCurrentUser();
     if (_currentUserId.isNotEmpty) {
       await _loadMessages(widget.eventID);
@@ -66,28 +65,19 @@ class _ChatPageState extends State<ChatPage>
 
   // Fonction pour récupérer l'user_id à partir du token
   Future<void> _loadCurrentUser() async {
-
     final storage = const FlutterSecureStorage();
     final token = await storage.read(key: jwtStorageToken);
 
     if (token != null) {
-
-
-           final uri = '${Constants.apiBaseUrl}/api/auth/me';
+      final uri = '${Constants.apiBaseUrl}/api/auth/me';
       try {
+        final response = await dio.get(uri.toString(),
+            options: Options(headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            }));
 
-      final response = await dio.get(
-        uri.toString(),
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token',
-          }));
-        
-
-
-        if (response.data['id'] != null &&response. data['id'].isNotEmpty) {
-
+        if (response.data['id'] != null && response.data['id'].isNotEmpty) {
           setState(() {
             _currentUserId = response.data['id'] ?? '';
           });
@@ -172,7 +162,6 @@ class _ChatPageState extends State<ChatPage>
         'content': message,
       };
 
-
       final uri = '${Constants.apiBaseUrl}/api/message';
 
       try {
@@ -226,7 +215,9 @@ class _ChatPageState extends State<ChatPage>
           children: [
             Expanded(
               child: Container(
-                color: Colors.grey[200],
+                color: Theme.of(context).colorScheme.primary.withValues(
+                      alpha: (Theme.of(context).colorScheme.primary.a * 0.03),
+                    ),
                 child: ListView.builder(
                   padding: const EdgeInsets.all(8.0),
                   itemCount: _messages.length,

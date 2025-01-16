@@ -405,7 +405,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                       label: Text(
                                                         player.role ==
                                                                 PlayerRole.coach
-                                                            ? 'Coach'
+                                                            ? translate?.coach ?? 'Coach'
                                                             : translate
                                                                     ?.organizer ??
                                                                 'Organisateur',
@@ -466,9 +466,7 @@ class _TeamsHandleState extends State<TeamsHandle> {
                                                         },
                                                       ),
                                                       if (widget
-                                                              .isEventNowPlaying &&
-                                                          player.role !=
-                                                              PlayerRole.coach)
+                                                          .isEventNowPlaying)
                                                         IconButton(
                                                           icon: Icon(
                                                               Icons.bar_chart),
