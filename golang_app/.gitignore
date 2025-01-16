@@ -2,7 +2,7 @@
 tmp
 dragonflydata
 postgresdata
-
+credentials.json
 # all files and folders inside ent without ent/schema in one line
 ent/*
 !ent/schema
