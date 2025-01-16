@@ -82,7 +82,7 @@ func main() {
 
 	// Créer un Hub WebSocket
 	hub := ws.NewHub()
-	go hub.Run() // Lancer le Hub dans une goroutine
+	go hub.Run()
 
 	// Route WebSocket
 	app.Get("/ws", websocket.New(ws.WebSocketHandler(hub)))
