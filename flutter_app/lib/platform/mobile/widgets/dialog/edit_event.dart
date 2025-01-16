@@ -40,9 +40,11 @@ class _EditEventDialogState extends State<EditEventDialog> {
     iso8601FormattedDateTime = event.date;
     debugPrint("Date ISO : $iso8601FormattedDateTime");
     _addressController.text = event.address;
-    _dateController.text =
-        DateFormat('dd/MM/yyyy').format(DateTime.parse(event.date));
-
+    _dateController.text = DateFormat('yyyy/MM/dd HH:mm').format(
+      DateTime.parse(event.date).add(
+        Duration(hours: 1),
+      ),
+    );
     _fetchSports();
   }
 
@@ -123,24 +125,13 @@ class _EditEventDialogState extends State<EditEventDialog> {
         pickedTime.minute,
       );
 
-      if (pickedDate != null) {
-        setState(() {
-          iso8601FormattedDateTime =
-              "${DateFormat("yyyy-MM-ddTHH:mm:ss").format(pickedDateTime.toUtc())}Z";
-          // Met à jour le champ de texte avec la date et l'heure formatée
-          _dateController.text =
-              DateFormat('dd/MM/yyyy HH:mm').format(pickedDateTime);
-        });
-      }
-      if (pickedDate != null) {
-        setState(() {
-          iso8601FormattedDateTime =
-              "${DateFormat("yyyy-MM-ddTHH:mm:ss").format(pickedDateTime.toUtc())}Z";
-          // Met à jour le champ de texte avec la date et l'heure formatée
-          _dateController.text =
-              DateFormat('dd/MM/yyyy HH:mm').format(pickedDateTime);
-        });
-      }
+      setState(() {
+        iso8601FormattedDateTime =
+            "${DateFormat("yyyy-MM-ddTHH:mm:ss").format(pickedDateTime.toUtc())}Z";
+        // Met à jour le champ de texte avec la date et l'heure formatée
+        _dateController.text =
+            DateFormat('yyyy/MM/dd HH:mm').format(pickedDateTime);
+      });
     }
   }
 
