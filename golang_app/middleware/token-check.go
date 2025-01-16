@@ -1,7 +1,9 @@
 package middleware
 
 import (
+	"fmt"
 	"strings"
+	"time"
 
 	"github.com/asma12a/challenge-s6/config"
 	"github.com/gofiber/fiber/v2"
@@ -16,6 +18,7 @@ type TokenCheck struct {
 func CheckToken(c *fiber.Ctx) (TokenCheck, error) {
 	// Récupérer le token depuis l'en-tête Authorization
 	token := c.Get("Authorization")
+	fmt.Println("token", token)
 	if token == "" {
 		// Token manquant, renvoyer une erreur avec un code 401
 		return TokenCheck{}, fiber.NewError(fiber.StatusUnauthorized, "No token provided")
@@ -40,16 +43,25 @@ func CheckToken(c *fiber.Ctx) (TokenCheck, error) {
 	})
 
 	if err != nil {
-		// Si le token est invalide, renvoyer une erreur
+		// Si le token est invalide, re	nvoyer une erreur
 		return TokenCheck{}, fiber.NewError(fiber.StatusUnauthorized, "Invalid token")
 	}
 
 	// Extraire les informations de l'utilisateur
 	user_id, ok_id := claims["id"].(string)
-	if !ok_id {
-		// Si les informations du token sont manquantes
+	roles, ok_roles := claims["roles"].(string)
+	expiration, ok_exp := claims["exp"].(float64)
+	if !ok_id || !ok_exp || !ok_roles {
 		return TokenCheck{}, fiber.NewError(fiber.StatusUnauthorized, "Invalid token claims")
+
 	}
 
-	return TokenCheck{UserID: user_id}, nil
+	if int64(expiration) < time.Now().Unix() {
+		return TokenCheck{}, fiber.NewError(fiber.StatusUnauthorized, "Invalid has expired")
+
+	}
+
+	fmt.Println("user_id", user_id)
+
+	return TokenCheck{UserID: user_id, Roles: roles}, nil
 }
