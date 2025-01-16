@@ -154,7 +154,8 @@
   "error_active": "L'utilisateur n'est pas actif. Veuillez vérifier votre compte.",
   "not_strong": "Le mot de passe n'est pas assez fort. Veuillez choisir un mot de passe plus fort.",
   "error_conflict": "L'adresse email est déjà utilisée.",
-  "event_updated_success": "L'événement a bien été mis à jour."
+  "event_updated_success": "L'événement a bien été mis à jour.",
+  "event_link": "Lien de l'événement"
 
 
 

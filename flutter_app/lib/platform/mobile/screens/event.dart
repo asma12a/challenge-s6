@@ -30,7 +30,8 @@ class EventScreen extends StatefulWidget {
   State<EventScreen> createState() => _EventScreenState();
 }
 
-class _EventScreenState extends State<EventScreen> {
+class _EventScreenState extends State<EventScreen>
+    with TickerProviderStateMixin {
   final EventService eventService = EventService();
   late Event event = widget.event ?? Event.empty();
   bool isOrganizer = false;
@@ -46,9 +47,15 @@ class _EventScreenState extends State<EventScreen> {
 
   bool get isEventToday => eventDate.isAtSameMomentAs(today);
 
+  late TabController _tabController;
+
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      setState(() {}); // Force le rebuild quand l'onglet change
+    });
     _fetchEventDetails();
   }
 
@@ -69,7 +76,6 @@ class _EventScreenState extends State<EventScreen> {
         isCoach = isUserCoach;
       });
     } catch (e) {
-      // Handle error
       log.severe('Failed to fetch event details: $e');
     }
   }
@@ -85,30 +91,28 @@ class _EventScreenState extends State<EventScreen> {
     final translate = AppLocalizations.of(context);
     return SafeArea(
       child: Scaffold(
-         floatingActionButton: 
-        // !isEventFinished
-            // ? FloatingActionButton(
-            //     shape: const CircleBorder(),
-            //     backgroundColor: event.sport.color?.withValues(alpha: 0.5) ??
-            //         Theme.of(context)
-            //             .colorScheme
-            //             .primary
-            //             .withValues(alpha: 0.5),
-            //     onPressed: () {
-            //       showDialog(
-            //         context: context,
-            //         builder: (context) {
-            //           return ShareEventDialog(event: event);
-            //         },
-            //       );
-            //     },
-            //     child: const Icon(
-            //       Icons.share,
-            //       color: Colors.white,
-            //     ),
-            //   )
-            // : 
-            null,
+        floatingActionButton: !isEventFinished && _tabController.index != 1
+            ? FloatingActionButton(
+                shape: const CircleBorder(),
+                backgroundColor: event.sport.color?.withValues(alpha: 0.5) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.5),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return ShareEventDialog(event: event);
+                    },
+                  );
+                },
+                child: const Icon(
+                  Icons.share,
+                  color: Colors.white,
+                ),
+              )
+            : null,
         body: event.id == null
             ? const Center(child: CircularProgressIndicator())
             : RefreshIndicator(
@@ -119,7 +123,10 @@ class _EventScreenState extends State<EventScreen> {
                   slivers: [
                     SliverAppBar(
                       leading: IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.white,),
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                        ),
                         onPressed: () {
                           context.go('/home');
                         },
@@ -152,7 +159,8 @@ class _EventScreenState extends State<EventScreen> {
                         message: event.name,
                         child: Text(
                           event.name,
-                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.white),
                         ),
                       ),
                       pinned: true,
@@ -187,11 +195,11 @@ class _EventScreenState extends State<EventScreen> {
                                 right: 16,
                               ),
                               decoration: BoxDecoration(
-                                color: event.sport.color?.withOpacity(0.03) ??
+                                color: event.sport.color?.withValues(alpha: 0.03) ??
                                     Theme.of(context)
                                         .colorScheme
                                         .primary
-                                        .withOpacity(0.03),
+                                        .withValues(alpha: 0.03),
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(16),
                                 ),
@@ -292,23 +300,24 @@ class _EventScreenState extends State<EventScreen> {
                                       height: 40,
                                       decoration: BoxDecoration(
                                         color: event.sport.color
-                                                ?.withOpacity(0.2) ??
+                                                ?.withValues(alpha: 0.2) ??
                                             Theme.of(context)
                                                 .colorScheme
                                                 .primary
-                                                .withOpacity(0.2),
+                                                .withValues(alpha: 0.2),
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: TabBar(
+                                        controller: _tabController,
                                         indicatorSize: TabBarIndicatorSize.tab,
                                         dividerColor: Colors.transparent,
                                         indicator: BoxDecoration(
                                           color: event.sport.color
-                                                  ?.withOpacity(0.5) ??
+                                                  ?.withValues(alpha: 0.5) ??
                                               Theme.of(context)
                                                   .colorScheme
                                                   .primary
-                                                  .withOpacity(0.5),
+                                                  .withValues(alpha: 0.5),
                                           borderRadius:
                                               BorderRadius.circular(10),
                                         ),
@@ -334,6 +343,7 @@ class _EventScreenState extends State<EventScreen> {
                                     ),
                                     Expanded(
                                       child: TabBarView(
+                                        controller: _tabController,
                                         children: [
                                           // Onglet Équipes
                                           Container(
@@ -341,11 +351,11 @@ class _EventScreenState extends State<EventScreen> {
                                                 const EdgeInsets.only(top: 16),
                                             decoration: BoxDecoration(
                                               color: event.sport.color
-                                                      ?.withOpacity(0.03) ??
+                                                      ?.withValues(alpha: 0.03) ??
                                                   Theme.of(context)
                                                       .colorScheme
                                                       .primary
-                                                      .withOpacity(0.03),
+                                                      .withValues(alpha: 0.03),
                                               borderRadius:
                                                   BorderRadius.circular(16),
                                             ),
@@ -377,8 +387,7 @@ class _EventScreenState extends State<EventScreen> {
                                             margin:
                                                 const EdgeInsets.only(top: 16),
                                             child: ChatPage(
-                                              eventID: event.id ??
-                                                  '',
+                                              eventID: event.id ?? '',
                                             ),
                                           ),
                                         ],

@@ -95,17 +95,26 @@ class _SearchScreenState extends State<SearchScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(5.0),
                   decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.secondary,
+                      color: Theme.of(context).colorScheme.primary.withValues(
+                            alpha:
+                                (Theme.of(context).colorScheme.primary.a * 0.7),
+                          ),
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8.0)),
                   child: DropdownButton<String>(
                     value: params["sport"],
-                    iconEnabledColor: Colors.black,
-                    dropdownColor: Theme.of(context).colorScheme.secondary,
+                    iconEnabledColor: Colors.white,
+                    dropdownColor: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(
+                          alpha:
+                              (Theme.of(context).colorScheme.primary.a * 0.7),
+                        ),
                     hint: Text(
                       translate?.sport_select_label ?? "Sport",
                       style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSecondary),
+                          color: Theme.of(context).colorScheme.onPrimary),
                     ),
                     items: _sports.map((sport) {
                       return DropdownMenuItem<String>(
@@ -131,13 +140,22 @@ class _SearchScreenState extends State<SearchScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(5.0),
                   decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.secondary,
+                      color: Theme.of(context).colorScheme.primary.withValues(
+                            alpha:
+                                (Theme.of(context).colorScheme.primary.a * 0.7),
+                          ),
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8.0)),
                   child: DropdownButton<String>(
                     value: params["type"],
-                    dropdownColor: Theme.of(context).colorScheme.secondary,
-                    iconEnabledColor: Colors.black,
+                    dropdownColor: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(
+                          alpha:
+                              (Theme.of(context).colorScheme.primary.a * 0.7),
+                        ),
+                    iconEnabledColor: Colors.white,
                     hint: Text(
                       translate?.type_select_label ?? "Type",
                       style: TextStyle(
@@ -147,11 +165,18 @@ class _SearchScreenState extends State<SearchScreen> {
                     items: [
                       DropdownMenuItem(
                         value: "match",
-                        child: Text(translate?.match ?? "Match"),
+                        child: Text(
+                          translate?.match ?? "Match",
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
                       DropdownMenuItem(
-                          value: "training",
-                          child: Text(translate?.training ?? "Training"))
+                        value: "training",
+                        child: Text(
+                          translate?.training ?? "Training",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      )
                     ],
                     onChanged: (String? value) {
                       params["type"] = value!;
