@@ -45,7 +45,8 @@ func createMessage(ctx context.Context, serviceMessage service.MessageService, s
 			})
 		}
 
-		// Vérification de l'existence de l'utilisateur (User)
+		fmt.Println("Event -----------------", event)
+
 		user, err := serviceUser.FindOne(ctx, messageInput.UserID)
 		if err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
@@ -53,6 +54,7 @@ func createMessage(ctx context.Context, serviceMessage service.MessageService, s
 				"error":  "User not found",
 			})
 		}
+		fmt.Println("User -----------------", user)
 
 		// Validation du champ Name
 		if user.Name == "" {
@@ -65,7 +67,6 @@ func createMessage(ctx context.Context, serviceMessage service.MessageService, s
 		newMessage := &entity.Message{
 			EventID: event.ID,
 			UserID:  user.ID,
-			// Le contenu du message
 			Message: ent.Message{
 				UpdatedAt: time.Now(),
 				UserName:  user.Name,
@@ -75,11 +76,24 @@ func createMessage(ctx context.Context, serviceMessage service.MessageService, s
 		}
 
 		// Logs pour débogage
-		fmt.Printf("New Message Object: %+v\n", newMessage)
+		fmt.Printf("New Message Object: ----------------- %+v\n", newMessage)
 
 		// Insérer dans le service
+		// Essayer d'insérer le message avec gestion des erreurs
+		defer func() {
+			if r := recover(); r != nil {
+				fmt.Println("Recovered in createMessage:", r)
+				c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+					"status": "error",
+					"error":  "An internal server error occurred",
+				})
+			}
+		}()
+
 		err = serviceMessage.Create(c.UserContext(), newMessage)
 		if err != nil {
+			// Log et retourne une erreur spécifique si nécessaire
+			fmt.Println("Error during message creation:", err)
 			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 				"status": "error",
 				"error":  err.Error(),
