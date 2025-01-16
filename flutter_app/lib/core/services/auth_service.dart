@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/models/user_app.dart';
@@ -10,7 +11,6 @@ class AuthService {
   final _storage = const FlutterSecureStorage();
 
   Future<Map<String, dynamic>> signIn(body) async {
-
     try {
       final uri = '${Constants.apiBaseUrl}/api/auth/login';
 
@@ -26,12 +26,11 @@ class AuthService {
 
       final data = response.data;
 
-
       await _storage.write(
           key: Constants.jwtStorageToken, value: data['token']);
-      await NotificationService().initNotifications();
-      await initialCacheOptions.store!
-          .delete('${Constants.apiBaseUrl}/api/events/user');
+      if (!kIsWeb) {
+        await NotificationService().initNotifications();
+      }
       return data;
     } catch (error) {
       log.severe('An error occurred while ', {error: error});
