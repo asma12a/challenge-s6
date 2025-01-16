@@ -153,7 +153,9 @@
   "error_password": "Credenciales incorrectas. Por favor verifique su información y vuelva a intentarlo.",
   "error_active": "El usuario no está activo. Por favor verifique su cuenta.",
   "not_strong": "La contraseña no es lo suficientemente fuerte. Elija una contraseña más segura.",
-  "error_conflict": "La dirección de correo electrónico ya está en uso."
+  "error_conflict": "La dirección de correo electrónico ya está en uso.",
+  "event_updated_success": "El evento se ha actualizado correctamente."
+
 
 
 

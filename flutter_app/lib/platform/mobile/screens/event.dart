@@ -21,6 +21,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class EventScreen extends StatefulWidget {
   final Event? event;
   final String? eventId;
+
   const EventScreen({super.key, this.event, this.eventId})
       : assert(event != null || eventId != null);
 
@@ -36,9 +37,12 @@ class _EventScreenState extends State<EventScreen> {
 
   final DateTime today =
       DateTime.parse(DateFormat('yyyy-MM-dd').format(DateTime.now()));
+
   DateTime get eventDate => DateTime.parse(
       DateFormat('yyyy-MM-dd').format(DateTime.parse(event.date)));
+
   bool get isEventFinished => eventDate.isBefore(today);
+
   bool get isEventToday => eventDate.isAtSameMomentAs(today);
 
   @override
@@ -112,7 +116,7 @@ class _EventScreenState extends State<EventScreen> {
                   slivers: [
                     SliverAppBar(
                       leading: IconButton(
-                        icon: const Icon(Icons.arrow_back),
+                        icon: const Icon(Icons.arrow_back, color: Colors.white,),
                         onPressed: () {
                           context.go('/home');
                         },
@@ -120,7 +124,7 @@ class _EventScreenState extends State<EventScreen> {
                       actions: [
                         if (isOrganizer && !isEventFinished)
                           IconButton(
-                            icon: const Icon(Icons.edit),
+                            icon: const Icon(Icons.edit, color: Colors.white),
                             onPressed: () {
                               if (!isOnline) {
                                 showDialog(
@@ -145,21 +149,25 @@ class _EventScreenState extends State<EventScreen> {
                         message: event.name,
                         child: Text(
                           event.name,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                         ),
                       ),
-                      // floating: true,
-                      // snap: true,
-
                       pinned: true,
                       expandedHeight: event.sport.imageUrl != null ? 100 : 0,
                       flexibleSpace: FlexibleSpaceBar(
                         background: event.sport.imageUrl != null
-                            ? Image.network(
-                                event.sport.imageUrl as String,
-                                fit: BoxFit.cover,
+                            ? Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  Image.network(
+                                    event.sport.imageUrl as String,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  Container(
+                                    color: Colors.black
+                                        .withAlpha(100), // Assombrit l'image
+                                  ),
+                                ],
                               )
                             : null,
                       ),

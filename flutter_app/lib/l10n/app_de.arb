@@ -153,7 +153,9 @@
   "error_password": "Falsche Anmeldeinformationen. Bitte überprüfen Sie Ihre Angaben und versuchen Sie es erneut.",
   "error_active": "Der Benutzer ist nicht aktiv. Bitte bestätigen Sie Ihr Konto.",
   "not_strong": "Das Passwort ist nicht stark genug. Bitte wählen Sie ein sichereres Passwort.",
-  "error_conflict": "Die E-Mail-Adresse wird bereits verwendet."
+  "error_conflict": "Die E-Mail-Adresse wird bereits verwendet.",
+  "event_updated_success": "Die Veranstaltung wurde erfolgreich aktualisiert."
+
 
 
 
