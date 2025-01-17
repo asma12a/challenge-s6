@@ -155,5 +155,13 @@
   "not_strong": "The password is not strong enough. Please choose a stronger password.",
   "error_conflict": "The email address is already in use.",
   "event_updated_success": "The event has been successfully updated.",
-  "event_link": "Event link"
+  "event_link": "Event link",
+  "french": "French",
+  "english": "English",
+  "german": "German",
+  "spanish": "Spanish"
+
+
+
+
 }

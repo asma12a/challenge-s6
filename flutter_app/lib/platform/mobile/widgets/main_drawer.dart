@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
+import 'package:squad_go/core/providers/locale_provider.dart';
 import 'package:squad_go/platform/mobile/widgets/logo.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -15,6 +16,11 @@ class MainDrawer extends StatelessWidget {
   void _logOut(BuildContext context) async {
     await context.read<AuthState>().logout();
     context.go('/sign-in');
+  }
+
+  void _changeLanguage(BuildContext context, String languageCode) {
+    final localeProvider = context.read<LocaleProvider>();
+    localeProvider.setLocale(Locale(languageCode));
   }
 
   @override
@@ -63,20 +69,73 @@ class MainDrawer extends StatelessWidget {
               onSelectScreen('meals');
             },
           ),
+          SizedBox(height: 20),
+          // Ajout du Dropdown pour changer la langue
           ListTile(
             leading: Icon(
-              Icons.logout,
+              Icons.language,
               size: 26,
               color: Theme.of(context).colorScheme.onSurface,
             ),
-            title: Text(
-              translate?.logout ?? 'Déconnexion',
-              style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 24,
+            title: DropdownButton<String>(
+              value: Localizations.localeOf(context)
+                  .languageCode, // Valeur actuelle de la langue
+              onChanged: (String? newLanguage) {
+                if (newLanguage != null) {
+                  _changeLanguage(context, newLanguage);
+                }
+              },
+              items: [
+                DropdownMenuItem(
+                  value: 'en',
+                  child: Text(translate?.english ??
+                    'English',
+                    style: TextStyle(fontSize: 24),
                   ),
+                ),
+                DropdownMenuItem(
+                  value: 'fr',
+                  child: Text(translate?.french ??
+                    'Français',
+                    style: TextStyle(fontSize: 24),
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'es',
+                  child: Text(translate?.spanish ??
+                    'Espagnol',
+                    style: TextStyle(fontSize: 24),
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'de',
+                  child: Text(translate?.german ??
+                    'Allemand',
+                    style: TextStyle(fontSize: 24),
+                  ),
+                ),
+              ],
             ),
-            onTap: () => _logOut(context),
+          ),
+          SizedBox(height: 250),
+          Expanded(
+            child: Align(
+              child: ListTile(
+                leading: Icon(
+                  Icons.logout,
+                  size: 26,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                title: Text(
+                  translate?.logout ?? 'Déconnexion',
+                  style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: 24,
+                      ),
+                ),
+                onTap: () => _logOut(context),
+              ),
+            ),
           )
         ],
       ),

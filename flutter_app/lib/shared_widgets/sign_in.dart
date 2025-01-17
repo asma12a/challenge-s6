@@ -81,30 +81,6 @@ class __FormContentState extends State<_FormContent> {
   var _enteredEmail = '';
   var _enteredPassword = '';
 
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
-
-  // Méthode de connexion avec Google
-  Future<void> _signInWithGoogle(BuildContext context) async {
-    try {
-      GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser != null) {
-        // Vous pouvez obtenir un token ou l'ID de l'utilisateur
-        final GoogleSignInAuthentication googleAuth =
-            await googleUser.authentication;
-        final accessToken = googleAuth.accessToken;
-        final idToken = googleAuth.idToken;
-
-        context.go('/home');
-      }
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erreur lors de la connexion avec Google : $error'),
-        ),
-      );
-    }
-  }
-
   void _signIn(BuildContext context) async {
     final translate = AppLocalizations.of(context);
     try {
@@ -295,42 +271,6 @@ class __FormContentState extends State<_FormContent> {
                     translate?.login_button ?? 'Se connecter',
                     style: const TextStyle(
                         fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            ),
-            _gap(),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4)),
-                ),
-                onPressed: () async {
-                  await _signInWithGoogle(
-                      context); // Authentification via Google
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.login,
-                        color: Colors.white,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        translate?.google_oauth ?? 'Se connecter via Google',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
                   ),
                 ),
               ),
