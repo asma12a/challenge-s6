@@ -31,6 +31,9 @@ class AuthService {
       if (!kIsWeb) {
         await NotificationService().initNotifications();
       }
+
+      await initialCacheOptions.store!
+          .delete('${Constants.apiBaseUrl}/api/events/user');
       return data;
     } catch (error) {
       log.severe('An error occurred while ', {error: error});
