@@ -95,8 +95,6 @@ func main() {
 			})
 		}
 
-		log.Printf("Connexion WebSocket avec event_id: %s, user_id: %s", eventID, userID)
-
 		return websocket.New(ws.WebSocketHandler(hub, eventID, userID))(c)
 	})
 

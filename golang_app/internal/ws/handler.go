@@ -14,13 +14,12 @@ type Message struct {
 }
 
 func WebSocketHandler(hub *Hub, eventID, userID string) func(*websocket.Conn) {
+
 	return func(conn *websocket.Conn) {
 		hub.register <- conn
 		defer func() {
 			hub.unregister <- conn
 		}()
-
-		log.Printf("Connexion WebSocket avec event_id: %s, user_id: %s", eventID, userID)
 
 		for {
 			_, message, err := conn.ReadMessage()
