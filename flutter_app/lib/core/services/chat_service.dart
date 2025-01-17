@@ -8,7 +8,6 @@ class ChatService {
 
   Function(String)? onMessageReceived;
   Future<void> connect(String eventID, String userID) async {
-
     try {
       final url = 'wss://${Constants.apiBaseUrlWs}/ws?event_id=$eventID&user_id=$userID';
 
@@ -17,6 +16,7 @@ class ChatService {
       isConnected = true;
 
       _channel.stream.listen((data) {
+        debugPrint("Message reçu via WebSocket : $data");
         if (onMessageReceived != null) {
           onMessageReceived!(data);
         }
@@ -35,7 +35,7 @@ class ChatService {
   }
 
   // Méthode pour envoyer un message via la WebSocket
-  void sendMessage(String message) async {
+  Future<void> sendMessage(String message) async {
     if (isConnected) {
       _channel.sink.add(message);
     } else {

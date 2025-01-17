@@ -36,7 +36,6 @@ class _ChatPageState extends State<ChatPage>
   void initState() {
     super.initState();
     _checkEventStatus();
-
     _initializeChat();
 
     _animationController = AnimationController(
@@ -49,6 +48,8 @@ class _ChatPageState extends State<ChatPage>
       final data = jsonDecode(message);
       final isSelf = data['self'] as bool;
       final content = data['content'] as String;
+
+      debugPrint("message $data");
 
       setState(() {
         _messages.add(isSelf ? 'Moi: $content' : 'Autre: $content');
@@ -67,8 +68,7 @@ class _ChatPageState extends State<ChatPage>
     await _loadCurrentUser();
     if (_currentUserId.isNotEmpty) {
       await _loadMessages(widget.eventID);
-
-      _chatService.connect(widget.eventID, _currentUserId);
+      await _chatService.connect(widget.eventID, _currentUserId);
     } else {
       debugPrint("Impossible d'initialiser le chat sans ID utilisateur.");
     }
@@ -106,7 +106,6 @@ class _ChatPageState extends State<ChatPage>
       final token = await storage.read(key: jwtStorageToken);
       final response = await Dio().get(uri,
           options: Options(headers: {'Authorization': 'Bearer $token'}));
-
       if (response.statusCode == 200) {
         setState(() {
           _messages.clear();
@@ -123,7 +122,7 @@ class _ChatPageState extends State<ChatPage>
     }
   }
 
-  void _sendMessage() async {
+  Future<void> _sendMessage() async {
     final message = _controller.text;
     if (message.isNotEmpty) {
       final messageData = {
@@ -157,12 +156,12 @@ class _ChatPageState extends State<ChatPage>
             'user_id': _currentUserId,
             'content': message,
           });
-          _chatService.sendMessage(webSocketMessage);
+          debugPrint("Envoi du message via WebSocket : $webSocketMessage");
+          await _chatService.sendMessage(webSocketMessage);
         }
       } catch (e) {
         debugPrint('Erreur lors de l\'enregistrement du message : $e');
       }
-
       _controller.clear();
     }
   }
