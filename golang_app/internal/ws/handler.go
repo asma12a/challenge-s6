@@ -47,7 +47,7 @@ func WebSocketHandler(hub *Hub, userName string) func(*websocket.Conn) {
 				break
 			}
 
-			hub.BroadcastToOthers(conn, []byte(`{"self":false, "name":"`+userName+`, "content":"`+msg.Content+`"}`))
+			hub.BroadcastToOthers(conn, []byte(`{"self":false, "name":"`+userName+`", "content":"`+msg.Content+`"}`))
 		}
 	}
 }
