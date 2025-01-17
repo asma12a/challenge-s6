@@ -176,7 +176,7 @@ class _NewEventState extends State<NewEvent> {
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );
-        Future.delayed(const Duration(seconds: 1), () {
+        Future.delayed(const Duration(seconds: 3), () {
           context.go('/home');
         });
       } on AppException catch (error) {
