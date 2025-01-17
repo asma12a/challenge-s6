@@ -41,11 +41,16 @@ class _EventScreenState extends State<EventScreen>
       DateTime.parse(DateFormat('yyyy-MM-dd').format(DateTime.now()));
 
   DateTime get eventDate => DateTime.parse(
-      DateFormat('yyyy-MM-dd').format(DateTime.parse(event.date)));
+          DateFormat('yyyy-MM-dd').format(DateTime.parse(event.date)))
+      .add(Duration(hours: 1));
 
   bool get isEventFinished => eventDate.isBefore(today);
 
-  bool get isEventToday => eventDate.isAtSameMomentAs(today);
+  bool get isEventToday =>
+      eventDate.year == today.year &&
+      eventDate.month == today.month &&
+      eventDate.day == today.day;
+
 
   late TabController _tabController;
 
@@ -267,8 +272,9 @@ class _EventScreenState extends State<EventScreen>
                                         ),
                                         Expanded(
                                           child: CustomLabel(
-                                            label: DateFormat('yyyy/MM/dd HH:mm')
-                                                .format(
+                                            label:
+                                                DateFormat('yyyy/MM/dd HH:mm')
+                                                    .format(
                                               DateTime.parse(event.date).add(
                                                 Duration(hours: 1),
                                               ),

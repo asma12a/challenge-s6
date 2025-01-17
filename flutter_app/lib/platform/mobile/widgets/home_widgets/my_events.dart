@@ -34,9 +34,11 @@ class HomeMyEventsState extends State<HomeMyEvents> {
     try {
       List<Event> events = await eventService.getMyEvents();
       DateTime now = DateTime.now();
+      DateTime today = DateTime(now.year, now.month, now.day);
       final filteredEvents = events.where((event) {
         DateTime eventDate = DateTime.parse(event.date);
-        return eventDate.isAfter(now);
+        DateTime eventDay = DateTime(eventDate.year, eventDate.month, eventDate.day);
+        return eventDay.isAfter(today);
       }).toList();
 
       setState(() {
