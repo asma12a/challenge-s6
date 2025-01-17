@@ -4,6 +4,8 @@
 
 # SquadGo - Application Mobile de Gestion d'Événements Sportifs
 
+⚠️⚠️ L'instance de backend utilisée pour ce projet est hébergée sur Render. Par conséquent, elle peut être mise en veille après une période d'inactivité. Cela peut entraîner un délai de 50 secondes ou plus pour les requêtes lorsqu'elle se réveille. Cela est normal et lié à la gestion des ressources sur Render pour les instances gratuites.
+
 ## Description
 
 **SquadGo** est une application mobile qui permet aux utilisateurs de créer, rejoindre et gérer des événements sportifs. Elle offre une plateforme interactive et intuitive pour organiser des événements, communiquer entre participants et suivre les performances sportives.
@@ -56,6 +58,7 @@ Développée avec **Flutter** pour le frontend et **Golang** pour le backend, l'
 - **Invitation des joueurs** : Les organisateurs peuvent inviter des joueurs à rejoindre un événement, même s'ils ne sont pas inscrits à l'application. Après l'inscription, leurs vrais prénoms apparaissent dans l'équipe.
 - **Partage du code d'événement** : Permet de partager un code pour inviter des amis à rejoindre un événement.
 - **Chat par événement** : Permet de discuter avec tous les participants d'un événement.
+- **Affichage carte** : Permet de visualiser la position géographique de l'événement en cliquant sur l'adresse (écran détail événement).
 
 ### 6. **Notifications**
 
