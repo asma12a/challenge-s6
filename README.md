@@ -25,23 +25,25 @@ Développée avec **Flutter** pour le frontend et **Golang** pour le backend, l'
 
 ### 1. **Authentification**
 
-- **Inscription avec confirmation par mail** : Les utilisateurs peuvent s'inscrire via un formulaire, avec une confirmation de leur adresse e-mail.
-- **Connexion** : Les utilisateurs peuvent se connecter à leur compte en utilisant leur adresse e-mail et mot de passe.
+- **Inscription avec confirmation par mail**
+- **Connexion**
 
-### 2. **Page d'accueil**
+### 2. **Accueil**
 
 - **Visualisation des événements** auxquels l'utilisateur participe ou a créés : Affichage des événements à venir.
-- **Recommandations d'événements** : Les événements recommandés sont basés sur la position géographique de l'utilisateur. Si l'utilisateur refuse de partager sa localisation, une latitude et longitude par défaut sont attribuées.
-- **Recherche d'événements** : Recherche filtrée par type (Match ou Training), et limitée aux événements publics. Il est également possible de rechercher par nom ou adresse.
+- **Recommandations d'événements** : Les événements recommandés sont basés sur la position géographique de l'utilisateur. Si l'utilisateur refuse de partager sa localisation, une latitude et longitude par défaut (FRANCE) sont attribuées.
+
+### 3. **Recherche**
+- **Recherche d'événements** : Recherche filtrée par type (Match ou Training), et limitée aux événements publics. Il est également possible de rechercher par sport, nom ou adresse.
 - **Recherche d'événements privés** : Permet la recherche d'un événement privé à l'aide d'un code d'événement.
 
-### 3. **Profil utilisateur**
+### 4. **Profil utilisateur**
 
 - **Modification des informations personnelles** : Les utilisateurs peuvent mettre à jour leurs données personnelles.
 - **Visualisation des événements liés à l'utilisateur** : Permet de voir tous les événements auxquels l'utilisateur participe ou qu'il a créés.
 - **Suivi des performances** : Visualisation des performances de l'utilisateur par sport (ex. : nombre de buts marqués, etc.).
 
-### 4. **Gestion des événements**
+### 5. **Gestion des événements**
 
 - **Création d'événements sportifs** : L'utilisateur peut créer un événement sportif parmi quatre types de sports par défaut : Football, Basketball, Tennis, Running.
 - **Rejoindre un événement** : Possibilité de rejoindre un événement existant via un code d'événement ou directement à partir de la page d'événements.
@@ -53,19 +55,19 @@ Développée avec **Flutter** pour le frontend et **Golang** pour le backend, l'
 - **Partage du code d'événement** : Permet de partager un code pour inviter des amis à rejoindre un événement.
 - **Chat par événement** : Permet de discuter avec tous les participants d'un événement.
 
-### 5. **Notifications**
+### 6. **Notifications**
 
 - **Notifications push** :
   - Informer un joueur lorsqu'il a été noté par un coach.
   - Rappel à J-1 de l'événement pour les participants.
   - Notification à l'organisateur lorsqu'un invité non inscrit rejoint l'événement après son inscription.
 
-### 6. **Hors-ligne**
+### 7. **Hors-ligne**
 
 - **Accès aux événements consultés hors-ligne** : L'utilisateur peut consulter les événements qu'il a déjà visualisés même sans connexion Internet.
 - **Prévention des actions (CRUD) en mode hors-ligne** : Des pop-ups empêchent l'utilisateur d'effectuer des actions lorsqu'il est hors-ligne.
 
-### 7. **Back-Office**
+### 8. **Back-Office**
 
 - **Accès réservé à l'admin** : L'admin peut effectuer des actions CRUD (Créer, Lire, Mettre à jour, Supprimer) sur les ressources suivantes :
   - Sports
