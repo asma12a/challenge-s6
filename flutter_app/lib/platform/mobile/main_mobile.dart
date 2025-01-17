@@ -4,6 +4,7 @@ import 'package:provider/provider.dart' as provider;
 import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
 import 'package:squad_go/core/providers/connectivity_provider.dart';
+import 'package:squad_go/core/providers/locale_provider.dart';
 import 'package:squad_go/platform/mobile/screens/event.dart';
 import 'package:squad_go/platform/mobile/screens/join.dart';
 import 'package:squad_go/shared_widgets/sign_in.dart';
@@ -89,19 +90,34 @@ final GoRouter _router = GoRouter(
   ],
 );
 
-class MyAppMobile extends StatelessWidget {
+class MyAppMobile extends StatefulWidget {
   const MyAppMobile({super.key});
 
+  @override
+  State<MyAppMobile> createState() => _MyAppMobileState();
+}
+
+class _MyAppMobileState extends State<MyAppMobile> {
+  Locale _locale = const Locale('en'); // Locale par défaut (Anglais)
+
+  // Méthode pour changer la locale
+  void setLocale(Locale locale) {
+    setState(() {
+      _locale = locale;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return provider.MultiProvider(
       providers: [
         provider.ChangeNotifierProvider(create: (_) => AuthState()),
         provider.ChangeNotifierProvider(create: (_) => ConnectivityState()),
+        provider.ChangeNotifierProvider(create: (_) => LocaleProvider()),
       ],
       builder: (context, child) => MaterialApp.router(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
+        locale: context.watch<LocaleProvider>().locale, // Utilisation de la locale du provider
         routerConfig: _router,
         theme: theme,
         debugShowCheckedModeBanner: false,
