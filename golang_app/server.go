@@ -23,6 +23,7 @@ import (
 	"github.com/asma12a/challenge-s6/database"
 	"github.com/asma12a/challenge-s6/database/redis"
 	_ "github.com/asma12a/challenge-s6/docs"
+	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/handler"
 	"github.com/asma12a/challenge-s6/internal/ws"
 	"github.com/asma12a/challenge-s6/middleware"
@@ -84,10 +85,18 @@ func main() {
 	hub := ws.NewHub()
 	go hub.Run()
 
+	userService := service.NewUserService(dbClient)
+
 	// Route WebSocket
 	app.Get("/ws", func(c *fiber.Ctx) error {
 		eventID := c.Query("event_id")
 		userID := c.Query("user_id")
+		user, err := userService.FindOne(c.Context(), ulid.ID(userID))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "User not found",
+			})
+		}
 
 		if eventID == "" || userID == "" {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -95,7 +104,7 @@ func main() {
 			})
 		}
 
-		return websocket.New(ws.WebSocketHandler(hub, eventID, userID))(c)
+		return websocket.New(ws.WebSocketHandler(hub, user.Name))(c)
 	})
 
 	notificationService, err := service.NewNotificationService()
@@ -119,7 +128,6 @@ func main() {
 	handler.MessageHandler(api.Group("/message", middleware.IsAuthMiddleware), context.Background(), *service.NewMessageService(dbClient), *service.NewEventService(dbClient), *service.NewUserService(dbClient))
 	handler.SportStatLabelsHandler(api.Group("/sportstatlabels", middleware.IsAuthMiddleware), context.Background(), *service.NewSportStatLabelsService(dbClient), *service.NewSportService(dbClient), *service.NewEventService(dbClient), *service.NewUserService(dbClient), *notificationService, rdb)
 	handler.ActionLogHandler(api.Group("/actionlogs", middleware.IsAuthMiddleware), context.Background(), *service.NewActionLogService(dbClient), *service.NewUserService(dbClient))
-	userService := service.NewUserService(dbClient)
 	oauthHandler := handler.NewOAuthHandler(userService)
 
 	app.Get("/auth/google/login", oauthHandler.OAuthLoginHandler)

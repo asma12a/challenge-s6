@@ -13,7 +13,7 @@ type Message struct {
 	Content string `json:"content"`
 }
 
-func WebSocketHandler(hub *Hub, eventID, userID string) func(*websocket.Conn) {
+func WebSocketHandler(hub *Hub, userName string) func(*websocket.Conn) {
 
 	return func(conn *websocket.Conn) {
 		hub.register <- conn
@@ -47,7 +47,7 @@ func WebSocketHandler(hub *Hub, eventID, userID string) func(*websocket.Conn) {
 				break
 			}
 
-			hub.BroadcastToOthers(conn, []byte(`{"self":false,"content":"`+msg.Content+`"}`))
+			hub.BroadcastToOthers(conn, []byte(`{"self":false, "name":"`+userName+` "content":"`+msg.Content+`"}`))
 		}
 	}
 }

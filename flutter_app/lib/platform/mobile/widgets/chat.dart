@@ -48,13 +48,15 @@ class _ChatPageState extends State<ChatPage>
       final data = jsonDecode(message);
       final isSelf = data['self'] as bool;
       final content = data['content'] as String;
+      final userName = data['name'] as String;
 
       debugPrint("message reçu $data");
 
       setState(() {
         // Vérification si le message reçu n'est pas déjà dans la liste
-        if (!_messages.contains(isSelf ? 'Moi: $content' : '$content')) {
-          _messages.add(isSelf ? 'Moi: $content' : 'Autre: $content');
+        if (!_messages
+            .contains(isSelf ? 'Moi: $content' : '$userName: $content')) {
+          _messages.add(isSelf ? 'Moi: $content' : '$userName: $content');
         }
       });
     };
