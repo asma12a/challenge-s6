@@ -192,7 +192,7 @@ class _EventScreenState extends State<EventScreen>
                               margin: const EdgeInsets.only(
                                 bottom: 16,
                                 left: 16,
-                                right: 16,
+                                right: 10,
                               ),
                               decoration: BoxDecoration(
                                 color: event.sport.color
@@ -265,21 +265,23 @@ class _EventScreenState extends State<EventScreen>
                                               eventTypeColor[event.type]
                                                   ?.withAlpha(20),
                                         ),
-                                        CustomLabel(
-                                          label: DateFormat('yyyy/MM/dd HH:mm')
-                                              .format(
-                                            DateTime.parse(event.date).add(
-                                              Duration(hours: 1),
+                                        Expanded(
+                                          child: CustomLabel(
+                                            label: DateFormat('yyyy/MM/dd HH:mm')
+                                                .format(
+                                              DateTime.parse(event.date).add(
+                                                Duration(hours: 1),
+                                              ),
                                             ),
+                                            icon: Icons.date_range,
+                                            color:
+                                                getColorBasedOnDate(event.date),
+                                            iconColor:
+                                                getColorBasedOnDate(event.date),
+                                            backgroundColor:
+                                                getColorBasedOnDate(event.date)
+                                                    .withAlpha(20),
                                           ),
-                                          icon: Icons.date_range,
-                                          color:
-                                              getColorBasedOnDate(event.date),
-                                          iconColor:
-                                              getColorBasedOnDate(event.date),
-                                          backgroundColor:
-                                              getColorBasedOnDate(event.date)
-                                                  .withAlpha(20),
                                         ),
                                       ],
                                     ),

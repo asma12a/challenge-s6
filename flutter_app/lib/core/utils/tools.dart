@@ -3,8 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:squad_go/core/models/team.dart';
 
 Color getColorBasedOnDate(String date) {
-  final DateTime now =
-      DateTime.parse(DateFormat('yyyy-MM-dd').format(DateTime.now()));
+  final DateTime now = DateTime.now();
   final DateTime eventDate = DateTime.parse(date);
 
   if (eventDate.isBefore(now)) {
