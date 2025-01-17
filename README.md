@@ -34,6 +34,7 @@ Développée avec **Flutter** pour le frontend et **Golang** pour le backend, l'
 - **Recommandations d'événements** : Les événements recommandés sont basés sur la position géographique de l'utilisateur. Si l'utilisateur refuse de partager sa localisation, une latitude et longitude par défaut (FRANCE) sont attribuées.
 
 ### 3. **Recherche**
+
 - **Recherche d'événements** : Recherche filtrée par type (Match ou Training), et limitée aux événements publics. Il est également possible de rechercher par sport, nom ou adresse.
 - **Recherche d'événements privés** : Permet la recherche d'un événement privé à l'aide d'un code d'événement.
 
@@ -257,8 +258,7 @@ Une fois le serveur backend lancé, accédez à la documentation interactive à 
 
 WebSocket Chat
 Connectez-vous au WebSocket pour un événement spécifique :
-`  ws://localhost:3001/ws/chat/:eventID
-`
+` ws://localhost:3001/ws/chat/:eventID`
 
 Exemple de message envoyé au serveur (format JSON) :
 
@@ -274,8 +274,7 @@ Les autres utilisateurs dans la salle recevront le message en temps réel.
 🧪 Tests
 Tests unitaires :
 Testez les règles de gestion via :
-`  go test ./...
-`
+` go test ./...`
 
 Tests d'intégration :
 Vérifiez les routes API et les fonctionnalités principales avec des mocks.
