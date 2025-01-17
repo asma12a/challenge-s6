@@ -4,7 +4,7 @@ import 'package:squad_go/core/models/team.dart';
 
 Color getColorBasedOnDate(String date) {
   final DateTime now = DateTime.now();
-  final DateTime eventDate = DateTime.parse(date);
+  final DateTime eventDate = DateTime.parse(date).add(Duration(hours: 1));
 
   if (eventDate.isBefore(now)) {
     return Colors.grey;
