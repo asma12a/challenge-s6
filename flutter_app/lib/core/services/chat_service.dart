@@ -8,10 +8,12 @@ class ChatService {
 
   Function(String)? onMessageReceived;
   Future<void> connect(String eventID, String userID) async {
+
     try {
       final url = 'ws://${Constants.apiBaseUrl}/ws?event_id=$eventID&user_id=$userID';
 
       _channel = WebSocketChannel.connect(Uri.parse(url));
+
       isConnected = true;
 
       _channel.stream.listen((data) {

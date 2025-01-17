@@ -54,8 +54,6 @@ class _ChatPageState extends State<ChatPage>
         _messages.add(isSelf ? 'Moi: $content' : 'Autre: $content');
       });
     };
-
-    _chatService.connect(widget.eventID, _currentUserId);
   }
 
   Future<void> _checkEventStatus() async {
@@ -69,6 +67,8 @@ class _ChatPageState extends State<ChatPage>
     await _loadCurrentUser();
     if (_currentUserId.isNotEmpty) {
       await _loadMessages(widget.eventID);
+
+      _chatService.connect(widget.eventID, _currentUserId);
     } else {
       debugPrint("Impossible d'initialiser le chat sans ID utilisateur.");
     }
