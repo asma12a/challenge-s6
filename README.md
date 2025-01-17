@@ -30,6 +30,7 @@ Développée avec **Flutter** pour le frontend et **Golang** pour le backend, l'
 
 ### 2. **Accueil**
 
+- **Traduction** : L'utilisateur peut changer la langue de l'application (français, anglais, allemand, espagnol) directement depuis le drawer.
 - **Visualisation des événements** auxquels l'utilisateur participe ou a créés : Affichage des événements à venir.
 - **Recommandations d'événements** : Les événements recommandés sont basés sur la position géographique de l'utilisateur. Si l'utilisateur refuse de partager sa localisation, une latitude et longitude par défaut (FRANCE) sont attribuées.
 
@@ -86,6 +87,10 @@ Pour accéder au back-office, vous pouvez utiliser le compte suivant :
 ### Lien du Back-Office
 
 Vous pouvez accéder au back-office à l'adresse suivante : [https://challenge-s6.vercel.app/](https://challenge-s6.vercel.app/)
+
+### Lien de l'API
+
+Vous pouvez accéder à l'api à l'adresse suivante : [https://challenge-s6-1.onrender.com](https://challenge-s6-1.onrender.com)
 
 ---
 
