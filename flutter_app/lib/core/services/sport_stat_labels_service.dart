@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
 import 'package:squad_go/core/models/sport_stat_labels.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';

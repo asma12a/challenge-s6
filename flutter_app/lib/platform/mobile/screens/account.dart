@@ -1,4 +1,3 @@
-import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:squad_go/core/models/user_app.dart';
@@ -29,7 +28,11 @@ class _AccountScreenState extends State<AccountScreen> {
   int eventsCount = 0;
 
   List<Sport> userSports = [];
-  List<String> labelNotifs = ["Évenements recommandés", "Évenement 1jour avant", "Personne invité inscrite"];
+  List<String> labelNotifs = [
+    "Évenements recommandés",
+    "Évenement 1jour avant",
+    "Personne invité inscrite"
+  ];
 
   @override
   void initState() {
@@ -49,7 +52,8 @@ class _AccountScreenState extends State<AccountScreen> {
     }
   }
 
-  Future<void> _updateUserInfo(BuildContext context, String name, String email) async {
+  Future<void> _updateUserInfo(
+      BuildContext context, String name, String email) async {
     final translate = AppLocalizations.of(context);
     try {
       final authState = context.read<AuthState>();
@@ -73,12 +77,14 @@ class _AccountScreenState extends State<AccountScreen> {
       ));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${translate?.error ?? 'Erreur'} : ${e.toString()}')),
+        SnackBar(
+            content: Text('${translate?.error ?? 'Erreur'} : ${e.toString()}')),
       );
     }
   }
 
-  Future<void> _updateUserPassword(BuildContext context, String password) async {
+  Future<void> _updateUserPassword(
+      BuildContext context, String password) async {
     try {
       final authState = context.read<AuthState>();
 
@@ -87,7 +93,8 @@ class _AccountScreenState extends State<AccountScreen> {
         throw Exception('ID utilisateur introuvable.');
       }
 
-      final result = await UserService.updateUserPassword(userId, {'password': password});
+      final result =
+          await UserService.updateUserPassword(userId, {'password': password});
       if (result?['status'] != null) {
         throw Exception(result?['error']);
       }
@@ -129,7 +136,10 @@ class _AccountScreenState extends State<AccountScreen> {
                               right: 16,
                             ),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primary.withOpacity(0.03),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primary
+                                  .withOpacity(0.03),
                               borderRadius: BorderRadius.all(
                                 Radius.circular(16),
                               ),
@@ -140,17 +150,23 @@ class _AccountScreenState extends State<AccountScreen> {
                                   padding: const EdgeInsets.all(4),
                                   child: Center(
                                     child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
                                         children: [
                                           Text(
                                             userInfo?.name ?? "Utilisateur",
-                                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headlineSmall
+                                                ?.copyWith(
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                           ),
                                           const SizedBox(height: 8),
-                                          Text('${translate?.participated_to ?? 'A participé à'} $eventsCount '
+                                          Text(
+                                              '${translate?.participated_to ?? 'A participé à'} $eventsCount '
                                               '${eventsCount == 1 ? translate?.event_singular ?? 'événement' : translate?.event_plural ?? 'événements'}')
                                         ]),
                                   ),
@@ -159,12 +175,16 @@ class _AccountScreenState extends State<AccountScreen> {
                                     top: 8,
                                     right: 8,
                                     child: IconButton(
-                                      icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.primary),
+                                      icon: Icon(Icons.edit,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary),
                                       onPressed: () {
                                         if (!isOnline) {
                                           showDialog(
                                             context: context,
-                                            builder: (context) => const OfflineDialog(),
+                                            builder: (context) =>
+                                                const OfflineDialog(),
                                           );
                                           return;
                                         }
@@ -172,8 +192,12 @@ class _AccountScreenState extends State<AccountScreen> {
                                           context: context,
                                           builder: (context) {
                                             return EditUserDialog(
-                                              onUpdateInfo: (name, email) => _updateUserInfo(context, name, email),
-                                              onUpdatePassword: (password) => _updateUserPassword(context, password),
+                                              onUpdateInfo: (name, email) =>
+                                                  _updateUserInfo(
+                                                      context, name, email),
+                                              onUpdatePassword: (password) =>
+                                                  _updateUserPassword(
+                                                      context, password),
                                             );
                                           },
                                         );
@@ -198,14 +222,20 @@ class _AccountScreenState extends State<AccountScreen> {
                                   Container(
                                     height: 40,
                                     decoration: BoxDecoration(
-                                      color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary
+                                          .withOpacity(0.5),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: TabBar(
                                       indicatorSize: TabBarIndicatorSize.tab,
                                       dividerColor: Colors.transparent,
                                       indicator: BoxDecoration(
-                                        color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary
+                                            .withOpacity(0.2),
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       labelColor: Colors.white,
@@ -215,17 +245,18 @@ class _AccountScreenState extends State<AccountScreen> {
                                       tabs: [
                                         Tab(
                                           child: Text(
-                                            translate?.my_events_profile ?? 'Mes events',
+                                            translate?.my_events_profile ??
+                                                'Mes events',
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
                                         Tab(
                                           child: Text(
-                                            translate?.performance ?? 'Performances',
+                                            translate?.performance ??
+                                                'Performances',
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
-
                                       ],
                                     ),
                                   ),
@@ -233,10 +264,15 @@ class _AccountScreenState extends State<AccountScreen> {
                                     child: TabBarView(
                                       children: [
                                         Container(
-                                          margin: const EdgeInsets.only(top: 16),
+                                          margin:
+                                              const EdgeInsets.only(top: 16),
                                           decoration: BoxDecoration(
-                                            color: Theme.of(context).colorScheme.primary.withOpacity(0.03),
-                                            borderRadius: BorderRadius.circular(16),
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary
+                                                .withOpacity(0.03),
+                                            borderRadius:
+                                                BorderRadius.circular(16),
                                           ),
                                           padding: const EdgeInsets.all(16),
                                           child: Center(
@@ -245,12 +281,14 @@ class _AccountScreenState extends State<AccountScreen> {
                                                 HomeMyEvents(
                                                   onRefresh: onRefresh,
                                                   isHome: false,
-                                                  onEventsCountChanged: (count) {
+                                                  onEventsCountChanged:
+                                                      (count) {
                                                     setState(() {
                                                       eventsCount = count;
                                                     });
                                                   },
-                                                  onDistinctSportsFetched: (sports) {
+                                                  onDistinctSportsFetched:
+                                                      (sports) {
                                                     setState(() {
                                                       userSports = sports;
                                                     });
@@ -262,10 +300,15 @@ class _AccountScreenState extends State<AccountScreen> {
                                           ),
                                         ),
                                         Container(
-                                          margin: const EdgeInsets.only(top: 16),
+                                          margin:
+                                              const EdgeInsets.only(top: 16),
                                           decoration: BoxDecoration(
-                                            color: Theme.of(context).colorScheme.primary.withOpacity(0.03),
-                                            borderRadius: BorderRadius.circular(16),
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary
+                                                .withOpacity(0.03),
+                                            borderRadius:
+                                                BorderRadius.circular(16),
                                           ),
                                           padding: const EdgeInsets.all(16),
                                           child: PerformancesHandle(

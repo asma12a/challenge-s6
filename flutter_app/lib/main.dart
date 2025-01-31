@@ -1,12 +1,9 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
-import 'package:squad_go/core/services/notification_service.dart';
 import 'package:squad_go/core/utils/connectivity_handler.dart';
 import 'package:squad_go/firebase_options.dart';
 import 'package:squad_go/platform/mobile/main_mobile.dart';
@@ -42,11 +39,9 @@ void main() async {
   if (!kIsWeb) {
     await FMTCObjectBoxBackend().initialise();
     await FMTCStore('mapStore').manage.create();
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
     //NotificationService().initNotifications();
-
-
-
   }
   runApp(const MyApp());
 }

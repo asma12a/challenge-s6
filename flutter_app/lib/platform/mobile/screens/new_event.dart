@@ -1,11 +1,12 @@
+import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:squad_go/core/exceptions/app_exception.dart';
+import 'package:squad_go/core/models/event.dart';
 import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/core/services/event_service.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:squad_go/main.dart';
-import 'package:squad_go/platform/mobile/screens/tabs.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 
@@ -20,10 +21,12 @@ class _NewEventState extends State<NewEvent> {
   final _formKey = GlobalKey<FormState>();
   var _enteredName = '';
   String? _selectedDate;
+  String iso8601FormattedDateTime = "";
   final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _dateController = TextEditingController();
   List<dynamic> _suggestedAddresses = [];
-  var _selectedType = '';
-  var _selectedSport = '';
+  EventType? _selectedType;
+  String? _selectedSport;
   String? showedDate;
   List<Sport> _sports = [];
   final eventService = EventService();
@@ -121,13 +124,12 @@ class _NewEventState extends State<NewEvent> {
         pickedTime.minute,
       );
 
-      // Formater la date et l'heure en ISO 8601
-      final iso8601FormattedDateTime =
-          '${DateFormat("yyyy-MM-ddTHH:mm:ss").format(pickedDateTime.toUtc())}Z';
-
       setState(() {
+        iso8601FormattedDateTime =
+            '${DateFormat("yyyy-MM-ddTHH:mm:ss").format(pickedDateTime.toUtc())}Z';
         _selectedDate = iso8601FormattedDateTime;
-        showedDate = DateFormat("yyyy-MM-dd HH:mm").format(pickedDateTime);
+        _dateController.text =
+            DateFormat("dd/MM/yyyy HH:mm").format(pickedDateTime);
       });
     }
   }
@@ -156,7 +158,7 @@ class _NewEventState extends State<NewEvent> {
           "address": _addressController.text,
           "date": _selectedDate!,
           "sport_id": _selectedSport,
-          "event_type": _selectedType,
+          "event_type": _selectedType?.name,
           "is_public": _isPublic,
           "latitude": _latitude,
           "longitude": _longitude,
@@ -176,9 +178,7 @@ class _NewEventState extends State<NewEvent> {
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );
-        Future.delayed(const Duration(seconds: 3), () {
-          context.go('/home');
-        });
+        context.go('/home');
       } on AppException catch (error) {
         debugPrint(error.message);
         ScaffoldMessenger.of(context).clearSnackBars();
@@ -196,6 +196,7 @@ class _NewEventState extends State<NewEvent> {
       }
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final translate = AppLocalizations.of(context);
@@ -231,9 +232,9 @@ class _NewEventState extends State<NewEvent> {
                         maxLength: 50,
                         decoration: InputDecoration(
                           border: const OutlineInputBorder(),
-                          icon: const Icon(Icons.title),
-                          label: Text(
-                              translate?.event_name ?? 'Nom de l\'événement'),
+                          prefixIcon: const Icon(Icons.title),
+                          labelText:
+                              translate?.event_name ?? 'Nom de l\'événement',
                         ),
                         onSaved: (value) {
                           _enteredName = value!;
@@ -254,7 +255,7 @@ class _NewEventState extends State<NewEvent> {
                                 color: Theme.of(context).colorScheme.onSurface),
                             decoration: InputDecoration(
                               border: OutlineInputBorder(),
-                              icon: Icon(Icons.place),
+                              prefixIcon: Icon(Icons.place),
                               labelText: translate?.event_address ??
                                   'Adresse de l\'événement',
                             ),
@@ -291,184 +292,172 @@ class _NewEventState extends State<NewEvent> {
                           });
                         },
                       ),
-                      SizedBox(height: 40),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 2),
-                        child: Row(
-                          children: [
-                            Icon(Icons.public),
-                            SizedBox(width: 15),
-                            Checkbox(
-                              value: _isPublic,
-                              // Utilise la valeur actuelle de _isPublic
-                              onChanged: (bool? value) {
+                      SizedBox(height: 30),
+                      TextFormField(
+                        controller: _dateController,
+                        readOnly: true,
+                        onTap: () async {
+                          _presentDatePicker();
+                        },
+                        onTapOutside: (event) {
+                          FocusScope.of(context).unfocus();
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return translate?.empty_date ??
+                                'Veuillez sélectionner une date';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.calendar_month),
+                            labelText: translate?.event_date ??
+                                'Date de l\'événement'),
+                      ),
+                      SizedBox(height: 30),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              value: _selectedSport,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText:
+                                    translate?.sport_select_label ?? 'Sport',
+                              ),
+                              items: _sports.map((sport) {
+                                return DropdownMenuItem(
+                                  value: sport.id,
+                                  child: Row(
+                                    children: [
+                                      if (sportIcon.containsKey(sport.name))
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(right: 8.0),
+                                          child: Icon(
+                                            sportIcon[sport.name],
+                                            size: 16,
+                                          ),
+                                        ),
+                                      Text(sport.name.name[0].toUpperCase() +
+                                          sport.name.name.substring(1)),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
                                 setState(() {
-                                  _isPublic = value!;
+                                  _selectedSport = value!;
                                 });
                               },
+                              validator: (value) {
+                                if (value == null) {
+                                  return translate?.empty_sport ??
+                                      'Veuillez sélectionner un sport';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) {
+                                _selectedSport = value!;
+                              },
                             ),
-                            Text(translate?.open_public ?? "Ouvert au public"),
-                            SizedBox(width: 20),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 15),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 2),
-                        child: Row(
-                          children: [
-                            Icon(Icons.calendar_month),
-                            SizedBox(width: 15),
-                            ElevatedButton(
-                              onPressed: _presentDatePicker,
-                              child: Text(translate?.select_date ??
-                                  "Sélectionner une date"),
-                            ),
-                            SizedBox(width: 20),
-                            Text(
-                              style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface),
-                              _selectedDate == null ? '' : showedDate!,
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 30),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 2),
-                        child: Row(
-                          children: [
-                            Icon(Icons.sports_sharp),
-                            SizedBox(width: 15),
-                            SizedBox(
-                              width: 200,
-                              child: DropdownButtonFormField(
-                                validator: (value) {
-                                  if (value == null) {
-                                    return translate?.empty_type ??
-                                        'Veuillez sélectionner un type.';
-                                  }
-                                  return null;
-                                },
-                                hint: Text(
-                                  translate?.type_select_label ?? "Type",
-                                  style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface),
-                                ),
-                                decoration: InputDecoration(
+                          ),
+                          SizedBox(width: 16),
+                          Expanded(
+                            child: DropdownButtonFormField<EventType>(
+                              value: _selectedType,
+                              decoration: InputDecoration(
                                   border: OutlineInputBorder(),
-                                ),
-                                items: [
-                                  DropdownMenuItem(
-                                    value: null,
-                                    child: Text(
-                                      translate?.type_select_label ?? "Type",
-                                      style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface),
-                                    ),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: "match",
-                                    child: Text(
-                                      translate?.match ?? "Match",
-                                      style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface),
-                                    ),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: "training",
-                                    child: Text(
-                                      translate?.training ?? "Training",
-                                      style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface),
-                                    ),
-                                  )
-                                ],
-                                onChanged: (value) {
-                                  _selectedType = value!;
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 30),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 2),
-                        child: Row(
-                          children: [
-                            Icon(Icons.sports_soccer),
-                            SizedBox(width: 15),
-                            SizedBox(
-                              width: 200,
-                              child: DropdownButtonFormField(
-                                validator: (value) {
-                                  if (value == null) {
-                                    return translate?.empty_sport ??
-                                        'Veuillez sélectionner un sport.';
-                                  }
-                                  return null;
-                                },
-                                hint: Text(
-                                  translate?.sport_select_label ?? "Sport",
-                                  style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface),
-                                ),
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                ),
-                                items: [
-                                  DropdownMenuItem<String>(
-                                    value: null,
-                                    child: Text(
-                                      translate?.sport_select_label ?? "Sport",
-                                      style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
-                                      ),
-                                    ),
-                                  ),
-                                  ..._sports.map((sport) {
-                                    return DropdownMenuItem<String>(
-                                      value: sport.id,
-                                      child: Text(
-                                        sport.name.name,
-                                        style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
+                                  labelText: translate?.event_type ??
+                                      'Type d\'événement'),
+                              items: EventType.values
+                                  .map((type) => DropdownMenuItem(
+                                        value: type,
+                                        child: Row(
+                                          children: [
+                                            if (eventTypeIcon.containsKey(type))
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 8.0),
+                                                child: Icon(
+                                                  eventTypeIcon[type],
+                                                  size: 16,
+                                                ),
+                                              ),
+                                            Text(type.name[0].toUpperCase() +
+                                                type.name.substring(1)),
+                                          ],
                                         ),
-                                      ),
-                                    );
-                                  }),
-                                ],
-                                onChanged: (value) {
-                                  _selectedSport = value!;
-                                },
-                              ),
+                                      ))
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedType = value!;
+                                });
+                              },
+                              onSaved: (value) {
+                                if (value != null) {
+                                  _selectedType = value;
+                                }
+                              },
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                       SizedBox(height: 30),
+                      AnimatedToggleSwitch.dual(
+                        first: false,
+                        second: true,
+                        current: _isPublic,
+                        onChanged: (value) => setState(() {
+                          _isPublic = value;
+                        }),
+                        iconBuilder: (value) => value
+                            ? const Icon(
+                                Icons.public,
+                                color: Colors.white,
+                              )
+                            : const Icon(
+                                Icons.lock,
+                                color: Colors.white,
+                              ),
+                        height: 40,
+                        style: ToggleStyle(
+                          indicatorColor: Colors.blue,
+                          borderColor: Colors.blue,
+                        ),
+                        textBuilder: (value) => value
+                            ? Text(
+                                translate?.public ?? 'Public',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              )
+                            : Text(
+                                translate?.private ?? 'Privé',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                      ),
                       SizedBox(
                         height: 60,
                       ),
-                      ElevatedButton(
-                          onPressed: _saveEvent,
-                          child: Text(translate?.save_event ?? "Enregistrer"))
+                      ElevatedButton.icon(
+                        onPressed: _saveEvent,
+                        icon: Icon(
+                          Icons.save,
+                          color: Colors.white,
+                        ),
+                        label: Text(translate?.save_event ?? "Enregistrer"),
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.blue,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
+                          textStyle: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      )
                     ],
                   ),
                 ),

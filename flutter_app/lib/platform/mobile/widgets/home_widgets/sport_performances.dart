@@ -3,7 +3,6 @@ import 'package:squad_go/core/services/sport_stat_labels_service.dart';
 import 'package:squad_go/main.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-
 class SportPerformances extends StatefulWidget {
   final String sportId;
   final String userId;
@@ -57,7 +56,7 @@ class _SportPerformancesState extends State<SportPerformances> {
           children: [
             if (nbEvents != 0) ...[
               Text(
-                '${translate?.nb_events ?? "Nombre d\'événements :"} $nbEvents',
+                '${translate?.nb_events ?? "Nombre d'événements :"} $nbEvents',
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
@@ -71,10 +70,8 @@ class _SportPerformancesState extends State<SportPerformances> {
                   return Container(
                     margin: EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withAlpha(20),
+                      color:
+                          Theme.of(context).colorScheme.primary.withAlpha(20),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: ListTile(

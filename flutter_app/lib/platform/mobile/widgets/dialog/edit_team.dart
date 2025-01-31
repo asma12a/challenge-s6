@@ -5,7 +5,6 @@ import 'package:squad_go/core/models/team.dart';
 import 'package:squad_go/core/providers/connectivity_provider.dart';
 import 'package:squad_go/core/services/team_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:squad_go/platform/mobile/widgets/dialog/offline.dart';
 
 class EditTeamDialog extends StatefulWidget {
   final String eventId;
@@ -53,7 +52,9 @@ class _EditTeamDialogState extends State<EditTeamDialog> {
     } catch (e) {
       // Handle other errors
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(translate?.error_occurred ?? 'Une erreur est survenue')),
+        SnackBar(
+            content:
+                Text(translate?.error_occurred ?? 'Une erreur est survenue')),
       );
     }
   }
@@ -125,10 +126,12 @@ class _EditTeamDialogState extends State<EditTeamDialog> {
               ),
               TextFormField(
                 initialValue: _team.name,
-                decoration: InputDecoration(labelText: translate?.name ?? 'Nom'),
+                decoration:
+                    InputDecoration(labelText: translate?.name ?? 'Nom'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return translate?.empty_team_name ?? 'Veuillez entrer un nom';
+                    return translate?.empty_team_name ??
+                        'Veuillez entrer un nom';
                   }
                   return null;
                 },

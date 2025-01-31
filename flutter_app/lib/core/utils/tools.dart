@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:squad_go/core/models/team.dart';
 
 Color getColorBasedOnDate(String date) {
