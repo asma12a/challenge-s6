@@ -23,10 +23,6 @@ class EventService {
             'Authorization': "Bearer $token",
           }));
 
-      if (response.statusCode != 200) {
-        throw Exception('Erreur lors de la récupération des événements.');
-      }
-
       final List<dynamic> data = response.data;
       return List<Map<String, dynamic>>.from(data);
     } catch (error) {

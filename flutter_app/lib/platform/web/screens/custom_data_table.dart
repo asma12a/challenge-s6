@@ -45,17 +45,20 @@ class CustomDataTable extends StatelessWidget {
           const SizedBox(height: 16),
           Align(
             alignment: Alignment.topRight,
-            child: ElevatedButton(
-              onPressed: onButtonPressed,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                foregroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              ),
-              child: Text(buttonText),
-            ),
+            child: buttonText.isNotEmpty
+                ? ElevatedButton(
+                    onPressed: onButtonPressed,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                    ),
+                    child: Text(buttonText),
+                  )
+                : const SizedBox(),
           ),
+
           const SizedBox(height: 16),
 
           // ✅ Correction : Ajout d'un défilement vertical

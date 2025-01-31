@@ -25,10 +25,6 @@ class SportService {
         }),
       );
 
-      if (response.statusCode != 200) {
-        throw Exception('Erreur lors de la récupération des sports.');
-      }
-
       final List<dynamic> data = response.data;
       return List<Map<String, dynamic>>.from(data);
     } catch (error) {

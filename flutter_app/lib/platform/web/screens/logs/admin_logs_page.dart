@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:squad_go/core/services/log_service.dart';
-import 'package:squad_go/core/models/action_log.dart';
+import 'package:intl/intl.dart';
 import 'package:squad_go/platform/web/screens/custom_data_table.dart';
-import 'package:intl/intl.dart';  // Importez la bibliothèque intl
 
 class AdminLogsPage extends StatefulWidget {
   const AdminLogsPage({super.key});
@@ -12,69 +11,87 @@ class AdminLogsPage extends StatefulWidget {
 }
 
 class _AdminLogsPageState extends State<AdminLogsPage> {
-  late Future<List<ActionLog>> _logsFuture;
+  List<Map<String, dynamic>> logs = [];
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadLogs();
+    fetchLogs();
   }
 
-  void _loadLogs() {
-    setState(() {
-      _logsFuture = LogService.getLogs();
-    });
+  Future<void> fetchLogs() async {
+    try {
+      final fetchedLogs = await LogService.getLogs();
+      if (mounted) {
+        setState(() {
+          logs = fetchedLogs ?? [];
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur: $e')),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<List<ActionLog>>(
-        future: _logsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                'Erreur: ${snapshot.error}',
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              ),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('Aucun log trouvé.'));
-          }
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : logs.isEmpty
+              ? const Center(
+                  child: Text(
+                    'Aucune donnée disponible',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                )
+              : SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height,
+                    ),
+                    child: CustomDataTable(
+                      title: 'Logs des Actions',
+                      columns: const [
+                        DataColumn(label: Text('Action')),
+                        DataColumn(label: Text('Description')),
+                        DataColumn(label: Text('Date')),
+                      ],
+                      rows: logs.map((log) {
+                        String formattedDate;
 
-          final logs = snapshot.data!;
+                        if (log['created_at'] != null) {
+                          try {
+                            DateTime parsedDate =
+                                DateTime.parse(log['created_at']);
 
-          return SingleChildScrollView(
-            child: CustomDataTable(
-              title: 'Logs des Actions',
-              columns: [
-                DataColumn(label: Text('ID')),
-                DataColumn(label: Text('Utilisateur')),
-                DataColumn(label: Text('Action')),
-                DataColumn(label: Text('Description')),
-                DataColumn(label: Text('Date')),
-              ],
-              rows: logs.map((log) {
-                String formattedDate = DateFormat('dd/MM/yyyy à HH:mm:ss').format(log.createdAt);
+                            formattedDate = DateFormat('dd/MM/yyyy à HH:mm:ss')
+                                .format(parsedDate);
+                          } catch (e) {
+                            formattedDate = 'Date invalide';
+                          }
+                        } else {
+                          formattedDate = 'Date non disponible';
+                        }
 
-                return DataRow(cells: [
-                  DataCell(Text(log.id)),
-                  DataCell(Text(log.userId)),
-                  DataCell(Text(log.action)),
-                  DataCell(Text(log.description)),
-                  DataCell(Text(formattedDate)), 
-                ]);
-              }).toList(),
-              buttonText: 'Ajouter un Log',
-              onButtonPressed: () {
-              },
-            ),
-          );
-        },
-      ),
+                        return DataRow(cells: [
+                          DataCell(
+                              Text(log['action'] ?? 'Action non spécifiée')),
+                          DataCell(Text(log['description'] ??
+                              'Description non disponible')),
+                          DataCell(Text(formattedDate)),
+                        ]);
+                      }).toList(),
+                      buttonText: '', // Valeur vide
+                      onButtonPressed: () {}, // Fonction vide
+                    ),
+                  ),
+                ),
     );
   }
 }

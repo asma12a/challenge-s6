@@ -82,11 +82,8 @@ class _AdminSportsPageState extends State<AdminSportsPage> {
                   ),
                   TextButton(
                     onPressed: () async {
-                      // Effectuer la suppression avant de fermer le dialogue
-                      await deleteSport(
-                          id); // Assurez-vous que cette opération s'exécute avant
-                      Navigator.of(context)
-                          .pop(); // Fermer le dialogue après la suppression
+                      await deleteSport(id);
+                      Navigator.of(context).pop();
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('$sportName a été supprimé.')),
@@ -122,13 +119,11 @@ class _AdminSportsPageState extends State<AdminSportsPage> {
               title: 'Sports',
               columns: const [
                 DataColumn(label: Text('Nom')),
-                DataColumn(label: Text('URL de l\'Image')),
                 DataColumn(label: Text('Actions')),
               ],
               rows: sports.map((sport) {
                 return DataRow(cells: [
                   DataCell(Text(sport['name'])),
-                  DataCell(Text(sport['image_url'] ?? '')),
                   DataCell(Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
