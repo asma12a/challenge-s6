@@ -284,6 +284,7 @@ class _ChatPageState extends State<ChatPage>
                 child: TextField(
                   controller: _controller,
                   style: const TextStyle(color: Colors.black),
+                  onTapOutside: (event) => FocusScope.of(context).unfocus(),
                   decoration: InputDecoration(
                     hintText: 'Entrez un message...',
                     hintStyle: const TextStyle(color: Colors.grey),

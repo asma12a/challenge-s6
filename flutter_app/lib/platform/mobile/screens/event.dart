@@ -51,7 +51,6 @@ class _EventScreenState extends State<EventScreen>
       eventDate.month == today.month &&
       eventDate.day == today.day;
 
-
   late TabController _tabController;
 
   @override
@@ -199,6 +198,7 @@ class _EventScreenState extends State<EventScreen>
                                 left: 16,
                                 right: 10,
                               ),
+                              padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
                                 color: event.sport.color
                                         ?.withValues(alpha: 0.03) ??
@@ -210,89 +210,81 @@ class _EventScreenState extends State<EventScreen>
                                   Radius.circular(16),
                                 ),
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    InkWell(
-                                      onTap: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return MapLocation(
-                                              latitude: event.latitude,
-                                              longitude: event.longitude,
-                                            );
-                                          },
-                                        );
-                                      },
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            Icons.place,
-                                            size: 16,
-                                          ),
-                                          SizedBox(width: 8),
-                                          Expanded(
-                                            child: Text(
-                                              event.address,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return MapLocation(
+                                            latitude: event.latitude,
+                                            longitude: event.longitude,
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Row(
                                       children: [
-                                        CustomLabel(
-                                          label: event.sport.name.name[0]
-                                                  .toUpperCase() +
-                                              event.sport.name.name
-                                                  .substring(1),
-                                          icon: sportIcon[event.sport.name],
-                                          color: event.sport.color,
-                                          iconColor: event.sport.color,
-                                          backgroundColor:
-                                              event.sport.color?.withAlpha(20),
+                                        Icon(
+                                          Icons.place,
+                                          size: 16,
                                         ),
-                                        CustomLabel(
-                                          label:
-                                              event.type.name[0].toUpperCase() +
-                                                  event.type.name.substring(1),
-                                          icon: eventTypeIcon[event.type],
-                                          color: eventTypeColor[event.type],
-                                          iconColor: eventTypeColor[event.type],
-                                          backgroundColor:
-                                              eventTypeColor[event.type]
-                                                  ?.withAlpha(20),
-                                        ),
+                                        SizedBox(width: 8),
                                         Expanded(
-                                          child: CustomLabel(
-                                            label:
-                                                DateFormat('yyyy/MM/dd HH:mm')
-                                                    .format(
-                                              DateTime.parse(event.date).add(
-                                                Duration(hours: 1),
-                                              ),
-                                            ),
-                                            icon: Icons.date_range,
-                                            color:
-                                                getColorBasedOnDate(event.date),
-                                            iconColor:
-                                                getColorBasedOnDate(event.date),
-                                            backgroundColor:
-                                                getColorBasedOnDate(event.date)
-                                                    .withAlpha(20),
+                                          child: Text(
+                                            event.address,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
                                       ],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                  Wrap(
+                                    spacing: 8.0,
+                                    runSpacing: 8.0,
+                                    children: [
+                                      CustomLabel(
+                                        label: event.sport.name.name[0]
+                                                .toUpperCase() +
+                                            event.sport.name.name.substring(1),
+                                        icon: sportIcon[event.sport.name],
+                                        color: event.sport.color,
+                                        iconColor: event.sport.color,
+                                        backgroundColor:
+                                            event.sport.color?.withAlpha(20),
+                                      ),
+                                      CustomLabel(
+                                        label:
+                                            event.type.name[0].toUpperCase() +
+                                                event.type.name.substring(1),
+                                        icon: eventTypeIcon[event.type],
+                                        color: eventTypeColor[event.type],
+                                        iconColor: eventTypeColor[event.type],
+                                        backgroundColor:
+                                            eventTypeColor[event.type]
+                                                ?.withAlpha(20),
+                                      ),
+                                      CustomLabel(
+                                        label: DateFormat('yyyy/MM/dd HH:mm')
+                                            .format(
+                                          DateTime.parse(event.date).add(
+                                            Duration(hours: 1),
+                                          ),
+                                        ),
+                                        icon: Icons.date_range,
+                                        color: getColorBasedOnDate(event.date),
+                                        iconColor:
+                                            getColorBasedOnDate(event.date),
+                                        backgroundColor:
+                                            getColorBasedOnDate(event.date)
+                                                .withAlpha(20),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
                           ),
