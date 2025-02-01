@@ -102,7 +102,7 @@ class __FormContentState extends State<_FormContent> {
             );
             break;
 
-          case 'error_password':
+          case 'error_password' || 'error_not_found':
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 backgroundColor: Theme.of(context).colorScheme.errorContainer,
