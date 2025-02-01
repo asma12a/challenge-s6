@@ -36,11 +36,62 @@ class SportStatLabelsService {
     }
   }
 
+  Future<List<SportStatLabels>> getMainStatLabelBySport(String sportId) async {
+    final token = await storage.read(key: Constants.jwtStorageToken);
+    try {
+      final Uri uri = Uri.parse(
+          '${Constants.apiBaseUrl}/api/sportstatlabels/$sportId/mainStat');
+
+      final response = await dio.get(
+        uri.toString(),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            "Authorization": "Bearer $token",
+          },
+        ),
+      );
+
+      final List<dynamic> sportStatLabels = response.data;
+      return sportStatLabels
+          .map((sportStat) => SportStatLabels.fromJson(sportStat))
+          .toList();
+    } catch (error) {
+      throw AppException(
+          message: 'Failed to retrieve main sport stat labels, please try again.');
+    }
+  }
+
+
   Future<List<UserStats>> getUserStatByEvent(String eventId, userId) async {
     final token = await storage.read(key: Constants.jwtStorageToken);
     try {
       final Uri uri = Uri.parse(
           '${Constants.apiBaseUrl}/api/sportstatlabels/$eventId/$userId/stats');
+
+      final response = await dio.get(
+        uri.toString(),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            "Authorization": "Bearer $token",
+          },
+        ),
+      );
+
+      final List<dynamic> userStats = response.data;
+      return userStats.map((userStat) => UserStats.fromJson(userStat)).toList();
+    } catch (error) {
+      throw AppException(
+          message: 'Failed to retrieve sport stat labels, please try again.');
+    }
+  }
+
+  Future<List<UserStats>> getAllTeamUserMainStatByEvent(String eventId) async {
+    final token = await storage.read(key: Constants.jwtStorageToken);
+    try {
+      final Uri uri = Uri.parse(
+          '${Constants.apiBaseUrl}/api/sportstatlabels/$eventId/stats');
 
       final response = await dio.get(
         uri.toString(),

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-
 	"github.com/asma12a/challenge-s6/ent"
 	"github.com/asma12a/challenge-s6/ent/schema/ulid"
 	"github.com/asma12a/challenge-s6/entity"
@@ -17,6 +16,8 @@ func SportStatLabelsHandler(app fiber.Router, ctx context.Context, serviceSportS
 	app.Post("/:eventId/addUserStat", middleware.IsEventOrganizerOrCoach(ctx, serviceEvent), addUserStat(ctx, serviceSportStatLables, serviceEvent, serviceUser, serviceNotification, rdb))
 	app.Post("/", middleware.IsAdminMiddleware, createSportStatLables(ctx, serviceSportStatLables, serviceSport))
 	app.Get("/:eventId/:userId/stats", middleware.IsAuthMiddleware, getUserStatsByEvent(ctx, serviceSportStatLables, serviceEvent, serviceUser))
+	app.Get("/:eventId/stats", middleware.IsAuthMiddleware, getAllTeamUserMainStatsByEvent(ctx, serviceSportStatLables, serviceEvent,))
+	app.Get("/:sportId/mainStat", middleware.IsAuthMiddleware, findMainStatLabelBySportID(ctx, serviceSportStatLables))
 	app.Get("/:sportId/:userId/performance", middleware.IsAuthMiddleware, getUserPerformanceBySport(ctx, serviceSportStatLables, serviceUser))
 	app.Get("/:sportId/labels", middleware.IsAuthMiddleware, listSportStatLabelsBySport(ctx, serviceSportStatLables))
 	app.Get("/:sportStatLabelId", middleware.IsAdminMiddleware, getSportStatLabel(ctx, serviceSportStatLables))
@@ -479,6 +480,80 @@ func getUserStatsByEvent(ctx context.Context, serviceSportStatLables service.Spo
 					IsMain: userStat.Edges.Stat.IsMain,
 				},
 				Value: userStat.StatValue,
+			}
+		}
+		return c.JSON(toJ)
+	}
+}
+
+func getAllTeamUserMainStatsByEvent(ctx context.Context, serviceSportStatLables service.SportStatLabels, serviceEvent service.Event) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		eventIDStr := c.Params("eventId")
+		eventID, err := ulid.Parse(eventIDStr)
+
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error parse event ID",
+				"error":  err.Error(),
+			})
+		}
+
+
+		event, err := serviceEvent.FindOne(ctx, eventID)
+		if err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+				"status": "error find event",
+				"error":  err.Error(),
+			})
+		}
+
+		userStats, err := serviceSportStatLables.GetAllTeamUserMainStatsByEventID(ctx, event.ID)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error get user stats",
+				"error":  err.Error(),
+			})
+		}
+
+		toJ := make([]presenter.UserStats, len(userStats))
+		for i, userStat := range userStats {
+			toJ[i] = presenter.UserStats{
+				User: &presenter.User{
+					ID: userStat.Edges.User.ID,
+				},
+				StatLabel: &presenter.SportStatLabels{
+					Label:  userStat.Edges.Stat.Label,
+				},
+				Value: userStat.StatValue,
+			}
+		}		
+		return c.JSON(toJ)
+	}
+}
+
+func findMainStatLabelBySportID(ctx context.Context, serviceSportStatLables service.SportStatLabels) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		sportIDStr := c.Params("sportId")
+		sportID, err := ulid.Parse(sportIDStr)
+
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error",
+				"error":  err.Error(),
+			})
+		}
+
+		sportStatLabels, err := serviceSportStatLables.FindMainStatLabelBySportID(ctx, sportID)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+				"status": "error find all",
+				"error":  err.Error(),
+			})
+		}
+		toJ := make([]presenter.SportStatLabels, len(sportStatLabels))
+		for i, sportStatLabel := range sportStatLabels {
+			toJ[i] = presenter.SportStatLabels{
+				Label:  sportStatLabel.Label,
 			}
 		}
 		return c.JSON(toJ)
