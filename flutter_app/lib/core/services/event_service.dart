@@ -161,9 +161,59 @@ class EventService {
 
       await initialCacheOptions.store!
           .delete('${Constants.apiBaseUrl}/api/events/user');
+      await createActionLog(token, event);
     } catch (error) {
       log.severe('An error occurred while ', {error: error});
       throw AppException(message: 'Failed to create event, please try again.');
+    }
+  }
+
+  Future<void> createActionLog(
+      String? token, Map<String, dynamic> event) async {
+    String userId = await _getUserId(token);
+
+    final actionLog = {
+      "userID": userId,
+      "action": "CREATE_EVENT",
+      "description": "Event créé avec titre: ${event['title']}"
+    };
+
+    try {
+      final Uri uri = Uri.parse('${Constants.apiBaseUrl}/api/actionlogs');
+
+      await dio.post(uri.toString(),
+          options: Options(headers: {
+            'Content-Type': 'application/json',
+            "Authorization": "Bearer $token",
+          }),
+          data: jsonEncode(actionLog));
+    } catch (error) {
+      log.severe('An error occurred while logging action', {error: error});
+    }
+  }
+
+  Future<String> _getUserId(String? token) async {
+    if (token != null) {
+      final uri = Uri.parse('${Constants.apiBaseUrl}/api/auth/me');
+      try {
+        final response = await dio.get(uri.toString(),
+            options: Options(headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            }));
+
+        if (response.data != null && response.data['id'] != null) {
+          return response.data['id'];
+        } else {
+          throw Exception('User ID not found');
+        }
+      } catch (error) {
+        log.severe(
+            'An error occurred while fetching user info', {error: error});
+        throw Exception('Failed to fetch user info');
+      }
+    } else {
+      throw Exception('Token is null');
     }
   }
 
