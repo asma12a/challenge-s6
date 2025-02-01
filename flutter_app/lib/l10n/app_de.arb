@@ -159,7 +159,11 @@
   "french": "Französisch",
   "english": "Englisch",
   "german": "Deutsch",
-  "spanish": "Spanisch"
+  "spanish": "Spanisch",
+  "event_incoming": "Aktuell",
+  "event_past": "Vergangenheit"
+
+
 
 
 

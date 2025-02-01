@@ -159,9 +159,8 @@
   "french": "Francés",
   "english": "Inglés",
   "german": "Alemán",
-  "spanish": "Español"
-
-
-
+  "spanish": "Español",
+  "event_incoming": "Actual",
+  "event_past": "Pasado"
 
 }
