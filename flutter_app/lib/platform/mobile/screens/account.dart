@@ -29,7 +29,6 @@ class _AccountScreenState extends State<AccountScreen> {
   int eventsCount = 0;
 
   List<Sport> userSports = [];
-  List<String> labelNotifs = ["Évenements recommandés", "Évenement 1jour avant", "Personne invité inscrite"];
 
   @override
   void initState() {

@@ -1,12 +1,14 @@
 // import 'package:squad_go/core/models/sport.dart';
 import 'package:squad_go/core/models/sport_stat_labels.dart';
+import 'package:squad_go/core/models/user.dart';
 
 class UserStats {
   final String? id;
   int value;
   final SportStatLabels? stat;
+  final User? user;
 
-  UserStats({this.id, required this.value, this.stat});
+  UserStats({this.id, required this.value, this.stat, this.user });
 
   factory UserStats.fromJson(Map<String, dynamic> json) {
     return UserStats(
@@ -15,6 +17,9 @@ class UserStats {
       stat: json['stat_label'] != null
           ? SportStatLabels.fromJson(json['stat_label'])
           : null,
+      user: json['user'] != null
+        ? User.fromJson(json['user'])
+          :null
     );
   }
 

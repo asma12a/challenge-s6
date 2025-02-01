@@ -8,14 +8,19 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:squad_go/core/utils/constants.dart';
 import 'package:squad_go/main.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 const apiBaseUrl = String.fromEnvironment('API_BASE_URL');
 const jwtStorageToken = String.fromEnvironment('JWT_STORAGE_KEY');
 
 class ChatPage extends StatefulWidget {
   final String eventID;
+  final Color? sportColor;
+  final bool isEventFinished;
 
-  const ChatPage({super.key, required this.eventID});
+
+  const ChatPage({super.key, required this.eventID, required this.isEventFinished, this.sportColor});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -28,14 +33,12 @@ class _ChatPageState extends State<ChatPage>
   final List<String> _messages = [];
   late AnimationController _animationController;
   String _currentUserId = '';
-  bool? _isEventFinished;
 
   final storage = const FlutterSecureStorage();
 
   @override
   void initState() {
     super.initState();
-    _checkEventStatus();
     _initializeChat();
 
     _animationController = AnimationController(
@@ -62,12 +65,7 @@ class _ChatPageState extends State<ChatPage>
     };
   }
 
-  Future<void> _checkEventStatus() async {
-    final isFinished = await isEventFinished();
-    setState(() {
-      _isEventFinished = isFinished;
-    });
-  }
+
 
   Future<void> _initializeChat() async {
     await _loadCurrentUser();
@@ -179,39 +177,18 @@ class _ChatPageState extends State<ChatPage>
     super.dispose();
   }
 
-  Future<bool> isEventFinished() async {
-    try {
-      final token = await storage.read(key: Constants.jwtStorageToken);
 
-      final uri = '${Constants.apiBaseUrl}/api/events/${widget.eventID}';
-      final response = await dio.get(
-        uri,
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token',
-          },
-        ),
-      );
-
-      final eventData = response.data;
-      final eventDate = DateTime.parse(eventData['date']);
-      return DateTime.now().isAfter(eventDate);
-    } catch (e) {
-      debugPrint('Erreur lors de la vérification de l\'événement : $e');
-      return false;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
+    final translate = AppLocalizations.of(context);
+
     var isOnline = context.watch<ConnectivityState>().isConnected;
 
-    if (_isEventFinished == true) {
+    if (widget.isEventFinished) {
       return Center(
         child: Text(
-          'Les messages sont désactivés car l’événement est terminé.',
-          style: TextStyle(color: Colors.grey, fontSize: 16),
+          translate?.chat_event_finished ?? 'Les messages sont désactivés car l’événement est terminé.',
           textAlign: TextAlign.center,
         ),
       );
@@ -234,9 +211,13 @@ class _ChatPageState extends State<ChatPage>
             margin: EdgeInsets.only(top: 16),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              color: Theme.of(context).colorScheme.primary.withValues(
-                    alpha: (Theme.of(context).colorScheme.primary.a * 0.03),
-                  ),
+              color: widget.sportColor
+                  ?.withValues(
+                  alpha: 0.03) ??
+                  Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withValues(alpha: 0.03)
             ),
             child: ListView.builder(
               padding: const EdgeInsets.all(8.0),

@@ -89,6 +89,10 @@ func (repo *SportStatLabels) FindBySportID(ctx context.Context, sportID ulid.ID)
 	return repo.db.SportStatLabels.Query().Where(sportstatlabels.HasSportWith(sport.IDEQ(sportID))).WithSport().All(ctx)
 }
 
+func (repo *SportStatLabels) FindMainStatLabelBySportID(ctx context.Context, eventID ulid.ID) ([]*ent.SportStatLabels, error) {
+	return repo.db.SportStatLabels.Query().Where(sportstatlabels.HasSportWith(sport.IDEQ(eventID)), sportstatlabels.IsMain(true)).WithSport().All(ctx)
+}
+
 func (repo *SportStatLabels) AddUserStat(ctx context.Context, eventID, userId ulid.ID, stats []struct {
 	StatID    ulid.ID `json:"stat_id" validate:"required"`
 	StatValue int     `json:"stat_value" validate:"gte=0"`
@@ -181,6 +185,10 @@ func (repo *SportStatLabels) Update(ctx context.Context, sportStatLabel *entity.
 
 func (repo *SportStatLabels) GetUserStatsByEventID(ctx context.Context, userId, eventID ulid.ID) ([]*ent.UserStats, error) {
 	return repo.db.UserStats.Query().Where(userstats.HasEventWith(event.IDEQ(eventID)), userstats.HasUserWith(user.IDEQ(userId))).WithStat().WithUser().All(ctx)
+}
+
+func (repo *SportStatLabels) GetAllTeamUserMainStatsByEventID(ctx context.Context, eventID ulid.ID) ([]*ent.UserStats, error) {
+	return repo.db.UserStats.Query().Where(userstats.HasEventWith(event.IDEQ(eventID)), userstats.HasStatWith(sportstatlabels.IsMain(true))).WithStat().WithUser().All(ctx)
 }
 
 func (repo *SportStatLabels) GetUserStatsBySportId(ctx context.Context, userId, sportID ulid.ID) ([]*ent.UserStats, error) {

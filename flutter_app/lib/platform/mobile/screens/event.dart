@@ -16,6 +16,7 @@ import 'package:provider/provider.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/map_location.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/offline.dart';
 import 'package:squad_go/platform/mobile/widgets/dialog/share_event.dart';
+import 'package:squad_go/platform/mobile/widgets/score.dart';
 import 'package:squad_go/platform/mobile/widgets/teams.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -57,7 +58,7 @@ class _EventScreenState extends State<EventScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() {
       setState(() {}); // Force le rebuild quand l'onglet change
     });
@@ -96,7 +97,7 @@ class _EventScreenState extends State<EventScreen>
     final translate = AppLocalizations.of(context);
     return SafeArea(
       child: Scaffold(
-        floatingActionButton: !isEventFinished && _tabController.index != 1
+        floatingActionButton: !isEventFinished && _tabController.index == 0
             ? FloatingActionButton(
                 shape: const CircleBorder(),
                 backgroundColor: event.sport.color?.withValues(alpha: 0.5) ??
@@ -305,7 +306,7 @@ class _EventScreenState extends State<EventScreen>
                                 right: 16,
                               ),
                               child: DefaultTabController(
-                                length: 2,
+                                length: 3,
                                 child: Column(
                                   children: [
                                     Container(
@@ -347,6 +348,12 @@ class _EventScreenState extends State<EventScreen>
                                           Tab(
                                             child: Text(
                                               'Chat',
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          Tab(
+                                            child: Text(
+                                              translate?.live_score ?? 'Live Score',
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
@@ -398,6 +405,18 @@ class _EventScreenState extends State<EventScreen>
                                           ),
                                           ChatPage(
                                             eventID: event.id ?? '',
+                                            sportColor: event.sport.color,
+                                            isEventFinished: isEventFinished,
+                                          ),
+                                          Container(
+                                            child: event.id != null ?
+                                            Score(
+                                              teams: event.teams ?? [],
+                                              eventId: event.id!,
+                                              sportId: event.sport.id,
+                                              isEventNowPlaying: isEventToday,
+                                              isEventFinished: isEventFinished,
+                                            ): null,
                                           ),
                                         ],
                                       ),
