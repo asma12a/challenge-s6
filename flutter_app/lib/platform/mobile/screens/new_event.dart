@@ -165,7 +165,6 @@ class _NewEventState extends State<NewEvent> {
         };
         await eventService.createEvent(newEvent);
         ScaffoldMessenger.of(context).clearSnackBars();
-
         // Afficher le Snackbar
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -178,7 +177,12 @@ class _NewEventState extends State<NewEvent> {
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );
-        context.go('/home');
+
+        // Attendre avant de naviguer
+        Future.delayed(const Duration(seconds: 1), () {
+          context.go('/home');
+        });
+
       } on AppException catch (error) {
         debugPrint(error.message);
         ScaffoldMessenger.of(context).clearSnackBars();
@@ -195,9 +199,7 @@ class _NewEventState extends State<NewEvent> {
         );
       }
     }
-  }
-
-  @override
+  }  @override
   Widget build(BuildContext context) {
     final translate = AppLocalizations.of(context);
 
