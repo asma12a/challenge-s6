@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

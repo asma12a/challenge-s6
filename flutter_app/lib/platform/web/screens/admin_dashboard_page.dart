@@ -40,7 +40,8 @@ class AdminDashboardPage extends StatelessWidget {
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Erreur: ${snapshot.error}'));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text('Aucun utilisateur trouvé.'));
+                    return const Center(
+                        child: Text('Aucun utilisateur trouvé.'));
                   } else {
                     final List<UserApp> users = snapshot.data!;
                     final userCount = users.length;
@@ -68,7 +69,8 @@ class AdminDashboardPage extends StatelessWidget {
                                 icon: Icons.event,
                                 label: 'Événements',
                                 value: eventSnapshot.data ?? 0,
-                                color: Theme.of(context).primaryColorLight, // Teal ici
+                                color: Theme.of(context)
+                                    .primaryColorLight, // Teal ici
                               );
                             },
                           ),
