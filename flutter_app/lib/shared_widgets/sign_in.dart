@@ -1,13 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:squad_go/core/providers/auth_state_provider.dart';
+import 'package:squad_go/platform/web/screens/home.dart';
 import 'package:squad_go/shared_widgets/sign_up.dart';
 import 'package:squad_go/platform/mobile/widgets/logo.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter/foundation.dart';
 
-class SignInScreen extends StatelessWidget {
+class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
+
+  @override
+  State<SignInScreen> createState() => _SignInScreenState();
+}
+
+class _SignInScreenState extends State<SignInScreen> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if(kIsWeb) {
+      _attemptLogin();
+    }
+  }
+
+  void _attemptLogin() async {
+    final authState = context.read<AuthState>();
+    bool isLoggedIn = await authState.tryLogin();
+    if (isLoggedIn) {
+      print("L'utilisateur est connecté !");
+    } else {
+      print("Aucun utilisateur trouvé.");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +159,15 @@ class __FormContentState extends State<_FormContent> {
             break;
 
           default:
-            context.go('/home');
+            if (kIsWeb) {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (ctx) => const WebHomeScreen(),
+                ),
+              );
+            } else {
+              context.go('/home');
+            }
         }
       }
     } catch (e) {
