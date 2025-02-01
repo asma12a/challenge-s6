@@ -37,7 +37,7 @@
   "player": "Player",
   "coach": "Coach",
   "teams": "Teams",
-  "add_player": "Add a participant",
+  "add_player": "Add player",
   "new_team": "New team",
   "edit_event": "Edit: {name}",
   "@edit_event": {
@@ -160,11 +160,8 @@
   "english": "English",
   "german": "German",
   "spanish": "Spanish",
-  "live_score": "Live score",
-   "score": "Score",
-   "players": "Players",
-   "event_not_started": "Come back when the event has started",
-   "chat_event_finished": "Messages are disabled because the event has ended"
+  "event_incoming": "Current",
+  "event_past": "Past"
 
 
 

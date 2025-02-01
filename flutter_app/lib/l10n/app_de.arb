@@ -36,7 +36,7 @@
   "player": "Spieler",
   "coach": "Trainer",
   "teams": "Teams",
-  "add_player": "Einen Teilnehmer hinzufügen",
+  "add_player": "Spieler hinzufügen",
   "new_team": "Neues Team",
   "edit_event": "Bearbeiten: {name}",
   "@edit_event": {
@@ -160,11 +160,8 @@
   "english": "Englisch",
   "german": "Deutsch",
   "spanish": "Spanisch",
-  "live_score": "Live-Ergebnis",
-  "score": "Punktestand",
-  "players": "Spieler",
-  "event_not_started": "Komm zurück, wenn das Event begonnen hat",
-  "chat_event_finished": "Nachrichten sind deaktiviert, da die Veranstaltung beendet ist"
+  "event_incoming": "Aktuell",
+  "event_past": "Vergangenheit"
 
 
 
