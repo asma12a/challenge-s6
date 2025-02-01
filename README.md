@@ -44,20 +44,21 @@ Développée avec **Flutter** pour le frontend et **Golang** pour le backend, l'
 ### 4. **Profil utilisateur**
 
 - **Modification des informations personnelles** : Les utilisateurs peuvent mettre à jour leurs données personnelles.
-- **Visualisation des événements liés à l'utilisateur** : Permet de voir tous les événements auxquels l'utilisateur participe ou qu'il a créés.
+- **Visualisation des événements liés à l'utilisateur** : Permet de voir tous les événements auxquels l'utilisateur participe ou qu'il a créés avec un filtre (Passés/Actuels).
 - **Suivi des performances** : Visualisation des performances de l'utilisateur par sport (ex. : nombre de buts marqués, etc.).
 
 ### 5. **Gestion des événements**
 
 - **Création d'événements sportifs** : L'utilisateur peut créer un événement sportif parmi quatre types de sports par défaut : Football, Basketball, Tennis, Running.
-- **Rejoindre un événement** : Possibilité de rejoindre un événement existant via un code d'événement ou directement à partir de la page d'événements.
+- **Rejoindre un événement** : Possibilité de rejoindre un événement existant via un code d'événement ou directement à partir de la page d'événements (uniquement les évenements dans le future).
 - **Rôles dans l'événement** :
-  - **Joueur classique** : Participant standard.
-  - **Coach** : Peut noter les participants (uniquement le jour de l'événement) sur la base des statistiques (ex. : buts marqués en football). Le coach peut également créer des équipes et ajouter des joueurs.
-  - **Organisateur** : Peut modifier les informations de l'événement, créer des équipes et gérer les joueurs au sein des équipes (ajouter via e-mail, changer de rôle, ou supprimer).
+  - **Joueur classique** : Participant standard, peut visualiser les performances globales des joueurs sur le sport de l'événement.
+  - **Coach** : Peut noter les joueurs :bar_chart: (uniquement le jour de l'événement) sur la base des statistiques (ex. : buts marqués en football). Le coach peut également créer des équipes et ajouter des joueurs.
+  - **Organisateur** : Peut modifier les informations de l'événement, créer des équipes et gérer les participants au sein des équipes (ajouter via e-mail, changer de rôle, ou supprimer).
 - **Invitation des joueurs** : Les organisateurs peuvent inviter des joueurs à rejoindre un événement, même s'ils ne sont pas inscrits à l'application. Après l'inscription, leurs vrais prénoms apparaissent dans l'équipe.
 - **Partage du code d'événement** : Permet de partager un code pour inviter des amis à rejoindre un événement.
 - **Chat par événement** : Permet de discuter avec tous les participants d'un événement.
+- **Live score** : Permet de suivre en temps réel l'évolution des scores des équipes et des performances des joueurs, **grâce aux notations du coach**. À la fin de l'événement, l'équipe gagnante est mise en avant.
 - **Affichage carte** : Permet de visualiser la position géographique de l'événement en cliquant sur l'adresse (écran détail événement).
 
 ### 6. **Notifications**
@@ -120,7 +121,7 @@ Vous pouvez accéder à l'api à l'adresse suivante : [https://challenge-s6-1.on
 
 3. Exécutez l'émulateur avec la commande suivante :
    ```bash
-   flutter run --dart-define=API_BASE_URL=https://challenge-s6-1.onrender.com/ --dart-define=JWT_STORAGE_KEY=squadgo-jwt
+   flutter run --dart-define=API_BASE_URL=https://challenge-s6-1.onrender.com --dart-define=JWT_STORAGE_KEY=squadgo-jwt
    ```
 
 ## 🚀 Backend : Golang
