@@ -8,21 +8,27 @@ const jwtStorageToken = String.fromEnvironment('JWT_STORAGE_KEY');
 class LogService {
   static Future<List<Map<String, dynamic>>> getLogs() async {
     final storage = const FlutterSecureStorage();
-
     final token = await storage.read(key: jwtStorageToken);
-
     final uri = '$apiBaseUrl/api/actionlogs';
-    final response = await dio.get(
-      uri.toString(),
-      options: Options(
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      ),
-    );
 
-    final List<dynamic> data = response.data;
-    return List<Map<String, dynamic>>.from(data);
+    try {
+      final response = await dio.get(
+        uri,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+      // Vérification de la structure de la réponse
+      if (response.data is List) {
+        return List<Map<String, dynamic>>.from(response.data);
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
   }
 }

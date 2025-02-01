@@ -30,6 +30,7 @@ class _AdminLogsPageState extends State<AdminLogsPage> {
         });
       }
     } catch (e) {
+      debugPrint("POURQII $e");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erreur: $e')),
